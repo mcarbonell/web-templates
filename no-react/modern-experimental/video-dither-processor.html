@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Dither Processor | Experimental VFX</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030303;
+            --accent: #00ffaa;
+            --accent-soft: rgba(0, 255, 170, 0.1);
+            --panel: rgba(15, 15, 15, 0.9);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-dim: #777777;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'JetBrains+Mono', monospace;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- Sidebar UI --- */
+        #aside-ui {
+            width: 380px;
+            background: var(--panel);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .control-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            border-bottom: 1px solid var(--accent-soft);
+            padding-bottom: 0.5rem;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .btn-mode {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.8rem;
+            text-align: left;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-mode:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-dim);
+        }
+
+        .btn-mode.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+            font-weight: 700;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            appearance: none;
+            outline: none;
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        /* --- Main Viewport --- */
+        #viewport {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image:
+                radial-gradient(circle at 50% 50%, #111 0%, #000 100%),
+                repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 100px),
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 100px);
+            padding: 2rem;
+        }
+
+        .canvas-container {
+            position: relative;
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border);
+            line-height: 0;
+            background: #000;
+        }
+
+        #main-canvas {
+            max-width: 100%;
+            max-height: 80vh;
+            image-rendering: pixelated;
+        }
+
+        /* --- Debug Elements --- */
+        #source-thumb {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            width: 160px;
+            border: 1px solid var(--border);
+            background: #000;
+            padding: 4px;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+        }
+
+        .stats {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-size: 0.7rem;
+            color: var(--accent);
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+            gap: 0.2rem;
+        }
+
+        /* Scanlines Effect Overlay */
+        .scanlines {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(to bottom,
+                    rgba(0, 0, 0, 0.1) 50%,
+                    rgba(0, 0, 0, 0.2) 50%);
+            background-size: 100% 4px;
+            z-index: 5;
+            opacity: 0.3;
+        }
+
+        .glitch-btn {
+            margin-top: auto;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 1rem;
+            font-family: 'JetBrains+Mono';
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .glitch-btn:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-soft);
+        }
+
+        #loading {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 1s ease;
+        }
+
+        .loader-text {
+            color: var(--accent);
+            font-size: 0.9rem;
+            letter-spacing: 0.5em;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loading">
+        <div class="loader-text">INITIALIZING_CORE</div>
+    </div>
+
+    <aside id="aside-ui">
+        <div class="header">
+            <h1>DITHER_ENGINE</h1>
+            <p>Video Processing Unit // v1.0</p>
+        </div>
+
+        <div class="control-section">
+            <span class="section-label">Source Feed</span>
+            <button class="btn-mode active" id="btn-browse"
+                style="justify-content: center; background: var(--accent-soft); border-color: var(--accent);">LOAD_LOCAL_VIDEO</button>
+            <input type="file" id="file-input" accept="video/*" style="display: none;">
+            <p style="font-size: 10px; color: var(--accent); margin-top: 5px; text-align: center;">Required for file://
+                security</p>
+        </div>
+
+        <div class="control-section">
+            <span class="section-label">Source Algorithm</span>
+            <div class="algorithm-grid">
+                <button class="btn-mode active" data-mode="bayer">Bayer 8x8 (Classic)</button>
+                <button class="btn-mode" data-mode="floyd">Floyd-Steinberg</button>
+                <button class="btn-mode" data-mode="atkinson">Atkinson (Mac Classic)</button>
+                <button class="btn-mode" data-mode="stochastic">Stochastic Noise</button>
+                <button class="btn-mode" data-mode="binary">Pure Binary</button>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <span class="section-label">Render Parameters</span>
+            <div class="slider-group">
+                <div class="slider-label"><span>Resolution Scale</span><span id="val-res">1x</span></div>
+                <input type="range" id="input-scale" min="1" max="8" value="2" step="1">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Contrast</span><span id="val-cnt">1.0</span></div>
+                <input type="range" id="input-contrast" min="0.5" max="3" value="1.5" step="0.1">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Brightness</span><span id="val-brt">1.0</span></div>
+                <input type="range" id="input-brightness" min="0.5" max="2" value="1.1" step="0.05">
+            </div>
+        </div>
+
+        <div class="control-section">
+            <span class="section-label">Playback</span>
+            <button class="btn-mode" id="btn-toggle-video">PAUSE / PLAY</button>
+        </div>
+
+        <button class="glitch-btn" onclick="window.location.reload()">RELOAD_KERNELS</button>
+    </aside>
+
+    <main id="viewport">
+        <div class="canvas-container">
+            <div class="scanlines"></div>
+            <canvas id="main-canvas"></canvas>
+        </div>
+
+        <div class="stats">
+            <span>FPS: <span id="fps">00</span></span>
+            <span>PROC_TIME: <span id="pt">0.0</span>ms</span>
+            <span>DATA_STREAM: ACTIVE</span>
+        </div>
+
+        <div id="source-thumb">
+            <video id="video-source" loop muted playsinline>
+                <source src="../../videos/earth_MP4_480_1_5MG.mp4" type="video/mp4">
+            </video>
+            <div style="font-size: 8px; color: var(--text-dim); margin-top: 4px; text-align: center;">RAW_SOURCE_FEED
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const video = document.getElementById('video-source');
+        const mainCanvas = document.getElementById('main-canvas');
+        const mainCtx = mainCanvas.getContext('2d', { alpha: false });
+
+        // Processing buffers
+        const bufferCanvas = document.createElement('canvas');
+        const bufferCtx = bufferCanvas.getContext('2d', { willReadFrequently: true });
+
+        // UI Elements
+        const fpsEl = document.getElementById('fps');
+        const ptEl = document.getElementById('pt');
+        const resEl = document.getElementById('val-res');
+        const cntEl = document.getElementById('val-cnt');
+        const brtEl = document.getElementById('val-brt');
+
+        // Params
+        let activeMode = 'bayer';
+        let renderScale = 2; // 1 = full, 2 = half...
+        let contrast = 1.5;
+        let brightness = 1.1;
+        let isPlaying = false;
+
+        // Bayer Matrix 8x8
+        const bayer8x8 = [
+            [0, 32, 8, 40, 2, 34, 10, 42],
+            [48, 16, 56, 24, 50, 18, 58, 26],
+            [12, 44, 4, 36, 14, 46, 6, 38],
+            [60, 28, 52, 20, 62, 30, 54, 22],
+            [3, 35, 11, 43, 1, 33, 9, 41],
+            [51, 19, 59, 27, 49, 17, 57, 25],
+            [15, 47, 7, 39, 13, 45, 5, 37],
+            [63, 31, 55, 23, 61, 29, 53, 21]
+        ].map(row => row.map(v => v / 64));
+
+        function init() {
+            // File Handling for local security bypass
+            const btnBrowse = document.getElementById('btn-browse');
+            const fileInput = document.getElementById('file-input');
+
+            btnBrowse.addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const url = URL.createObjectURL(file);
+                    video.src = url;
+                    video.load();
+                    video.play();
+                }
+            });
+
+            video.addEventListener('loadedmetadata', () => {
+                const w = video.videoWidth;
+                const h = video.videoHeight;
+
+                updateResolution(w, h);
+
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(() => document.getElementById('loading').remove(), 1000);
+
+                video.play();
+                isPlaying = true;
+                requestAnimationFrame(processFrame);
+            });
+
+            // UI Listeners
+            document.querySelectorAll('.btn-mode').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const mode = btn.dataset.mode;
+                    if (mode) {
+                        document.querySelector('.btn-mode.active').classList.remove('active');
+                        btn.classList.add('active');
+                        activeMode = mode;
+                    }
+                });
+            });
+
+            document.getElementById('btn-toggle-video').addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                    isPlaying = true;
+                } else {
+                    video.pause();
+                    isPlaying = false;
+                }
+            });
+
+            document.getElementById('input-scale').oninput = (e) => {
+                renderScale = parseInt(e.target.value);
+                resEl.innerText = (1 / renderScale).toFixed(2) + 'x';
+                updateResolution(video.videoWidth, video.videoHeight);
+            };
+
+            document.getElementById('input-contrast').oninput = (e) => {
+                contrast = parseFloat(e.target.value);
+                cntEl.innerText = contrast.toFixed(1);
+            };
+
+            document.getElementById('input-brightness').oninput = (e) => {
+                brightness = parseFloat(e.target.value);
+                brtEl.innerText = brightness.toFixed(2);
+            };
+        }
+
+        function updateResolution(w, h) {
+            const rw = Math.floor(w / renderScale);
+            const rh = Math.floor(h / renderScale);
+
+            bufferCanvas.width = rw;
+            bufferCanvas.height = rh;
+
+            mainCanvas.width = rw;
+            mainCanvas.height = rh;
+
+            // Adjust visual size for pixelated look
+            mainCanvas.style.width = (rw * renderScale) + 'px';
+            mainCanvas.style.height = (rh * renderScale) + 'px';
+        }
+
+        let lastTime = 0;
+        let frames = 0;
+        let fpsLastUpdate = 0;
+
+        function processFrame(time) {
+            if (!isPlaying && video.paused) {
+                requestAnimationFrame(processFrame);
+                return;
+            }
+
+            const startTime = performance.now();
+
+            // 1. Draw video to buffer
+            bufferCtx.drawImage(video, 0, 0, bufferCanvas.width, bufferCanvas.height);
+
+            // 2. Get pixel data
+            const imgData = bufferCtx.getImageData(0, 0, bufferCanvas.width, bufferCanvas.height);
+            const data = imgData.data;
+            const w = bufferCanvas.width;
+            const h = bufferCanvas.height;
+
+            // 3. Process
+            if (activeMode === 'bayer') {
+                applyBayer(data, w, h);
+            } else if (activeMode === 'floyd') {
+                applyFloydSteinberg(data, w, h);
+            } else if (activeMode === 'atkinson') {
+                applyAtkinson(data, w, h);
+            } else if (activeMode === 'stochastic') {
+                applyStochastic(data, w, h);
+            } else {
+                applyBinary(data, w, h);
+            }
+
+            // 4. Render
+            mainCtx.putImageData(imgData, 0, 0);
+
+            // Metrics
+            const endTime = performance.now();
+            ptEl.innerText = (endTime - startTime).toFixed(1);
+
+            frames++;
+            if (time > fpsLastUpdate + 1000) {
+                fpsEl.innerText = frames;
+                frames = 0;
+                fpsLastUpdate = time;
+            }
+
+            requestAnimationFrame(processFrame);
+        }
+
+        // --- Algorithms ---
+
+        // Helpers
+        function getLuminance(r, g, b) {
+            // Apply contrast and brightness
+            let lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            lum = ((lum - 0.5) * contrast) + 0.5; // Contrast
+            lum *= brightness; // Brightness
+            return Math.max(0, Math.min(1, lum));
+        }
+
+        function applyBayer(data, w, h) {
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const idx = (y * w + x) * 4;
+                    const lum = getLuminance(data[idx], data[idx + 1], data[idx + 2]);
+                    const threshold = bayer8x8[y % 8][x % 8];
+                    const val = lum > threshold ? 255 : 0;
+                    data[idx] = data[idx + 1] = data[idx + 2] = val;
+                }
+            }
+        }
+
+        function applyStochastic(data, w, h) {
+            for (let i = 0; i < data.length; i += 4) {
+                const lum = getLuminance(data[i], data[i + 1], data[i + 2]);
+                const val = lum > Math.random() ? 255 : 0;
+                data[i] = data[i + 1] = data[i + 2] = val;
+            }
+        }
+
+        function applyBinary(data, w, h) {
+            for (let i = 0; i < data.length; i += 4) {
+                const lum = getLuminance(data[i], data[i + 1], data[i + 2]);
+                const val = lum > 0.5 ? 255 : 0;
+                data[i] = data[i + 1] = data[i + 2] = val;
+            }
+        }
+
+        function applyFloydSteinberg(data, w, h) {
+            // Floyd requires working on a float array for error diffusion
+            const grey = new Float32Array(w * h);
+            for (let i = 0; i < w * h; i++) {
+                grey[i] = getLuminance(data[i * 4], data[i * 4 + 1], data[i * 4 + 2]);
+            }
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const i = y * w + x;
+                    const oldP = grey[i];
+                    const newP = oldP > 0.5 ? 1 : 0;
+                    const error = oldP - newP;
+                    grey[i] = newP;
+
+                    // Distribute error
+                    if (x + 1 < w) grey[i + 1] += error * 7 / 16;
+                    if (y + 1 < h) {
+                        if (x > 0) grey[i + w - 1] += error * 3 / 16;
+                        grey[i + w] += error * 5 / 16;
+                        if (x + 1 < w) grey[i + w + 1] += error * 1 / 16;
+                    }
+                }
+            }
+
+            for (let i = 0; i < w * h; i++) {
+                const v = grey[i] > 0.5 ? 255 : 0;
+                data[i * 4] = data[i * 4 + 1] = data[i * 4 + 2] = v;
+            }
+        }
+
+        function applyAtkinson(data, w, h) {
+            const grey = new Float32Array(w * h);
+            for (let i = 0; i < w * h; i++) {
+                grey[i] = getLuminance(data[i * 4], data[i * 4 + 1], data[i * 4 + 2]);
+            }
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const i = y * w + x;
+                    const oldP = grey[i];
+                    const newP = oldP > 0.5 ? 1 : 0;
+                    const error = (oldP - newP) / 8;
+                    grey[i] = newP;
+
+                    // Atkinson distribution
+                    if (x + 1 < w) grey[i + 1] += error;
+                    if (x + 2 < w) grey[i + 2] += error;
+                    if (y + 1 < h) {
+                        if (x > 0) grey[i + w - 1] += error;
+                        grey[i + w] += error;
+                        if (x + 1 < w) grey[i + w + 1] += error;
+                        if (y + 2 < h) grey[i + 2 * w] += error;
+                    }
+                }
+            }
+
+            for (let i = 0; i < w * h; i++) {
+                const v = grey[i] > 0.5 ? 255 : 0;
+                data[i * 4] = data[i * 4 + 1] = data[i * 4 + 2] = v;
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

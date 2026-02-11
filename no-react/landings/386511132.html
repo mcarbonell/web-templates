@@ -1,0 +1,1128 @@
+<!--
+  LANDING PAGE - SEED: 386511132
+  
+  DESIGN DECOMPOSITION:
+  ======================
+  Digit 1 (3): Primary Color → Teal/Cyan family (HSL ~180°)
+  Digit 2 (8): Accent Intensity → High contrast coral/orange accents
+  Digit 3 (6): Typography → Geometric sans-serif (Outfit font)
+  Digit 4 (5): Layout → Asymmetric with diagonal elements
+  Digit 5 (1): Animation → Minimal, subtle transitions
+  Digit 6 (1): Border Radius → Sharp, angular (4px max)
+  Digit 7 (1): Shadows → Light, crisp shadows
+  Digit 8 (3): Grid → 3-column layouts
+  Digit 9 (2): Spacing → Compact, tight rhythm
+  
+  RESULTING STYLE: Sharp geometric aesthetic with teal/coral palette,
+  diagonal accent lines, minimal animations, and angular shapes.
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertex — Design Innovation Platform</title>
+    <meta name="description"
+        content="Transform your creative vision into reality with Vertex's cutting-edge design platform.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <style>
+        /* DESIGN SYSTEM - Based on seed decomposition */
+        :root {
+            /* Digit 3 → Teal primary */
+            --primary: #0d9488;
+            --primary-light: #14b8a6;
+            --primary-dark: #0f766e;
+            /* Digit 8 → High contrast coral accent */
+            --accent: #f97316;
+            --accent-light: #fb923c;
+            /* Light theme */
+            --bg: #fafafa;
+            --bg-alt: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            /* Digit 1 → Sharp shadows */
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+            /* Digit 6 → Angular radius */
+            --radius: 4px;
+            /* Digit 2 → Compact spacing */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2.5rem;
+            --space-xl: 4rem;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-alt: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Digit 5 → Diagonal accent element */
+        .diagonal-accent {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            transform: skewY(-6deg);
+            transform-origin: top left;
+            z-index: -1;
+        }
+
+        /* NAVIGATION */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-alt);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-md);
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--space-sm);
+            align-items: center;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        .btn-accent:hover {
+            background: var(--accent-light);
+        }
+
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: var(--text);
+            transition: 0.3s;
+        }
+
+        /* HERO - Digit 5: Asymmetric layout */
+        .hero {
+            min-height: 100vh;
+            padding: calc(80px + var(--space-xl)) var(--space-md) var(--space-xl);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero .diagonal-accent {
+            top: -20%;
+            opacity: 0.05;
+        }
+
+        .hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            align-items: center;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: var(--space-sm);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: var(--space-md);
+        }
+
+        .hero h1 .highlight {
+            color: var(--primary);
+            position: relative;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: var(--space-lg);
+            max-width: 500px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        /* Geometric visual - Digit 6: Angular shapes */
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .geo-container {
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 1;
+            position: relative;
+        }
+
+        .geo-shape {
+            position: absolute;
+            background: var(--primary);
+            opacity: 0.9;
+        }
+
+        .geo-1 {
+            width: 60%;
+            height: 60%;
+            top: 20%;
+            left: 20%;
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+        }
+
+        .geo-2 {
+            width: 35%;
+            height: 35%;
+            top: 0;
+            right: 10%;
+            background: var(--accent);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .geo-3 {
+            width: 25%;
+            height: 25%;
+            bottom: 10%;
+            left: 5%;
+            background: var(--primary-light);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            animation: float 5s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        /* SECTIONS */
+        section {
+            padding: var(--space-xl) var(--space-md);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto var(--space-xl);
+        }
+
+        .section-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: var(--space-sm);
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* FEATURES - Digit 8: 3-column grid */
+        .features {
+            background: var(--bg-alt);
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+        }
+
+        .feature-card {
+            padding: var(--space-lg);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* STATS */
+        .stats {
+            background: var(--primary);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -100%;
+            left: -50%;
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 40px,
+                    rgba(255, 255, 255, 0.03) 40px,
+                    rgba(255, 255, 255, 0.03) 80px);
+        }
+
+        .stats-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            text-align: center;
+            position: relative;
+        }
+
+        .stat h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        .stat p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        /* SHOWCASE */
+        .showcase-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+        }
+
+        .showcase-card {
+            position: relative;
+            aspect-ratio: 4/3;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+        }
+
+        .showcase-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .showcase-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: var(--space-md);
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .showcase-card:hover .showcase-overlay {
+            opacity: 1;
+        }
+
+        .showcase-overlay h4 {
+            font-size: 1.1rem;
+        }
+
+        .showcase-overlay p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* TESTIMONIALS */
+        .testimonials {
+            background: var(--bg-alt);
+        }
+
+        .testimonials-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+        }
+
+        .testimonial-card {
+            padding: var(--space-lg);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .testimonial-card p {
+            font-size: 1rem;
+            margin-bottom: var(--space-md);
+            color: var(--text-muted);
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .testimonial-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .testimonial-info strong {
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .testimonial-info span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* PRICING */
+        .pricing-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+        }
+
+        .price-card {
+            padding: var(--space-lg);
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .price-card.featured {
+            border-color: var(--primary);
+            position: relative;
+        }
+
+        .price-card.featured::before {
+            content: 'Popular';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .price-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: var(--space-sm) 0;
+        }
+
+        .price-amount span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .price-features {
+            list-style: none;
+            margin: var(--space-md) 0;
+            text-align: left;
+        }
+
+        .price-features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .price-features li::before {
+            content: '✓';
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* CTA */
+        .cta {
+            background: var(--bg-alt);
+            text-align: center;
+        }
+
+        .cta-box {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            background: var(--primary);
+            border-radius: var(--radius);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -150px;
+            right: -100px;
+        }
+
+        .cta-box h2 {
+            font-size: 2rem;
+            margin-bottom: var(--space-sm);
+            position: relative;
+        }
+
+        .cta-box p {
+            opacity: 0.9;
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+
+        .cta-box .btn-accent {
+            background: white;
+            color: var(--primary);
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--bg-alt);
+            border-top: 1px solid var(--border);
+            padding: var(--space-xl) var(--space-md) var(--space-md);
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: var(--space-xl);
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            margin-top: var(--space-sm);
+            font-size: 0.95rem;
+        }
+
+        .footer-col h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-sm);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-col a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .footer-col a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: var(--space-lg) auto 0;
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .social-links {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hero-inner {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-cta {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                order: -1;
+                margin-bottom: var(--space-lg);
+            }
+
+            .geo-container {
+                max-width: 300px;
+            }
+
+            .features-grid,
+            .showcase-grid,
+            .testimonials-grid,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon"></div>Vertex
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#showcase">Work</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+                <a href="#" class="btn btn-primary">Get Started</a>
+                <button class="hamburger" id="menuToggle" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="diagonal-accent"></div>
+        <div class="hero-inner">
+            <div class="hero-content" data-aos="fade-right">
+                <span class="hero-tag">◆ Next-Gen Design Platform</span>
+                <h1>Create <span class="highlight">stunning</span> digital experiences</h1>
+                <p>Vertex empowers creators with powerful tools to design, prototype, and ship beautiful products faster
+                    than ever.</p>
+                <div class="hero-cta">
+                    <a href="#" class="btn btn-primary">Start Free Trial →</a>
+                    <a href="#" class="btn btn-outline">Watch Demo</a>
+                </div>
+            </div>
+            <div class="hero-visual" data-aos="fade-left">
+                <div class="geo-container">
+                    <div class="geo-shape geo-1"></div>
+                    <div class="geo-shape geo-2"></div>
+                    <div class="geo-shape geo-3"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <div class="section-header" data-aos="fade-up">
+            <h2>Powerful Features</h2>
+            <p>Everything you need to bring your ideas to life with precision and speed.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+                <div class="feature-icon">⚡</div>
+                <h3>Lightning Fast</h3>
+                <p>Optimized performance that keeps up with your creativity. No lag, no waiting.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-icon">🎨</div>
+                <h3>Smart Design</h3>
+                <p>AI-powered suggestions that help you make better design decisions instantly.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-icon">🔗</div>
+                <h3>Seamless Sync</h3>
+                <p>Real-time collaboration with your team, no matter where they are.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-icon">📦</div>
+                <h3>Component Library</h3>
+                <p>Thousands of ready-to-use components to accelerate your workflow.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-icon">🔒</div>
+                <h3>Enterprise Security</h3>
+                <p>Bank-grade encryption and compliance for peace of mind.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-icon">📱</div>
+                <h3>Responsive Export</h3>
+                <p>Export designs optimized for any screen size automatically.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats">
+        <div class="stats-grid" data-aos="zoom-in">
+            <div class="stat">
+                <h3>50K+</h3>
+                <p>Active Users</p>
+            </div>
+            <div class="stat">
+                <h3>2M+</h3>
+                <p>Projects Created</p>
+            </div>
+            <div class="stat">
+                <h3>99.9%</h3>
+                <p>Uptime</p>
+            </div>
+            <div class="stat">
+                <h3>4.9★</h3>
+                <p>User Rating</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SHOWCASE -->
+    <section class="showcase" id="showcase">
+        <div class="section-header" data-aos="fade-up">
+            <h2>Featured Work</h2>
+            <p>See what our community has built with Vertex.</p>
+        </div>
+        <div class="showcase-grid">
+            <div class="showcase-card" data-aos="fade-up">
+                <div style="background:linear-gradient(135deg,#0d9488,#14b8a6);height:100%"></div>
+                <div class="showcase-overlay">
+                    <h4>Finance Dashboard</h4>
+                    <p>Modern analytics interface</p>
+                </div>
+            </div>
+            <div class="showcase-card" data-aos="fade-up" data-aos-delay="100">
+                <div style="background:linear-gradient(135deg,#f97316,#fb923c);height:100%"></div>
+                <div class="showcase-overlay">
+                    <h4>E-Commerce App</h4>
+                    <p>Seamless shopping experience</p>
+                </div>
+            </div>
+            <div class="showcase-card" data-aos="fade-up" data-aos-delay="200">
+                <div style="background:linear-gradient(135deg,#0f766e,#0d9488);height:100%"></div>
+                <div class="showcase-overlay">
+                    <h4>Social Platform</h4>
+                    <p>Community-first design</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials">
+        <div class="section-header" data-aos="fade-up">
+            <h2>Loved by Creators</h2>
+            <p>Join thousands of designers who trust Vertex.</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card" data-aos="fade-up">
+                <p>"Vertex transformed our design workflow. We ship 3x faster now."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">JD</div>
+                    <div class="testimonial-info"><strong>Jane Doe</strong><span>Design Lead, TechCorp</span></div>
+                </div>
+            </div>
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+                <p>"The component library alone saved us hundreds of hours."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">MS</div>
+                    <div class="testimonial-info"><strong>Mike Smith</strong><span>Founder, StartupXYZ</span></div>
+                </div>
+            </div>
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+                <p>"Best design tool I've ever used. Period."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">AL</div>
+                    <div class="testimonial-info"><strong>Anna Lee</strong><span>Freelance Designer</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="pricing" id="pricing">
+        <div class="section-header" data-aos="fade-up">
+            <h2>Simple Pricing</h2>
+            <p>Start free, scale as you grow.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="price-card" data-aos="fade-up">
+                <h3>Starter</h3>
+                <div class="price-amount">$0<span>/mo</span></div>
+                <ul class="price-features">
+                    <li>3 Projects</li>
+                    <li>Basic Components</li>
+                    <li>Community Support</li>
+                </ul>
+                <a href="#" class="btn btn-outline" style="width:100%;justify-content:center">Get Started</a>
+            </div>
+            <div class="price-card featured" data-aos="fade-up" data-aos-delay="100">
+                <h3>Pro</h3>
+                <div class="price-amount">$29<span>/mo</span></div>
+                <ul class="price-features">
+                    <li>Unlimited Projects</li>
+                    <li>Full Component Library</li>
+                    <li>Priority Support</li>
+                    <li>Team Collaboration</li>
+                </ul>
+                <a href="#" class="btn btn-primary" style="width:100%;justify-content:center">Start Free Trial</a>
+            </div>
+            <div class="price-card" data-aos="fade-up" data-aos-delay="200">
+                <h3>Enterprise</h3>
+                <div class="price-amount">Custom</div>
+                <ul class="price-features">
+                    <li>Everything in Pro</li>
+                    <li>SSO & Advanced Security</li>
+                    <li>Dedicated Support</li>
+                    <li>Custom Integrations</li>
+                </ul>
+                <a href="#" class="btn btn-outline" style="width:100%;justify-content:center">Contact Sales</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta" id="contact">
+        <div class="cta-box" data-aos="zoom-in">
+            <h2>Ready to transform your workflow?</h2>
+            <p>Join 50,000+ creators and start building beautiful products today.</p>
+            <a href="#" class="btn btn-accent">Start Your Free Trial →</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <div class="logo-icon"></div>Vertex
+                </a>
+                <p>Empowering creators to build stunning digital experiences.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Changelog</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Status</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Vertex. All rights reserved.</span>
+            <div class="social-links">
+                <a href="#" aria-label="Twitter">𝕏</a>
+                <a href="#" aria-label="LinkedIn">in</a>
+                <a href="#" aria-label="GitHub">◐</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init({ duration: 600, once: true, offset: 50 });
+        const toggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        toggle.addEventListener('click', () => {
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            toggle.textContent = isDark ? '🌙' : '☀️';
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beep's Big Journey</title>
+    <style>
+        /* --- GENERAL SETTINGS --- */
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            transition: background-color 2s ease;
+            background-color: #87CEEB; /* Sky Blue */
+        }
+
+        #stage {
+            position: relative;
+            width: 100vw;
+            height: 80vh;
+        }
+
+        #story-box {
+            height: 20vh;
+            background: #fff;
+            border-top: 5px solid #FFD700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+        }
+
+        h2 { margin: 0 0 10px 0; color: #333; }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #FF4500;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px #c03600;
+        }
+        button:active { transform: translateY(2px); box-shadow: 0 2px #c03600; }
+
+        /* --- SCENERY --- */
+        .grass {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100px;
+            background-color: #32CD32;
+            transition: bottom 2s;
+        }
+
+        .stars-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        /* --- CHARACTERS --- */
+        
+        /* ROBOT */
+        .robot {
+            position: absolute;
+            bottom: 110px;
+            left: 20%;
+            width: 80px;
+            height: 80px;
+            background: #A9A9A9;
+            border-radius: 10px;
+            border: 3px solid #555;
+            transition: all 1s ease;
+            z-index: 10;
+        }
+        .robot::before { /* Antenna */
+            content: ''; position: absolute; top: -20px; left: 35px;
+            width: 4px; height: 20px; background: #555;
+        }
+        .robot::after { /* Antenna Ball */
+            content: ''; position: absolute; top: -25px; left: 32px;
+            width: 10px; height: 10px; background: red; border-radius: 50%;
+        }
+        .eyes {
+            position: absolute; top: 20px; left: 15px;
+            width: 15px; height: 15px; background: white; border-radius: 50%;
+            box-shadow: 35px 0 0 white; /* Second eye */
+        }
+        .mouth {
+            position: absolute; bottom: 15px; left: 20px;
+            width: 40px; height: 5px; background: #333;
+        }
+
+        /* ROCKET */
+        .rocket {
+            position: absolute;
+            bottom: 100px;
+            left: 60%;
+            width: 60px;
+            height: 100px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 10px 10px 0 0;
+            transition: transform 2s ease-in;
+            z-index: 5;
+        }
+        .rocket-top {
+            position: absolute; top: -40px; left: -2px;
+            width: 0; height: 0;
+            border-left: 32px solid transparent;
+            border-right: 32px solid transparent;
+            border-bottom: 40px solid red;
+        }
+        .rocket-window {
+            position: absolute; top: 20px; left: 15px;
+            width: 30px; height: 30px;
+            background: #87CEEB; border-radius: 50%; border: 2px solid #333;
+        }
+        .fire {
+            position: absolute; bottom: -30px; left: 10px;
+            width: 40px; height: 30px;
+            background: orange;
+            border-radius: 0 0 20px 20px;
+            opacity: 0;
+        }
+
+        /* SPACE OBJECTS */
+        .moon {
+            position: absolute; top: 50px; right: -150px;
+            width: 80px; height: 80px;
+            background: #F0E68C;
+            border-radius: 50%;
+            box-shadow: inset -15px 0 0 0 #dbce56;
+            transition: right 2s ease;
+        }
+        .star-friend {
+            position: absolute; top: -100px; left: 50%;
+            width: 0; height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 40px solid gold;
+            transform: translateX(-50%);
+            transition: top 1s ease;
+        }
+        .star-friend::after {
+            content: ''; position: absolute; top: 12px; left: -20px;
+            width: 0; height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid gold;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes twinkle {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.2); }
+        }
+        @keyframes dance {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            75% { transform: rotate(-10deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .anim-bounce { animation: bounce 1s infinite; }
+        .anim-shake { animation: shake 0.1s infinite; }
+        .anim-twinkle { animation: twinkle 1s infinite; }
+        .anim-dance { animation: dance 1s infinite; }
+
+    </style>
+</head>
+<body>
+
+    <div id="stage">
+        <div class="stars-bg"></div>
+        <div class="moon"></div>
+        <div class="star-friend"></div>
+        
+        <div class="robot anim-bounce">
+            <div class="eyes"></div>
+            <div class="mouth"></div>
+        </div>
+        
+        <div class="rocket">
+            <div class="rocket-top"></div>
+            <div class="rocket-window"></div>
+            <div class="fire"></div>
+        </div>
+        
+        <div class="grass"></div>
+    </div>
+
+    <div id="story-box">
+        <h2 id="text-display">Welcome to Beep's Story!</h2>
+        <button id="next-btn" onclick="nextStep()">Start Story</button>
+    </div>
+
+    <script>
+        let step = 0;
+        const textDisplay = document.getElementById('text-display');
+        const btn = document.getElementById('next-btn');
+        const body = document.body;
+        
+        // Elements
+        const robot = document.querySelector('.robot');
+        const rocket = document.querySelector('.rocket');
+        const fire = document.querySelector('.fire');
+        const grass = document.querySelector('.grass');
+        const starsBg = document.querySelector('.stars-bg');
+        const moon = document.querySelector('.moon');
+        const starFriend = document.querySelector('.star-friend');
+
+        function nextStep() {
+            step++;
+            handleScene(step);
+        }
+
+        function handleScene(currentStep) {
+            switch(currentStep) {
+                case 1:
+                    textDisplay.innerText = "Once upon a time, Beep the Robot felt lonely. He wanted a friend.";
+                    btn.innerText = "Next";
+                    break;
+                
+                case 2:
+                    textDisplay.innerText = "Beep looked at his rocket ship. 'I will go to the stars!' he said.";
+                    // Move robot to rocket
+                    robot.style.left = "60%";
+                    robot.style.transform = "scale(0.5)"; // Enter rocket
+                    robot.style.opacity = "0"; // Hide inside
+                    break;
+
+                case 3:
+                    textDisplay.innerText = "3... 2... 1... BLAST OFF!";
+                    // Launch animation
+                    fire.style.opacity = "1";
+                    rocket.classList.add('anim-shake');
+                    setTimeout(() => {
+                        rocket.classList.remove('anim-shake');
+                        rocket.style.transform = "translateY(-120vh)"; // Fly up
+                        grass.style.bottom = "-100px"; // Hide grass
+                    }, 1000);
+                    break;
+
+                case 4:
+                    textDisplay.innerText = "The sky turned dark. Beep was in space! He saw the sleepy Moon.";
+                    // Change background
+                    body.style.backgroundColor = "#000033";
+                    starsBg.style.opacity = "1";
+                    
+                    // Reset positions for space scene
+                    setTimeout(() => {
+                        rocket.style.transition = "none";
+                        rocket.style.transform = "translateY(0) rotate(90deg)";
+                        rocket.style.left = "-100px";
+                        rocket.style.top = "40%";
+                        
+                        // Fly rocket in from left
+                        setTimeout(() => {
+                            rocket.style.transition = "left 3s linear";
+                            rocket.style.left = "20%";
+                            fire.style.opacity = "0";
+                        }, 50);
+                    }, 1000);
+
+                    // Show Moon
+                    moon.style.right = "10%";
+                    break;
+
+                case 5:
+                    textDisplay.innerText = "Suddenly, Beep saw a twinkling light. It was a Little Star!";
+                    // Beep comes out for space walk
+                    robot.style.transition = "all 1s";
+                    robot.style.opacity = "1";
+                    robot.style.transform = "scale(1)";
+                    robot.style.left = "30%";
+                    robot.style.bottom = "auto";
+                    robot.style.top = "30%";
+                    
+                    // Star appears
+                    starFriend.style.top = "30%";
+                    starFriend.classList.add('anim-twinkle');
+                    break;
+
+                case 6:
+                    textDisplay.innerText = "'Will you be my friend?' asked Beep. The Star glowed bright!";
+                    // Move closer
+                    robot.style.left = "40%";
+                    break;
+
+                case 7:
+                    textDisplay.innerText = "Beep and the Star danced in the sky forever. The End.";
+                    btn.innerText = "Play Again";
+                    btn.onclick = () => location.reload();
+                    
+                    // Dance animation
+                    robot.classList.add('anim-dance');
+                    starFriend.classList.add('anim-dance');
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

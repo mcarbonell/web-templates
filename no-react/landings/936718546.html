@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BarkPet - Your Local Pet Shop</title>
+    <style>
+        /* Design Choices:
+        - Business: Pet Shop (Retail & Local Shops)
+        - Brand: BarkPet (generated from random words)
+        - Color Scheme: Bright green (#75f841) as primary, with light/dark mode variations
+        - Hero Layout: Split screen (random roll 1)
+        - Overall Layout: Grid-based (random roll 0)
+        - Special Feature: Particles animation (random roll 1)
+        - Animation Type: Bounce (random roll 1)
+        - Aesthetic: Playful, animal-themed, modern with SVG graphics, daring use of neon accents and geometric shapes
+        - Accessibility: WCAG AA compliant, semantic HTML, ARIA roles, skip link, focus states, prefers-reduced-motion
+        */
+
+        :root {
+            --primary: #75f841;
+            --secondary: #ff6b6b;
+            --accent: #4ecdc4;
+            --text-light: #333;
+            --text-dark: #f5f5f5;
+            --bg-light: #ffffff;
+            --bg-dark: #1a1a1a;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --text-light: #f5f5f5;
+            --text-dark: #333;
+            --bg-light: #1a1a1a;
+            --bg-dark: #ffffff;
+            --shadow: rgba(255,255,255,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-light);
+            background: var(--bg-light);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--primary);
+            color: var(--text-dark);
+            padding: 8px;
+            text-decoration: none;
+            z-index: 1000;
+            border-radius: 4px;
+        }
+
+        .skip-link:focus {
+            top: 6px;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: var(--bg-light);
+            box-shadow: 0 2px 10px var(--shadow);
+            z-index: 100;
+            transition: background 0.3s;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a:focus {
+            color: var(--primary);
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s;
+        }
+
+        .theme-toggle:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .mobile-menu-toggle:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--bg-light);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 2px 10px var(--shadow);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+
+        main {
+            margin-top: 80px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 100vh;
+            align-items: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--text-dark);
+        }
+
+        .hero-content {
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: bounceIn 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: transform 0.3s;
+        }
+
+        .cta-button:hover, .cta-button:focus {
+            transform: scale(1.05);
+            outline: 2px solid var(--secondary);
+            outline-offset: 2px;
+        }
+
+        .hero-image {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-svg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero h1, .particle, .cta-button {
+                animation: none;
+            }
+        }
+
+        .section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: var(--bg-dark);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .about {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .contact {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: white;
+        }
+
+        .contact form {
+            display: grid;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .contact input, .contact textarea, .contact button {
+            padding: 1rem;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .contact button {
+            background: var(--primary);
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .contact button:hover, .contact button:focus {
+            background: var(--secondary);
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        footer {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body data-theme="light">
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <header role="banner">
+        <nav role="navigation">
+            <div class="logo">BarkPet</div>
+            <ul class="nav-links" role="list">
+                <li role="listitem"><a href="#services">Services</a></li>
+                <li role="listitem"><a href="#about">About</a></li>
+                <li role="listitem"><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" aria-label="Toggle theme" aria-expanded="false">🌙</button>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+        </nav>
+    </header>
+
+    <main role="main" id="main">
+        <section class="hero" role="region" aria-labelledby="hero-heading">
+            <div class="hero-content">
+                <h1 id="hero-heading">Welcome to BarkPet</h1>
+                <p>Your one-stop shop for all pet needs. From food to toys, we've got your furry friends covered!</p>
+                <a href="#contact" class="cta-button" aria-label="Shop now">Shop Now</a>
+            </div>
+            <div class="hero-image">
+                <svg class="hero-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#75f841;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="200" cy="200" r="150" fill="url(#grad1)" />
+                    <path d="M150 180 Q200 120 250 180 Q250 220 200 250 Q150 220 150 180" fill="#fff" />
+                    <circle cx="180" cy="160" r="5" fill="#000" />
+                    <circle cx="220" cy="160" r="5" fill="#000" />
+                    <ellipse cx="200" cy="190" rx="20" ry="10" fill="#000" />
+                </svg>
+                <div class="particles" aria-live="polite" aria-label="Animated particles for visual effect"></div>
+            </div>
+        </section>
+
+        <section id="services" class="section services" role="region" aria-labelledby="services-heading">
+            <h2 id="services-heading">Our Services</h2>
+            <div class="service-card" role="article">
+                <h3>Pet Food & Supplies</h3>
+                <p>High-quality food and essentials for your pets.</p>
+            </div>
+            <div class="service-card" role="article">
+                <h3>Grooming Services</h3>
+                <p>Professional grooming to keep your pets looking great.</p>
+            </div>
+            <div class="service-card" role="article">
+                <h3>Pet Accessories</h3>
+                <p>Toys, beds, and more to make your pets happy.</p>
+            </div>
+        </section>
+
+        <section id="about" class="section about" role="region" aria-labelledby="about-heading">
+            <h2 id="about-heading">About BarkPet</h2>
+            <div class="about-content">
+                <div>
+                    <p>At BarkPet, we're passionate about pets. Our store offers everything your furry, feathered, or scaly friends need to live happy, healthy lives.</p>
+                </div>
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="80" fill="#75f841" />
+                    <path d="M70 90 L100 70 L130 90 L130 130 L70 130 Z" fill="#fff" />
+                    <circle cx="85" cy="100" r="3" fill="#000" />
+                    <circle cx="115" cy="100" r="3" fill="#000" />
+                </svg>
+            </div>
+        </section>
+
+        <section id="contact" class="section contact" role="region" aria-labelledby="contact-heading">
+            <h2 id="contact-heading">Contact Us</h2>
+            <form action="#" method="post">
+                <input type="text" name="name" placeholder="Your Name" required aria-label="Name">
+                <input type="email" name="email" placeholder="Your Email" required aria-label="Email">
+                <textarea name="message" placeholder="Your Message" required aria-label="Message"></textarea>
+                <button type="submit" aria-label="Send message">Send Message</button>
+            </form>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <p>&copy; 2023 BarkPet. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Theme toggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        const body = document.body;
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            themeToggle.setAttribute('aria-expanded', 'true');
+            setTimeout(() => themeToggle.setAttribute('aria-expanded', 'false'), 1000);
+        });
+
+        // Mobile menu
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        mobileToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            const expanded = mobileToggle.getAttribute('aria-expanded') === 'true';
+            mobileToggle.setAttribute('aria-expanded', !expanded);
+        });
+
+        // Particles animation
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.width = Math.random() * 10 + 5 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.animationDelay = Math.random() * 3 + 's';
+            document.querySelector('.particles').appendChild(particle);
+            setTimeout(() => particle.remove(), 3000);
+        }
+        setInterval(createParticle, 500);
+
+        // GSAP animations
+        gsap.from('.hero h1', { duration: 1, y: 50, opacity: 0, ease: 'bounce.out' });
+        gsap.from('.hero p', { duration: 1, y: 50, opacity: 0, delay: 0.5, ease: 'bounce.out' });
+        gsap.from('.cta-button', { duration: 1, scale: 0, delay: 1, ease: 'bounce.out' });
+    </script>
+</body>
+</html>

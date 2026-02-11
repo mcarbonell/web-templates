@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealFlow Physiotherapy - Expert Care for Your Well-Being</title>
+    <style>
+        /* CSS Variables for Light and Dark Themes */
+        :root {
+            --primary-color: #23fe18; /* Random hex: 23fe18 */
+            --secondary-color: #0a0a0a;
+            --accent-color: #ff6b6b;
+            --text-color: #333;
+            --bg-color: #ffffff;
+            --card-bg: #f8f9fa;
+            --shadow: rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --text-color: #e0e0e0;
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --shadow: rgba(255,255,255,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: var(--transition);
+        }
+
+        /* Accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--primary-color);
+            color: #000;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 1000;
+            border-radius: 4px;
+        }
+
+        .skip-link:focus {
+            top: 6px;
+        }
+
+        /* Focus States */
+        a:focus, button:focus, input:focus, textarea:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Header */
+        header[role="banner"] {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] header {
+            background: rgba(26,26,26,0.9);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        nav[role="navigation"] {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            aria-expanded: false;
+        }
+
+        /* Hero Section - Full Screen Layout (random choice 0) */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            z-index: 2;
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: #000;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: var(--transition);
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px var(--shadow);
+        }
+
+        /* Parallax Background (special feature: parallax) */
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23ffffff" opacity="0.1"/></svg>');
+            background-size: cover;
+            transform: translateY(0);
+            transition: transform 0.1s linear;
+        }
+
+        /* Sections */
+        section[role="region"] {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .services {
+            background: var(--card-bg);
+        }
+
+        .about {
+            background: var(--bg-color);
+        }
+
+        .testimonials {
+            background: var(--card-bg);
+        }
+
+        .contact {
+            background: var(--bg-color);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .services ul[role="list"] {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .services li[role="listitem"] {
+            background: var(--bg-color);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: var(--transition);
+        }
+
+        .services li:hover {
+            transform: translateY(-10px);
+        }
+
+        .testimonials ul[role="list"] {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .testimonials li[role="listitem"] {
+            background: var(--bg-color);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px var(--shadow);
+            text-align: center;
+        }
+
+        .contact form {
+            max-width: 600px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+        }
+
+        input, textarea {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button[type="submit"] {
+            padding: 1rem;
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        button[type="submit"]:hover {
+            background: var(--accent-color);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Footer */
+        footer[role="contentinfo"] {
+            background: var(--secondary-color);
+            color: #fff;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Animations - Spring type (random choice 1) */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+
+            nav {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .services ul, .testimonials ul {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ARIA Live Region for Theme Changes */
+        .theme-announcement {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <header role="banner">
+        <div class="logo">HealFlow Physiotherapy</div>
+        <nav role="navigation" aria-label="Main navigation">
+            <a href="#services">Services</a>
+            <a href="#about">About</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="#contact">Contact</a>
+        </nav>
+        <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false">☰</button>
+    </header>
+
+    <main role="main" id="main">
+        <section class="hero" role="region" aria-labelledby="hero-heading">
+            <div class="parallax-bg"></div>
+            <div class="hero-content">
+                <h1 id="hero-heading">Heal Your Body, Restore Your Life</h1>
+                <p>Expert physiotherapy services tailored to your needs. Get back to doing what you love.</p>
+                <a href="#contact" class="cta-button" aria-label="Book an appointment">Book Appointment</a>
+            </div>
+        </section>
+
+        <section id="services" class="services" role="region" aria-labelledby="services-heading">
+            <h2 id="services-heading">Our Services</h2>
+            <ul role="list">
+                <li role="listitem">
+                    <h3>Sports Injury Rehabilitation</h3>
+                    <p>Specialized treatment for athletes and active individuals.</p>
+                </li>
+                <li role="listitem">
+                    <h3>Chronic Pain Management</h3>
+                    <p>Effective strategies to manage and reduce persistent pain.</p>
+                </li>
+                <li role="listitem">
+                    <h3>Post-Surgical Recovery</h3>
+                    <p>Accelerate healing and regain mobility after surgery.</p>
+                </li>
+            </ul>
+        </section>
+
+        <section id="about" class="about" role="region" aria-labelledby="about-heading">
+            <h2 id="about-heading">About HealFlow</h2>
+            <p>At HealFlow Physiotherapy, we believe in a holistic approach to healing. Our experienced team uses evidence-based techniques to help you achieve optimal health and wellness.</p>
+        </section>
+
+        <section id="testimonials" class="testimonials" role="region" aria-labelledby="testimonials-heading">
+            <h2 id="testimonials-heading">What Our Patients Say</h2>
+            <ul role="list">
+                <li role="listitem">
+                    <p>"HealFlow helped me recover from a severe knee injury. Highly recommend!"</p>
+                    <cite>- John D.</cite>
+                </li>
+                <li role="listitem">
+                    <p>"Professional and caring staff. My back pain is gone!"</p>
+                    <cite>- Sarah M.</cite>
+                </li>
+            </ul>
+        </section>
+
+        <section id="contact" class="contact" role="region" aria-labelledby="contact-heading">
+            <h2 id="contact-heading">Contact Us</h2>
+            <form action="#" method="post">
+                <input type="text" name="name" placeholder="Your Name" required aria-label="Your name">
+                <input type="email" name="email" placeholder="Your Email" required aria-label="Your email">
+                <textarea name="message" placeholder="Your Message" required aria-label="Your message"></textarea>
+                <button type="submit" aria-label="Send message">Send Message</button>
+            </form>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <p>&copy; 2023 HealFlow Physiotherapy. All rights reserved.</p>
+    </footer>
+
+    <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">🌙</button>
+    <div class="theme-announcement" aria-live="polite" id="theme-announcement"></div>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const theme = body.getAttribute('data-theme');
+            const newTheme = theme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            document.getElementById('theme-announcement').textContent = `Theme switched to ${newTheme} mode`;
+            const toggle = document.querySelector('.theme-toggle');
+            toggle.textContent = newTheme === 'light' ? '🌙' : '☀️';
+        }
+
+        // Parallax Effect
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.parallax-bg');
+            parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
+        });
+
+        // Mobile Menu Toggle
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        const nav = document.querySelector('nav');
+        mobileToggle.addEventListener('click', () => {
+            const expanded = mobileToggle.getAttribute('aria-expanded') === 'true';
+            mobileToggle.setAttribute('aria-expanded', !expanded);
+            nav.style.display = expanded ? 'none' : 'flex';
+        });
+    </script>
+</body>
+</html>

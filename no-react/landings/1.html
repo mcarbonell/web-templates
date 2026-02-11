@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artisan Atelier | Hair & Beauty Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <style>
+    :root {
+      --color-bg: #FAFAF9;
+      --color-surface: #FFFFFF;
+      --color-text: #1F2937;
+      --color-text-muted: #6B7280;
+      --color-primary: #8B5CF6;
+      --color-primary-light: #A78BFA;
+      --color-secondary: #EC4899;
+      --color-secondary-light: #F472B6;
+      --color-accent: #F59E0B;
+      --color-accent-light: #FBBF24;
+      --color-border: #E5E7EB;
+      --color-focus: #3B82F6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    [data-theme="dark"] {
+      --color-bg: #111827;
+      --color-surface: #1F2937;
+      --color-text: #F9FAFB;
+      --color-text-muted: #D1D5DB;
+      --color-primary: #A78BFA;
+      --color-primary-light: #C4B5FD;
+      --color-secondary: #F472B6;
+      --color-secondary-light: #F9A8D4;
+      --color-accent: #FBBF24;
+      --color-accent-light: #FCD34D;
+      --color-border: #374151;
+      --color-focus: #60A5FA;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      html {
+        scroll-behavior: auto
+      }
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800
+    }
+
+    h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 1.5rem
+    }
+
+    h3 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      margin-bottom: 1rem
+    }
+
+    p {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: var(--color-text-muted)
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--color-primary);
+      color: white;
+      padding: 8px 16px;
+      z-index: 10000;
+      transition: top 0.3s;
+      border-radius: 0 0 4px 0;
+    }
+
+    .skip-link:focus {
+      top: 0
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem
+    }
+
+    .section {
+      padding: 5rem 0
+    }
+
+    .grid {
+      display: grid;
+      gap: 2rem
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))
+    }
+
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .site-header.scrolled {
+      box-shadow: var(--shadow-md)
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-list {
+      display: none;
+      list-style: none;
+      gap: 2rem
+    }
+
+    @media(min-width:768px) {
+      .nav-list {
+        display: flex
+      }
+    }
+
+    .nav-link {
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--color-text);
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary)
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--color-primary);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover::after {
+      width: 100%
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem
+    }
+
+    .theme-toggle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      transition: all 0.2s;
+    }
+
+    .theme-toggle:hover {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary)
+    }
+
+    .mobile-menu-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 8px;
+      z-index: 1001;
+    }
+
+    .mobile-menu-btn span {
+      width: 24px;
+      height: 2px;
+      background: var(--color-text);
+      transition: all 0.3s ease;
+    }
+
+    @media(min-width:768px) {
+      .mobile-menu-btn {
+        display: none
+      }
+    }
+
+    .mobile-menu[aria-expanded="true"] .mobile-menu-btn span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .mobile-menu[aria-expanded="true"] .mobile-menu-btn span:nth-child(2) {
+      opacity: 0
+    }
+
+    .mobile-menu[aria-expanded="true"] .mobile-menu-btn span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    .mobile-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--color-surface);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .mobile-nav[aria-hidden="false"] {
+      transform: translateX(0)
+    }
+
+    .mobile-nav-link {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--color-text)
+    }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding-top: 80px;
+    }
+
+    .hero-background {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .blob-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.6;
+      animation: blob-morph 20s infinite ease-in-out;
+    }
+
+    .blob-1 {
+      width: 600px;
+      height: 600px;
+      background: var(--color-primary);
+      top: -200px;
+      right: -100px;
+      animation-delay: 0s
+    }
+
+    .blob-2 {
+      width: 500px;
+      height: 500px;
+      background: var(--color-secondary);
+      bottom: -150px;
+      left: -100px;
+      animation-delay: -7s
+    }
+
+    .blob-3 {
+      width: 400px;
+      height: 400px;
+      background: var(--color-accent);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -14s
+    }
+
+    @keyframes blob-morph {
+
+      0%,
+      100% {
+        border-radius: 60% 40% 30% 70%/60% 30% 70% 40%;
+        transform: scale(1) rotate(0deg)
+      }
+
+      25% {
+        border-radius: 30% 60% 70% 40%/50% 60% 30% 60%
+      }
+
+      50% {
+        border-radius: 50% 60% 30% 60%/30% 70% 50% 70%;
+        transform: scale(1.1) rotate(180deg)
+      }
+
+      75% {
+        border-radius: 60% 40% 60% 30%/70% 30% 50% 60%
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      .blob {
+        animation: none
+      }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: center
+    }
+
+    @media(min-width:992px) {
+      .hero-content {
+        grid-template-columns: 1.2fr 0.8fr
+      }
+    }
+
+    .hero-text {
+      max-width: 600px
+    }
+
+    .hero-tag {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: var(--color-primary);
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-title {
+      margin-bottom: 1.5rem;
+      color: var(--color-text)
+    }
+
+    .hero-title span {
+      display: block;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-description {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      color: var(--color-text-muted)
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      min-height: 48px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-xl)
+    }
+
+    .btn-secondary {
+      background: var(--color-surface);
+      color: var(--color-text);
+      border: 2px solid var(--color-border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary)
+    }
+
+    .hero-visual {
+      position: relative;
+      height: 500px
+    }
+
+    .hero-image-card {
+      position: absolute;
+      background: var(--color-surface);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .hero-image-card:hover {
+      transform: scale(1.02) rotate(1deg)
+    }
+
+    .card-main {
+      width: 100%;
+      height: 400px;
+      z-index: 2
+    }
+
+    .card-accent {
+      width: 60%;
+      height: 200px;
+      bottom: -50px;
+      left: -30px;
+      z-index: 1;
+      border: 4px solid var(--color-surface);
+    }
+
+    .card-floating {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      top: 30px;
+      right: -40px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-secondary));
+      color: white;
+      font-weight: 700;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .services {
+      background: var(--color-surface)
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 4rem;
+    }
+
+    .section-subtitle {
+      color: var(--color-primary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .service-card {
+      background: var(--color-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      border: 1px solid var(--color-border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg)
+    }
+
+    .service-card:hover::before {
+      transform: scaleX(1)
+    }
+
+    .service-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      color: white;
+    }
+
+    .service-icon svg {
+      width: 32px;
+      height: 32px
+    }
+
+    .service-title {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      color: var(--color-text)
+    }
+
+    .service-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-top: 1rem
+    }
+
+    .about {
+      position: relative;
+      overflow: hidden
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .bento-item {
+      background: var(--color-surface);
+      border-radius: 24px;
+      padding: 2.5rem;
+      border: 1px solid var(--color-border);
+      transition: all 0.3s ease;
+    }
+
+    .bento-item:hover {
+      transform: scale(1.02);
+      box-shadow: var(--shadow-lg)
+    }
+
+    .bento-item.large {
+      grid-column: span 2
+    }
+
+    @media(max-width:768px) {
+      .bento-item.large {
+        grid-column: span 1
+      }
+    }
+
+    .bento-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      margin-top: 2rem
+    }
+
+    .stat-item {
+      text-align: center
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .gallery {
+      background: var(--color-surface)
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 4/5;
+      cursor: pointer;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.1)
+    }
+
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 60%);
+      display: flex;
+      align-items: flex-end;
+      padding: 1.5rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .gallery-item:hover .gallery-overlay {
+      opacity: 1
+    }
+
+    .gallery-overlay-text {
+      color: white
+    }
+
+    .gallery-overlay-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .testimonials {
+      position: relative;
+      overflow: hidden
+    }
+
+    .testimonial-slider {
+      max-width: 900px;
+      margin: 0 auto
+    }
+
+    .testimonial-card {
+      background: var(--color-surface);
+      border-radius: 24px;
+      padding: 3rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--color-border);
+      text-align: center;
+    }
+
+    .testimonial-rating {
+      display: flex;
+      justify-content: center;
+      gap: 0.25rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-accent);
+    }
+
+    .testimonial-text {
+      font-size: 1.25rem;
+      font-style: italic;
+      color: var(--color-text);
+      margin-bottom: 2rem;
+      line-height: 1.8;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .author-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .author-info {
+      text-align: left
+    }
+
+    .author-name {
+      font-weight: 600;
+      color: var(--color-text)
+    }
+
+    .author-service {
+      font-size: 0.875rem;
+      color: var(--color-text-muted)
+    }
+
+    .contact {
+      background: var(--color-surface)
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem
+    }
+
+    @media(min-width:768px) {
+      .contact-grid {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem
+    }
+
+    .contact-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .contact-details h4 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: var(--color-text);
+    }
+
+    .contact-details p {
+      margin: 0;
+      color: var(--color-text-muted)
+    }
+
+    .contact-form {
+      background: var(--color-bg);
+      border-radius: 24px;
+      padding: 2.5rem;
+      border: 1px solid var(--color-border);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--color-text)
+    }
+
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid var(--color-border);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      background: var(--color-surface);
+      color: var(--color-text);
+      transition: border-color 0.2s;
+      min-height: 48px;
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--color-primary)
+    }
+
+    .form-submit {
+      width: 100%;
+      margin-top: 1rem
+    }
+
+    .site-footer {
+      background: var(--color-text);
+      color: var(--color-bg);
+      padding: 4rem 0 2rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand h3 {
+      color: white;
+      margin-bottom: 1rem
+    }
+
+    .footer-brand p {
+      color: rgba(255, 255, 255, 0.7)
+    }
+
+    .footer-links h4 {
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links ul {
+      list-style: none
+    }
+
+    .footer-links li {
+      margin-bottom: 0.5rem
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.7);
+      transition: color 0.2s
+    }
+
+    .footer-links a:hover {
+      color: var(--color-primary-light)
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      text-align: center;
+    }
+
+    @media(min-width:768px) {
+      .footer-bottom {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left
+      }
+    }
+
+    .footer-copyright {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.875rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1rem
+    }
+
+    .social-link {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .social-link:hover {
+      background: var(--color-primary);
+      transform: translateY(-2px)
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media(max-width:767px) {
+      .section {
+        padding: 3rem 0
+      }
+
+      .hero {
+        min-height: auto;
+        padding: 6rem 0 4rem
+      }
+
+      .hero-visual {
+        height: 400px
+      }
+
+      .card-main {
+        height: 300px
+      }
+
+      .card-accent {
+        width: 80%;
+        height: 150px
+      }
+    }
+
+    .loading {
+      opacity: 0;
+      transform: translateY(20px)
+    }
+
+    .loaded .loading {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+  <div aria-live="polite" aria-atomic="true" class="sr-only" id="announcements"></div>
+  <header role="banner" class="site-header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="#" class="logo" aria-label="Artisan Atelier - Inicio">Artisan Atelier</a>
+        <nav role="navigation" aria-label="Menú principal">
+          <ul class="nav-list" role="list">
+            <li role="listitem"><a href="#services" class="nav-link">Servicios</a></li>
+            <li role="listitem"><a href="#about" class="nav-link">Nosotros</a></li>
+            <li role="listitem"><a href="#gallery" class="nav-link">Galería</a></li>
+            <li role="listitem"><a href="#testimonials" class="nav-link">Testimonios</a></li>
+            <li role="listitem"><a href="#contact" class="nav-link">Contacto</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <button type="button" class="theme-toggle" aria-label="Cambiar tema de color" id="theme-toggle">
+            <svg class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" aria-hidden="true" style="display:none">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+          <button type="button" class="mobile-menu-btn" aria-label="Abrir menú móvil" aria-expanded="false"
+            aria-controls="mobile-nav" id="mobile-menu-btn">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <nav id="mobile-nav" class="mobile-nav" role="navigation" aria-label="Menú móvil" aria-hidden="true">
+    <a href="#services" class="mobile-nav-link">Servicios</a>
+    <a href="#about" class="mobile-nav-link">Nosotros</a>
+    <a href="#gallery" class="mobile-nav-link">Galería</a>
+    <a href="#testimonials" class="mobile-nav-link">Testimonios</a>
+    <a href="#contact" class="mobile-nav-link">Contacto</a>
+  </nav>
+  <main role="main" id="main-content">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-background">
+        <div class="blob-container" aria-hidden="true">
+          <div class="blob blob-1"></div>
+          <div class="blob blob-2"></div>
+          <div class="blob blob-3"></div>
+        </div>
+      </div>
+      <div class="container">
+        <div class="hero-content loading">
+          <div class="hero-text">
+            <span class="hero-tag">✨ Nuevo: Diseño Personalizado 2025</span>
+            <h1 id="hero-title">Transforma tu<br><span>Estilo & Belleza</span></h1>
+            <p class="hero-description">
+              Descubre el arte de la peluquería y estética en Artisan Atelier.
+              Donde la innovación se encuentra con la tradición, y tu belleza
+              se convierte en nuestra obra maestra.
+            </p>
+            <div class="hero-cta">
+              <a href="#contact" class="btn btn-primary">
+                Reservar Cita
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+              <a href="#services" class="btn btn-secondary">Ver Servicios</a>
+            </div>
+          </div>
+          <div class="hero-visual">
+            <div class="hero-image-card card-main">
+              <svg viewBox="0 0 400 400" aria-label="Ilustración decorativa">
+                <defs>
+                  <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:var(--color-primary);stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:var(--color-secondary);stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <rect fill="var(--color-bg)" width="400" height="400" />
+                <circle cx="200" cy="200" r="150" fill="url(#grad1)" opacity="0.2" />
+                <path d="M200 100 Q250 150 200 200 Q150 250 200 300" stroke="url(#grad1)" stroke-width="8" fill="none"
+                  stroke-linecap="round" />
+                <circle cx="200" cy="150" r="40" fill="var(--color-accent)" opacity="0.8" />
+                <path d="M160 250 L200 220 L240 250 L200 280 Z" fill="var(--color-secondary)" opacity="0.6" />
+              </svg>
+            </div>
+            <div class="hero-image-card card-accent">
+              <svg viewBox="0 0 200 200" aria-label="Decoración">
+                <rect fill="var(--color-bg)" width="200" height="200" />
+                <circle cx="100" cy="100" r="60" stroke="var(--color-accent)" stroke-width="4" fill="none" />
+                <path d="M100 60 L100 140 M60 100 L140 100" stroke="var(--color-primary)" stroke-width="3" />
+              </svg>
+            </div>
+            <div class="hero-image-card card-floating"><span>⭐ 5.0</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="services" class="section services" role="region" aria-label="Nuestros servicios">
+      <div class="container">
+        <div class="section-header loading">
+          <p class="section-subtitle">Lo que ofrecemos</p>
+          <h2>Servicios Excepcionales</h2>
+          <p>Desde cortes de vanguardia hasta tratamientos de spa, cada servicio está diseñado para realzar tu belleza
+            única.</p>
+        </div>
+        <div class="grid grid-3">
+          <article class="service-card loading">
+            <div class="service-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 3v18M18 3v18M3 12h18M3 6h18M3 18h18" />
+              </svg>
+            </div>
+            <h3 class="service-title">Corte & Estilo</h3>
+            <p>Cortes personalizados que complementan tu forma de rostro y estilo de vida.</p>
+            <div class="service-price">Desde 35€</div>
+          </article>
+          <article class="service-card loading">
+            <div class="service-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+            </div>
+            <h3 class="service-title">Coloración Premium</h3>
+            <p>Técnicas avanzadas con productos orgánicos. Balayage, ombré, mechas.</p>
+            <div class="service-price">Desde 65€</div>
+          </article>
+          <article class="service-card loading">
+            <div class="service-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+            <h3 class="service-title">Tratamientos Capilares</h3>
+            <p>Terapias reparadoras e hidratación profunda.</p>
+            <div class="service-price">Desde 45€</div>
+          </article>
+          <article class="service-card loading">
+            <div class="service-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </div>
+            <h3 class="service-title">Maquillaje</h3>
+            <p>Maquillaje profesional para eventos y sesiones.</p>
+            <div class="service-price">Desde 40€</div>
+          </article>
+          <article class="service-card loading">
+            <div class="service-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <h3 class="service-title">Spa & Bienestar</h3>
+            <p>Masajes relajantes y tratamientos faciales.</p>
+            <div class="service-price">Desde 55€</div>
+          </article>
+          <article class="service-card loading">
+            <div class="service-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <h3 class="service-title">Belleza para Novias</h3>
+            <p>Paquetes completos para tu día especial.</p>
+            <div class="service-price">Desde 150€</div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section id="about" class="section about" role="region" aria-label="Sobre nosotros">
+      <div class="container">
+        <div class="section-header loading">
+          <p class="section-subtitle">Nuestra historia</p>
+          <h2>Arte en Cada Detalle</h2>
+        </div>
+        <div class="bento-grid">
+          <div class="bento-item large loading">
+            <div class="bento-number">15+</div>
+            <h3>Años de Experiencia</h3>
+            <p>Desde 2009, transformando vidas a través del arte del estilismo.</p>
+            <div class="stat-grid">
+              <div class="stat-item">
+                <span class="stat-value" data-count="5000">0</span>
+                <span class="stat-label">Clientes</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value" data-count="25">0</span>
+                <span class="stat-label">Expertos</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value" data-count="12">0</span>
+                <span class="stat-label">Premios</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value" data-count="98">0</span>
+                <span class="stat-label">% Retención</span>
+              </div>
+            </div>
+          </div>
+          <div class="bento-item loading">
+            <h3>🎨 Filosofía</h3>
+            <p>Cada persona es única. Enfoque personalizado para superar expectativas.</p>
+          </div>
+          <div class="bento-item loading">
+            <h3>🌿 Verde</h3>
+            <p>Productos ecológicos. Reciclamos y reducimos residuos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="gallery" class="section gallery" role="region" aria-label="Galería">
+      <div class="container">
+        <div class="section-header loading">
+          <p class="section-subtitle">Portfolio</p>
+          <h2>Nuestro Trabajo</h2>
+        </div>
+        <div class="gallery-grid">
+          <div class="gallery-item loading">
+            <svg viewBox="0 0 400 500" aria-label="Balayage">
+              <rect fill="#FDE68A" width="400" height="500" />
+              <rect x="100" y="150" width="200" height="300" rx="20" fill="var(--color-primary)" opacity="0.8" />
+            </svg>
+            <div class="gallery-overlay">
+              <div class="gallery-overlay-text">
+                <div class="gallery-overlay-title">Balayage Caramelo</div>
+              </div>
+            </div>
+          </div>
+          <div class="gallery-item loading">
+            <svg viewBox="0 0 400 500" aria-label="Novia">
+              <rect fill="#FBCFE8" width="400" height="500" />
+              <path d="M150 100 Q200 50 250 100" fill="var(--color-accent)" opacity="0.7" />
+            </svg>
+            <div class="gallery-overlay">
+              <div class="gallery-overlay-text">
+                <div class="gallery-overlay-title">Recogido de Novia</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="testimonials" class="section testimonials" role="region" aria-label="Testimonios">
+      <div class="container">
+        <div class="section-header loading">
+          <p class="section-subtitle">Testimonios</p>
+          <h2>Clientes Encantados</h2>
+        </div>
+        <div class="testimonial-slider loading">
+          <div class="testimonial-card">
+            <div class="testimonial-rating" aria-label="5 estrellas">★★★★★</div>
+            <blockquote class="testimonial-text">"¡Increíble experiencia! Superó todas mis expectativas."</blockquote>
+            <div class="testimonial-author">
+              <div class="author-avatar" aria-hidden="true">MC</div>
+              <div class="author-info">
+                <p class="author-name">María Castellanos</p>
+                <p class="author-service">Cliente desde 2020</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="contact" class="section contact" role="region" aria-label="Contacto">
+      <div class="container">
+        <div class="section-header loading">
+          <p class="section-subtitle">Reserva Tu Cita</p>
+          <h2>Contacto</h2>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-info loading">
+            <div class="contact-item">
+              <div class="contact-icon" aria-hidden="true">📍</div>
+              <div class="contact-details">
+                <h4>Ubicación</h4>
+                <p>Calle de la Belleza 123<br>28001 Madrid</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon" aria-hidden="true">📞</div>
+              <div class="contact-details">
+                <h4>Teléfono</h4>
+                <p>+34 912 345 678</p>
+              </div>
+            </div>
+          </div>
+          <div class="contact-form loading">
+            <form id="contact-form">
+              <div class="form-group">
+                <label for="name" class="form-label">Nombre</label>
+                <input type="text" id="name" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-input" required>
+              </div>
+              <button type="submit" class="btn btn-primary form-submit">Enviar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer role="contentinfo" class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>Artisan Atelier</h3>
+          <p>Donde el arte se encuentra con la belleza.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Servicios</h4>
+          <ul role="list">
+            <li role="listitem"><a href="#services">Corte & Estilo</a></li>
+            <li role="listitem"><a href="#services">Coloración</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Empresa</h4>
+          <ul role="list">
+            <li role="listitem"><a href="#about">Sobre Nosotros</a></li>
+            <li role="listitem"><a href="#gallery">Galería</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copyright">© 2025 Artisan Atelier. Seed: 662516173</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Instagram">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      const themeToggle = document.getElementById('theme-toggle');
+      const sunIcon = document.querySelector('.sun-icon');
+      const moonIcon = document.querySelector('.moon-icon');
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileNav = document.getElementById('mobile-nav');
+      const header = document.querySelector('.site-header');
+      const announcements = document.getElementById('announcements');
+      const THEME_KEY = 'artisan-theme';
+      function getPreferredTheme() {
+        const saved = localStorage.getItem(THEME_KEY);
+        if (saved) return saved;
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+        return 'light';
+      }
+      function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(THEME_KEY, theme);
+        if (theme === 'dark') { sunIcon.style.display = 'none'; moonIcon.style.display = 'block' }
+        else { sunIcon.style.display = 'block'; moonIcon.style.display = 'none' }
+        announcements.textContent = theme === 'dark' ? 'Tema oscuro activado' : 'Tema claro activado';
+      }
+      setTheme(getPreferredTheme());
+      themeToggle.addEventListener('click', function () {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+      });
+      function toggleMobileMenu() {
+        const isExpanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
+        mobileMenuBtn.setAttribute('aria-expanded', !isExpanded);
+        mobileNav.setAttribute('aria-hidden', isExpanded);
+        document.body.style.overflow = isExpanded ? '' : 'hidden';
+      }
+      mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+      mobileNav.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', function () {
+          if (mobileMenuBtn.getAttribute('aria-expanded') === 'true') toggleMobileMenu();
+        });
+      });
+      window.addEventListener('scroll', function () {
+        if (window.pageYOffset > 50) header.classList.add('scrolled');
+        else header.classList.remove('scrolled');
+      }, { passive: true });
+      gsap.registerPlugin(ScrollTrigger);
+      document.addEventListener('DOMContentLoaded', function () {
+        gsap.set('.loading', { opacity: 0, y: 20 });
+        gsap.to('.loading', {
+          opacity: 1, y: 0, duration: 0.8, stagger: 0.05, ease: 'bounce.out'
+        });
+        gsap.from('.service-card,.bento-item,.gallery-item', {
+          opacity: 0, y: 50, duration: 0.8, stagger: 0.1, ease: 'bounce.out',
+          scrollTrigger: { trigger: '.services', start: 'top 80%' }
+        });
+      });
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          const href = this.getAttribute('href');
+          if (href === '#') return;
+          const target = document.querySelector(href);
+          if (target) {
+            e.preventDefault();
+            const headerHeight = header.offsetHeight;
+            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
+            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+          }
+        });
+      });
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        gsap.globalTimeline.timeScale(10000);
+      }
+    })();
+  </script>
+</body>
+
+</html>

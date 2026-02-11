@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sunrise Café – Modern Landing Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A striking, accessible, and responsive landing page for a local café with light/dark mode, animated hero, and glass‑morphism design.">
+  <!-- External Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha512-+KxroQF1gWkJ8+vVhVQ4V5e1qYdGgM5X2zUeZK6kIw6FjJcRgj4gYQ5z9VICVXpFZk7cZqgT6tB4vJzF0r5B5g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <style>
+    /* ----- CSS Reset & Base ----- */
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+      transition: background 0.3s, color 0.3s;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ----- Light/Dark Theme ----- */
+    :root {
+      --bg: #fafafa;
+      --text: #222222;
+      --primary: #0066ff;
+      --secondary: #ff6600;
+      --card-bg: rgba(255,255,255,0.6);
+      --card-shadow: rgba(0,0,0,0.1);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111111;
+        --text: #eaeaea;
+        --primary: #3399ff;
+        --secondary: #ff9966;
+        --card-bg: rgba(255,255,255,0.07);
+        --card-shadow: rgba(0,0,0,0.5);
+      }
+    }
+    body[data-theme="dark"] {
+      --bg: #111111;
+      --text: #eaeaea;
+      --primary: #3399ff;
+      --secondary: #ff9966;
+      --card-bg: rgba(255,255,255,0.07);
+      --card-shadow: rgba(0,0,0,0.5);
+    }
+
+    /* ----- Accessibility ----- */
+    a:focus, button:focus, input:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+    .skip-link:focus {
+      left: 1rem;
+      top: 1rem;
+      width: auto;
+      height: auto;
+      padding: .5rem 1rem;
+      background: var(--primary);
+      color: #fff;
+      z-index: 1000;
+    }
+
+    /* ----- Layout ----- */
+    header[role="banner"] { padding: 1rem 2rem; background: var(--bg); }
+    nav[role="navigation"] { display: flex; gap: 1rem; }
+    main[role="main"] { padding: 2rem; }
+    section[role="region"] { margin-bottom: 3rem; }
+    footer[role="contentinfo"] { text-align:center; padding:1rem; font-size:.9rem; }
+
+    /* ----- Hero ----- */
+    .hero {
+      position: relative;
+      height: 80vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      background: url('https://picsum.photos/seed/cafe/1200/800') center/cover no-repeat;
+      color:#fff;
+    }
+    .hero::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,0.4);
+    }
+    .hero-content {
+      position:relative;
+      max-width:800px;
+      padding:2rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius:12px;
+      box-shadow:0 4px 12px var(--card-shadow);
+    }
+    .hero h1 { font-size:2.5rem; margin-bottom:.5rem; }
+    .hero p { font-size:1.2rem; margin-bottom:1rem; }
+    .hero button {
+      background: var(--primary);
+      border:none;
+      color:#fff;
+      padding:.75rem 1.5rem;
+      font-size:1rem;
+      border-radius:6px;
+      cursor:pointer;
+    }
+
+    /* ----- Content Density ----- */
+    .minimalist .card { max-width:300px; }
+    .dense .card { max-width:100%; }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      padding:1.5rem;
+      border-radius:12px;
+      box-shadow:0 2px 8px var(--card-shadow);
+      margin:1rem;
+    }
+
+    /* ----- Theme Toggle ----- */
+    .theme-toggle {
+      position:fixed;
+      bottom:1rem;
+      right:1rem;
+      background:var(--secondary);
+      border:none;
+      color:#fff;
+      padding:.5rem 1rem;
+      border-radius:30px;
+      cursor:pointer;
+    }
+
+    /* ----- Particles (Special Feature) ----- */
+    #particles-js {
+      position:absolute;
+      inset:0;
+      z-index:-1;
+    }
+
+    /* ----- Reduced Motion ----- */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation:none !important; transition:none !important; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+
+  <!-- Skip to content -->
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header role="banner" aria-label="Site Header">
+    <nav role="navigation" aria-label="Primary navigation">
+      <a href="#about">About</a>
+      <a href="#menu">Menu</a>
+      <a href="#location">Location</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section role="region" aria-label="Hero Section" class="hero" id="hero">
+    <div id="particles-js"></div>
+    <div class="hero-content">
+      <h1>Sunrise Café</h1>
+      <p>Where every cup tells a story.</p>
+      <button aria-label="Explore our menu">Explore Menu</button>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main role="main" id="main">
+
+    <!-- About -->
+    <section role="region" aria-label="About Us" id="about" class="dense">
+      <h2>About Us</h2>
+      <div class="card">
+        <p>Located in the heart of the city, Sunrise Café blends modern design with a cozy atmosphere. We source fresh beans and bake daily pastries.</p>
+      </div>
+    </section>
+
+    <!-- Menu -->
+    <section role="region" aria-label="Our Menu" id="menu" class="minimalist">
+      <h2>Our Menu</h2>
+      <div class="card">
+        <h3>Signature Coffee</h3>
+        <p>Espresso, Cappuccino, Latte – all crafted with precision.</p>
+      </div>
+      <div class="card">
+        <h3>Fresh Pastries</h3>
+        <p>Croissants, muffins, and seasonal treats baked in‑house.</p>
+      </div>
+    </section>
+
+    <!-- Location -->
+    <section role="region" aria-label="Location" id="location">
+      <h2>Find Us</h2>
+      <div class="card">
+        <p>123 Main Street, Cityville<br>Open: Mon‑Fri 7am‑7pm, Sat‑Sun 8am‑5pm</p>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section role="region" aria-label="Contact" id="contact">
+      <h2>Contact</h2>
+      <div class="card">
+        <p>Phone: (555) 123‑4567<br>Email: hello@sunrisecafe.com</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <p>&copy; <script>document.write(new Date().getFullYear())</script> Sunrise Café. All rights reserved.</p>
+  </footer>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" aria-label="Toggle light/dark theme">Toggle Theme</button>
+
+  <script>
+    // Theme toggle logic
+    const toggleBtn = document.querySelector('.theme-toggle');
+    const htmlEl = document.documentElement;
+    toggleBtn.addEventListener('click', () => {
+      const current = htmlEl.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      htmlEl.setAttribute('data-theme', next);
+    });
+
+    // Particles.js init (special feature)
+    particlesJS('particles-js', {
+      "particles": {
+        "number": {"value": 60},
+        "color": {"value": "#ffffff"},
+        "shape": {"type": "circle"},
+        "opacity": {"value": 0.5},
+        "size": {"value": 3},
+        "move": {"enable": true, "speed": 2}
+      },
+      "interactivity": {"events": {"onhover": {"enable": true, "mode": "grab"}}}
+    });
+
+    // Hero animation using GSAP (randomized timing)
+    const heroContent = document.querySelector('.hero-content');
+    gsap.fromTo(heroContent, {y: -30, opacity:0}, {y:0, opacity:1, duration:1.2, ease:"power3.out"});
+  </script>
+</body>
+</html>

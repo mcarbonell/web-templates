@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="INKD.space - Award-winning futuristic tattoo and piercing studio. Precision ink, cybernetic aesthetics, and elite safety protocols.">
+    <title>INKD.space | Cybernetic Tattoo Collective</title>
+
+    <!-- Meta -->
+    <meta property="og:title" content="INKD.space | Future Inking">
+    <meta name="theme-color" content="#050505">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;700&family=Syne:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* 
+        DESIGN CHOICES (Seed: 761898050)
+        - Business: Tattoo & Piercing Studio (INKD.space)
+        - Palette: Neon/Cyberpunk (Midnight, Neon Pink, Acid Lime)
+        - Hero: Dynamic Split Screen (Diagonal split)
+        - Special: Morphing Gooey SVG Blobs
+        - Motion: Smooth/Fluid (Sine-like)
+        - Density: Information-Dense (Sticker-slap aesthetic)
+        - Accessibility: WCAG AA, focus states, skip-link, semantic HTML
+        */
+
+        :root {
+            --bg: #050505;
+            --surface: #111;
+            --accent-1: #ff00ff;
+            /* Neon Pink */
+            --accent-2: #ccff00;
+            /* Acid Lime */
+            --text: #ffffff;
+            --text-dim: #888;
+            --border: rgba(255, 255, 255, 0.1);
+            --font-h: 'Syne', sans-serif;
+            --font-b: 'JetBrains Mono', monospace;
+            --ease: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .light-mode {
+            --bg: #f5f5f5;
+            --surface: #ffffff;
+            --accent-1: #d400d4;
+            --accent-2: #84aa00;
+            --text: #050505;
+            --text-dim: #555;
+            --border: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline-color: var(--accent-2);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-b);
+            line-height: 1.5;
+            overflow-x: hidden;
+            transition: background-color 0.6s var(--ease), color 0.6s var(--ease);
+        }
+
+        /* Skip Link */
+        .skip-to-content {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--accent-1);
+            padding: 1rem;
+            z-index: 1000;
+            color: #000;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .skip-to-content:focus {
+            top: 0;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: var(--font-h);
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            padding: 0 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--accent-1);
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: var(--accent-1) 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--accent-1);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            transition: transform 0.3s var(--ease);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-1);
+        }
+
+        /* Hero */
+        #hero {
+            height: 100vh;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .hero-left {
+            flex: 1;
+            padding: 5% 5% 5% 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .hero-right {
+            flex: 1;
+            background: #222;
+            position: relative;
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+
+        .hero-tag {
+            background: var(--accent-1);
+            color: #000;
+            padding: 0.2rem 1rem;
+            display: inline-block;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            transform: rotate(-1deg);
+        }
+
+        h1 {
+            font-size: clamp(3rem, 10vw, 7rem);
+            line-height: 0.85;
+            margin-bottom: 2rem;
+        }
+
+        .hero-desc {
+            max-width: 400px;
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            margin-bottom: 3rem;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            text-decoration: none;
+            border: 2px solid var(--text);
+            color: var(--text);
+            display: inline-block;
+            transition: all 0.3s var(--ease);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-1);
+            transition: transform 0.3s var(--ease);
+            z-index: -1;
+        }
+
+        .btn:hover {
+            color: #000;
+            border-color: var(--accent-1);
+        }
+
+        .btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .blob-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            filter: blur(60px);
+            opacity: 0.6;
+        }
+
+        .blob {
+            position: absolute;
+            fill: var(--accent-1);
+        }
+
+        /* Sections */
+        section {
+            padding: 10rem 10%;
+            position: relative;
+        }
+
+        .sec-header {
+            margin-bottom: 5rem;
+        }
+
+        .sec-header h2 {
+            font-size: 4rem;
+            color: var(--accent-2);
+        }
+
+        /* Sticker Grid (Info Dense) */
+        .work-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .sticker {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            position: relative;
+            transition: all 0.4s var(--ease);
+            cursor: pointer;
+        }
+
+        .sticker:nth-child(even) {
+            transform: rotate(2deg);
+        }
+
+        .sticker:nth-child(odd) {
+            transform: rotate(-1.5deg);
+        }
+
+        .sticker:hover {
+            transform: rotate(0) translateY(-10px) scale(1.05);
+            z-index: 10;
+            border-color: var(--accent-2);
+            box-shadow: 10px 10px 0px var(--accent-2);
+        }
+
+        .sticker img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+            filter: grayscale(1);
+            transition: filter 0.3s ease;
+        }
+
+        .sticker:hover img {
+            filter: grayscale(0);
+        }
+
+        .sticker-label {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--accent-2);
+            color: #000;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+
+        /* Protocols Section */
+        #protocols {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+        }
+
+        .protocol-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+        }
+
+        .protocol-item h4 {
+            color: var(--accent-1);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .protocol-item p {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        /* Booking Section */
+        #booking {
+            text-align: center;
+        }
+
+        .booking-card {
+            background: var(--bg);
+            border: 4px solid var(--text);
+            padding: 5rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .booking-card::before {
+            content: 'SCAN TO BOOK';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg);
+            padding: 0 1rem;
+            font-weight: 800;
+            color: var(--accent-1);
+        }
+
+        /* Footer */
+        footer {
+            padding: 5rem 10%;
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .footer-brand p {
+            margin-top: 2rem;
+            color: var(--text-dim);
+        }
+
+        .footer-links h4 {
+            margin-bottom: 2rem;
+            color: var(--accent-1);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-2);
+        }
+
+        .socials {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .social-icon {
+            width: 30px;
+            height: 30px;
+            fill: var(--text);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            header {
+                padding: 0 20px;
+            }
+
+            nav {
+                display: none;
+            }
+
+            #hero {
+                flex-direction: column;
+            }
+
+            .hero-right {
+                display: none;
+            }
+
+            .hero-left {
+                padding: 80px 5% 5% 5%;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 4rem;
+            }
+
+            .hero-desc {
+                margin-inline: auto;
+            }
+
+            .sec-header h2 {
+                font-size: 2.5rem;
+            }
+
+            footer {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+    </style>
+</head>
+
+<body>
+    <a href="#main" class="skip-to-content">Skip to content</a>
+
+    <div id="theme-status" class="sr-only" aria-live="polite">Theme: Dark</div>
+
+    <header role="banner">
+        <div class="logo">INKD.space</div>
+        <nav role="navigation" aria-label="Main navigation">
+            <ul role="list">
+                <li role="listitem"><a href="#hero">Neural-Link</a></li>
+                <li role="listitem"><a href="#work">Artifacts</a></li>
+                <li role="listitem"><a href="#protocols">Safety</a></li>
+                <li role="listitem"><a href="#booking">Upload</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light and dark mode">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5" />
+                    <path
+                        d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                </svg>
+            </button>
+            <a href="#booking" class="btn" style="padding: 0.8rem 1.5rem; font-size: 0.8rem;">Book Port</a>
+        </div>
+    </header>
+
+    <main id="main" role="main">
+        <!-- Hero Section -->
+        <section id="hero" role="region" aria-label="Hero Section">
+            <div class="hero-left">
+                <span class="hero-tag">STATUS: ONLINE // 2026 EDITION</span>
+                <h1>YOUR BIO-CANVAS, <span style="color:var(--accent-2)">REWIRED.</span></h1>
+                <p class="hero-desc">
+                    Elite tattooing for the digital vanguard. We don't just apply ink; we merge aesthetic vision with
+                    biological precision.
+                </p>
+                <div class="hero-actions">
+                    <a href="#work" class="btn">View Gallery</a>
+                </div>
+            </div>
+            <div class="hero-right">
+                <div class="blob-container" aria-hidden="true">
+                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="blob"
+                        style="width:500px; height:500px;">
+                        <path id="blob-path"
+                            d="M44.7,-76.4C58.8,-69.2,71.8,-59.1,79.6,-45.8C87.4,-32.5,90,-16.3,88.5,-0.9C87,14.5,81.4,29.1,72.6,41.9C63.8,54.7,51.8,65.7,37.9,72.9C24,80.1,8.1,83.4,-7.8,81.5C-23.7,79.6,-39.6,72.5,-52.8,62C-66,51.5,-76.5,37.7,-81.7,22.2C-86.9,6.7,-86.8,-10.5,-81.4,-26.1C-76,-41.7,-65.3,-55.7,-51.9,-63.3C-38.5,-70.9,-22.4,-72,-6.4,-61.1C9.6,-50.2,25.6,-38,44.7,-76.4Z" />
+                    </svg>
+                </div>
+                <!-- Placeholder Image via SVG -->
+                <svg style="position:absolute; width:100%; height:100%; top:0; left:0; object-fit:cover; opacity: 0.3;"
+                    viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                    <rect width="100" height="100" fill="#222" />
+                    <circle cx="50" cy="50" r="40" stroke="var(--accent-1)" stroke-width="0.1" fill="none" />
+                </svg>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="work" role="region" aria-labelledby="work-heading">
+            <div class="sec-header reveal">
+                <h2 id="work-heading">The Collection</h2>
+                <p style="color:var(--accent-1)">[ ARCHIVE_01 THROUGH ARCHIVE_06 ]</p>
+            </div>
+            <div class="work-grid" role="list">
+                <!-- Portfolios -->
+                <article class="sticker reveal" role="listitem">
+                    <div class="sticker-label">NEW</div>
+                    <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80"
+                        alt="Cyberpunk geometric forearm tattoo">
+                    <h3>CYBER-GEOM</h3>
+                    <p style="font-size: 0.8rem; margin-top: 1rem;">Vector-perfect linework inspired by mainframe
+                        schematics.</p>
+                </article>
+
+                <article class="sticker reveal" role="listitem">
+                    <img src="https://images.unsplash.com/photo-1590208608077-44672fa6992d?auto=format&fit=crop&w=800&q=80"
+                        alt="Traditional Japanese style with a neon twist">
+                    <h3>NEO-TRAD</h3>
+                    <p style="font-size: 0.8rem; margin-top: 1rem;">Fusing 17th-century craft with 21st-century
+                        saturation.</p>
+                </article>
+
+                <article class="sticker reveal" role="listitem">
+                    <div class="sticker-label">HOT</div>
+                    <img src="https://images.unsplash.com/photo-1560707303-4e980ce876ad?auto=format&fit=crop&w=800&q=80"
+                        alt="Blackwork neck tattoo">
+                    <h3>VOID-BLACK</h3>
+                    <p style="font-size: 0.8rem; margin-top: 1rem;">Absolute saturation. Total commitment to the shadow.
+                    </p>
+                </article>
+
+                <article class="sticker reveal" role="listitem">
+                    <img src="https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28?auto=format&fit=crop&w=800&q=80"
+                        alt="Intricate piercing work on ear">
+                    <h3>BIO-HARDWARE</h3>
+                    <p style="font-size: 0.8rem; margin-top: 1rem;">Titanium and gold structural modifications.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Protocols Section -->
+        <section id="protocols" role="region" aria-labelledby="proto-heading">
+            <div class="sec-header reveal">
+                <h2 id="proto-heading">Safe_Mode</h2>
+                <p>WE EXCEED ALL MEDICAL GRADE STANDARDS.</p>
+            </div>
+            <ul class="protocol-list" role="list">
+                <li class="protocol-item reveal" role="listitem">
+                    <h4>01. STERILE</h4>
+                    <p>Hepa-filtered surgical grade air and 100% single-use biological hazards disposal.</p>
+                </li>
+                <li class="protocol-item reveal" role="listitem">
+                    <h4>02. VEGAN</h4>
+                    <p>All inks and aftercare are 100% synthetic, cruelty-free, and high-pigment.</p>
+                </li>
+                <li class="protocol-item reveal" role="listitem">
+                    <h4>03. ANOMALY</h4>
+                    <p>Advanced diagnostic checks for skin compatibility before any deep-layer work.</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Booking Section -->
+        <section id="booking" role="region" aria-labelledby="book-heading">
+            <div class="booking-card reveal">
+                <h2 id="book-heading">Initiate Procedure</h2>
+                <p style="margin-bottom: 3rem; color: var(--text-dim);">Ready to update your physical shell? Choose your
+                    port and artist.</p>
+                <form
+                    onsubmit="event.preventDefault(); alert('Session Locked. Check your neural-link for confirmation.');"
+                    style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <label for="procedure" class="sr-only">Choose Procedure</label>
+                    <select id="procedure"
+                        style="padding: 1.2rem; background: var(--surface); color: var(--text); border: 1px solid var(--border); font-family: var(--font-b);">
+                        <option>SELECT SUBSTRATE...</option>
+                        <option>FULL_SLEEVE.EXE</option>
+                        <option>MICRO_INJECTION.JPG</option>
+                        <option>PIERCING_HARDWARE.DRV</option>
+                    </select>
+                    <input type="email" placeholder="YOUR_CORE_ADDRESS@EMAIL.COM" required
+                        style="padding: 1.2rem; background: var(--surface); color: var(--text); border: 1px solid var(--border); font-family: var(--font-b);">
+                    <button type="submit" class="btn" style="background:var(--accent-1); color:#000; border:none;">Lock
+                        Session</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="footer-brand">
+            <div class="logo">INKD.space</div>
+            <p>A Collective of Rogue Artists and Bio-Engineers.<br>Berlin // Tokyo // NYC</p>
+            <div class="socials">
+                <a href="#" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" class="social-icon">
+                        <path
+                            d="M7 2C4.24 2 2 4.24 2 7V17C2 19.76 4.24 22 7 22H17C19.76 22 22 19.76 22 17V7C22 4.24 19.76 2 17 2H7ZM12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9ZM18 5C18.55 5 19 5.45 19 6C19 6.55 18.55 7 18 7C17.45 7 17 6.55 17 6C17 5.45 17.45 5 18 5Z" />
+                    </svg>
+                </a>
+                <a href="#" aria-label="Twitter">
+                    <svg viewBox="0 0 24 24" class="social-icon">
+                        <path
+                            d="M22.46 6.01C21.69 6.35 20.86 6.58 20 6.69C20.88 6.16 21.56 5.32 21.88 4.31C21.05 4.81 20.13 5.16 19.16 5.36C18.37 4.5 17.26 4 16.03 4C13.65 4 11.73 5.92 11.73 8.29C11.73 8.63 11.77 8.96 11.84 9.27C8.28 9.09 5.11 7.38 3 4.79C2.63 5.42 2.42 6.16 2.42 6.94C2.42 8.43 3.17 9.75 4.33 10.5C3.62 10.48 2.96 10.28 2.38 10V10.03C2.38 12.11 3.86 13.84 5.82 14.23C5.46 14.33 5.08 14.38 4.68 14.38C4.41 14.38 4.14 14.36 3.88 14.31C4.44 16.03 6.03 17.29 7.93 17.33C6.44 18.49 4.57 19.18 2.52 19.18C2.17 19.18 1.82 19.16 1.48 19.12C3.4 20.35 5.67 21 8.12 21C16.08 21 20.44 14.41 20.44 8.71C20.44 8.52 20.44 8.33 20.43 8.15C21.28 7.54 22 6.77 22.46 5.88" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <h4>DIRECTIVES</h4>
+            <ul role="list">
+                <li role="listitem"><a href="#">Booking.exe</a></li>
+                <li role="listitem"><a href="#">Portfolios.log</a></li>
+                <li role="listitem"><a href="#">Safety.md</a></li>
+                <li role="listitem"><a href="#">Artists.sys</a></li>
+            </ul>
+        </div>
+        <div class="footer-links">
+            <h4>SUPPORT</h4>
+            <ul role="list">
+                <li role="listitem"><a href="#">Aftercare.txt</a></li>
+                <li role="listitem"><a href="#">Policies.cfg</a></li>
+                <li role="listitem"><a href="#">Terminal_FAQ</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script>
+        // Init GSAP
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Theme Toggle
+        const toggle = document.getElementById('theme-toggle');
+        const status = document.getElementById('theme-status');
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            status.textContent = isLight ? 'Theme: Light' : 'Theme: Dark';
+        });
+
+        // Blob Animation
+        const blobPaths = [
+            "M44.7,-76.4C58.8,-69.2,71.8,-59.1,79.6,-45.8C87.4,-32.5,90,-16.3,88.5,-0.9C87,14.5,81.4,29.1,72.6,41.9C63.8,54.7,51.8,65.7,37.9,72.9C24,80.1,8.1,83.4,-7.8,81.5C-23.7,79.6,-39.6,72.5,-52.8,62C-66,51.5,-76.5,37.7,-81.7,22.2C-86.9,6.7,-86.8,-10.5,-81.4,-26.1C-76,-41.7,-65.3,-55.7,-51.9,-63.3C-38.5,-70.9,-22.4,-72,-6.4,-61.1C9.6,-50.2,25.6,-38,44.7,-76.4Z",
+            "M48.1,-79.1C60.1,-71.4,66,-53.4,72.8,-37.7C79.6,-22,87.4,-8.6,87.8,5.1C88.2,18.8,81.3,32.8,70.6,43.2C59.9,53.5,45.4,60.2,31.2,66.8C16.9,73.4,2.9,79.9,-12.3,79.1C-27.4,78.2,-43.7,70,-55.1,58.8C-66.5,47.6,-73,33.5,-78.9,18.5C-84.8,3.5,-90.1,-12.3,-84.9,-25.1C-79.6,-37.9,-63.8,-47.7,-49.2,-54.6C-34.5,-61.5,-21,-65.4,-6.2,-61C8.6,-56.6,23.1,-43.8,48.1,-79.1Z",
+            "M52.3,-83.4C66,-75.4,74.2,-57.3,79.6,-39.8C85,-22.3,87.6,-5.5,84.9,10.2C82.2,25.8,74.1,40.3,62.8,51.1C51.5,61.9,37,68.9,21.9,73.5C6.7,78.1,-9.1,80.2,-24.8,76.9C-40.5,73.6,-56.1,64.9,-68,52.2C-79.9,39.5,-88.1,22.8,-89.6,5.6C-91.1,-11.6,-85.9,-29.3,-75,-42.9C-64.1,-56.5,-47.5,-66.1,-31.6,-73C-15.7,-79.9,-0.6,-84,15.7,-82.1C32,-80.1,49.5,-72.1,52.3,-83.4Z"
+        ];
+
+        let blobIdx = 0;
+        function updateBlob() {
+            blobIdx = (blobIdx + 1) % blobPaths.length;
+            gsap.to("#blob-path", {
+                duration: 4,
+                attr: { d: blobPaths[blobIdx] },
+                ease: "sine.inOut",
+                onComplete: updateBlob
+            });
+        }
+        updateBlob();
+
+        // Hero Parallax on mouse
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 40;
+            const y = (e.clientY / window.innerHeight - 0.5) * 40;
+            gsap.to(".blob-container", { x: x, y: y, duration: 1, ease: "power2.out" });
+        });
+
+        // Entrance Anim
+        gsap.from(".logo", { opacity: 0, y: -20, duration: 1, ease: "power4.out" });
+        gsap.from("nav li", { opacity: 0, y: -20, stagger: 0.1, duration: 1, ease: "power4.out", delay: 0.5 });
+        gsap.from(".hero-tag", { scale: 0, duration: 1, ease: "elastic.out(1, 0.5)", delay: 1 });
+        gsap.from("h1", { x: -100, opacity: 0, duration: 1.5, ease: "power4.out", delay: 1.2 });
+        gsap.from(".hero-desc", { y: 20, opacity: 0, duration: 1, delay: 1.5 });
+        gsap.from(".hero-actions", { y: 20, opacity: 0, duration: 1, delay: 1.8 });
+
+        // Scroll Reveal
+        gsap.utils.toArray(".reveal").forEach(el => {
+            gsap.to(el, {
+                opacity: 1,
+                y: 0,
+                duration: 1.2,
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 85%",
+                    toggleActions: "play none none none"
+                }
+            });
+        });
+
+        // Sticker hover sounds (simulated by interaction timing)
+        document.querySelectorAll('.sticker').forEach(sticker => {
+            sticker.addEventListener('mouseenter', () => {
+                gsap.to(sticker, { scale: 1.05, rotate: 0, duration: 0.3, ease: "snap" });
+            });
+            sticker.addEventListener('mouseleave', () => {
+                const rot = (Math.random() - 0.5) * 4;
+                gsap.to(sticker, { scale: 1, rotate: rot, duration: 0.5, ease: "sine.inOut" });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS | Immersive 3D Experience</title>
+    <style>
+        /* ==========================================================================
+           DESIGN SYSTEM - SEED: 85975522 | CHAOS LEVEL: 8
+           Color Palette: Warm (oranges, corals, ambers)
+           Typography: Brutalist (bold, raw, unconventional)
+           Shape Style: Mixed (organic + geometric)
+           Layout: Asymmetrical with floating elements
+           Accent: 3D Cubes with WebGL effects
+           ========================================================================== */
+
+        :root {
+            /* Warm Palette - Light Mode */
+            --warm-50: #FFF8F5;
+            --warm-100: #FFEEE6;
+            --warm-200: #FFD9C8;
+            --warm-300: #FFBC9E;
+            --warm-400: #FF946E;
+            --warm-500: #FF6B42;
+            --warm-600: #F54D26;
+            --warm-700: #E03A1A;
+            --warm-800: #BC2F16;
+            --warm-900: #9A2917;
+            --warm-950: #541209;
+
+            /* Neutrals */
+            --neutral-50: #FAFAFA;
+            --neutral-100: #F4F4F5;
+            --neutral-200: #E4E4E7;
+            --neutral-300: #D4D4D8;
+            --neutral-400: #A1A1AA;
+            --neutral-500: #71717A;
+            --neutral-600: #52525B;
+            --neutral-700: #3F3F46;
+            --neutral-800: #27272A;
+            --neutral-900: #18181B;
+            --neutral-950: #09090B;
+
+            /* Typography Scale - Brutalist */
+            --font-display: 'Impact', 'Haettenschweiler', 'Arial Black', sans-serif;
+            --font-heading: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            --space-4xl: 6rem;
+            --space-5xl: 8rem;
+
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-glow: 0 0 40px rgba(255, 107, 66, 0.4);
+        }
+
+        [data-theme="dark"] {
+            --warm-50: #09090B;
+            --warm-100: #18181B;
+            --warm-200: #27272A;
+            --warm-300: #3F3F46;
+            --warm-400: #52525B;
+            --warm-500: #71717A;
+            --warm-600: #A1A1AA;
+            --warm-700: #D4D4D8;
+            --warm-800: #E4E4E7;
+            --warm-900: #F4F4F5;
+            --warm-950: #FAFAFA;
+        }
+
+        /* ==========================================================================
+           RESET & BASE
+           ========================================================================== */
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--warm-100);
+            color: var(--warm-900);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background-color var(--transition-slow), color var(--transition-slow);
+        }
+
+        [data-theme="dark"] body {
+            background-color: var(--warm-950);
+            color: var(--warm-50);
+        }
+
+        /* ==========================================================================
+           TYPOGRAPHY - BRUTALIST STYLE
+           ========================================================================== */
+
+        .display-text {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 12vw, 10rem);
+            font-weight: 900;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+            word-break: break-word;
+        }
+
+        .heading-text {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .subheading-text {
+            font-family: var(--font-heading);
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .body-text {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.7;
+        }
+
+        .caption-text {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* ==========================================================================
+           LAYOUT - CHAOS LEVEL 8: ASYMMETRICAL, BROKEN GRID
+           ========================================================================== */
+
+        .page-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .canvas-container canvas {
+            display: block;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 1;
+            padding: var(--space-lg);
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                padding: var(--space-3xl);
+            }
+        }
+
+        /* Chaos Grid - Broken, asymmetrical layout */
+        .chaos-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-lg);
+        }
+
+        @media (min-width: 768px) {
+            .chaos-grid {
+                grid-template-columns: repeat(12, 1fr);
+                gap: var(--space-xl);
+            }
+        }
+
+        /* Asymmetrical placement based on chaos level */
+        .grid-item-1 { grid-column: 1 / -1; }
+
+        @media (min-width: 768px) {
+            .grid-item-1 { grid-column: 2 / 8; }
+            .grid-item-2 { grid-column: 7 / 13; margin-top: var(--space-4xl); }
+            .grid-item-3 { grid-column: 1 / 6; margin-top: var(--space-2xl); }
+            .grid-item-4 { grid-column: 5 / 13; margin-top: var(--space-3xl); }
+            .grid-item-5 { grid-column: 3 / 11; margin-top: var(--space-5xl); }
+        }
+
+        /* ==========================================================================
+           HEADER - FLOATING, DYNAMIC
+           ========================================================================== */
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: var(--space-md) var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            mix-blend-mode: difference;
+            color: white;
+        }
+
+        @media (min-width: 768px) {
+            .header {
+                padding: var(--space-lg) var(--space-3xl);
+            }
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-toggle {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            background: transparent;
+            border: 2px solid currentColor;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform var(--transition-bounce);
+        }
+
+        .nav-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .nav-toggle svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: var(--space-md);
+            right: var(--space-md);
+            z-index: 101;
+            width: 48px;
+            height: 48px;
+            background: var(--warm-200);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-md);
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background: var(--warm-800);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .theme-toggle svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--warm-700);
+            fill: none;
+            transition: transform var(--transition-bounce);
+        }
+
+        [data-theme="dark"] .theme-toggle svg {
+            stroke: var(--warm-200);
+        }
+
+        .theme-toggle .sun-icon { display: none; }
+        [data-theme="dark"] .theme-toggle .sun-icon { display: block; }
+        [data-theme="dark"] .theme-toggle .moon-icon { display: none; }
+
+        /* ==========================================================================
+           HERO SECTION - DRAMATIC, FULL HEIGHT
+           ========================================================================== */
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: var(--space-5xl);
+            position: relative;
+        }
+
+        .hero-title {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title .line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .hero-title .word {
+            display: inline-block;
+            transform: translateY(100%);
+            opacity: 0;
+        }
+
+        .hero-subtitle {
+            margin-top: var(--space-xl);
+            max-width: 400px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* Decorative chaotic elements */
+        .chaos-decoration {
+            position: absolute;
+            border: 3px solid var(--warm-500);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .chaos-decoration-1 {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            right: 10%;
+            transform: rotate(45deg);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .chaos-decoration-2 {
+            width: 60px;
+            height: 60px;
+            bottom: 30%;
+            left: 5%;
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        .chaos-decoration-3 {
+            width: 80px;
+            height: 80px;
+            top: 60%;
+            right: 20%;
+            transform: rotate(30deg);
+            animation: float 7s ease-in-out infinite 1s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        /* ==========================================================================
+           FEATURE CARDS - TILTED, FLOATING
+           ========================================================================== */
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: var(--space-xl);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-base);
+        }
+
+        [data-theme="dark"] .feature-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--warm-400), var(--warm-600));
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: var(--space-md);
+            stroke: var(--warm-500);
+            fill: none;
+        }
+
+        /* ==========================================================================
+           CTA SECTION - BOLD BUTTONS
+           ========================================================================== */
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-lg) var(--space-2xl);
+            font-family: var(--font-heading);
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-base);
+        }
+
+        .cta-button-primary {
+            background: var(--warm-500);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .cta-button-primary:hover {
+            background: var(--warm-600);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .cta-button-secondary {
+            background: transparent;
+            color: var(--warm-900);
+            border: 3px solid var(--warm-900);
+        }
+
+        [data-theme="dark"] .cta-button-secondary {
+            color: var(--warm-100);
+            border-color: var(--warm-100);
+        }
+
+        .cta-button-secondary:hover {
+            background: var(--warm-900);
+            color: var(--warm-100);
+        }
+
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cta-button:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0;
+            transition: transform 0s, opacity 0.3s;
+        }
+
+        /* ==========================================================================
+           3D OBJECT CONTAINER
+           ========================================================================== */
+
+        .object-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .object-container canvas {
+            display: block;
+        }
+
+        /* Interactive zones */
+        .interactive-zone {
+            position: absolute;
+            border: 2px dashed var(--warm-400);
+            border-radius: 50%;
+            pointer-events: all;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all var(--transition-base);
+        }
+
+        .interactive-zone:hover {
+            opacity: 0.6;
+            background: rgba(255, 107, 66, 0.1);
+        }
+
+        /* ==========================================================================
+           MARQUEE - SCROLLING TEXT
+           ========================================================================== */
+
+        .marquee-container {
+            overflow: hidden;
+            padding: var(--space-xl) 0;
+            background: var(--warm-200);
+            border-top: 1px solid var(--warm-300);
+            border-bottom: 1px solid var(--warm-300);
+        }
+
+        [data-theme="dark"] .marquee-container {
+            background: var(--warm-900);
+            border-color: var(--warm-800);
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 20s linear infinite;
+        }
+
+        .marquee-item {
+            flex-shrink: 0;
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--warm-600);
+            padding: 0 var(--space-xl);
+            white-space: nowrap;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ==========================================================================
+           FOOTER - MINIMAL
+           ========================================================================== */
+
+        .footer {
+            padding: var(--space-3xl) var(--space-lg);
+            background: var(--warm-200);
+            border-top: 1px solid var(--warm-300);
+        }
+
+        [data-theme="dark"] .footer {
+            background: var(--warm-900);
+            border-color: var(--warm-800);
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-lg);
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .footer-content {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
+        }
+
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 900;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: var(--space-xl);
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--warm-700);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color var(--transition-fast);
+        }
+
+        [data-theme="dark"] .footer-links a {
+            color: var(--warm-300);
+        }
+
+        .footer-links a:hover {
+            color: var(--warm-500);
+        }
+
+        /* ==========================================================================
+           UTILITY CLASSES
+           ========================================================================== */
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .sr-only-focusable:focus {
+            position: static;
+            width: auto;
+            height: auto;
+            padding: inherit;
+            margin: inherit;
+            overflow: visible;
+            clip: auto;
+            white-space: normal;
+        }
+
+        /* Glitch effect for brutalist style */
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .glitch:hover::before {
+            animation: glitch-1 0.3s linear;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .glitch:hover::after {
+            animation: glitch-2 0.3s linear;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { opacity: 0; transform: translate(0); }
+            20% { opacity: 0.8; transform: translate(-3px, 3px); }
+            40% { opacity: 0.8; transform: translate(3px, -3px); }
+            60% { opacity: 0.8; transform: translate(-3px, -3px); }
+            80% { opacity: 0.8; transform: translate(3px, 3px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { opacity: 0; transform: translate(0); }
+            20% { opacity: 0.8; transform: translate(3px, -3px); }
+            40% { opacity: 0.8; transform: translate(-3px, 3px); }
+            60% { opacity: 0.8; transform: translate(3px, 3px); }
+            80% { opacity: 0.8; transform: translate(-3px, -3px); }
+        }
+
+        /* ==========================================================================
+           RESPONSIVE ADJUSTMENTS
+           ========================================================================== */
+
+        @media (max-width: 767px) {
+            .display-text {
+                font-size: clamp(2.5rem, 15vw, 5rem);
+            }
+
+            .feature-card {
+                margin: var(--space-md);
+            }
+
+            .cta-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .marquee-item {
+                font-size: 2rem;
+            }
+        }
+
+        /* ==========================================================================
+           ANIMATION CLASSES
+           ========================================================================== */
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stagger-1 { transition-delay: 0.1s; }
+        .stagger-2 { transition-delay: 0.2s; }
+        .stagger-3 { transition-delay: 0.3s; }
+        .stagger-4 { transition-delay: 0.4s; }
+        .stagger-5 { transition-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <!-- ==========================================================================
+         NEXUS LANDING PAGE - SEED: 85975522 | CHAOS LEVEL: 8
+         Design Philosophy: Brutalist aesthetics meet immersive 3D experiences
+         The chaos level of 8 means aggressive rule-breaking in layout, typography,
+         and visual hierarchy. Elements overlap, grids are intentionally broken,
+         and animations feel organic and slightly unpredictable.
+         ========================================================================== -->
+
+    <!-- Fixed 3D Canvas Background -->
+    <div class="canvas-container" id="canvasContainer"></div>
+
+    <!-- Header with Navigation -->
+    <header class="header">
+        <a href="#" class="logo" aria-label="NEXUS Home">NEXUS</a>
+        <nav class="nav-toggle" aria-label="Toggle Navigation" role="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <line x1="4" y1="18" x2="20" y2="18" />
+            </svg>
+        </nav>
+    </header>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+        <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+    </button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title display-text glitch" data-text="CREATE">
+                <span class="line"><span class="word">CREATE</span></span>
+                <span class="line"><span class="word" style="color: var(--warm-500);">IMPACT</span></span>
+                <span class="line"><span class="word">FUTURE</span></span>
+            </h1>
+            <p class="hero-subtitle subheading-text body-text">
+                Experience the next generation of digital storytelling.
+                Immersive 3D environments that blur reality and imagination.
+            </p>
+
+            <!-- Chaos decorations - intentional visual noise -->
+            <div class="chaos-decoration chaos-decoration-1"></div>
+            <div class="chaos-decoration chaos-decoration-2"></div>
+            <div class="chaos-decoration chaos-decoration-3"></div>
+        </section>
+
+        <!-- Feature Grid - Asymmetrical Placement -->
+        <section class="chaos-grid" style="margin-top: var(--space-5xl);">
+            <article class="feature-card grid-item-1 fade-in">
+                <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
+                    <line x1="12" y1="22" x2="12" y2="15.5" />
+                    <polyline points="22 8.5 12 15.5 2 8.5" />
+                    <polyline points="2 15.5 12 8.5 22 15.5" />
+                </svg>
+                <h2 class="heading-text">3D Immersion</h2>
+                <p class="body-text" style="margin-top: var(--space-md);">
+                    WebGL-powered experiences that transport users into living digital worlds.
+                    Real-time rendering meets artistic vision.
+                </p>
+            </article>
+
+            <article class="feature-card grid-item-2 fade-in stagger-1">
+                <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                </svg>
+                <h2 class="heading-text">Real-time Animation</h2>
+                <p class="body-text" style="margin-top: var(--space-md);">
+                    GSAP-powered motion that responds to user interaction.
+                    Every scroll, hover, and movement creates meaningful engagement.
+                </p>
+            </article>
+
+            <article class="feature-card grid-item-3 fade-in stagger-2">
+                <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <line x1="9" y1="3" x2="9" y2="21" />
+                </svg>
+                <h2 class="heading-text">Adaptive Layout</h2>
+                <p class="body-text" style="margin-top: var(--space-md);">
+                    Chaos-level 8 design that breaks traditional rules.
+                    Mobile-first architecture with desktop ambition.
+                </p>
+            </article>
+
+            <article class="feature-card grid-item-4 fade-in stagger-3">
+                <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <h2 class="heading-text">Performance First</h2>
+                <p class="body-text" style="margin-top: var(--space-md);">
+                    Optimized shaders and efficient rendering pipelines.
+                    Beautiful experiences that load instantly.
+                </p>
+            </article>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="chaos-grid" style="margin-top: var(--space-5xl); margin-bottom: var(--space-5xl);">
+            <div class="grid-item-5 fade-in stagger-4" style="text-align: center;">
+                <h2 class="heading-text" style="margin-bottom: var(--space-xl);">
+                    Ready to Transform<br>
+                    <span style="color: var(--warm-500);">Your Digital Presence?</span>
+                </h2>
+                <div style="display: flex; flex-wrap: wrap; gap: var(--space-md); justify-content: center;">
+                    <a href="#" class="cta-button cta-button-primary">
+                        Start Project
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </a>
+                    <a href="#" class="cta-button cta-button-secondary">
+                        View Portfolio
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scrolling Marquee -->
+    <div class="marquee-container" aria-hidden="true">
+        <div class="marquee-content">
+            <span class="marquee-item">IMMERSIVE EXPERIENCES</span>
+            <span class="marquee-item">•</span>
+            <span class="marquee-item">3D VISUALIZATION</span>
+            <span class="marquee-item">•</span>
+            <span class="marquee-item">CREATIVE TECHNOLOGY</span>
+            <span class="marquee-item">•</span>
+            <span class="marquee-item">DIGITAL INNOVATION</span>
+            <span class="marquee-item">•</span>
+            <span class="marquee-item">WEBGL MAGIC</span>
+            <span class="marquee-item">•</span>
+            <span class="marquee-item">BRUTALIST DESIGN</span>
+            <span class="marquee-item">•</span>
+            <!-- Duplicate for seamless loop -->
+            <span class="marquee-item">IMMERSIVE EXPERIENCES</span>
+            <span class="marquee-item">•</span>
+            <span class="marquee-item">3D VISUALIZATION</span>
+            <span class="marquee-item">•</span>
+            <span class="marquee-item">CREATIVE TECHNOLOGY</span>
+            <span class="marquee-item">•</span>
+            <span class="marquee-item">DIGITAL INNOVATION</span>
+            <span class="marquee-item">•</span>
+            <span class="marquee-item">WEBGL MAGIC</span>
+            <span class="marquee-item">•</span>
+            <span class="marquee-item">BRUTALIST DESIGN</span>
+            <span class="marquee-item">•</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <span class="footer-logo">NEXUS</span>
+            <ul class="footer-links">
+                <li><a href="#">Work</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="#">Blog</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- Three.js for 3D Rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Custom 3D Scene -->
+    <script>
+        /**
+         * NEXUS 3D Experience - Seed: 85975522
+         * Chaos Level: 8
+         *
+         * This script creates an immersive 3D environment featuring:
+         * - Floating cubes with organic movement patterns
+         * - Mouse/touch interaction for dynamic camera movement
+         * - Custom shaders for warm color palette integration
+         * - Performance-optimized rendering
+         */
+
+        // ==========================================================================
+        // CONFIGURATION
+        // ==========================================================================
+
+        const CONFIG = {
+            cubeCount: 25,
+            cubeSize: { min: 0.5, max: 2.5 },
+            rotationSpeed: { min: 0.001, max: 0.005 },
+            floatSpeed: { min: 0.3, max: 0.8 },
+            floatAmplitude: { min: 1, max: 3 },
+            colors: [
+                0xFF6B42, // Warm orange
+                0xF54D26, // Coral red
+                0xE03A1A, // Deep coral
+                0xFF946E, // Light coral
+                0xBC2F16, // Burnt sienna
+            ],
+            mouseSensitivity: 0.0003,
+            lerpFactor: 0.05,
+        };
+
+        // ==========================================================================
+        // THREE.JS SETUP
+        // ==========================================================================
+
+        class NexusScene {
+            constructor() {
+                this.container = document.getElementById('canvasContainer');
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.cubes = [];
+                this.clock = new THREE.Clock();
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.targetX = 0;
+                this.targetY = 0;
+                this.time = 0;
+
+                this.init();
+            }
+
+            init() {
+                // Scene
+                this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.FogExp2(0xFFF8F5, 0.02);
+
+                // Camera
+                this.camera = new THREE.PerspectiveCamera(
+                    75,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    1000
+                );
+                this.camera.position.z = 15;
+                this.camera.position.y = 5;
+
+                // Renderer
+                this.renderer = new THREE.WebGLRenderer({
+                    antialias: true,
+                    alpha: true,
+                    powerPreference: 'high-performance'
+                });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.setClearColor(0x000000, 0);
+                this.container.appendChild(this.renderer.domElement);
+
+                // Lighting
+                this.setupLighting();
+
+                // Create cubes
+                this.createCubes();
+
+                // Create particles
+                this.createParticles();
+
+                // Events
+                this.bindEvents();
+
+                // Start animation
+                this.animate();
+
+                // Handle theme changes
+                this.handleThemeChange();
+            }
+
+            setupLighting() {
+                // Ambient light
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                this.scene.add(ambientLight);
+
+                // Main directional light
+                const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                mainLight.position.set(10, 20, 10);
+                this.scene.add(mainLight);
+
+                // Accent lights for warmth
+                const warmLight1 = new THREE.PointLight(0xFF6B42, 0.5, 50);
+                warmLight1.position.set(-10, 10, 10);
+                this.scene.add(warmLight1);
+
+                const warmLight2 = new THREE.PointLight(0xF54D26, 0.3, 50);
+                warmLight2.position.set(10, -10, 10);
+                this.scene.add(warmLight2);
+            }
+
+            createCubes() {
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+
+                for (let i = 0; i < CONFIG.cubeCount; i++) {
+                    // Random material with warm colors
+                    const material = new THREE.MeshStandardMaterial({
+                        color: CONFIG.colors[Math.floor(Math.random() * CONFIG.colors.length)],
+                        metalness: 0.3,
+                        roughness: 0.4,
+                        transparent: true,
+                        opacity: 0.8 + Math.random() * 0.2,
+                    });
+
+                    const cube = new THREE.Mesh(geometry, material);
+
+                    // Random positioning with chaos level 8 - more spread out
+                    cube.position.x = (Math.random() - 0.5) * 40;
+                    cube.position.y = (Math.random() - 0.5) * 30;
+                    cube.position.z = (Math.random() - 0.5) * 20 - 5;
+
+                    // Random scaling
+                    const scale = CONFIG.cubeSize.min + Math.random() * (CONFIG.cubeSize.max - CONFIG.cubeSize.min);
+                    cube.scale.set(scale, scale, scale);
+
+                    // Store animation data
+                    cube.userData = {
+                        rotationSpeed: {
+                            x: (Math.random() - 0.5) * CONFIG.rotationSpeed.max * 2,
+                            y: (Math.random() - 0.5) * CONFIG.rotationSpeed.max * 2,
+                            z: (Math.random() - 0.5) * CONFIG.rotationSpeed.max * 2,
+                        },
+                        floatSpeed: CONFIG.floatSpeed.min + Math.random() * (CONFIG.floatSpeed.max - CONFIG.floatSpeed.min),
+                        floatAmplitude: CONFIG.floatAmplitude.min + Math.random() * (CONFIG.floatAmplitude.max - CONFIG.floatAmplitude.min),
+                        initialY: cube.position.y,
+                        phase: Math.random() * Math.PI * 2,
+                    };
+
+                    this.cubes.push(cube);
+                    this.scene.add(cube);
+                }
+            }
+
+            createParticles() {
+                const particleCount = 500;
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                const colors = new Float32Array(particleCount * 3);
+
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3] = (Math.random() - 0.5) * 100;
+                    positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 50 - 10;
+
+                    // Warm color palette
+                    const color = new THREE.Color(CONFIG.colors[Math.floor(Math.random() * CONFIG.colors.length)]);
+                    colors[i * 3] = color.r;
+                    colors[i * 3 + 1] = color.g;
+                    colors[i * 3 + 2] = color.b;
+                }
+
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+                const material = new THREE.PointsMaterial({
+                    size: 0.1,
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0.6,
+                    blending: THREE.AdditiveBlending,
+                });
+
+                this.particles = new THREE.Points(geometry, material);
+                this.scene.add(this.particles);
+            }
+
+            bindEvents() {
+                // Mouse movement
+                window.addEventListener('mousemove', (e) => {
+                    this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                    this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+                });
+
+                // Touch support
+                window.addEventListener('touchmove', (e) => {
+                    if (e.touches.length > 0) {
+                        this.mouseX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+                        this.mouseY = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+                    }
+                });
+
+                // Resize
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+
+                // Theme change observer
+                const observer = new MutationObserver(() => this.handleThemeChange());
+                observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+            }
+
+            handleThemeChange() {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const bgColor = isDark ? 0x09090B : 0xFFF8F5;
+                const fogColor = isDark ? 0x09090B : 0xFFF8F5;
+
+                this.scene.fog.color.setHex(fogColor);
+                this.renderer.setClearColor(0x000000, 0);
+
+                // Update lights for theme
+                this.scene.children.forEach(child => {
+                    if (child.isPointLight) {
+                        child.intensity = isDark ? child.intensity * 0.5 : child.intensity * 2;
+                    }
+                });
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+
+                const delta = this.clock.getDelta();
+                this.time += delta;
+
+                // Smooth mouse following
+                this.targetX += (this.mouseX - this.targetX) * CONFIG.lerpFactor;
+                this.targetY += (this.mouseY - this.targetY) * CONFIG.lerpFactor;
+
+                // Animate cubes
+                this.cubes.forEach((cube, index) => {
+                    // Rotation
+                    cube.rotation.x += cube.userData.rotationSpeed.x;
+                    cube.rotation.y += cube.userData.rotationSpeed.y;
+                    cube.rotation.z += cube.userData.rotationSpeed.z;
+
+                    // Floating motion
+                    cube.position.y = cube.userData.initialY +
+                        Math.sin(this.time * cube.userData.floatSpeed + cube.userData.phase) *
+                        cube.userData.floatAmplitude;
+
+                    // Subtle drift towards mouse
+                    cube.position.x += (this.targetX * 2 - cube.position.x * 0.1) * 0.01;
+                    cube.position.z += (this.targetY * 2 - cube.position.z * 0.1) * 0.01;
+                });
+
+                // Rotate particles slowly
+                if (this.particles) {
+                    this.particles.rotation.y += 0.0002;
+                    this.particles.rotation.x += 0.0001;
+                }
+
+                // Camera movement based on mouse
+                this.camera.position.x += (this.targetX * 3 - this.camera.position.x) * 0.02;
+                this.camera.position.y += (this.targetY * 3 + 5 - this.camera.position.y) * 0.02;
+                this.camera.lookAt(0, 0, 0);
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // ==========================================================================
+        // GSAP ANIMATIONS
+        // ==========================================================================
+
+        function initGSAPAnimations() {
+            // Hero text reveal
+            const heroWords = document.querySelectorAll('.hero-title .word');
+            heroWords.forEach((word, index) => {
+                gsap.to(word, {
+                    y: 0,
+                    opacity: 1,
+                    duration: 1.2,
+                    ease: 'power4.out',
+                    delay: index * 0.2,
+                });
+            });
+
+            // Subtitle fade in
+            gsap.to('.hero-subtitle', {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                delay: 0.8,
+                ease: 'power3.out',
+            });
+
+            // Scroll animations for feature cards
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px',
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Parallax effect for decorations
+            gsap.to('.chaos-decoration-1', {
+                y: 50,
+                scrollTrigger: {
+                    trigger: '.hero-section',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: 1,
+                },
+            });
+
+            gsap.to('.chaos-decoration-2', {
+                y: -30,
+                scrollTrigger: {
+                    trigger: '.hero-section',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: 1,
+                },
+            });
+        }
+
+        // ==========================================================================
+        // THEME TOGGLE
+        // ==========================================================================
+
+        function initThemeToggle() {
+            const toggle = document.getElementById('themeToggle');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            // Set initial theme
+            if (prefersDark || localStorage.getItem('theme') === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+
+            toggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        }
+
+        // ==========================================================================
+        // INITIALIZATION
+        // ==========================================================================
+
+        // Load GSAP
+        const gsapScript = document.createElement('script');
+        gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+        gsapScript.onload = () => {
+            gsapScript.onload = null;
+            const scrollTriggerScript = document.createElement('script');
+            scrollTriggerScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
+            scrollTriggerScript.onload = () => {
+                gsap.registerPlugin(ScrollTrigger);
+                initGSAPAnimations();
+            };
+            document.head.appendChild(scrollTriggerScript);
+        };
+        document.head.appendChild(gsapScript);
+
+        // Initialize Three.js scene
+        window.addEventListener('DOMContentLoaded', () => {
+            initThemeToggle();
+
+            // Check if Three.js loaded
+            if (typeof THREE !== 'undefined') {
+                new NexusScene();
+            } else {
+                // Retry if Three.js not yet loaded
+                setTimeout(() => {
+                    if (typeof THREE !== 'undefined') {
+                        new NexusScene();
+                    }
+                }, 100);
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

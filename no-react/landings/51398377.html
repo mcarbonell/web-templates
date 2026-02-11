@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHER | Future of Digital Presence</title>
+    <!-- 
+        SEED DECOMPOSITION: 51398377
+        ----------------------------
+        5: Color Palette - Deep Indigo (#4F46E5) as primary agent of trust and depth.
+        1: Layout - Minimalist Asymmetric Grid. Using "Bento" style containers for content sections.
+        3: Typography - Using 'Outfit' for a geometric yet friendly modern feel.
+        9: Visual Effects - Heavy use of "Glassmorphism" and "Noise" textures for depth.
+        8: Interactivity - Smooth Magnetic buttons and Cursor-following background glows.
+        3: Micro-animations - Scroll-triggered reveals with GSAP for fluid feeling.
+        7: Accent Style - Electric Cyan (#06B6D4) used for highlights and CTA buttons.
+        7: Background Flow - Animated gradient blobs that change based on theme.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.4);
+            --accent: #06b6d4;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --card-light: rgba(255, 255, 255, 0.7);
+            --card-dark: rgba(30, 41, 59, 0.7);
+            --text-light: #1e293b;
+            --text-dark: #f1f5f9;
+            --border-light: rgba(0, 0, 0, 0.05);
+            --border-dark: rgba(255, 255, 255, 0.1);
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: var(--transition);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        /* Noise Texture Overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3External%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .background-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            filter: blur(80px);
+        }
+
+        .blob {
+            position: absolute;
+            width: 40vw;
+            height: 40vw;
+            border-radius: 50%;
+            background: var(--primary-glow);
+            animation: move 20s infinite alternate;
+        }
+
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            background: rgba(79, 70, 229, 0.2);
+        }
+
+        .blob-2 {
+            bottom: -10%;
+            right: -10%;
+            background: rgba(6, 182, 212, 0.2);
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(10%, 10%) scale(1.1);
+            }
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .dark-mode nav {
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: inherit;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--card-light);
+            transition: var(--transition);
+        }
+
+        .dark-mode .theme-toggle {
+            background: var(--card-dark);
+            border-color: var(--border-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 200px 0 100px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            max-width: 900px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 30px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px var(--primary-glow);
+        }
+
+        /* Bento Grid Section */
+        .features {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 200px;
+            gap: 1.5rem;
+        }
+
+        .bento-item {
+            background: var(--card-light);
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .dark-mode .bento-item {
+            background: var(--card-dark);
+            border-color: var(--border-dark);
+        }
+
+        .bento-item:hover {
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .item-1 {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .item-2 {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+
+        .item-3 {
+            grid-column: span 1;
+            grid-row: span 2;
+        }
+
+        .item-4 {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+
+        .item-5 {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+
+        @media (max-width: 768px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+                grid-auto-rows: auto;
+            }
+
+            .item-1,
+            .item-2,
+            .item-3,
+            .item-4,
+            .item-5 {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+        }
+
+        .bento-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .bento-item p {
+            opacity: 0.7;
+            font-size: 0.95rem;
+        }
+
+        /* Marquee Section */
+        .marquee {
+            overflow: hidden;
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 0;
+            white-space: nowrap;
+            position: relative;
+            margin: 50px 0;
+        }
+
+        .marquee-inner {
+            display: flex;
+            animation: marquee 20s linear infinite;
+        }
+
+        .marquee span {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0 2rem;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 100px 0;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 3rem;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.6;
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: 100px 0;
+        }
+
+        .faq-item {
+            background: var(--card-light);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .dark-mode .faq-item {
+            background: var(--card-dark);
+            border-color: var(--border-dark);
+        }
+
+        .faq-question {
+            padding: 1.5rem 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .faq-answer {
+            padding: 0 2rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: var(--transition);
+            opacity: 0;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 2rem 1.5rem;
+            max-height: 200px;
+            opacity: 0.8;
+        }
+
+        footer {
+            padding: 100px 5% 50px;
+            text-align: center;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .dark-mode footer {
+            border-color: var(--border-dark);
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+
+        .copyright {
+            margin-top: 3rem;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s;
+        }
+
+        @media (max-width: 1024px) {
+            .cursor {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="dark-mode"> <!-- Default to dark mode for striking impression -->
+
+    <div class="cursor"></div>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <nav>
+        <div class="logo">AETHER.</div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#stats">Performance</a>
+            <a href="#faq">FAQ</a>
+            <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark Mode">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="sun-icon">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+            </button>
+            <a href="#" class="btn btn-primary" style="padding: 0.6rem 1.5rem;">Join Beta</a>
+        </div>
+    </nav>
+
+    <header class="hero container">
+        <h1 class="reveal">Next Evolution of Digital Identity</h1>
+        <p class="reveal">Build cutting-edge digital experiences with our minimalist, performance-first framework
+            designed for the boldest creators.</p>
+        <div class="reveal">
+            <a href="#features" class="btn btn-primary">Explore Core</a>
+            <a href="#" class="btn" style="margin-left: 1rem; border: 1px solid var(--border-dark);">View
+                Documentation</a>
+        </div>
+    </header>
+
+    <div class="marquee">
+        <div class="marquee-inner">
+            <span>Modern Aesthetic</span>
+            <span>Geometric Design</span>
+            <span>Ultra Fast</span>
+            <span>Mobile First</span>
+            <span>Open Source</span>
+            <span>Modern Aesthetic</span>
+            <span>Geometric Design</span>
+            <span>Ultra Fast</span>
+            <span>Mobile First</span>
+            <span>Open Source</span>
+        </div>
+    </div>
+
+    <section id="features" class="features container">
+        <div class="section-title reveal">
+            <h2>The Aether Toolkit</h2>
+        </div>
+        <div class="bento-grid">
+            <div class="bento-item item-1 reveal">
+                <h3>Infinite Scalability</h3>
+                <p>Proprietary load balancing that grows with your audience without missing a pulse.</p>
+            </div>
+            <div class="bento-item item-2 reveal">
+                <h3>Adaptive UI</h3>
+                <p>Real-time aesthetic adjustments based on user context.</p>
+            </div>
+            <div class="bento-item item-3 reveal">
+                <h3>Edge Logic</h3>
+                <p>Run complex workflows literally anywhere in the world in milliseconds.</p>
+            </div>
+            <div class="bento-item item-4 reveal">
+                <h3>Trust-less</h3>
+                <p>End-to-end encrypted metadata for every single packet.</p>
+            </div>
+            <div class="bento-item item-5 reveal">
+                <h3>Eco-Conscious</h3>
+                <p>90% less carbon footprint than legacy cloud solutions.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="stats" class="stats container">
+        <div class="stat-card reveal">
+            <div class="stat-number">99.9</div>
+            <div class="stat-label">Uptime %</div>
+        </div>
+        <div class="stat-card reveal">
+            <div class="stat-number">12ms</div>
+            <div class="stat-label">Latency</div>
+        </div>
+        <div class="stat-card reveal">
+            <div class="stat-number">5M+</div>
+            <div class="stat-label">Requests/s</div>
+        </div>
+    </section>
+
+    <section id="faq" class="faq container">
+        <div class="section-title reveal">
+            <h2>Common Inquiries</h2>
+        </div>
+        <div style="max-width: 800px; margin: 0 auto;">
+            <div class="faq-item reveal">
+                <div class="faq-question">
+                    Is Aether compatible with legacy frameworks?
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    Yes, Aether provides a seamless bridge for React, Vue, and Svelte, allowing you to migrate at your
+                    own pace while enjoying performance boosts immediately.
+                </div>
+            </div>
+            <div class="faq-item reveal">
+                <div class="faq-question">
+                    What makes the design "Novel"?
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    We use a combination of geometric grids, glassmorphism, and noise textures influenced by
+                    architectural brutalism and high-fashion aesthetics.
+                </div>
+            </div>
+            <div class="faq-item reveal">
+                <div class="faq-question">
+                    How do I switch between modes?
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    Simply click the toggle icon in the navigation bar. Our system automatically remembers your
+                    preference for future visits using local storage.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-logo">AETHER.</div>
+        <div class="nav-links" style="display: flex; justify-content: center; margin-bottom: 2rem;">
+            <a href="#">Twitter</a>
+            <a href="#">GitHub</a>
+            <a href="#">Discord</a>
+        </div>
+        <p>Built with precision in the future.</p>
+        <div class="copyright">&copy; 2026 Aether Systems Inc. Seed 51398377</div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            themeToggle.innerHTML = isDark
+                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sun-icon"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="moon-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
+            // Adjust CSS variables for light/dark explicitly if needed or rely on .dark-mode selector
+        });
+
+        // FAQ Accordion Logic
+        document.querySelectorAll('.faq-question').forEach(q => {
+            q.addEventListener('click', () => {
+                const item = q.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+
+        // Custom Cursor Movement
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Magnetic Button Effect for Hero CTA
+        const btn = document.querySelector('.hero .btn-primary');
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+        });
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = `translate(0, 0)`;
+        });
+
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.utils.toArray('.reveal').forEach(elem => {
+            gsap.from(elem, {
+                scrollTrigger: {
+                    trigger: elem,
+                    start: "top 85%",
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+
+        // Typing title effect based on seed (subtle variation)
+        const title = document.querySelector('.hero h1');
+        const text = title.innerText;
+        title.innerText = '';
+        let i = 0;
+        function typeWriter() {
+            if (i < text.length) {
+                title.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 50);
+            }
+        }
+        typeWriter();
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethereal Flow | Template 589240108</title>
+    <!-- 
+        DESIGN CHOICES - TEMPLATE 589240108
+        Seed: 589240108
+        Concept: Neo-Ethereal / Liquid Metal (Concept 4)
+        Chaos Level: 1 (Minimalist Structure, balanced grid)
+        Palette: Deep Amethyst & Obsidian / Soft Pearl & Lavender (Palette 4)
+        3D Logic: Three.js Shader Plane (Logic 1)
+
+        The design focuses on the contrast between high-end shader complexity and a strictly structured layout (Chaos 1).
+        Smooth GSAP transitions and custom Three.js ray-marching elements create a high-premium feel.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --fg: #f5f5f7;
+            --accent: #9d5ae5;
+            --accent-glow: rgba(157, 90, 229, 0.3);
+            --surface: rgba(255, 255, 255, 0.05);
+            --transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        [data-theme="light"] {
+            --bg: #f5f5f7;
+            --fg: #0a0a0c;
+            --accent: #7c3aed;
+            --accent-glow: rgba(124, 58, 237, 0.1);
+            --surface: rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            overflow-x: hidden;
+            transition: background-color var(--transition), color var(--transition);
+        }
+
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Nav */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            width: 50px;
+            height: 25px;
+            background: var(--surface);
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 19px;
+            height: 19px;
+            background: var(--accent);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        [data-theme="light"] .toggle-knob {
+            left: 27px;
+        }
+
+        /* Hero */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 12vw;
+            line-height: 0.9;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .hero-title span {
+            display: block;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--fg);
+        }
+
+        .hero-desc {
+            max-width: 600px;
+            font-size: 1.25rem;
+            opacity: 0.7;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            background: var(--accent);
+            color: white;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 10px 30px var(--accent-glow);
+            transition: transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Chaos Level 1 Grid */
+        .content-sections {
+            padding: 10vh 5vw;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: left;
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 18vw;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Scroll Progress */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent);
+            width: 0%;
+            z-index: 101;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="progress-bar" id="progress"></div>
+    <canvas id="webgl-canvas"></canvas>
+
+    <nav>
+        <div class="logo">ETHEREAL<sub>589240108</sub></div>
+        <div class="theme-toggle" id="mode-toggle">
+            <div class="toggle-knob"></div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="hero-title" id="title">
+            LIQUID<span>DIGITAL</span>FLOW
+        </h1>
+        <p class="hero-desc" id="desc">
+            Experience the harmony of crystalline aesthetics and advanced fluid mathematics. A unique vision of the
+            future, encoded in reality.
+        </p>
+        <a href="#" class="btn" id="cta">Explore Core</a>
+    </section>
+
+    <div class="content-sections">
+        <div class="card-grid">
+            <div class="card">
+                <h3>01. Fluidity</h3>
+                <p>Mathematical shaders simulating non-newtonian chrome surfaces. A dance of light and shadow.</p>
+            </div>
+            <div class="card">
+                <h3>02. Structure</h3>
+                <p>Chaos Level 1 ensures a balanced, architectural layout that emphasizes content clarity.</p>
+            </div>
+            <div class="card">
+                <h3>03. Response</h3>
+                <p>Real-time interaction mapping your cursor to the gravitational centers of the 3D surface.</p>
+            </div>
+            <div class="card">
+                <h3>04. Vision</h3>
+                <p>Pusing the boundaries of single-file deployment with high-end GLSL rendering.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shaders -->
+    <script id="vertexShader" type="x-shader/x-vertex">
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    </script>
+
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        uniform float time;
+        uniform vec2 mouse;
+        uniform vec2 resolution;
+        uniform vec3 color1;
+        uniform vec3 color2;
+        uniform vec3 bgColor;
+        varying vec2 vUv;
+
+        mat2 rot(float a) {
+            float s=sin(a), c=cos(a);
+            return mat2(c, -s, s, c);
+        }
+
+        void main() {
+            vec2 uv = (gl_FragCoord.xy - 0.5 * resolution.xy) / min(resolution.y, resolution.x);
+            
+            vec3 finalColor = bgColor;
+            
+            float d = length(uv);
+            vec2 uv2 = uv * rot(time * 0.1);
+            
+            for(float i=0.0; i<3.0; i++) {
+                uv2 = abs(uv2) - 0.5;
+                uv2 *= rot(time * 0.2 + i);
+                
+                float f = 0.01 / abs(length(uv2) - 0.2 + sin(time * 0.5 + d * 5.0) * 0.05);
+                finalColor += f * mix(color1, color2, sin(time + i) * 0.5 + 0.5);
+            }
+
+            // Mouse influence
+            float mDist = length(uv - (mouse - 0.5) * 2.0);
+            finalColor += 0.02 / (mDist + 0.5) * color1;
+
+            gl_FragColor = vec4(finalColor, 1.0);
+        }
+    </script>
+
+    <script>
+        // Theme Management
+        const body = document.body;
+        const toggle = document.getElementById('mode-toggle');
+        let isDark = true;
+
+        const colors = {
+            dark: {
+                c1: new THREE.Color(0x9d5ae5),
+                c2: new THREE.Color(0x2d1a44),
+                bg: new THREE.Color(0x0a0a0c)
+            },
+            light: {
+                c1: new THREE.Color(0x7c3aed),
+                c2: new THREE.Color(0xffffff),
+                bg: new THREE.Color(0xf5f5f7)
+            }
+        };
+
+        toggle.addEventListener('click', () => {
+            isDark = !isDark;
+            body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+            const target = colors[isDark ? 'dark' : 'light'];
+
+            // Update Shader Uniforms
+            gsap.to(uniforms.color1.value, {
+                r: target.c1.r,
+                g: target.c1.g,
+                b: target.c1.b,
+                duration: 1
+            });
+            gsap.to(uniforms.color2.value, {
+                r: target.c2.r,
+                g: target.c2.g,
+                b: target.c2.b,
+                duration: 1
+            });
+            gsap.to(uniforms.bgColor.value, {
+                r: target.bg.r,
+                g: target.bg.g,
+                b: target.bg.b,
+                duration: 1
+            });
+        });
+
+        // Three.js Setup
+        const canvas = document.getElementById('webgl-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+        const uniforms = {
+            time: { value: 0 },
+            mouse: { value: new THREE.Vector2(0.5, 0.5) },
+            resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            color1: { value: colors.dark.c1.clone() },
+            color2: { value: colors.dark.c2.clone() },
+            bgColor: { value: colors.dark.bg.clone() }
+        };
+
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const material = new THREE.ShaderMaterial({
+            uniforms,
+            vertexShader: document.getElementById('vertexShader').textContent,
+            fragmentShader: document.getElementById('fragmentShader').textContent
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        // Resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+        });
+
+        // Mouse
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(uniforms.mouse.value, {
+                x: e.clientX / window.innerWidth,
+                y: 1 - (e.clientY / window.innerHeight),
+                duration: 0.8
+            });
+        });
+
+        // Animation Loop
+        function animate(t) {
+            uniforms.time.value = t * 0.001;
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate(0);
+
+        // Entrance Animations
+        window.onload = () => {
+            const tl = gsap.timeline({ defaults: { ease: "power4.out", duration: 1.5 } });
+            tl.to("#title", { opacity: 1, y: 0, stagger: 0.1 })
+                .to("#desc", { opacity: 0.7, y: 0 }, "-=1")
+                .to("#cta", { opacity: 1, y: 0 }, "-=1");
+
+            // Scroll Progress
+            window.addEventListener('scroll', () => {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                document.getElementById("progress").style.width = scrolled + "%";
+            });
+
+            // Card Triggers
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.from(".card", {
+                scrollTrigger: {
+                    trigger: ".card-grid",
+                    start: "top 80%",
+                },
+                y: 100,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.2
+            });
+        };
+    </script>
+</body>
+
+</html>

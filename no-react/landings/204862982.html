@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Fiesta | Premium Event Rentals</title>
+    <meta name="description"
+        content="Shocking event rentals for the modern party. Furniture, lighting, and sound that defines your night.">
+    <!-- Google Fonts: Syne for headings, Inter for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Design Choices Comment
+    SEED ID: 204862982
+    BUSINESS: Events & Creative -> Party Rental Company
+    BRAND: Electric Fiesta (.events)
+    COLOR PALETTE: High Contrast Cyberpunk (Neon Blue/Purple Base Hue 230, Obsidian Background)
+    TYPOGRAPHY: Syne (Ultra Bold) + Inter
+    HERO LAYOUT: Brutalist Vertical Split Screen
+    SPECIAL FEATURE: 3D CSS Floating "Energy Cubes" & Kinetic Typography Parallax
+    ANIMATION TYPE: Elastic / Overshoot Transitions
+    VISUAL TEXTURE: Glassmorphic Layers & Grainy Noise Overlays
+    CORNER TREATMENT: 0px Sharp Brutalist Edges
+    INTERACTION: Parallax movement on hover & magnetic buttons
+    -->
+
+    <style>
+        :root {
+            /* Theme: Dark (Default) */
+            --bg: #050505;
+            --surface: #0a0a0a;
+            --surface-accent: #151515;
+            --text: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent: #00f2ff;
+            /* Electric Blue from Hue 230 logic */
+            --accent-secondary: #ff00c3;
+            /* Contrast Neon Pink */
+            --border: #222;
+            --radius: 0px;
+            --transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Elastic overshoot */
+            --glass: rgba(255, 255, 255, 0.05);
+            --blur: 12px;
+        }
+
+        [data-theme="light"] {
+            --bg: #ffffff;
+            --surface: #f5f5f5;
+            --surface-accent: #ececec;
+            --text: #050505;
+            --text-muted: #555555;
+            --accent: #2300ff;
+            /* Deep Royal Blue */
+            --accent-secondary: #d000a0;
+            --border: #dddddd;
+            --glass: rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        .syne {
+            font-family: 'Syne', sans-serif;
+            text-transform: uppercase;
+            line-height: 0.9;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* --- Components --- */
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 3rem;
+            background: var(--accent);
+            color: #000;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--text);
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: var(--accent-secondary);
+            color: #fff;
+        }
+
+        /* --- Header --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.5rem 0;
+            mix-blend-mode: difference;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+        }
+
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                height: auto;
+                padding-top: 15vh;
+            }
+        }
+
+        .hero-left {
+            padding: 6rem;
+            border-right: 2px solid var(--border);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-left {
+                border-right: none;
+                padding: 2rem;
+                border-bottom: 2px solid var(--border);
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(4rem, 10vw, 9rem);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .hero h1 span {
+            display: block;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--accent);
+        }
+
+        .hero-tagline {
+            font-size: 1.5rem;
+            max-width: 500px;
+            margin-bottom: 3rem;
+            color: var(--text-muted);
+        }
+
+        .hero-right {
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Special Feature: Floating 3D Cubes */
+        .cube-container {
+            width: 200px;
+            height: 200px;
+            perspective: 1000px;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 10s infinite linear;
+        }
+
+        .cube div {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 2px solid var(--accent);
+            background: rgba(0, 242, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-family: 'Syne';
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        .front {
+            transform: translateZ(100px);
+        }
+
+        .back {
+            transform: rotateY(180deg) translateZ(100px);
+        }
+
+        .right {
+            transform: rotateY(90deg) translateZ(100px);
+        }
+
+        .left {
+            transform: rotateY(-90deg) translateZ(100px);
+        }
+
+        .top {
+            transform: rotateX(90deg) translateZ(100px);
+        }
+
+        .bottom {
+            transform: rotateX(-90deg) translateZ(100px);
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotateX(0) rotateY(0) rotateZ(0);
+            }
+
+            100% {
+                transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+            }
+        }
+
+        /* --- Inventory Section --- */
+        .section-title {
+            padding: 8rem 2rem 4rem;
+            border-bottom: 2px solid var(--border);
+            text-align: center;
+        }
+
+        .section-title h2 {
+            font-size: clamp(3rem, 8vw, 6rem);
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        }
+
+        @media (max-width: 768px) {
+            .inventory-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .item-card {
+            border: 1px solid var(--border);
+            position: relative;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 3rem;
+            transition: var(--transition);
+        }
+
+        .item-card:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .item-card:hover .item-image {
+            transform: scale(1.1) rotate(5deg);
+            opacity: 0.1;
+        }
+
+        .item-image {
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 60%;
+            height: 60%;
+            z-index: -1;
+            transition: var(--transition);
+            filter: grayscale(1) contrast(1.2) brightness(0.8);
+        }
+
+        .item-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .item-card p {
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        /* --- Process Section --- */
+        .process {
+            background: var(--surface);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-bottom: 2px solid var(--border);
+        }
+
+        @media (max-width: 1024px) {
+            .process {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .step {
+            padding: 6rem 4rem;
+            border-right: 2px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .step:last-child {
+            border-right: none;
+        }
+
+        @media (max-width: 1024px) {
+            .step {
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+            }
+        }
+
+        .step:hover {
+            background: var(--surface-accent);
+        }
+
+        .step-num {
+            font-size: 5rem;
+            font-family: 'Syne';
+            font-weight: 800;
+            -webkit-text-stroke: 1px var(--accent);
+            color: transparent;
+            margin-bottom: 2rem;
+        }
+
+        .step h4 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* --- Kinetic Text Section --- */
+        .kinetic-marquee {
+            white-space: nowrap;
+            overflow: hidden;
+            background: var(--accent);
+            color: #000;
+            padding: 2rem 0;
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-family: 'Syne';
+            border-y: 2px solid #000;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* --- Featured Package --- */
+        .package {
+            padding: 10rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #111, #000);
+        }
+
+        .package-card {
+            max-width: 800px;
+            padding: 6rem;
+            border: 5px solid var(--accent);
+            position: relative;
+        }
+
+        .package-card::before {
+            content: 'LIMITED';
+            position: absolute;
+            top: -2.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: #000;
+            padding: 0.5rem 2rem;
+            font-weight: 900;
+            font-family: 'Syne';
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 8rem 0 4rem;
+            background: var(--bg);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 6rem;
+            margin-bottom: 4rem;
+        }
+
+        @media (max-width: 1024px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .footer-brand h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            max-width: 400px;
+        }
+
+        .footer-links h5 {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--accent);
+        }
+
+        .footer-links li {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        .footer-links li:hover {
+            color: var(--text);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* --- Custom Effects --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: var(--transition);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cursor-blob {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+            transform: translate(-50%, -50%);
+            transition: 0.1s linear;
+        }
+
+        /* Glassmorphism Classes */
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="cursor-blob" id="blob"></div>
+
+    <nav aria-label="Main Navigation">
+        <div class="container nav-content">
+            <a href="#" class="logo syne" aria-label="Electric Fiesta Home">ELECTRIC FIESTA<span
+                    style="color:var(--accent)">.</span></a>
+            <ul class="nav-links">
+                <li><a href="#inventory" aria-label="Our Inventory">Inventory</a></li>
+                <li><a href="#process" aria-label="How it works">Process</a></li>
+                <li><a href="#packages" aria-label="Event Packages">Packages</a></li>
+                <li><a href="#contact" aria-label="Contact Us">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle Light and Dark Mode">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun-moon">
+                    <path d="M12 8a2.83 2.83 0 0 0 4 4" />
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="m4.9 4.9 1.4 1.4" />
+                    <path d="m17.7 17.7 1.4 1.4" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
+                    <path d="m6.3 17.7-1.4 1.4" />
+                    <path d="m19.1 4.9-1.4 1.4" />
+                    <path d="M22 3a5 5 0 0 0-9 4.5 7 7 0 1 1-4.5 9A5 5 0 1 0 22 3Z" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-left">
+                <h1 class="reveal">WE RENT <span>ATMOSPHERE</span></h1>
+                <p class="hero-tagline reveal">Premium sound, neon lighting, and high-end furniture for events that
+                    refuse to be forgotten.</p>
+                <div class="hero-btns reveal">
+                    <a href="#inventory" class="btn" aria-label="View Inventory">View Stock</a>
+                    <a href="#" class="btn btn-outline" style="margin-left: 1rem"
+                        aria-label="Book a consultation">Consult</a>
+                </div>
+            </div>
+            <div class="hero-right">
+                <div class="cube-container">
+                    <div class="cube" aria-hidden="true">
+                        <div class="front">SOUND</div>
+                        <div class="back">LIGHT</div>
+                        <div class="right">STAGING</div>
+                        <div class="left">PARTY</div>
+                        <div class="top">DANCE</div>
+                        <div class="bottom">BASH</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marquee Section -->
+        <div class="kinetic-marquee" aria-hidden="true">
+            <div class="marquee-content">
+                NO BORING PARTIES &bull; ELECTRIC RENTALS &bull; SOUND SYSTEMS &bull; NEON NIGHTS &bull; DESIGNER
+                STAGING &bull; NO BORING PARTIES &bull; ELECTRIC RENTALS &bull; SOUND SYSTEMS &bull; NEON NIGHTS &bull;
+                DESIGNER STAGING &bull;
+            </div>
+        </div>
+
+        <!-- Inventory Grid -->
+        <section class="section-title" id="inventory">
+            <h2 class="reveal">THE VAULT</h2>
+        </section>
+
+        <section class="inventory-grid">
+            <div class="item-card reveal" aria-labelledby="item1">
+                <svg class="item-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <path d="M2 12h20M2 12l4-4M2 12l4 4M22 12l-4-4M22 12l-4 4" />
+                </svg>
+                <h3 id="item1">AUDIO</h3>
+                <p>10kW Sound-stacks & Sublow arrays</p>
+            </div>
+            <div class="item-card reveal" aria-labelledby="item2">
+                <svg class="item-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M8 12h8M12 8v8" />
+                </svg>
+                <h3 id="item2">VISION</h3>
+                <p>Laser projectors & LED wall panels</p>
+            </div>
+            <div class="item-card reveal" aria-labelledby="item3">
+                <svg class="item-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+                </svg>
+                <h3 id="item3">GLOW</h3>
+                <p>Neon tubes & DMX moving heads</p>
+            </div>
+            <div class="item-card reveal" aria-labelledby="item4">
+                <svg class="item-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <path d="M3 3h18v18H3zM9 9h6v6H9z" />
+                </svg>
+                <h3 id="item4">MODS</h3>
+                <p>Brutalist furniture & custom modular bars</p>
+            </div>
+        </section>
+
+        <!-- Process Section -->
+        <section class="process" id="process">
+            <div class="step reveal">
+                <div class="step-num" aria-hidden="true">01</div>
+                <h4>CURATE</h4>
+                <p>Select your gear from our curated 'Vault' or speak to our event designers for a custom package.</p>
+            </div>
+            <div class="step reveal">
+                <div class="step-num" aria-hidden="true">02</div>
+                <h4>DEPLOY</h4>
+                <p>Our black-ops crew arrives onsite to install and sound-check your event. Zero friction. Total
+                    precision.</p>
+            </div>
+            <div class="step reveal">
+                <div class="step-num" aria-hidden="true">03</div>
+                <h4>ASCEND</h4>
+                <p>Host the event of the decade. We handle the teardown while you handle the memories.</p>
+            </div>
+        </section>
+
+        <!-- Featured Package -->
+        <section class="package reveal" id="packages">
+            <div class="package-card glass">
+                <h2 class="syne" style="font-size: 4rem; margin-bottom: 2rem;">NEON OVERDRIVE</h2>
+                <ul style="margin-bottom: 3rem; text-align: left; font-size: 1.2rem;">
+                    <li>&bull; Full L-Acoustics Sound System</li>
+                    <li>&bull; 40-Piece Neon Arcs Array</li>
+                    <li>&bull; Haze & Atmosphere Generator</li>
+                    <li>&bull; Modular Brutalist Lounge Set</li>
+                </ul>
+                <a href="#" class="btn" aria-label="Rent Neon Overdrive Package">Request $4,999+</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2 class="syne">ELECTRIC FIESTA</h2>
+                    <p>Redefining event aesthetics for those who crave the bold. Not for the faint of heart.</p>
+                </div>
+                <div class="footer-links">
+                    <h5>SERVICES</h5>
+                    <ul>
+                        <li><a href="#">Audio Rental</a></li>
+                        <li><a href="#">Light Design</a></li>
+                        <li><a href="#">Furniture Hire</a></li>
+                        <li><a href="#">Event Tech</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h5>COMPANY</h5>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Portfolio</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Legal</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h5>CONNECT</h5>
+                    <ul>
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">Vimeo</a></li>
+                        <li><a href="#">Behance</a></li>
+                        <li><a href="#">Spotify</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 ELECTRIC FIESTA. 204862982_TEMPL</p>
+                <p>ESTABLISHED IN DARKNESS</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+        });
+
+        // Mouse Blob Movement
+        const blob = document.getElementById('blob');
+        document.addEventListener('mousemove', (e) => {
+            blob.style.left = e.clientX + 'px';
+            blob.style.top = e.clientY + 'px';
+        });
+
+        // Reveal on Scroll Logic
+        const reveal = () => {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const revealTop = el.getBoundingClientRect().top;
+                const revealPoint = 150;
+
+                if (revealTop < windowHeight - revealPoint) {
+                    el.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', reveal);
+        reveal(); // Trigger on load
+
+        // Performance Optimization: Throttle Scroll
+        let isScrolling = false;
+        window.addEventListener('scroll', () => {
+            if (!isScrolling) {
+                window.requestAnimationFrame(() => {
+                    reveal();
+                    isScrolling = false;
+                });
+                isScrolling = true;
+            }
+        });
+
+        // Simple Magnetic Effect on Hero BTN
+        const btn = document.querySelector('.hero-btns .btn');
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px) scale(1.05)`;
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = `translate(0px, 0px) scale(1)`;
+        });
+
+    </script>
+</body>
+
+</html>

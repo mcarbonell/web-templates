@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIOCA.io - The Future of Digital Experience</title>
+  
+  <!-- Fonts: Plus Jakarta Sans + DM Serif -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- AOS Animation Library -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    /* ========================================
+       DESIGN CHOICES EXPLANATION
+       Template ID: 710358700
+       
+       Theme: Cyber Lime (#00ff88, #32cd32)
+       - Neon green accents for energy/vitality
+       - High contrast on both light/dark modes
+       
+       Hero: Centered floating cards with depth
+       - 3D perspective on hero section
+       - Cards float at different z-depths
+       
+       Layout: Full-width sections with contained content
+       - Sections span viewport width
+       - Content constrained to max-width
+       
+       Special Feature: Particle system (floating orbs)
+       - Canvas-based particle animation
+       - Interactive mouse repulsion
+       
+       Animation: Elastic bounce (AOS + custom)
+       - Springy entrance animations
+       - Elastic hover effects
+       
+       Typography: Plus Jakarta Sans (body) + DM Serif (headings)
+       - Modern geometric sans-serif
+       - Elegant serif for impact
+       
+       Radius: Soft (12px) throughout
+       - Consistent border-radius
+       - Friendly, approachable aesthetic
+       
+       Navigation: Bottom bar (mobile-first)
+       - Accessible thumb zone
+       - Persistent across all sections
+       ======================================== */
+    
+    :root {
+      /* Base colors */
+      --lime-400: #32cd32;
+      --lime-300: #00ff88;
+      --lime-200: #66ffaa;
+      --lime-100: #99ffcc;
+      
+      /* Dark theme (default) */
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-tertiary: #1a1a25;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0b0;
+      --text-muted: #606070;
+      --accent: var(--lime-300);
+      --accent-soft: var(--lime-400);
+      --glow: rgba(0, 255, 136, 0.4);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: rgba(0, 0, 0, 0.5);
+    }
+    
+    [data-theme="light"] {
+      --bg-primary: #fafafa;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f0f0f5;
+      --text-primary: #0a0a0f;
+      --text-secondary: #4a4a5a;
+      --text-muted: #8a8a9a;
+      --accent: #00c968;
+      --accent-soft: #28a745;
+      --glow: rgba(0, 201, 104, 0.2);
+      --border: rgba(0, 0, 0, 0.08);
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+    
+    h1, h2, h3, h4 {
+      font-family: 'DM Serif Display', serif;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+    
+    /* Typography scale */
+    .heading-xl {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      letter-spacing: -0.02em;
+    }
+    
+    .heading-lg {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: -0.01em;
+    }
+    
+    .heading-md {
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+    }
+    
+    .heading-sm {
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+    }
+    
+    .body-lg {
+      font-size: 1.125rem;
+      line-height: 1.7;
+    }
+    
+    .body-md {
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    
+    .body-sm {
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    
+    /* Particle Canvas */
+    .particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      border-radius: 12px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+      color: var(--bg-primary);
+      box-shadow: 0 4px 24px var(--glow);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 32px var(--glow);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
+      transform: translateY(-3px);
+      border-color: var(--accent);
+    }
+    
+    .btn-glow::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, var(--accent), transparent, var(--accent));
+      border-radius: 14px;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .btn-glow:hover::before {
+      opacity: 1;
+    }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(var(--bg-secondary-rgb, 18, 18, 26), 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding: 0.75rem 0;
+    }
+    
+    .nav-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.5rem 1rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      border-radius: 12px;
+    }
+    
+    .nav-item:hover,
+    .nav-item.active {
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+    
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .nav-item:hover svg {
+      transform: scale(1.15);
+    }
+    
+    .theme-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .theme-toggle:hover {
+      background: var(--accent);
+      color: var(--bg-primary);
+      transform: rotate(180deg) scale(1.1);
+    }
+    
+    /* Hero Section */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1000px;
+      overflow: hidden;
+      padding: 6rem 1.5rem;
+    }
+    
+    .hero-bg-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+      pointer-events: none;
+      animation: pulse-glow 4s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      max-width: 900px;
+    }
+    
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.875rem;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      animation: float-badge 3s ease-in-out infinite;
+    }
+    
+    @keyframes float-badge {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    
+    .hero-badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    
+    .hero-title {
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero-subtitle {
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+    }
+    
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 4rem;
+    }
+    
+    /* Floating Cards */
+    .hero-cards {
+      position: relative;
+      height: 400px;
+      max-width: 900px;
+      margin: 0 auto;
+      transform-style: preserve-3d;
+    }
+    
+    .float-card {
+      position: absolute;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 25px 50px -12px var(--shadow);
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+    }
+    
+    .float-card:hover {
+      transform: scale(1.05) translateZ(20px) !important;
+      border-color: var(--accent);
+      box-shadow: 0 0 40px var(--glow);
+    }
+    
+    .float-card-1 {
+      top: 10%;
+      left: 5%;
+      width: 280px;
+      animation: float-1 6s ease-in-out infinite;
+      z-index: 3;
+    }
+    
+    .float-card-2 {
+      top: 5%;
+      right: 5%;
+      width: 240px;
+      animation: float-2 7s ease-in-out infinite;
+      animation-delay: -2s;
+      z-index: 2;
+    }
+    
+    .float-card-3 {
+      bottom: 10%;
+      left: 15%;
+      width: 220px;
+      animation: float-3 8s ease-in-out infinite;
+      animation-delay: -4s;
+      z-index: 1;
+    }
+    
+    .float-card-4 {
+      bottom: 15%;
+      right: 10%;
+      width: 260px;
+      animation: float-4 5s ease-in-out infinite;
+      animation-delay: -1s;
+      z-index: 4;
+    }
+    
+    @keyframes float-1 {
+      0%, 100% { transform: translateY(0) rotateY(-5deg) translateZ(30px); }
+      50% { transform: translateY(-20px) rotateY(-5deg) translateZ(30px); }
+    }
+    
+    @keyframes float-2 {
+      0%, 100% { transform: translateY(0) rotateY(5deg) translateZ(20px); }
+      50% { transform: translateY(-15px) rotateY(5deg) translateZ(20px); }
+    }
+    
+    @keyframes float-3 {
+      0%, 100% { transform: translateY(0) rotateX(5deg) translateZ(10px); }
+      50% { transform: translateY(-25px) rotateX(5deg) translateZ(10px); }
+    }
+    
+    @keyframes float-4 {
+      0%, 100% { transform: translateY(0) rotateY(-3deg) translateZ(40px); }
+      50% { transform: translateY(-18px) rotateY(-3deg) translateZ(40px); }
+    }
+    
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg-primary);
+      margin-bottom: 1rem;
+    }
+    
+    .card-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card-text {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+    
+    /* Section Styles */
+    .section {
+      position: relative;
+      z-index: 10;
+      padding: 6rem 0;
+    }
+    
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 4rem;
+    }
+    
+    .section-label {
+      display: inline-block;
+      padding: 0.375rem 1rem;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid var(--accent);
+      border-radius: 100px;
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    
+    .section-title {
+      margin-bottom: 1rem;
+    }
+    
+    .section-subtitle {
+      color: var(--text-secondary);
+    }
+    
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .feature-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px -15px var(--shadow);
+    }
+    
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+    
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      transition: all 0.3s;
+    }
+    
+    .feature-card:hover .feature-icon {
+      background: var(--accent);
+      color: var(--bg-primary);
+      transform: scale(1.1) rotate(5deg);
+    }
+    
+    .feature-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .feature-desc {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+    }
+    
+    /* Stats Section */
+    .stats-section {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      text-align: center;
+    }
+    
+    .stat-item {
+      padding: 2rem;
+    }
+    
+    .stat-number {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      font-family: 'DM Serif Display', serif;
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+    
+    /* Showcase Section */
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+    }
+    
+    .showcase-item {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .showcase-item:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+    }
+    
+    .showcase-large {
+      grid-column: span 12;
+    }
+    
+    .showcase-medium {
+      grid-column: span 6;
+    }
+    
+    .showcase-small {
+      grid-column: span 4;
+    }
+    
+    .showcase-visual {
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .showcase-visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--glow) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .showcase-item:hover .showcase-visual::before {
+      opacity: 1;
+    }
+    
+    .showcase-icon-large {
+      width: 80px;
+      height: 80px;
+      color: var(--accent);
+      transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .showcase-item:hover .showcase-icon-large {
+      transform: scale(1.1) rotate(-5deg);
+    }
+    
+    .showcase-content {
+      padding: 1.5rem;
+    }
+    
+    .showcase-tag {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(0, 255, 136, 0.1);
+      border-radius: 100px;
+      color: var(--accent);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+    
+    .showcase-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .showcase-desc {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+    
+    /* Testimonials */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .testimonial-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .testimonial-card::before {
+      content: '"';
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      font-family: 'DM Serif Display', serif;
+      font-size: 5rem;
+      color: var(--accent);
+      opacity: 0.2;
+      line-height: 1;
+    }
+    
+    .testimonial-card:hover {
+      transform: translateY(-5px) rotate(1deg);
+      border-color: var(--accent);
+    }
+    
+    .testimonial-text {
+      font-size: 1.0625rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .author-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg-primary);
+      font-weight: 700;
+    }
+    
+    .author-name {
+      font-weight: 700;
+      font-size: 0.9375rem;
+    }
+    
+    .author-role {
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+    }
+    
+    /* Pricing Section */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .pricing-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      position: relative;
+    }
+    
+    .pricing-card.featured {
+      border-color: var(--accent);
+      box-shadow: 0 0 40px var(--glow);
+      transform: scale(1.02);
+    }
+    
+    .pricing-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent);
+    }
+    
+    .pricing-card.featured:hover {
+      transform: scale(1.02) translateY(-8px);
+    }
+    
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: var(--bg-primary);
+      padding: 0.375rem 1rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    
+    .pricing-tier {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .pricing-desc {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .pricing-price {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+      font-family: 'DM Serif Display', serif;
+    }
+    
+    .pricing-period {
+      color: var(--text-muted);
+      font-size: 0.9375rem;
+      margin-bottom: 2rem;
+    }
+    
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+    
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+    }
+    
+    .pricing-features li svg {
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+      position: relative;
+      padding: 6rem 0;
+      overflow: hidden;
+    }
+    
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .cta-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .cta-title {
+      margin-bottom: 1.5rem;
+    }
+    
+    .cta-text {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+    
+    /* Footer */
+    .footer {
+      padding: 4rem 0 8rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr);
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+    
+    .footer-brand {
+      max-width: 300px;
+    }
+    
+    .footer-logo {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .footer-desc {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .social-link {
+      width: 40px;
+      height: 40px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .social-link:hover {
+      background: var(--accent);
+      color: var(--bg-primary);
+      transform: translateY(-3px) scale(1.1);
+    }
+    
+    .footer-column h4 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.9375rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.25rem;
+    }
+    
+    .footer-links {
+      list-style: none;
+    }
+    
+    .footer-links li {
+      margin-bottom: 0.75rem;
+    }
+    
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9375rem;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .footer-links a:hover {
+      color: var(--accent);
+      transform: translateX(4px);
+    }
+    
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .showcase-medium {
+        grid-column: span 6;
+      }
+      
+      .showcase-small {
+        grid-column: span 6;
+      }
+      
+      .float-card {
+        position: relative;
+        width: 100% !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        animation: none !important;
+        margin-bottom: 1rem;
+      }
+      
+      .hero-cards {
+        height: auto;
+        transform-style: flat;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 3rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      .showcase-medium,
+      .showcase-small {
+        grid-column: span 12;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .pricing-card.featured {
+        transform: none;
+        order: -1;
+      }
+      
+      .hero-bg-glow {
+        width: 400px;
+        height: 400px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .hero-cta {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .stat-number {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Particle Canvas for floating orbs effect -->
+  <canvas class="particle-canvas" id="particleCanvas"></canvas>
+  
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-bg-glow"></div>
+    
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge" data-aos="fade-down" data-aos-duration="800">
+          <span>New: v2.0 is live</span>
+        </div>
+        
+        <h1 class="hero-title heading-xl" data-aos="fade-up" data-aos-delay="100">
+          Build the Future with DIOCA
+        </h1>
+        
+        <p class="hero-subtitle body-lg" data-aos="fade-up" data-aos-delay="200">
+          The next-generation platform for digital creators. Design, deploy, and scale your vision with unprecedented speed and elegance.
+        </p>
+        
+        <div class="hero-cta" data-aos="fade-up" data-aos-delay="300">
+          <a href="#pricing" class="btn btn-primary btn-glow">
+            <i data-lucide="rocket"></i>
+            Get Started Free
+          </a>
+          <a href="#features" class="btn btn-secondary">
+            <i data-lucide="play-circle"></i>
+            Watch Demo
+          </a>
+        </div>
+      </div>
+      
+      <!-- Floating Cards with Depth -->
+      <div class="hero-cards" data-aos="zoom-in" data-aos-delay="500" data-aos-duration="1000">
+        <div class="float-card float-card-1">
+          <div class="card-icon">
+            <i data-lucide="zap"></i>
+          </div>
+          <h3 class="card-title">Lightning Fast</h3>
+          <p class="card-text">Deploy in seconds with our edge-optimized infrastructure</p>
+        </div>
+        
+        <div class="float-card float-card-2">
+          <div class="card-icon">
+            <i data-lucide="shield-check"></i>
+          </div>
+          <h3 class="card-title">Enterprise Security</h3>
+          <p class="card-text">Bank-grade encryption and compliance built-in</p>
+        </div>
+        
+        <div class="float-card float-card-3">
+          <div class="card-icon">
+            <i data-lucide="globe"></i>
+          </div>
+          <h3 class="card-title">Global Scale</h3>
+          <p class="card-text">Auto-scaling across 50+ regions worldwide</p>
+        </div>
+        
+        <div class="float-card float-card-4">
+          <div class="card-icon">
+            <i data-lucide="cpu"></i>
+          </div>
+          <h3 class="card-title">AI Powered</h3>
+          <p class="card-text">Intelligent automation and insights at every step</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="section-label">Features</span>
+        <h2 class="section-title heading-lg">Everything you need to succeed</h2>
+        <p class="section-subtitle body-md">Powerful tools designed for modern teams who demand excellence.</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="feature-icon">
+            <i data-lucide="layers"></i>
+          </div>
+          <h3 class="feature-title">Modular Architecture</h3>
+          <p class="feature-desc">Build with composable blocks that snap together perfectly. No code bloat, just pure efficiency.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-icon">
+            <i data-lucide="workflow"></i>
+          </div>
+          <h3 class="feature-title">Smart Workflows</h3>
+          <p class="feature-desc">Automate complex processes with visual workflow builders powered by machine learning.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-icon">
+            <i data-lucide="bar-chart-3"></i>
+          </div>
+          <h3 class="feature-title">Real-time Analytics</h3>
+          <p class="feature-desc">Monitor performance with live dashboards and actionable insights that drive growth.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="feature-icon">
+            <i data-lucide="users"></i>
+          </div>
+          <h3 class="feature-title">Team Collaboration</h3>
+          <p class="feature-desc">Work together seamlessly with real-time editing, comments, and version control.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="feature-icon">
+            <i data-lucide="plug"></i>
+          </div>
+          <h3 class="feature-title">Universal Integrations</h3>
+          <p class="feature-desc">Connect with 500+ tools instantly. APIs, webhooks, and native integrations included.</p>
+        </div>
+        
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+          <div class="feature-icon">
+            <i data-lucide="headphones"></i>
+          </div>
+          <h3 class="feature-title">24/7 Support</h3>
+          <p class="feature-desc">Our expert team is always ready to help via chat, email, or video call.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Stats Section -->
+  <section class="section stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item" data-aos="fade-up" data-aos-delay="0">
+          <div class="stat-number" data-count="10000">0</div>
+          <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+          <div class="stat-number" data-count="500">0</div>
+          <div class="stat-label">Enterprise Clients</div>
+        </div>
+        <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+          <div class="stat-number" data-count="99.9">0</div>
+          <div class="stat-label">Uptime %</div>
+        </div>
+        <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+          <div class="stat-number" data-count="150">0</div>
+          <div class="stat-label">Countries</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Showcase Section -->
+  <section class="section" id="showcase">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="section-label">Showcase</span>
+        <h2 class="section-title heading-lg">See what's possible</h2>
+        <p class="section-subtitle body-md">Explore the capabilities that set us apart from the competition.</p>
+      </div>
+      
+      <div class="showcase-grid">
+        <div class="showcase-item showcase-large" data-aos="fade-up">
+          <div class="showcase-visual">
+            <i data-lucide="sparkles" class="showcase-icon-large"></i>
+          </div>
+          <div class="showcase-content">
+            <span class="showcase-tag">AI Features</span>
+            <h3 class="showcase-title">Intelligent Content Generation</h3>
+            <p class="showcase-desc">Leverage cutting-edge AI to generate, optimize, and personalize content at scale. From text to images, our models understand context and deliver quality.</p>
+          </div>
+        </div>
+        
+        <div class="showcase-item showcase-medium" data-aos="fade-up" data-aos-delay="100">
+          <div class="showcase-visual">
+            <i data-lucide="server" class="showcase-icon-large"></i>
+          </div>
+          <div class="showcase-content">
+            <span class="showcase-tag">Infrastructure</span>
+            <h3 class="showcase-title">Edge Computing</h3>
+            <p class="showcase-desc">Deploy globally with low-latency edge nodes in 50+ locations.</p>
+          </div>
+        </div>
+        
+        <div class="showcase-item showcase-medium" data-aos="fade-up" data-aos-delay="200">
+          <div class="showcase-visual">
+            <i data-lucide="lock" class="showcase-icon-large"></i>
+          </div>
+          <div class="showcase-content">
+            <span class="showcase-tag">Security</span>
+            <h3 class="showcase-title">Zero Trust Security</h3>
+            <p class="showcase-desc">Enterprise-grade protection with SOC2, GDPR, and HIPAA compliance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Testimonials Section -->
+  <section class="section" id="testimonials">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="section-label">Testimonials</span>
+        <h2 class="section-title heading-lg">Loved by thousands</h2>
+        <p class="section-subtitle body-md">Join the community of creators and businesses transforming their digital presence.</p>
+      </div>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="0">
+          <p class="testimonial-text">"DIOCA completely transformed how we build products. What used to take months now takes days. The platform is intuitive yet incredibly powerful."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">SK</div>
+            <div>
+              <div class="author-name">Sarah Kim</div>
+              <div class="author-role">CTO at TechFlow</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+          <p class="testimonial-text">"The best investment we've made for our startup. The speed and reliability are unmatched, and their support team is phenomenal."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">MR</div>
+            <div>
+              <div class="author-name">Marcus Rivera</div>
+              <div class="author-role">Founder at NexGen Labs</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+          <p class="testimonial-text">"Finally, a platform that understands enterprise needs without the enterprise complexity. Our dev team productivity increased by 300%."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">EP</div>
+            <div>
+              <div class="author-name">Elena Petrova</div>
+              <div class="author-role">VP Engineering at GlobalScale</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Pricing Section -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="section-label">Pricing</span>
+        <h2 class="section-title heading-lg">Simple, transparent pricing</h2>
+        <p class="section-subtitle body-md">Choose the plan that fits your needs. No hidden fees, cancel anytime.</p>
+      </div>
+      
+      <div class="pricing-grid">
+        <div class="pricing-card" data-aos="fade-up" data-aos-delay="0">
+          <h3 class="pricing-tier">Starter</h3>
+          <p class="pricing-desc">Perfect for individuals and small projects</p>
+          <div class="pricing-price">$0</div>
+          <div class="pricing-period">Free forever</div>
+          <ul class="pricing-features">
+            <li><i data-lucide="check"></i> Up to 3 projects</li>
+            <li><i data-lucide="check"></i> 10GB storage</li>
+            <li><i data-lucide="check"></i> Basic analytics</li>
+            <li><i data-lucide="check"></i> Community support</li>
+          </ul>
+          <a href="#" class="btn btn-secondary" style="width: 100%; justify-content: center;">Get Started</a>
+        </div>
+        
+        <div class="pricing-card featured" data-aos="fade-up" data-aos-delay="100">
+          <span class="pricing-badge">Most Popular</span>
+          <h3 class="pricing-tier">Pro</h3>
+          <p class="pricing-desc">For growing teams and businesses</p>
+          <div class="pricing-price">$29</div>
+          <div class="pricing-period">per user / month</div>
+          <ul class="pricing-features">
+            <li><i data-lucide="check"></i> Unlimited projects</li>
+            <li><i data-lucide="check"></i> 100GB storage</li>
+            <li><i data-lucide="check"></i> Advanced analytics</li>
+            <li><i data-lucide="check"></i> Priority support</li>
+            <li><i data-lucide="check"></i> Custom integrations</li>
+          </ul>
+          <a href="#" class="btn btn-primary btn-glow" style="width: 100%; justify-content: center;">Start Free Trial</a>
+        </div>
+        
+        <div class="pricing-card" data-aos="fade-up" data-aos-delay="200">
+          <h3 class="pricing-tier">Enterprise</h3>
+          <p class="pricing-desc">For large organizations with custom needs</p>
+          <div class="pricing-price">Custom</div>
+          <div class="pricing-period">Contact sales</div>
+          <ul class="pricing-features">
+            <li><i data-lucide="check"></i> Everything in Pro</li>
+            <li><i data-lucide="check"></i> Unlimited storage</li>
+            <li><i data-lucide="check"></i> Dedicated success manager</li>
+            <li><i data-lucide="check"></i> SLA guarantees</li>
+            <li><i data-lucide="check"></i> On-premise option</li>
+          </ul>
+          <a href="#" class="btn btn-secondary" style="width: 100%; justify-content: center;">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-bg"></div>
+    <div class="container">
+      <div class="cta-content" data-aos="zoom-in">
+        <h2 class="cta-title heading-lg">Ready to get started?</h2>
+        <p class="cta-text body-lg">Join thousands of creators and businesses already building the future with DIOCA.</p>
+        <a href="#" class="btn btn-primary btn-glow">
+          <i data-lucide="arrow-right"></i>
+          Start Building Today
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <i data-lucide="hexagon"></i>
+            DIOCA.io
+          </div>
+          <p class="footer-desc">The next-generation platform for digital creators. Build, deploy, and scale with unprecedented speed.</p>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Twitter">
+              <i data-lucide="twitter"></i>
+            </a>
+            <a href="#" class="social-link" aria-label="GitHub">
+              <i data-lucide="github"></i>
+            </a>
+            <a href="#" class="social-link" aria-label="LinkedIn">
+              <i data-lucide="linkedin"></i>
+            </a>
+            <a href="#" class="social-link" aria-label="Discord">
+              <i data-lucide="message-circle"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#">Integrations</a></li>
+            <li><a href="#">Changelog</a></li>
+            <li><a href="#">Roadmap</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Resources</h4>
+          <ul class="footer-links">
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">API Reference</a></li>
+            <li><a href="#">Tutorials</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Community</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>2026 DIOCA.io. All rights reserved.</p>
+        <p>Made with passion for creators everywhere</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-nav">
+    <div class="nav-container">
+      <a href="#home" class="nav-item active">
+        <i data-lucide="home"></i>
+        <span>Home</span>
+      </a>
+      <a href="#features" class="nav-item">
+        <i data-lucide="grid-3x3"></i>
+        <span>Features</span>
+      </a>
+      <a href="#showcase" class="nav-item">
+        <i data-lucide="layout"></i>
+        <span>Showcase</span>
+      </a>
+      <a href="#pricing" class="nav-item">
+        <i data-lucide="credit-card"></i>
+        <span>Pricing</span>
+      </a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i data-lucide="sun" class="icon-sun"></i>
+        <i data-lucide="moon" class="icon-moon" style="display: none;"></i>
+      </button>
+    </div>
+  </nav>
+  
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+    
+    // Initialize AOS animations
+    AOS.init({
+      duration: 800,
+      easing: 'ease-out-cubic',
+      once: true,
+      offset: 100
+    });
+    
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const sunIcon = themeToggle.querySelector('.icon-sun');
+    const moonIcon = themeToggle.querySelector('.icon-moon');
+    
+    function updateThemeIcons() {
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      sunIcon.style.display = isDark ? 'block' : 'none';
+      moonIcon.style.display = isDark ? 'none' : 'block';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcons();
+    });
+    
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      html.setAttribute('data-theme', savedTheme);
+    }
+    updateThemeIcons();
+    
+    // Active nav item on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navItems = document.querySelectorAll('.nav-item');
+    
+    function updateActiveNav() {
+      const scrollPos = window.scrollY + 200;
+      
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        const sectionId = section.getAttribute('id');
+        
+        if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+          navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href') === '#' + sectionId) {
+              item.classList.add('active');
+            }
+          });
+        }
+      });
+    }
+    
+    window.addEventListener('scroll', updateActiveNav);
+    
+    // Animated counter for stats
+    const counters = document.querySelectorAll('[data-count]');
+    const speed = 200;
+    
+    const animateCounter = (counter) => {
+      const target = parseFloat(counter.getAttribute('data-count'));
+      const count = parseFloat(counter.innerText);
+      const increment = target / speed;
+      
+      if (count < target) {
+        const next = Math.ceil((count + increment) * 10) / 10;
+        counter.innerText = next >= target ? target : next;
+        setTimeout(() => animateCounter(counter), 20);
+      } else {
+        counter.innerText = target;
+      }
+    };
+    
+    // Intersection Observer for counters
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          counterObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    counters.forEach(counter => counterObserver.observe(counter));
+    
+    // Particle System
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouse = { x: null, y: null };
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.speedY = Math.random() * 1 - 0.5;
+        this.opacity = Math.random() * 0.5 + 0.2;
+      }
+      
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        
+        // Mouse interaction
+        if (mouse.x != null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 100) {
+            const force = (100 - distance) / 100;
+            this.x -= dx * force * 0.02;
+            this.y -= dy * force * 0.02;
+          }
+        }
+        
+        // Wrap around edges
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.y < 0) this.y = canvas.height;
+        if (this.y > canvas.height) this.y = 0;
+      }
+      
+      draw() {
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        ctx.fillStyle = isDark 
+          ? `rgba(0, 255, 136, ${this.opacity})`
+          : `rgba(0, 201, 104, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    function initParticles() {
+      particles = [];
+      const particleCount = window.innerWidth < 768 ? 25 : 50;
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+    }
+    
+    function connectParticles() {
+      const maxDistance = 150;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < maxDistance) {
+            const opacity = (1 - distance / maxDistance) * 0.15;
+            ctx.strokeStyle = isDark 
+              ? `rgba(0, 255, 136, ${opacity})`
+              : `rgba(0, 201, 104, ${opacity})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+    
+    let animationId;
+    let isActive = true;
+    
+    function animate() {
+      if (!isActive) return;
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+      
+      connectParticles();
+      
+      animationId = requestAnimationFrame(animate);
+    }
+    
+    // Mouse tracking
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.x;
+      mouse.y = e.y;
+    });
+    
+    window.addEventListener('mouseleave', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+    
+    // Pause animation when tab is hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        isActive = false;
+        cancelAnimationFrame(animationId);
+      } else {
+        isActive = true;
+        animate();
+      }
+    });
+    
+    initParticles();
+    animate();
+  </script>
+</body>
+</html>

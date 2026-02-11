@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page - Seed 639597631</title>
+    <style>
+        /* 
+     * DISEÑO BASADO EN SEED: 639597631
+     * Descomposición y decisiones:
+     * - Color de acento: dígito 9 (1) → Cyan #00FFFF (índice 1 de paleta brillante)
+     * - Ancho de borde: dígito 2 (3) → 3px (bordes principales), dígito 7 (6) → 6px (bordes de énfasis)
+     * - Columnas desktop: dígito 1 (6) → 3 columnas (6/2)
+     * - Espaciado base: dígito 4 (5) → 1.5rem (5*0.3)
+     * - Radio de borde: dígito 5 (9) → 0px (esquinas afiladas, neo-brutalista)
+     * - Duración animación: dígito 6 (7) → 0.4s (7*0.06) para transiciones snappy
+     * - Patrón fondo: dígito 7 (6) → grid pattern sutil (líneas 1px, spacing 20px, opacidad 0.05)
+     * - Superposición: dígito 8 (3) → -10px (solapamiento de elementos)
+     * - Móvil: dígito 9 (1) → layout apilado (1 columna)
+     * - Tipografía: mezcla de system fonts para contraste: Arial Black (display), Courier New (body), Times New Roman (serif)
+     * - Sombras: offset 4px 4px 0 #000 (sombras duras sin desenfoque)
+     */
+
+        :root {
+            --color-accent: #00FFFF;
+            /* Cyan vibrante */
+            --color-bg: #FFFFFF;
+            --color-text: #000000;
+            --border-width: 3px;
+            --border-width-emphasis: 6px;
+            --spacing: 1.5rem;
+            --spacing-section: 4rem;
+            --font-display: "Arial Black", "Impact", sans-serif;
+            --font-body: "Courier New", monospace;
+            --font-serif: "Times New Roman", serif;
+            --shadow-offset: 4px;
+            --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Patrón de fondo grid sutil */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing);
+        }
+
+        .section {
+            padding: var(--spacing-section) 0;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            background: var(--color-bg);
+            border-bottom: var(--border-width) solid var(--color-text);
+            z-index: 1000;
+            padding: var(--spacing) 0;
+        }
+
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: var(--border-width) solid var(--color-text);
+            padding: 0.5rem 1rem;
+            background: var(--color-accent);
+            color: var(--color-text);
+        }
+
+        nav ul {
+            display: none;
+            list-style: none;
+            gap: var(--spacing);
+        }
+
+        nav a {
+            font-family: var(--font-display);
+            text-decoration: none;
+            color: var(--color-text);
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 0.5rem 1rem;
+            border: var(--border-width) solid transparent;
+            transition: var(--transition);
+        }
+
+        nav a:hover {
+            border: var(--border-width) solid var(--color-text);
+            background: var(--color-accent);
+        }
+
+        .menu-toggle {
+            display: block;
+            background: none;
+            border: var(--border-width) solid var(--color-text);
+            padding: 0.5rem;
+            cursor: pointer;
+            font-family: var(--font-display);
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        @media (min-width: 768px) {
+            nav ul {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: none;
+            }
+        }
+
+        /* Hero */
+        .hero {
+            background: var(--color-text);
+            color: var(--color-bg);
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 10vw, 6rem);
+            line-height: 1.1;
+            margin-bottom: var(--spacing);
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        .hero p {
+            font-family: var(--font-serif);
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            margin-bottom: var(--spacing);
+            opacity: 0.9;
+        }
+
+        .hero .cta-button {
+            display: inline-block;
+            background: var(--color-accent);
+            color: var(--color-text);
+            padding: 1rem 2.5rem;
+            border: var(--border-width-emphasis) solid var(--color-text);
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: 900;
+            transition: var(--transition);
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-bg);
+        }
+
+        .hero .cta-button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0 var(--color-bg);
+            background: var(--color-bg);
+        }
+
+        /* Marquee */
+        .marquee {
+            background: var(--color-accent);
+            color: var(--color-text);
+            padding: 1rem 0;
+            overflow: hidden;
+            border-top: var(--border-width) solid var(--color-text);
+            border-bottom: var(--border-width) solid var(--color-text);
+        }
+
+        .marquee-content {
+            display: flex;
+            white-space: nowrap;
+            animation: scroll 20s linear infinite;
+        }
+
+        .marquee-item {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            padding: 0 2rem;
+            font-weight: 900;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Features */
+        .features {
+            background: var(--color-bg);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-section);
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem 2rem;
+            border: var(--border-width) solid var(--color-text);
+            background: var(--color-accent);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing);
+        }
+
+        @media (min-width: 768px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .feature-card {
+            border: var(--border-width) solid var(--color-text);
+            padding: var(--spacing);
+            background: var(--color-bg);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .feature-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-text);
+            z-index: 10;
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .feature-card p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--color-accent);
+            border: var(--border-width) solid var(--color-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Showcase */
+        .showcase {
+            background: var(--color-text);
+            color: var(--color-bg);
+        }
+
+        .showcase .section-title {
+            background: var(--color-bg);
+            color: var(--color-text);
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing);
+        }
+
+        @media (min-width: 768px) {
+            .showcase-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .showcase-item {
+            border: var(--border-width) solid var(--color-bg);
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .showcase-item:hover {
+            transform: translate(4px, 4px);
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-accent);
+        }
+
+        .showcase-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-accent);
+            opacity: 0.1;
+            transition: var(--transition);
+        }
+
+        .showcase-item:hover::before {
+            opacity: 0.3;
+        }
+
+        .showcase-number {
+            font-family: var(--font-display);
+            font-size: 8rem;
+            position: absolute;
+            opacity: 0.2;
+            z-index: 1;
+        }
+
+        .showcase-label {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            z-index: 2;
+            background: var(--color-bg);
+            padding: 0.5rem 1rem;
+            border: var(--border-width) solid var(--color-text);
+        }
+
+        /* Testimonios */
+        .testimonios {
+            background: var(--color-bg);
+        }
+
+        .testimonios-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing);
+        }
+
+        @media (min-width: 768px) {
+            .testimonios-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .testimonial-card {
+            border: var(--border-width) solid var(--color-text);
+            padding: var(--spacing);
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: "\201C";
+            font-family: var(--font-serif);
+            font-size: 6rem;
+            position: absolute;
+            top: -20px;
+            left: 10px;
+            opacity: 0.2;
+        }
+
+        .testimonial-text {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-author {
+            font-family: var(--font-display);
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .testimonial-role {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Pricing */
+        .pricing {
+            background: var(--color-text);
+            color: var(--color-bg);
+        }
+
+        .pricing .section-title {
+            background: var(--color-accent);
+            color: var(--color-text);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing);
+        }
+
+        @media (min-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .pricing-card {
+            border: var(--border-width) solid var(--color-bg);
+            padding: var(--spacing);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 var(--shadow-offset) 0 var(--color-bg);
+        }
+
+        .pricing-card.featured {
+            border-width: var(--border-width-emphasis);
+            background: var(--color-accent);
+            color: var(--color-text);
+        }
+
+        .pricing-name {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-price {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-price span {
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed currentColor;
+            opacity: 0.8;
+        }
+
+        .pricing-button {
+            display: inline-block;
+            width: 100%;
+            padding: 1rem;
+            border: var(--border-width) solid currentColor;
+            background: transparent;
+            color: inherit;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-weight: 900;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .pricing-button:hover {
+            background: var(--color-bg);
+            color: var(--color-text);
+        }
+
+        .pricing-card.featured .pricing-button:hover {
+            background: var(--color-text);
+            color: var(--color-bg);
+        }
+
+        /* CTA */
+        .cta {
+            background: var(--color-accent);
+            color: var(--color-text);
+            text-align: center;
+            border-top: var(--border-width) solid var(--color-text);
+            border-bottom: var(--border-width) solid var(--color-text);
+        }
+
+        .cta h2 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 6vw, 4rem);
+            text-transform: uppercase;
+            margin-bottom: var(--spacing);
+        }
+
+        .cta p {
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button-large {
+            display: inline-block;
+            background: var(--color-text);
+            color: var(--color-bg);
+            padding: 1.2rem 3rem;
+            border: var(--border-width-emphasis) solid var(--color-text);
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: 900;
+            transition: var(--transition);
+        }
+
+        .cta-button-large:hover {
+            background: var(--color-bg);
+            color: var(--color-text);
+            transform: scale(1.05);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--color-text);
+            color: var(--color-bg);
+            padding: var(--spacing-section) 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing);
+        }
+
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            text-transform: uppercase;
+            border: var(--border-width) solid var(--color-accent);
+            padding: 0.5rem 1rem;
+            color: var(--color-accent);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--spacing);
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--color-bg);
+            text-decoration: none;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            padding: 0.3rem 0.8rem;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            border: 2px solid var(--color-accent);
+            color: var(--color-accent);
+        }
+
+        .footer-copy {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            margin-top: var(--spacing);
+        }
+
+        .design-notes {
+            margin-top: var(--spacing);
+            font-size: 0.75rem;
+            opacity: 0.4;
+            max-width: 600px;
+            line-height: 1.4;
+        }
+
+        /* Utilidades */
+        .text-accent {
+            color: var(--color-accent);
+        }
+
+        .bg-accent {
+            background: var(--color-accent);
+            color: var(--color-text);
+        }
+
+        /* Asegurar que los elementos con borde tengan el ancho correcto */
+        * {
+            border-style: solid;
+        }
+
+        /* Mejoras de accesibilidad */
+        :focus {
+            outline: 3px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-inner">
+            <div class="logo">Seed<span class="text-accent">639</span></div>
+            <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+            <nav>
+                <ul>
+                    <li><a href="#hero">Inicio</a></li>
+                    <li><a href="#features">Características</a></li>
+                    <li><a href="#showcase">Showcase</a></li>
+                    <li><a href="#testimonios">Testimonios</a></li>
+                    <li><a href="#pricing">Precios</a></li>
+                    <li><a href="#cta">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="hero">
+            <div class="container hero-content">
+                <h1>REIMAGINA<br>EL <span class="text-accent">FUTURO</span></h1>
+                <p>Una experiencia digital única, sin gradientes, con impacto brutalista y modernidad extrema.</p>
+                <a href="#cta" class="cta-button">Comenzar ahora</a>
+            </div>
+        </section>
+
+        <!-- Marquee -->
+        <div class="marquee">
+            <div class="marquee-content">
+                <span class="marquee-item">INNOVACIÓN • CREATIVIDAD • IMPACTO • DISEÑO • TECNOLOGÍA • </span>
+                <span class="marquee-item">INNOVACIÓN • CREATIVIDAD • IMPACTO • DISEÑO • TECNOLOGÍA • </span>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <section id="features" class="section features">
+            <div class="container">
+                <h2 class="section-title">Características</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Velocidad</h3>
+                        <p>Optimizado para móviles y rendimiento extremo. Sin frameworks, solo HTML y CSS puro.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>Seguridad</h3>
+                        <p>Construido con mejores prácticas de accesibilidad y estándares web modernos.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3>Diseño</h3>
+                        <p>Estilo neo-brutalista único, con bordes afilados y colores de alto contraste.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Showcase -->
+        <section id="showcase" class="section showcase">
+            <div class="container">
+                <h2 class="section-title">Showcase</h2>
+                <div class="showcase-grid">
+                    <div class="showcase-item">
+                        <span class="showcase-number">01</span>
+                        <span class="showcase-label">Proyecto Alpha</span>
+                    </div>
+                    <div class="showcase-item">
+                        <span class="showcase-number">02</span>
+                        <span class="showcase-label">Proyecto Beta</span>
+                    </div>
+                    <div class="showcase-item">
+                        <span class="showcase-number">03</span>
+                        <span class="showcase-label">Proyecto Gamma</span>
+                    </div>
+                    <div class="showcase-item">
+                        <span class="showcase-number">04</span>
+                        <span class="showcase-label">Proyecto Delta</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonios -->
+        <section id="testimonios" class="section testimonios">
+            <div class="container">
+                <h2 class="section-title">Testimonios</h2>
+                <div class="testimonios-grid">
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">"Un diseño increíblemente audaz. Capturó nuestra visión
+                            perfectamente."</p>
+                        <p class="testimonial-author">Ana García</p>
+                        <p class="testimonial-role">Directora de Marketing</p>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">"La landing page generó un 200% más de conversiones. Altamente
+                            recomendada."</p>
+                        <p class="testimonial-author">Carlos Ruiz</p>
+                        <p class="testimonial-role">Fundador de TechStart</p>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">"Brutal, moderno y efectivo. Exactamente lo que necesitábamos."</p>
+                        <p class="testimonial-author">María López</p>
+                        <p class="testimonial-role">Diseñadora UX</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing -->
+        <section id="pricing" class="section pricing">
+            <div class="container">
+                <h2 class="section-title">Precios</h2>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3 class="pricing-name">Básico</h3>
+                        <p class="pricing-price">$29<span>/mes</span></p>
+                        <ul class="pricing-features">
+                            <li>Landing page simple</li>
+                            <li>Hasta 5 secciones</li>
+                            <li>Soporte por email</li>
+                            <li>Analíticas básicas</li>
+                        </ul>
+                        <a href="#cta" class="pricing-button">Elegir plan</a>
+                    </div>
+                    <div class="pricing-card featured">
+                        <h3 class="pricing-name">Profesional</h3>
+                        <p class="pricing-price">$79<span>/mes</span></p>
+                        <ul class="pricing-features">
+                            <li>Landing page avanzada</li>
+                            <li>Secciones ilimitadas</li>
+                            <li>Soporte prioritario</li>
+                            <li>Analíticas avanzadas</li>
+                            <li>A/B testing</li>
+                        </ul>
+                        <a href="#cta" class="pricing-button">Elegir plan</a>
+                    </div>
+                    <div class="pricing-card">
+                        <h3 class="pricing-name">Empresa</h3>
+                        <p class="pricing-price">$199<span>/mes</span></p>
+                        <ul class="pricing-features">
+                            <li>Solución personalizada</li>
+                            <li>Integraciones API</li>
+                            <li>Gerente dedicado</li>
+                            <li>SLA 99.9%</li>
+                            <li>Auditoría de seguridad</li>
+                        </ul>
+                        <a href="#cta" class="pricing-button">Elegir plan</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section id="cta" class="section cta">
+            <div class="container">
+                <h2>¿LISTO PARA <span class="text-accent">DESTACAR</span>?</h2>
+                <p>Únete a miles de empresas que ya han transformado su presencia digital.</p>
+                <a href="#" class="cta-button-large">Comienza hoy</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-logo">Seed<span class="text-accent">639</span></div>
+            <ul class="footer-links">
+                <li><a href="#hero">Inicio</a></li>
+                <li><a href="#features">Características</a></li>
+                <li><a href="#showcase">Showcase</a></li>
+                <li><a href="#testimonios">Testimonios</a></li>
+                <li><a href="#pricing">Precios</a></li>
+                <li><a href="#cta">Contacto</a></li>
+            </ul>
+            <p class="footer-copy">&copy; 2024 Seed Landing. Todos los derechos reservados.</p>
+            <div class="design-notes">
+                <strong>Design Notes:</strong> Esta página fue generada utilizando el seed 639597631 para determinar
+                parámetros de diseño. La descomposición del seed (dígitos: 6,3,9,5,9,7,6,3,1) guió decisiones como el
+                color de acento (cian), el ancho de bordes (3px/6px), la cantidad de columnas (3), el espaciado
+                (1.5rem), las esquinas afiladas (0px), la duración de animaciones (0.4s), el patrón de fondo (grid
+                sutil), el solapamiento (-10px) y el layout móvil (1 columna). El resultado es un estilo neo-brutalista
+                moderno, sin gradientes, con alto contraste y optimizado para móviles.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Menú móvil simple
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navUl = document.querySelector('nav ul');
+
+            if (menuToggle && navUl) {
+                menuToggle.addEventListener('click', function () {
+                    const isVisible = navUl.style.display === 'flex';
+                    navUl.style.display = isVisible ? 'none' : 'flex';
+                    navUl.style.flexDirection = 'column';
+                    navUl.style.position = 'absolute';
+                    navUl.style.top = '100%';
+                    navUl.style.left = '0';
+                    navUl.style.right = '0';
+                    navUl.style.background = 'var(--color-bg)';
+                    navUl.style.padding = '1rem';
+                    navUl.style.borderTop = 'var(--border-width) solid var(--color-text)';
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,307 @@
+/* 
+   SEED: 857652327
+   1. Palette (8): "Midnight Neon" - Deep void backgrounds with searing magenta/cyan accents.
+   2. Typography (5): Syne (Headings) + Plus Jakarta Sans (Body). Geometric art meets utility.
+   3. Rhythm (7): 4px baseline grid (Tight technical rhythm).
+   4. Animation (6): Physics-based spring reveals.
+   5. Corners (5): Mixed - 16px soft squares.
+   6. Texture (2): Noise grain overlay on surfaces.
+   7. Density (3): Airy - sparse content, massive whitespace.
+   8. Interaction (2): Subtle scaling, distinct hover states.
+   9. Geometry (7): 7/9 Angular - 15deg decorative slopes/cuts.
+*/
+
+:root {
+    /* --- COLOR PALETTE (Seed Digit 1: 8) --- */
+    --color-bg-body: #050505;
+    --color-bg-surface: #121214;
+    --color-bg-surface-2: #1c1c22;
+
+    --color-text-main: #f0f0f0;
+    --color-text-muted: #888899;
+    --color-text-on-accent: #000000;
+
+    --color-accent-primary: #7c3aed;
+    /* Violet */
+    --color-accent-secondary: #00ffff;
+    /* Cyan */
+    --color-border: #333333;
+
+    /* --- TYPOGRAPHY (Seed Digit 2: 5) --- */
+    --font-heading: 'Syne', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+
+    /* --- SPACING (Seed Digit 3: 7 - Tight Grid / Seed Digit 7: 3 - Airy usage) --- */
+    /* Base unit 4px */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-4: 1rem;
+    --space-8: 2rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-32: 8rem;
+    --space-64: 16rem;
+    /* utilized for airy layout */
+
+    --container-width: 1440px;
+    --header-height: 80px;
+
+    /* --- CORNERS (Seed Digit 5: 5) --- */
+    --radius-sm: 4px;
+    --radius-md: 12px;
+    --radius-lg: 24px;
+    --radius-full: 999px;
+
+    /* --- ANIMATION (Seed Digit 4: 6) --- */
+    --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --duration-short: 200ms;
+    --duration-normal: 400ms;
+    --duration-long: 800ms;
+
+    /* --- Z-INDEX --- */
+    --z-back: -1;
+    --z-base: 1;
+    --z-sticky: 100;
+    --z-overlay: 900;
+    --z-modal: 1000;
+}
+
+/* RESET */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    background-color: var(--color-bg-body);
+    color: var(--color-text-main);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+    /* Texture (Seed-6: 2) */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* TYPOGRAPHY */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: var(--space-4);
+    letter-spacing: -0.02em;
+    font-display: swap;
+    /* Performance hint */
+}
+
+h1 {
+    font-size: clamp(3rem, 6vw, 6rem);
+}
+
+h2 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+}
+
+h3 {
+    font-size: clamp(2rem, 4vw, 3rem);
+}
+
+h4 {
+    font-size: 1.5rem;
+}
+
+p {
+    margin-bottom: var(--space-4);
+    color: var(--color-text-muted);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: color var(--duration-short) ease;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--radius-md);
+}
+
+/* UTILITIES */
+.container {
+    width: 90%;
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+}
+
+.section-padding {
+    padding: var(--space-16) 0;
+    /* Airy padding */
+    content-visibility: auto;
+    /* Performance optimization for offroad rendering */
+    contain-intrinsic-size: 1px 500px;
+    /* Placeholder size prevents scrollbar jumping */
+}
+
+/* ACCENT GEOMETRY (Seed Digit 9: 7 - Angular) */
+.clip-angle {
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+}
+
+.grid-cols-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--space-8);
+}
+
+.grid-cols-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-8);
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.text-accent {
+    color: var(--color-accent-primary);
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* THEME TOGGLE SUPPORT */
+[data-theme="light"] {
+    --color-bg-body: #ffffff;
+    --color-bg-surface: #f4f4f5;
+    --color-bg-surface-2: #e4e4e7;
+    --color-text-main: #18181b;
+    --color-text-muted: #52525b;
+    --color-border: #e4e4e7;
+}
+
+/* INTERACTION (Seed Digit 8: 2) */
+.hover-lift {
+    transition: transform var(--duration-short) var(--ease-smooth);
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+}
+
+/* BUTTONS */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4) var(--space-8);
+    font-family: var(--font-body);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: var(--radius-sm);
+    /* Mix of sharp/round */
+    cursor: pointer;
+    transition: all var(--duration-short) ease;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--color-accent-primary);
+    color: var(--color-text-on-accent);
+}
+
+.btn-primary:hover {
+    background: var(--color-accent-secondary);
+    color: var(--color-bg-body);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 255, 255, 0.2);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--color-text-main);
+    color: var(--color-text-main);
+}
+
+.btn-outline:hover {
+    background: var(--color-text-main);
+    color: var(--color-bg-body);
+}
+
+/* ANIMATIONS */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.reveal {
+    opacity: 0;
+    /* Animation filled by JS observer */
+}
+
+.reveal.active {
+    animation: fadeInUp var(--duration-long) var(--ease-elastic) forwards;
+}
+
+.reveal-delay-1 {
+    animation-delay: 100ms;
+}
+
+.reveal-delay-2 {
+    animation-delay: 200ms;
+}
+
+.reveal-delay-3 {
+    animation-delay: 300ms;
+}

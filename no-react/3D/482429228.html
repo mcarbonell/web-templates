@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<!--
+  Template ID: 482429228 (seed from Math.random).
+  Design dice: palette=0 (cold), 3d_style=2 (CSS 3D + parallax), font_vibe=1 (modern serif),
+  hero_bg=1 (grid/mesh), motion=0 (stagger fade). Single file, no React/Tailwind/inline styles.
+-->
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio 482 — Award-Winning Design</title>
+  <!-- Font: seed font_vibe=1 → serif moderna. Fraunces (variable) for distinctive headings. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&display=swap" rel="stylesheet">
+  <!-- GSAP: stagger + ScrollTrigger only; no Three.js to keep load/runtime fast. -->
+  <script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <style>
+    /* Palette 0: cold. --theme-* swapped by data-theme (light/dark). Semantic classes only. */
+    :root,
+    [data-theme="light"] {
+      --theme-bg: #f0f4f8;
+      --theme-surface: #ffffff;
+      --theme-text: #0f172a;
+      --theme-text-muted: #475569;
+      --theme-accent: #0ea5e9;
+      --theme-accent-soft: #e0f2fe;
+      --theme-border: rgba(15, 23, 42, 0.08);
+      --theme-grid: rgba(14, 165, 233, 0.12);
+      --theme-glow: rgba(14, 165, 233, 0.35);
+    }
+
+    [data-theme="dark"] {
+      --theme-bg: #0c0f1a;
+      --theme-surface: #141824;
+      --theme-text: #f1f5f9;
+      --theme-text-muted: #94a3b8;
+      --theme-accent: #22d3ee;
+      --theme-accent-soft: #164e63;
+      --theme-border: rgba(241, 245, 249, 0.08);
+      --theme-grid: rgba(34, 211, 238, 0.15);
+      --theme-glow: rgba(34, 211, 238, 0.4);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Fraunces", Georgia, serif;
+      background: var(--theme-bg);
+      color: var(--theme-text);
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* hero_bg=1: grid/mesh. Two grid layers for depth; parallax applied in JS. */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(1.5rem, 5vw, 3rem);
+      isolation: isolate;
+    }
+
+    .hero__grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--theme-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--theme-grid) 1px, transparent 1px);
+      background-size: 60px 60px;
+      transform: perspective(400px) rotateX(12deg) scale(1.2);
+      transform-origin: center 30%;
+      will-change: transform;
+      pointer-events: none;
+    }
+
+    .hero__grid-inner {
+      position: absolute;
+      inset: -20%;
+      background-image:
+        linear-gradient(var(--theme-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--theme-grid) 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity: 0.6;
+      transform: perspective(500px) rotateX(8deg) scale(1.1);
+      transform-origin: center 40%;
+      will-change: transform;
+    }
+
+    /* 3d_style=2: CSS 3D only (perspective, rotateX/Y). No WebGL for performance. */
+    .hero__shapes {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      perspective: 1200px;
+    }
+
+    .hero__shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(1px);
+      will-change: transform;
+    }
+
+    .hero__shape--1 {
+      width: min(280px, 60vw);
+      height: min(280px, 60vw);
+      background: radial-gradient(circle at 30% 30%, var(--theme-accent), transparent 70%);
+      opacity: 0.4;
+      top: 15%;
+      left: 10%;
+      transform-style: preserve-3d;
+    }
+
+    .hero__shape--2 {
+      width: min(180px, 40vw);
+      height: min(180px, 40vw);
+      background: radial-gradient(circle at 60% 40%, var(--theme-accent-soft), transparent 70%);
+      opacity: 0.6;
+      bottom: 25%;
+      right: 15%;
+      transform-style: preserve-3d;
+    }
+
+    .hero__shape--3 {
+      width: min(120px, 28vw);
+      height: min(120px, 28vw);
+      border: 2px solid var(--theme-accent);
+      opacity: 0.35;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) translateZ(-80px);
+      transform-style: preserve-3d;
+    }
+
+    .hero__content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 42rem;
+    }
+
+    .hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      background: var(--theme-surface);
+      border: 1px solid var(--theme-border);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--theme-text-muted);
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .hero__badge svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--theme-accent);
+    }
+
+    .hero__title {
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .hero__title span {
+      background: linear-gradient(135deg, var(--theme-accent), var(--theme-text));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero__lead {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--theme-text-muted);
+      margin-bottom: 2rem;
+      font-weight: 400;
+    }
+
+    .hero__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 1.75rem;
+      background: var(--theme-accent);
+      color: var(--theme-bg);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 32px var(--theme-glow);
+    }
+
+    .hero__cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px var(--theme-glow);
+    }
+
+    .hero__cta svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* motion=0: stagger fade-in. .reveal animated by GSAP on load + scroll. */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1rem clamp(1.5rem, 5vw, 3rem);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: transparent;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .header.scrolled {
+      background: var(--theme-surface);
+      box-shadow: 0 1px 0 var(--theme-border);
+    }
+
+    .header__logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--theme-text);
+      text-decoration: none;
+    }
+
+    .header__theme-toggle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--theme-border);
+      background: var(--theme-surface);
+      color: var(--theme-text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .header__theme-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .header__theme-toggle svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .header__theme-toggle .icon-sun { display: block; }
+    .header__theme-toggle .icon-moon { display: none; }
+    [data-theme="dark"] .header__theme-toggle .icon-sun { display: none; }
+    [data-theme="dark"] .header__theme-toggle .icon-moon { display: block; }
+
+    /* Section: features */
+    .section {
+      padding: clamp(4rem, 12vw, 8rem) clamp(1.5rem, 5vw, 3rem);
+      max-width: 72rem;
+      margin: 0 auto;
+    }
+
+    .section__title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--theme-surface);
+      border: 1px solid var(--theme-border);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    .card:hover {
+      transform: translateY(-4px) translateZ(0);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08);
+    }
+
+    .card__icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+      color: var(--theme-accent);
+    }
+
+    .card__title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .card__text {
+      color: var(--theme-text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 2rem clamp(1.5rem, 5vw, 3rem);
+      text-align: center;
+      border-top: 1px solid var(--theme-border);
+      color: var(--theme-text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; }
+      .hero__shape,
+      .hero__grid,
+      .hero__grid-inner { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header" id="header">
+    <a href="#" class="header__logo">Studio 482</a>
+    <button type="button" class="header__theme-toggle" id="theme-toggle" aria-label="Alternar tema claro/oscuro">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <!-- Parallax grid layers (hero_bg 1) -->
+      <div class="hero__grid" id="hero-grid" aria-hidden="true"></div>
+      <div class="hero__grid-inner" id="hero-grid-inner" aria-hidden="true"></div>
+      <!-- CSS 3D floating shapes (3d_style 2) -->
+      <div class="hero__shapes" aria-hidden="true">
+        <div class="hero__shape hero__shape--1" id="shape1"></div>
+        <div class="hero__shape hero__shape--2" id="shape2"></div>
+        <div class="hero__shape hero__shape--3" id="shape3"></div>
+      </div>
+      <div class="hero__content">
+        <p class="hero__badge reveal" id="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          Award-Winning Agency
+        </p>
+        <h1 id="hero-title" class="hero__title reveal">
+          Design that <span>moves</span> people
+        </h1>
+        <p class="hero__lead reveal">
+          We craft bold digital experiences and brands that stand out. Strategy, identity, and motion in one place.
+        </p>
+        <a href="#work" class="hero__cta reveal">
+          See our work
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <section class="section" id="work" aria-labelledby="section-title">
+      <h2 id="section-title" class="section__title reveal">What we do</h2>
+      <div class="cards">
+        <article class="card reveal">
+          <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+          <h3 class="card__title">Brand identity</h3>
+          <p class="card__text">Logos, systems, and voices that make you unforgettable.</p>
+        </article>
+        <article class="card reveal">
+          <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+          </svg>
+          <h3 class="card__title">Digital products</h3>
+          <p class="card__text">Web and app experiences that feel alive and fast.</p>
+        </article>
+        <article class="card reveal">
+          <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>
+          </svg>
+          <h3 class="card__title">Motion & film</h3>
+          <p class="card__text">Animation and video that tell your story with impact.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Studio 482 — Template ID 482429228. Crafted with cold palette &amp; CSS 3D.</p>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+      // Theme: toggle data-theme; persist in localStorage; prefer system preference on first load.
+      // Parallax: requestAnimationFrame + lerp for smooth grid/shape movement from mouse/touch.
+      // Reveal: GSAP stagger on hero, ScrollTrigger on section; fallback sets opacity if no GSAP.
+      var themeKey = 'theme-482429228';
+      var root = document.documentElement;
+      var toggle = document.getElementById('theme-toggle');
+
+      function getStored() { return localStorage.getItem(themeKey); }
+      function setStored(val) { try { localStorage.setItem(themeKey, val); } catch (e) {} }
+      function setTheme(val) {
+        root.setAttribute('data-theme', val);
+        setStored(val);
+      }
+
+      var stored = getStored();
+      if (stored === 'light' || stored === 'dark') {
+        setTheme(stored);
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setTheme('dark');
+      } else {
+        setTheme('light');
+      }
+
+      toggle.addEventListener('click', function () {
+        var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        setTheme(next);
+      });
+
+      // --- Header scroll: add .scrolled for background ---
+      var header = document.getElementById('header');
+      function onScroll() {
+        header.classList.toggle('scrolled', window.scrollY > 40);
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // --- Parallax: move grid and shapes by mouse/touch and scroll (lightweight, no GSAP) ---
+      var grid = document.getElementById('hero-grid');
+      var gridInner = document.getElementById('hero-grid-inner');
+      var s1 = document.getElementById('shape1');
+      var s2 = document.getElementById('shape2');
+      var s3 = document.getElementById('shape3');
+
+      var mouseX = 0, mouseY = 0;
+      var currentX = 0, currentY = 0;
+
+      function lerp(a, b, t) { return a + (b - a) * t; }
+
+      function tick() {
+        currentX = lerp(currentX, mouseX, 0.04);
+        currentY = lerp(currentY, mouseY, 0.04);
+        if (grid) {
+          grid.style.transform = 'perspective(400px) rotateX(' + (12 + currentY * 0.08) + 'deg) rotateY(' + (currentX * 0.06) + 'deg) scale(1.2)';
+        }
+        if (gridInner) {
+          gridInner.style.transform = 'perspective(500px) rotateX(' + (8 + currentY * 0.05) + 'deg) rotateY(' + (currentX * 0.04) + 'deg) scale(1.1)';
+        }
+        if (s1) s1.style.transform = 'rotateX(' + (currentY * -0.3) + 'deg) rotateY(' + (currentX * 0.3) + 'deg) translateZ(20px)';
+        if (s2) s2.style.transform = 'rotateX(' + (currentY * 0.2) + 'deg) rotateY(' + (currentX * -0.25) + 'deg) translateZ(-10px)';
+        if (s3) s3.style.transform = 'translate(-50%, -50%) translateZ(' + (-80 + currentY * 2 + currentX * 2) + 'px) rotateY(' + (currentX * 0.15) + 'deg)';
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+
+      function onMove(e) {
+        var x = 0, y = 0;
+        if (e.touches && e.touches.length) {
+          x = (e.touches[0].clientX / window.innerWidth - 0.5) * 2;
+          y = (e.touches[0].clientY / window.innerHeight - 0.5) * 2;
+        } else {
+          x = (e.clientX / window.innerWidth - 0.5) * 2;
+          y = (e.clientY / window.innerHeight - 0.5) * 2;
+        }
+        mouseX = x * 8;
+        mouseY = y * 8;
+      }
+      window.addEventListener('mousemove', onMove, { passive: true });
+      window.addEventListener('touchmove', onMove, { passive: true });
+
+      // --- Stagger reveal: Motion 0 = stagger fade. Use GSAP if available, else simple fallback ---
+      var reveals = document.querySelectorAll('.reveal');
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.set('.reveal', { opacity: 0, y: 24 });
+        gsap.to('.hero .reveal', {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.12,
+          ease: 'power2.out',
+          delay: 0.2
+        });
+        gsap.to('.section .reveal', {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.section',
+            start: 'top 80%',
+            toggleActions: 'play none none none'
+          }
+        });
+      } else {
+        reveals.forEach(function (el, i) {
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

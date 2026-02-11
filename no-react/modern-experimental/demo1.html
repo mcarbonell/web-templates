@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Modern Web Demo</title>
+    
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --accent: #00ffcc;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Inter', system-ui, sans-serif;
+            overflow-x: hidden;
+            height: 100%;
+        }
+
+        /* 1. GRAINY GRADIENT BACKGROUND */
+        .bg-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            z-index: -2;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.05;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3仿真%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* 2. BENTO GRID LAYOUT */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto repeat(2, 300px);
+            gap: 20px;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 3. KINETIC TYPOGRAPHY (Header) */
+        header {
+            grid-column: span 4;
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .kinetic-title {
+            font-size: 8vw;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin: 0;
+            line-height: 0.9;
+            cursor: default;
+            transition: transform 0.1s ease-out;
+            display: inline-block;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 4. GLASSMORPHISM CARDS */
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        /* Celdas especiales del Bento */
+        .card-large { grid-column: span 2; grid-row: span 2; }
+        .card-tall { grid-row: span 2; }
+
+        /* Contenedor para el ASCII 3D */
+        #ascii-render-zone {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+        }
+
+        h2 { margin: 0; font-size: 1.5rem; z-index: 1; }
+        p { opacity: 0.6; z-index: 1; }
+
+        pre { 
+            font-size: 6px !important; 
+            line-height: 5px !important; 
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-canvas"></div>
+    <div class="noise-overlay"></div>
+
+    <div class="container">
+        <header>
+            <h1 class="kinetic-title" id="title">FUTURE<br>LABS</h1>
+        </header>
+
+        <!-- CARD 1: ASCII ART 3D -->
+        <div class="card card-large">
+            <div id="ascii-render-zone"></div>
+            <h2>ASCII Core</h2>
+            <p>Renderizado 3D en tiempo real con caracteres.</p>
+        </div>
+
+        <!-- CARD 2: GLASSMORPHISM -->
+        <div class="card card-tall">
+            <h2>Glassmorphism</h2>
+            <p>Efecto de cristal esmerilado con desenfoque de fondo nativo.</p>
+        </div>
+
+        <!-- CARD 3: INFO -->
+        <div class="card">
+            <h2>Bento UI</h2>
+            <p>Estructura modular Apple-style.</p>
+        </div>
+
+        <!-- CARD 4: TEXTURE -->
+        <div class="card">
+            <h2 style="color: var(--accent);">Noise Texture</h2>
+            <p>Grano analógico sobre gradientes digitales.</p>
+        </div>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { AsciiEffect } from 'three/addons/effects/AsciiEffect.js';
+
+        // --- 1. KINETIC TYPOGRAPHY LOGIC ---
+        const title = document.getElementById('title');
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 25;
+            const y = (window.innerHeight / 2 - e.pageY) / 25;
+            title.style.transform = `rotateY(${x}deg) rotateX(${y}deg) skew(${x/2}deg)`;
+        });
+
+        // --- 2. ASCII 3D LOGIC (Inyectado en la Card) ---
+        let camera, scene, renderer, effect, torus;
+        const container = document.getElementById('ascii-render-zone');
+        const width = container.offsetWidth;
+        const height = container.offsetHeight;
+
+        init();
+        animate();
+
+        function init() {
+            camera = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+            camera.position.z = 500;
+
+            scene = new THREE.Scene();
+            
+            const light = new THREE.PointLight(0xffffff, 1.5, 0, 0);
+            light.position.set(500, 500, 500);
+            scene.add(light);
+
+            // Una esfera con picos (Icosahedron) para variar
+            const geometry = new THREE.IcosahedronGeometry(150, 1);
+            const material = new THREE.MeshPhongMaterial({ flatShading: true });
+            torus = new THREE.Mesh(geometry, material);
+            scene.add(torus);
+
+            renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(width, height);
+
+            effect = new AsciiEffect(renderer, ' .:-+*=%@#', { invert: true });
+            effect.setSize(width, height);
+            effect.domElement.style.color = '#00ffcc'; // Color neón
+            
+            container.appendChild(effect.domElement);
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onWindowResize() {
+            const newWidth = container.offsetWidth;
+            const newHeight = container.offsetHeight;
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(newWidth, newHeight);
+            effect.setSize(newWidth, newHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            torus.rotation.x += 0.005;
+            torus.rotation.y += 0.01;
+            effect.render(scene, camera);
+        }
+    </script>
+</body>
+</html>

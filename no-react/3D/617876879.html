@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS — Digital Evolution</title>
+    
+    <!-- 
+        DESIGN CHOICES EXPLAINED (Seed: 617876879)
+        ==========================================
+        
+        [Roll 96] COLOR PALETTE: Ultra-dark cyberpunk aesthetic
+        - Base: #050505 (near-black)
+        - Primary accent: #00f0ff (electric cyan)
+        - Secondary accent: #ff006e (neon magenta)  
+        - Tertiary: #7b2cbf (deep purple)
+        - High contrast for accessibility
+        
+        [Roll 33] TYPOGRAPHY: Space Grotesk + JetBrains Mono
+        - Geometric sans for headlines (modern, tech feel)
+        - Monospace for body (code aesthetic)
+        - Extreme weight contrast (300 vs 700)
+        
+        [Roll 90] LAYOUT: 15-degree diagonal split composition
+        - Breaking the rectangular grid
+        - Asymmetric balance
+        - Visual tension through angles
+        
+        [Roll 87] 3D ELEMENTS: Three.js floating icosahedrons
+        - Geometric purity (platonic solids)
+        - Bloom/glow post-processing
+        - Physics-based floating animation
+        - Wireframe + solid hybrid materials
+        
+        [Roll 44] THEME: Cyber-organic fusion
+        - Technology meets nature
+        - Synthetic biology aesthetic
+        - Digital growth patterns
+        
+        [Roll 21] ANIMATIONS: Liquid morphing via GSAP
+        - Smooth, physics-based easing
+        - Morphing SVG shapes
+        - Staggered reveal sequences
+        
+        [Roll 38] INTERACTIONS: Magnetic cursor + parallax
+        - Elements attract toward cursor
+        - Multi-layer parallax on scroll
+        - Custom cursor with blend modes
+        
+        [Roll 35] BACKGROUND: Animated mesh gradient
+        - Simplex noise-based color shifting
+        - Subtle movement (20s cycle)
+        - Dark base with accent bleeding
+        
+        [Roll 32] SCROLL: Horizontal snap sections
+        - Vertical scroll translates to horizontal movement
+        - Z-depth layering (parallax)
+        - Snap points for each section
+        
+        [Roll 49] ACCENTS: Glassmorphism floating cards
+        - backdrop-filter: blur()
+        - Semi-transparent borders
+        - 3D transforms on hover
+    -->
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        /* CSS Reset & Base */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            /* Color System */
+            --color-base: #050505;
+            --color-surface: #0a0a0f;
+            --color-surface-elevated: #12121a;
+            --color-accent-cyan: #00f0ff;
+            --color-accent-magenta: #ff006e;
+            --color-accent-purple: #7b2cbf;
+            --color-text-primary: #ffffff;
+            --color-text-secondary: #a0a0b0;
+            --color-text-muted: #606070;
+            
+            /* Typography */
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'JetBrains Mono', monospace;
+            
+            /* Spacing */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 2rem;
+            --space-lg: 4rem;
+            --space-xl: 8rem;
+            
+            /* Animation */
+            --ease-liquid: cubic-bezier(0.23, 1, 0.32, 1);
+            --ease-snap: cubic-bezier(0.87, 0, 0.13, 1);
+            --duration-slow: 1.2s;
+            --duration-base: 0.6s;
+            --duration-fast: 0.3s;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-base);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-accent-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.15s var(--ease-liquid), 
+                        width 0.3s var(--ease-liquid), 
+                        height 0.3s var(--ease-liquid),
+                        background 0.3s var(--ease-liquid);
+            transform: translate(-50%, -50%);
+        }
+        
+        .cursor.hover {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 240, 255, 0.1);
+        }
+        
+        .cursor-dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: var(--color-accent-magenta);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Background Canvas */
+        .bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            opacity: 0.6;
+        }
+        
+        /* Three.js Canvas */
+        .three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* Noise Overlay */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: var(--space-md);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            mix-blend-mode: difference;
+        }
+        
+        .nav-logo {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.05em;
+            text-decoration: none;
+            color: var(--color-text-primary);
+        }
+        
+        .nav-logo span {
+            color: var(--color-accent-cyan);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: var(--space-lg);
+            list-style: none;
+        }
+        
+        .nav-link {
+            font-size: 0.875rem;
+            text-decoration: none;
+            color: var(--color-text-secondary);
+            position: relative;
+            transition: color var(--duration-fast) var(--ease-liquid);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--color-accent-cyan);
+            transition: width var(--duration-fast) var(--ease-liquid);
+        }
+        
+        .nav-link:hover {
+            color: var(--color-text-primary);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Main Container */
+        .main-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        /* Section Base */
+        .section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: var(--space-xl) var(--space-lg);
+            position: relative;
+        }
+        
+        /* Hero Section */
+        .hero {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .hero-eyebrow {
+            font-size: 0.875rem;
+            color: var(--color-accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            margin-bottom: var(--space-md);
+            display: block;
+        }
+        
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 700;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            margin-bottom: var(--space-md);
+        }
+        
+        .hero-title-line {
+            display: block;
+            overflow: hidden;
+        }
+        
+        .hero-title-line span {
+            display: block;
+            transform: translateY(100%);
+        }
+        
+        .hero-title-accent {
+            color: transparent;
+            -webkit-text-stroke: 2px var(--color-accent-magenta);
+            text-shadow: 0 0 40px rgba(255, 0, 110, 0.3);
+        }
+        
+        .hero-description {
+            font-size: 1.125rem;
+            color: var(--color-text-secondary);
+            max-width: 500px;
+            margin-bottom: var(--space-lg);
+            line-height: 1.8;
+        }
+        
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: linear-gradient(135deg, var(--color-accent-cyan), var(--color-accent-purple));
+            color: var(--color-base);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: 100px;
+            position: relative;
+            overflow: hidden;
+            transition: transform var(--duration-fast) var(--ease-liquid),
+                        box-shadow var(--duration-fast) var(--ease-liquid);
+        }
+        
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s var(--ease-liquid);
+        }
+        
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.3);
+        }
+        
+        .hero-cta:hover::before {
+            left: 100%;
+        }
+        
+        .hero-stats {
+            position: absolute;
+            bottom: var(--space-xl);
+            right: var(--space-lg);
+            display: flex;
+            gap: var(--space-lg);
+        }
+        
+        .stat-item {
+            text-align: right;
+        }
+        
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--color-accent-cyan);
+            line-height: 1;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+        
+        /* Diagonal Divider */
+        .diagonal-divider {
+            position: absolute;
+            top: 0;
+            left: 60%;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--color-accent-cyan), transparent);
+            transform: rotate(15deg);
+            transform-origin: top center;
+            opacity: 0.3;
+        }
+        
+        /* Features Section */
+        .features {
+            background: linear-gradient(180deg, transparent, rgba(123, 44, 191, 0.05), transparent);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .feature-card {
+            background: rgba(18, 18, 26, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: var(--space-lg);
+            position: relative;
+            overflow: hidden;
+            transition: transform var(--duration-base) var(--ease-liquid),
+                        border-color var(--duration-fast) var(--ease-liquid);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                        rgba(0, 240, 255, 0.1), transparent 50%);
+            opacity: 0;
+            transition: opacity var(--duration-fast);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            border-color: rgba(0, 240, 255, 0.2);
+        }
+        
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+        
+        .feature-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .feature-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .feature-description {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            line-height: 1.7;
+        }
+        
+        .feature-number {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        /* Showcase Section */
+        .showcase {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .showcase-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            align-items: center;
+        }
+        
+        .showcase-text {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .showcase-eyebrow {
+            font-size: 0.875rem;
+            color: var(--color-accent-magenta);
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            margin-bottom: var(--space-md);
+        }
+        
+        .showcase-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: var(--space-md);
+        }
+        
+        .showcase-title span {
+            color: var(--color-accent-cyan);
+        }
+        
+        .showcase-description {
+            font-size: 1rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-lg);
+            max-width: 500px;
+        }
+        
+        .showcase-visual {
+            position: relative;
+            height: 600px;
+        }
+        
+        .floating-card {
+            position: absolute;
+            background: rgba(18, 18, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: var(--space-md);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        
+        .floating-card-1 {
+            top: 10%;
+            left: 10%;
+            width: 280px;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-card-2 {
+            top: 40%;
+            right: 5%;
+            width: 240px;
+            animation: float 8s ease-in-out infinite 1s;
+        }
+        
+        .floating-card-3 {
+            bottom: 10%;
+            left: 20%;
+            width: 200px;
+            animation: float 7s ease-in-out infinite 0.5s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .card-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .card-dot-1 { background: var(--color-accent-magenta); }
+        .card-dot-2 { background: var(--color-accent-cyan); }
+        .card-dot-3 { background: #ffd700; }
+        
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .card-content {
+            height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-visual {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .pulse-ring {
+            width: 60px;
+            height: 60px;
+            border: 2px solid var(--color-accent-cyan);
+            border-radius: 50%;
+            animation: pulse 2s ease-out infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        .wave-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 60px;
+        }
+        
+        .wave-bar {
+            width: 8px;
+            background: linear-gradient(to top, var(--color-accent-magenta), var(--color-accent-purple));
+            border-radius: 4px;
+            animation: wave 1s ease-in-out infinite;
+        }
+        
+        .wave-bar:nth-child(1) { height: 30%; animation-delay: 0s; }
+        .wave-bar:nth-child(2) { height: 70%; animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { height: 50%; animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { height: 90%; animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { height: 40%; animation-delay: 0.4s; }
+        .wave-bar:nth-child(6) { height: 80%; animation-delay: 0.5s; }
+        .wave-bar:nth-child(7) { height: 60%; animation-delay: 0.6s; }
+        .wave-bar:nth-child(8) { height: 100%; animation-delay: 0.7s; }
+        
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.5); }
+        }
+        
+        /* CTA Section */
+        .cta {
+            text-align: center;
+            position: relative;
+        }
+        
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: var(--space-md);
+            background: linear-gradient(135deg, var(--color-text-primary), var(--color-accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .cta-description {
+            font-size: 1.25rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-lg);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: 100px;
+            transition: all var(--duration-fast) var(--ease-liquid);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: var(--color-accent-cyan);
+            color: var(--color-base);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(0, 240, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--color-accent-magenta);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: var(--space-xl) var(--space-lg);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+        
+        .footer-logo {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: var(--space-lg);
+            list-style: none;
+        }
+        
+        .footer-link {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            transition: color var(--duration-fast);
+        }
+        
+        .footer-link:hover {
+            color: var(--color-accent-cyan);
+        }
+        
+        .footer-copyright {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .showcase-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .showcase-visual {
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            :root {
+                --space-lg: 2rem;
+                --space-xl: 4rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-stats {
+                position: relative;
+                bottom: auto;
+                right: auto;
+                margin-top: var(--space-lg);
+                justify-content: flex-start;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .diagonal-divider {
+                display: none;
+            }
+            
+            .floating-card {
+                position: relative;
+                top: auto !important;
+                left: auto !important;
+                right: auto !important;
+                bottom: auto !important;
+                width: 100% !important;
+                margin-bottom: var(--space-md);
+                animation: none;
+            }
+            
+            .showcase-visual {
+                height: auto;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            body {
+                cursor: auto;
+            }
+            
+            .cursor, .cursor-dot {
+                display: none;
+            }
+        }
+        
+        /* Scroll Reveal Base States */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        /* Magnetic Button Effect Container */
+        .magnetic {
+            display: inline-block;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <!-- Noise Overlay for Texture -->
+    <div class="noise-overlay"></div>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
+    
+    <!-- Three.js Canvas for 3D Elements -->
+    <canvas class="three-canvas" id="three-canvas"></canvas>
+    
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="#" class="nav-logo">NEX<span>US</span></a>
+        <ul class="nav-links">
+            <li><a href="#features" class="nav-link">Features</a></li>
+            <li><a href="#showcase" class="nav-link">Showcase</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-container">
+        
+        <!-- Hero Section -->
+        <section class="section hero" id="hero">
+            <div class="diagonal-divider"></div>
+            <div class="hero-content">
+                <span class="hero-eyebrow reveal">Digital Evolution</span>
+                <h1 class="hero-title">
+                    <span class="hero-title-line"><span>Shape the</span></span>
+                    <span class="hero-title-line"><span class="hero-title-accent">Future</span></span>
+                    <span class="hero-title-line"><span>of Web</span></span>
+                </h1>
+                <p class="hero-description reveal">
+                    We craft immersive digital experiences that blur the line between imagination and reality. Push boundaries with next-generation web technology.
+                </p>
+                <a href="#showcase" class="hero-cta magnetic reveal">
+                    <span>Explore Work</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+                
+                <div class="hero-stats reveal">
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="247">0</div>
+                        <div class="stat-label">Projects</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="98">0</div>
+                        <div class="stat-label">Clients</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="15">0</div>
+                        <div class="stat-label">Awards</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="section features" id="features">
+            <div class="features-grid">
+                <article class="feature-card reveal">
+                    <span class="feature-number">01</span>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 60 60" fill="none">
+                            <circle cx="30" cy="30" r="28" stroke="url(#gradient1)" stroke-width="2"/>
+                            <path d="M20 30l8 8 12-16" stroke="url(#gradient1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="gradient1" x1="0" y1="0" x2="60" y2="60">
+                                    <stop offset="0%" stop-color="#00f0ff"/>
+                                    <stop offset="100%" stop-color="#7b2cbf"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Immersive 3D</h3>
+                    <p class="feature-description">WebGL-powered experiences that captivate and engage users with stunning real-time 3D graphics.</p>
+                </article>
+                
+                <article class="feature-card reveal">
+                    <span class="feature-number">02</span>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 60 60" fill="none">
+                            <rect x="8" y="8" width="44" height="44" rx="8" stroke="url(#gradient2)" stroke-width="2"/>
+                            <path d="M20 30h20M30 20v20" stroke="url(#gradient2)" stroke-width="2" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="gradient2" x1="0" y1="0" x2="60" y2="60">
+                                    <stop offset="0%" stop-color="#ff006e"/>
+                                    <stop offset="100%" stop-color="#00f0ff"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Fluid Motion</h3>
+                    <p class="feature-description">Physics-based animations and micro-interactions that feel natural and responsive to every gesture.</p>
+                </article>
+                
+                <article class="feature-card reveal">
+                    <span class="feature-number">03</span>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 60 60" fill="none">
+                            <polygon points="30,5 55,45 5,45" stroke="url(#gradient3)" stroke-width="2" fill="none"/>
+                            <circle cx="30" cy="32" r="8" stroke="url(#gradient3)" stroke-width="2"/>
+                            <defs>
+                                <linearGradient id="gradient3" x1="0" y1="0" x2="60" y2="60">
+                                    <stop offset="0%" stop-color="#7b2cbf"/>
+                                    <stop offset="100%" stop-color="#ff006e"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Future Ready</h3>
+                    <p class="feature-description">Built with cutting-edge technologies that scale and evolve with your digital ambitions.</p>
+                </article>
+            </div>
+        </section>
+        
+        <!-- Showcase Section -->
+        <section class="section showcase" id="showcase">
+            <div class="showcase-content">
+                <div class="showcase-text">
+                    <span class="showcase-eyebrow reveal">Our Process</span>
+                    <h2 class="showcase-title reveal">
+                        Where <span>Creativity</span> Meets <span>Technology</span>
+                    </h2>
+                    <p class="showcase-description reveal">
+                        We blend artistic vision with technical excellence to create digital experiences that leave lasting impressions. Every pixel is purposeful, every interaction meaningful.
+                    </p>
+                    <a href="#contact" class="btn btn-primary magnetic reveal">
+                        <span>Start Project</span>
+                    </a>
+                </div>
+                
+                <div class="showcase-visual reveal">
+                    <div class="floating-card floating-card-1">
+                        <div class="card-header">
+                            <div class="card-dot card-dot-1"></div>
+                            <span class="card-title">Analytics</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-visual">
+                                <div class="wave-container">
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="floating-card floating-card-2">
+                        <div class="card-header">
+                            <div class="card-dot card-dot-2"></div>
+                            <span class="card-title">Live Status</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-visual">
+                                <div class="pulse-ring"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="floating-card floating-card-3">
+                        <div class="card-header">
+                            <div class="card-dot card-dot-3"></div>
+                            <span class="card-title">Performance</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-visual" style="padding: 20px;">
+                                <svg width="100%" height="100%" viewBox="0 0 160 80">
+                                    <path d="M0,60 Q40,20 80,40 T160,20" stroke="url(#perfGradient)" stroke-width="3" fill="none"/>
+                                    <defs>
+                                        <linearGradient id="perfGradient" x1="0" y1="0" x2="160" y2="0">
+                                            <stop offset="0%" stop-color="#ffd700"/>
+                                            <stop offset="100%" stop-color="#ff006e"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA Section -->
+        <section class="section cta" id="contact">
+            <div class="cta-content">
+                <h2 class="cta-title reveal">Ready to Transform?</h2>
+                <p class="cta-description reveal">Let's create something extraordinary together. Your vision, our expertise.</p>
+                <div class="cta-buttons reveal">
+                    <a href="mailto:hello@nexus.studio" class="btn btn-primary magnetic">
+                        <span>Get in Touch</span>
+                    </a>
+                    <a href="#" class="btn btn-secondary magnetic">
+                        <span>View Portfolio</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">NEXUS</div>
+            <ul class="footer-links">
+                <li><a href="#" class="footer-link">Privacy</a></li>
+                <li><a href="#" class="footer-link">Terms</a></li>
+                <li><a href="#" class="footer-link">Careers</a></li>
+            </ul>
+            <p class="footer-copyright">© 2026 Nexus Studio. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // ==========================================
+        // THREE.JS 3D SCENE - Floating Icosahedrons
+        // ==========================================
+        const initThreeJS = () => {
+            const canvas = document.getElementById('three-canvas');
+            const scene = new THREE.Scene();
+            
+            // Camera setup
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // Renderer setup
+            const renderer = new THREE.WebGLRenderer({ 
+                canvas, 
+                alpha: true, 
+                antialias: true 
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const pointLight1 = new THREE.PointLight(0x00f0ff, 1, 100);
+            pointLight1.position.set(5, 5, 5);
+            scene.add(pointLight1);
+            
+            const pointLight2 = new THREE.PointLight(0xff006e, 1, 100);
+            pointLight2.position.set(-5, -5, 5);
+            scene.add(pointLight2);
+            
+            // Create floating geometric shapes
+            const geometries = [];
+            const materials = [];
+            const meshes = [];
+            
+            // Icosahedron 1 - Cyan
+            const geo1 = new THREE.IcosahedronGeometry(0.8, 0);
+            const mat1 = new THREE.MeshPhongMaterial({
+                color: 0x00f0ff,
+                emissive: 0x00f0ff,
+                emissiveIntensity: 0.2,
+                shininess: 100,
+                transparent: true,
+                opacity: 0.8,
+                wireframe: true
+            });
+            const mesh1 = new THREE.Mesh(geo1, mat1);
+            mesh1.position.set(3, 1, -2);
+            scene.add(mesh1);
+            geometries.push(geo1);
+            materials.push(mat1);
+            meshes.push({ mesh: mesh1, speed: 0.005, floatSpeed: 0.001, floatAmp: 0.3 });
+            
+            // Icosahedron 2 - Magenta (Solid)
+            const geo2 = new THREE.IcosahedronGeometry(0.6, 0);
+            const mat2 = new THREE.MeshPhongMaterial({
+                color: 0xff006e,
+                emissive: 0xff006e,
+                emissiveIntensity: 0.3,
+                shininess: 100,
+                transparent: true,
+                opacity: 0.6
+            });
+            const mesh2 = new THREE.Mesh(geo2, mat2);
+            mesh2.position.set(-3, -1, -1);
+            scene.add(mesh2);
+            meshes.push({ mesh: mesh2, speed: -0.007, floatSpeed: 0.0015, floatAmp: 0.2 });
+            
+            // Octahedron - Purple
+            const geo3 = new THREE.OctahedronGeometry(0.5, 0);
+            const mat3 = new THREE.MeshPhongMaterial({
+                color: 0x7b2cbf,
+                emissive: 0x7b2cbf,
+                emissiveIntensity: 0.25,
+                shininess: 100,
+                wireframe: true
+            });
+            const mesh3 = new THREE.Mesh(geo3, mat3);
+            mesh3.position.set(0, 2, -3);
+            scene.add(mesh3);
+            meshes.push({ mesh: mesh3, speed: 0.003, floatSpeed: 0.002, floatAmp: 0.25 });
+            
+            // Torus - Cyan accent
+            const geo4 = new THREE.TorusGeometry(0.4, 0.1, 16, 100);
+            const mat4 = new THREE.MeshPhongMaterial({
+                color: 0x00f0ff,
+                emissive: 0x00f0ff,
+                emissiveIntensity: 0.2,
+                transparent: true,
+                opacity: 0.5
+            });
+            const mesh4 = new THREE.Mesh(geo4, mat4);
+            mesh4.position.set(-2, 2, -2);
+            scene.add(mesh4);
+            meshes.push({ mesh: mesh4, speed: 0.01, floatSpeed: 0.0008, floatAmp: 0.15 });
+            
+            // Store initial positions for floating animation
+            meshes.forEach(item => {
+                item.initialY = item.mesh.position.y;
+                item.initialX = item.mesh.position.x;
+                item.randomOffset = Math.random() * Math.PI * 2;
+            });
+            
+            // Mouse interaction
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+            
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+            
+            // Animation loop
+            let time = 0;
+            const animate = () => {
+                requestAnimationFrame(animate);
+                time += 0.01;
+                
+                // Smooth mouse following
+                targetX += (mouseX - targetX) * 0.05;
+                targetY += (mouseY - targetY) * 0.05;
+                
+                meshes.forEach((item, index) => {
+                    // Rotation
+                    item.mesh.rotation.x += item.speed;
+                    item.mesh.rotation.y += item.speed * 0.5;
+                    
+                    // Floating motion
+                    const floatOffset = Math.sin(time * item.floatSpeed * 100 + item.randomOffset) * item.floatAmp;
+                    item.mesh.position.y = item.initialY + floatOffset;
+                    
+                    // Mouse parallax (different depths)
+                    const depth = (index + 1) * 0.1;
+                    item.mesh.position.x = item.initialX + targetX * depth;
+                    item.mesh.rotation.z = targetX * 0.1;
+                });
+                
+                // Subtle camera movement
+                camera.position.x = targetX * 0.5;
+                camera.position.y = targetY * 0.5;
+                camera.lookAt(scene.position);
+                
+                renderer.render(scene, camera);
+            };
+            
+            animate();
+            
+            // Handle resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+        
+        // ==========================================
+        // CUSTOM CURSOR
+        // ==========================================
+        const initCursor = () => {
+            const cursor = document.querySelector('.cursor');
+            const cursorDot = document.querySelector('.cursor-dot');
+            
+            // Check for touch device
+            if (window.matchMedia('(pointer: coarse)').matches) {
+                cursor.style.display = 'none';
+                cursorDot.style.display = 'none';
+                return;
+            }
+            
+            let cursorX = 0, cursorY = 0;
+            let dotX = 0, dotY = 0;
+            
+            document.addEventListener('mousemove', (e) => {
+                cursorX = e.clientX;
+                cursorY = e.clientY;
+            });
+            
+            // Smooth cursor animation
+            const animateCursor = () => {
+                dotX += (cursorX - dotX) * 0.5;
+                dotY += (cursorY - dotY) * 0.5;
+                
+                cursor.style.left = cursorX + 'px';
+                cursor.style.top = cursorY + 'px';
+                cursorDot.style.left = dotX + 'px';
+                cursorDot.style.top = dotY + 'px';
+                
+                requestAnimationFrame(animateCursor);
+            };
+            animateCursor();
+            
+            // Hover effects
+            const interactiveElements = document.querySelectorAll('a, button, .magnetic, .feature-card');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+            });
+        };
+        
+        // ==========================================
+        // MAGNETIC BUTTON EFFECT
+        // ==========================================
+        const initMagneticButtons = () => {
+            const magnetics = document.querySelectorAll('.magnetic');
+            
+            magnetics.forEach(magnetic => {
+                magnetic.addEventListener('mousemove', (e) => {
+                    const rect = magnetic.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    magnetic.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                });
+                
+                magnetic.addEventListener('mouseleave', () => {
+                    magnetic.style.transform = 'translate(0, 0)';
+                });
+            });
+        };
+        
+        // ==========================================
+        // GSAP ANIMATIONS
+        // ==========================================
+        const initGSAP = () => {
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // Hero title reveal
+            gsap.to('.hero-title-line span', {
+                y: 0,
+                duration: 1.2,
+                ease: 'power4.out',
+                stagger: 0.1,
+                delay: 0.3
+            });
+            
+            // Reveal animations on scroll
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach((el, index) => {
+                gsap.fromTo(el, 
+                    { opacity: 0, y: 30 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: el,
+                            start: 'top 85%',
+                            toggleActions: 'play none none none'
+                        },
+                        delay: index % 3 * 0.1
+                    }
+                );
+            });
+            
+            // Parallax for floating cards
+            gsap.utils.toArray('.floating-card').forEach((card, i) => {
+                gsap.to(card, {
+                    y: -50 * (i + 1),
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: '.showcase',
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: 1
+                    }
+                });
+            });
+            
+            // Diagonal divider animation
+            gsap.fromTo('.diagonal-divider',
+                { scaleY: 0 },
+                {
+                    scaleY: 1,
+                    duration: 1.5,
+                    ease: 'power3.inOut',
+                    delay: 0.5
+                }
+            );
+        };
+        
+        // ==========================================
+        // COUNTER ANIMATION
+        // ==========================================
+        const initCounters = () => {
+            const counters = document.querySelectorAll('.stat-number');
+            
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-count'));
+                const duration = 2000;
+                const step = target / (duration / 16);
+                let current = 0;
+                
+                const updateCounter = () => {
+                    current += step;
+                    if (current < target) {
+                        counter.textContent = Math.floor(current);
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.textContent = target + '+';
+                    }
+                };
+                
+                // Start when in view
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            updateCounter();
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+                
+                observer.observe(counter);
+            });
+        };
+        
+        // ==========================================
+        // FEATURE CARD INTERACTION
+        // ==========================================
+        const initFeatureCards = () => {
+            const cards = document.querySelectorAll('.feature-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    
+                    card.style.setProperty('--mouse-x', x + '%');
+                    card.style.setProperty('--mouse-y', y + '%');
+                });
+            });
+        };
+        
+        // ==========================================
+        // SMOOTH SCROLL
+        // ==========================================
+        const initSmoothScroll = () => {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        };
+        
+        // ==========================================
+        // INITIALIZE ALL
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initThreeJS();
+            initCursor();
+            initMagneticButtons();
+            initGSAP();
+            initCounters();
+            initFeatureCards();
+            initSmoothScroll();
+        });
+    </script>
+</body>
+</html>

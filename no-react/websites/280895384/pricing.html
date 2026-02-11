@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Transparent pricing for Nexus Tech's digital solutions. Choose from Basic, Professional, or Enterprise plans.">
+  
+  <title>Pricing | Nexus Tech</title>
+  
+  <!-- 
+    SEED: 280895384
+    PAGE: pricing.html - Pricing Tiers, Feature Comparison, FAQ
+    
+    DESIGN DECISIONS FROM SEED:
+    - Digit 1 (2): Deep Ocean color palette - Gradient pricing cards
+    - Digit 2 (8): Space Grotesk headings, Inter body text
+    - Digit 3 (0): Ultra-spacious rhythm - Generous padding on pricing cards
+    - Digit 4 (8): High-impact animations - Staggered card reveals
+    - Digit 5 (9): Super-rounded corners - 32px+ on all cards
+    - Digit 6 (5): Layered depth - Shadow layers on featured tier
+    - Digit 8 (8): 3D card hover effects on pricing tiers
+    - Digit 9 (4): Hexagon accents in hero section
+  -->
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  
+  <style>
+    .pricing-card {
+      background: var(--gradient-card);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      transition: all var(--duration-normal) var(--ease-out);
+      transform-style: preserve-3d;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .pricing-card:hover {
+      transform: translateY(-12px) rotateX(2deg) rotateY(-2deg);
+      box-shadow: var(--shadow-2xl);
+    }
+    
+    .pricing-card-featured {
+      background: var(--gradient-hero);
+      border-color: transparent;
+      color: white;
+      transform: scale(1.05);
+      box-shadow: var(--shadow-2xl), var(--glow-primary);
+    }
+    
+    .pricing-card-featured:hover {
+      transform: scale(1.05) translateY(-12px);
+      box-shadow: var(--shadow-2xl), var(--glow-accent);
+    }
+    
+    .pricing-card-featured .pricing-card-title,
+    .pricing-card-featured .pricing-card-price,
+    .pricing-card-featured .pricing-card-description,
+    .pricing-card-featured .pricing-card-feature {
+      color: white;
+    }
+    
+    .pricing-badge {
+      position: absolute;
+      top: var(--space-4);
+      right: var(--space-4);
+      background: var(--color-accent-500);
+      color: white;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-family: var(--font-heading);
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wider);
+    }
+    
+    .pricing-card-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      margin-bottom: var(--space-2);
+      color: var(--color-text);
+    }
+    
+    .pricing-card-description {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-6);
+      line-height: var(--leading-relaxed);
+    }
+    
+    .pricing-card-price {
+      font-family: var(--font-heading);
+      font-size: var(--text-5xl);
+      font-weight: var(--font-bold);
+      color: var(--color-text);
+      margin-bottom: var(--space-2);
+    }
+    
+    .pricing-card-period {
+      font-size: var(--text-base);
+      color: var(--color-text-muted);
+      font-weight: var(--font-normal);
+    }
+    
+    .pricing-card-featured .pricing-card-period {
+      color: rgba(255,255,255,0.7);
+    }
+    
+    .pricing-card-features {
+      list-style: none;
+      margin: var(--space-8) 0;
+      padding: 0;
+    }
+    
+    .pricing-card-feature {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+    }
+    
+    .pricing-card-feature svg {
+      flex-shrink: 0;
+      color: var(--color-success);
+    }
+    
+    .pricing-card-featured .pricing-card-feature svg {
+      color: var(--color-secondary-300);
+    }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+      padding: var(--space-4) var(--space-6);
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .comparison-table th {
+      font-family: var(--font-heading);
+      font-weight: var(--font-semibold);
+      color: var(--color-text);
+      background: var(--color-bg-elevated);
+    }
+    
+    .comparison-table th:first-child {
+      border-radius: var(--radius-lg) 0 0 0;
+    }
+    
+    .comparison-table th:last-child {
+      border-radius: 0 var(--radius-lg) 0 0;
+    }
+    
+    .comparison-table tr:hover td {
+      background: var(--color-bg-elevated);
+    }
+    
+    .faq-item {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-4);
+      overflow: hidden;
+    }
+    
+    .faq-question {
+      width: 100%;
+      padding: var(--space-5) var(--space-6);
+      background: var(--color-bg);
+      border: none;
+      text-align: left;
+      font-family: var(--font-heading);
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      color: var(--color-text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background var(--duration-fast) var(--ease-out);
+    }
+    
+    .faq-question:hover {
+      background: var(--color-bg-elevated);
+    }
+    
+    .faq-question svg {
+      transition: transform var(--duration-normal) var(--ease-out);
+    }
+    
+    .faq-item.active .faq-question svg {
+      transform: rotate(180deg);
+    }
+    
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--duration-normal) var(--ease-out);
+    }
+    
+    .faq-item.active .faq-answer {
+      max-height: 500px;
+    }
+    
+    .faq-answer-content {
+      padding: 0 var(--space-6) var(--space-6);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="loader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <span class="loader-text">LOADING</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        NEXUS
+      </a>
+      
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      
+      <div class="nav-menu">
+        <a href="services.html" class="nav-link">Services</a>
+        <a href="case-studies.html" class="nav-link">Case Studies</a>
+        <a href="pricing.html" class="nav-link active">Pricing</a>
+        <a href="blog.html" class="nav-link">Blog</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </div>
+      
+      <div class="nav-actions">
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-toggle-icon theme-toggle-icon-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-toggle-icon theme-toggle-icon-moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <a href="contact.html" class="btn btn-primary btn-sm">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="section" style="padding-top: 160px; background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-secondary-900) 100%); position: relative; overflow: hidden;">
+      <div style="position: absolute; width: 500px; height: 500px; background: #2dd4bf; border-radius: 50%; filter: blur(100px); opacity: 0.2; top: -200px; right: -100px;" data-parallax="0.2"></div>
+      <div style="position: absolute; width: 400px; height: 400px; background: #fb7185; border-radius: 50%; filter: blur(100px); opacity: 0.15; bottom: -100px; left: -100px;"></div>
+      
+      <!-- Hexagon accents -->
+      <div class="hero-hex" style="position: absolute; width: 150px; height: 173px; background: rgba(255,255,255,0.03); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); top: 30%; right: 10%; animation: float 6s ease-in-out infinite;"></div>
+      
+      <div class="container" style="position: relative; z-index: 1;">
+        <div class="reveal" style="text-align: center; max-width: 800px; margin: 0 auto;">
+          <span class="badge" style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.1); color: white;">Pricing</span>
+          <h1 style="font-family: var(--font-heading); font-size: var(--text-5xl); font-weight: 700; color: white; margin-bottom: 1.5rem;">
+            Simple, Transparent Pricing
+          </h1>
+          <p style="color: rgba(255,255,255,0.85); font-size: var(--text-xl); line-height: var(--leading-relaxed);">
+            Choose the perfect plan for your business. No hidden fees, no surprises. Scale up or down at any time.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Cards Section -->
+    <section class="section" style="background: var(--color-bg-elevated);">
+      <div class="container">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; align-items: start;">
+          <!-- Basic Plan -->
+          <div class="pricing-card reveal" data-card-3d>
+            <h3 class="pricing-card-title">Basic</h3>
+            <p class="pricing-card-description">Perfect for startups and small projects getting started.</p>
+            <div class="pricing-card-price">
+              $999<span class="pricing-card-period">/project</span>
+            </div>
+            <ul class="pricing-card-features">
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Up to 5 pages
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Responsive design
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Basic SEO setup
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                2 weeks delivery
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Email support
+              </li>
+              <li class="pricing-card-feature" style="opacity: 0.4;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                Custom animations
+              </li>
+              <li class="pricing-card-feature" style="opacity: 0.4;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                Priority support
+              </li>
+            </ul>
+            <a href="contact.html" class="btn btn-secondary" style="width: 100%;">Get Started</a>
+          </div>
+          
+          <!-- Professional Plan -->
+          <div class="pricing-card pricing-card-featured reveal" data-card-3d style="transition-delay: 100ms;">
+            <span class="pricing-badge">Most Popular</span>
+            <h3 class="pricing-card-title">Professional</h3>
+            <p class="pricing-card-description">Ideal for growing businesses that need more features.</p>
+            <div class="pricing-card-price">
+              $2,499<span class="pricing-card-period">/project</span>
+            </div>
+            <ul class="pricing-card-features">
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Up to 15 pages
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Responsive design
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Advanced SEO
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                4 weeks delivery
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Priority email support
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Custom animations
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                CMS integration
+              </li>
+              <li class="pricing-card-feature" style="opacity: 0.5;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                Dedicated manager
+              </li>
+            </ul>
+            <a href="contact.html" class="btn btn-lg" style="width: 100%; background: white; color: var(--color-primary-900);">Get Started</a>
+          </div>
+          
+          <!-- Enterprise Plan -->
+          <div class="pricing-card reveal" data-card-3d style="transition-delay: 200ms;">
+            <h3 class="pricing-card-title">Enterprise</h3>
+            <p class="pricing-card-description">Full-scale solutions for large organizations.</p>
+            <div class="pricing-card-price">
+              Custom
+            </div>
+            <ul class="pricing-card-features">
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Unlimited pages
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Custom design system
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Enterprise SEO
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Flexible timeline
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                24/7 phone support
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Advanced animations
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Custom integrations
+              </li>
+              <li class="pricing-card-feature">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Dedicated manager
+              </li>
+            </ul>
+            <a href="contact.html" class="btn btn-primary" style="width: 100%;">Contact Sales</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature Comparison Table -->
+    <section class="section">
+      <div class="container">
+        <div class="reveal" style="text-align: center; max-width: 700px; margin: 0 auto 4rem;">
+          <span class="badge badge-primary" style="margin-bottom: 1rem;">Comparison</span>
+          <h2 style="font-family: var(--font-heading); font-size: var(--text-4xl); font-weight: 700; color: var(--color-text);">
+            Feature Comparison
+          </h2>
+        </div>
+        
+        <div class="reveal" style="overflow-x: auto;">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Features</th>
+                <th style="text-align: center;">Basic</th>
+                <th style="text-align: center; background: var(--color-primary-100); color: var(--color-primary-700);">Professional</th>
+                <th style="text-align: center;">Enterprise</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Number of Pages</td>
+                <td style="text-align: center;">Up to 5</td>
+                <td style="text-align: center; background: var(--color-bg-elevated);">Up to 15</td>
+                <td style="text-align: center;">Unlimited</td>
+              </tr>
+              <tr>
+                <td>Responsive Design</td>
+                <td style="text-align: center;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="margin: 0 auto;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </td>
+                <td style="text-align: center; background: var(--color-bg-elevated);">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="margin: 0 auto;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </td>
+                <td style="text-align: center;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="margin: 0 auto;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </td>
+              </tr>
+              <tr>
+                <td>SEO Optimization</td>
+                <td style="text-align: center;">Basic</td>
+                <td style="text-align: center; background: var(--color-bg-elevated);">Advanced</td>
+                <td style="text-align: center;">Enterprise</td>
+              </tr>
+              <tr>
+                <td>Custom Animations</td>
+                <td style="text-align: center;">—</td>
+                <td style="text-align: center; background: var(--color-bg-elevated);">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="margin: 0 auto;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </td>
+                <td style="text-align: center;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="margin: 0 auto;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </td>
+              </tr>
+              <tr>
+                <td>CMS Integration</td>
+                <td style="text-align: center;">—</td>
+                <td style="text-align: center; background: var(--color-bg-elevated);">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="margin: 0 auto;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </td>
+                <td style="text-align: center;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="margin: 0 auto;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </td>
+              </tr>
+              <tr>
+                <td>E-commerce Features</td>
+                <td style="text-align: center;">—</td>
+                <td style="text-align: center; background: var(--color-bg-elevated);">Basic</td>
+                <td style="text-align: center;">Advanced</td>
+              </tr>
+              <tr>
+                <td>Support</td>
+                <td style="text-align: center;">Email</td>
+                <td style="text-align: center; background: var(--color-bg-elevated);">Priority Email</td>
+                <td style="text-align: center;">24/7 Phone</td>
+              </tr>
+              <tr>
+                <td>Dedicated Manager</td>
+                <td style="text-align: center;">—</td>
+                <td style="text-align: center; background: var(--color-bg-elevated);">—</td>
+                <td style="text-align: center;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="margin: 0 auto;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </td>
+              </tr>
+              <tr>
+                <td>Delivery Timeline</td>
+                <td style="text-align: center;">2 weeks</td>
+                <td style="text-align: center; background: var(--color-bg-elevated);">4 weeks</td>
+                <td style="text-align: center;">Custom</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="section" style="background: var(--color-bg-elevated);">
+      <div class="container">
+        <div class="reveal" style="text-align: center; max-width: 700px; margin: 0 auto 4rem;">
+          <span class="badge badge-accent" style="margin-bottom: 1rem;">FAQ</span>
+          <h2 style="font-family: var(--font-heading); font-size: var(--text-4xl); font-weight: 700; color: var(--color-text);">
+            Frequently Asked Questions
+          </h2>
+        </div>
+        
+        <div style="max-width: 800px; margin: 0 auto;">
+          <div class="faq-item reveal">
+            <button class="faq-question">
+              What's included in the project price?
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-content">
+                Our project pricing includes design, development, testing, and deployment. You'll receive a fully functional website with all the features listed in your chosen plan. Hosting and domain registration are separate costs, but we can help you set those up.
+              </div>
+            </div>
+          </div>
+          
+          <div class="faq-item reveal" style="transition-delay: 100ms;">
+            <button class="faq-question">
+              Can I upgrade my plan later?
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-content">
+                Absolutely! You can upgrade your plan at any time. We'll credit any unused portion of your current plan toward the upgrade. Just contact our support team, and we'll help you make the transition seamless.
+              </div>
+            </div>
+          </div>
+          
+          <div class="faq-item reveal" style="transition-delay: 200ms;">
+            <button class="faq-question">
+              What payment methods do you accept?
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-content">
+                We accept all major credit cards (Visa, MasterCard, American Express), bank transfers, and PayPal. For Enterprise clients, we also offer invoicing with Net 30 terms. Contact us to discuss custom payment arrangements for large projects.
+              </div>
+            </div>
+          </div>
+          
+          <div class="faq-item reveal" style="transition-delay: 300ms;">
+            <button class="faq-question">
+              Do you offer refunds?
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-content">
+                Yes, we offer a 14-day money-back guarantee for all our plans. If you're not satisfied with our work within the first 14 days of project kickoff, we'll refund your payment in full. After the 14-day period, refunds are handled on a case-by-case basis.
+              </div>
+            </div>
+          </div>
+          
+          <div class="faq-item reveal" style="transition-delay: 400ms;">
+            <button class="faq-question">
+              How does the revision process work?
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-content">
+                All plans include revision rounds. Basic includes 2 revision rounds, Professional includes 4 rounds, and Enterprise includes unlimited revisions. We present designs and gather your feedback at key milestones to ensure we're aligned throughout the project.
+              </div>
+            </div>
+          </div>
+          
+          <div class="faq-item reveal" style="transition-delay: 500ms;">
+            <button class="faq-question">
+              Do you provide ongoing maintenance?
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-content">
+                Yes! We offer monthly maintenance packages starting at $199/month. This includes security updates, backups, performance monitoring, and minor content updates. All clients receive 30 days of complimentary support after project completion.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section" style="background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-secondary-900) 100%); position: relative; overflow: hidden;">
+      <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: var(--color-accent-500); border-radius: 50%; filter: blur(150px); opacity: 0.3;"></div>
+      <div style="position: absolute; bottom: -100px; left: -100px; width: 300px; height: 300px; background: var(--color-primary-500); border-radius: 50%; filter: blur(150px); opacity: 0.3;"></div>
+      
+      <div class="container">
+        <div class="reveal" style="text-align: center; max-width: 800px; margin: 0 auto; position: relative; z-index: 1;">
+          <h2 style="font-family: var(--font-heading); font-size: var(--text-4xl); font-weight: 700; color: white; margin-bottom: 1.5rem;">
+            Still Have Questions?
+          </h2>
+          <p style="color: rgba(255,255,255,0.85); font-size: var(--text-xl); margin-bottom: 2.5rem;">
+            Our team is here to help you choose the perfect plan for your needs. Schedule a free consultation today.
+          </p>
+          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="contact.html" class="btn btn-lg" style="background: white; color: var(--color-primary-900);">
+              Schedule a Call
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </a>
+            <a href="contact.html" class="btn btn-ghost btn-lg" style="color: white; border-color: rgba(255,255,255,0.3);">
+              Contact Sales
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo" style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--color-accent-500), var(--color-accent-600)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+            </div>
+            NEXUS
+          </div>
+          <p class="footer-description">
+            Pioneering digital innovation since 2012. We transform ambitious ideas into extraordinary digital experiences.
+          </p>
+          <div class="footer-social">
+            <a href="#" class="footer-social-link" aria-label="Twitter">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+              </svg>
+            </a>
+            <a href="#" class="footer-social-link" aria-label="LinkedIn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                <rect x="2" y="9" width="4" height="12"></rect>
+                <circle cx="4" cy="4" r="2"></circle>
+              </svg>
+            </a>
+            <a href="#" class="footer-social-link" aria-label="GitHub">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="footer-title">Services</h4>
+          <ul class="footer-links">
+            <li><a href="services.html" class="footer-link">Web Development</a></li>
+            <li><a href="services.html" class="footer-link">Mobile Apps</a></li>
+            <li><a href="services.html" class="footer-link">Cloud Solutions</a></li>
+            <li><a href="services.html" class="footer-link">AI & Machine Learning</a></li>
+            <li><a href="services.html" class="footer-link">UX/UI Design</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="footer-title">Company</h4>
+          <ul class="footer-links">
+            <li><a href="about.html" class="footer-link">About Us</a></li>
+            <li><a href="case-studies.html" class="footer-link">Case Studies</a></li>
+            <li><a href="blog.html" class="footer-link">Blog</a></li>
+            <li><a href="resources.html" class="footer-link">Resources</a></li>
+            <li><a href="contact.html" class="footer-link">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="footer-title">Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">Privacy Policy</a></li>
+            <li><a href="#" class="footer-link">Terms of Service</a></li>
+            <li><a href="#" class="footer-link">Cookie Policy</a></li>
+            <li><a href="#" class="footer-link">GDPR</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p class="footer-copyright">© 2026 Nexus Tech. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="#" class="footer-legal-link">Privacy</a>
+          <a href="#" class="footer-legal-link">Terms</a>
+          <a href="#" class="footer-legal-link">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent -->
+  <div class="cookie-consent" role="dialog" aria-label="Cookie consent">
+    <div class="cookie-consent-content">
+      <p class="cookie-consent-text">
+        We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic.
+      </p>
+      <div class="cookie-consent-buttons">
+        <button class="btn btn-primary btn-sm cookie-accept">Accept All</button>
+        <button class="btn btn-ghost btn-sm cookie-decline">Decline</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/components.js"></script>
+  
+  <script>
+    // FAQ Accordion functionality
+    document.querySelectorAll('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const item = button.parentElement;
+        const isActive = item.classList.contains('active');
+        
+        // Close all items
+        document.querySelectorAll('.faq-item').forEach(faqItem => {
+          faqItem.classList.remove('active');
+        });
+        
+        // Open clicked item if it wasn't active
+        if (!isActive) {
+          item.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

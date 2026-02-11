@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources - SaaSFlow</title>
+    <meta name="description" content="Access free tools, calculators, guides, and templates to maximize your business productivity with SaaSFlow">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <style>
+        /* Seed 672710564 - Resources Page Styles */
+        /* Position 8 (6): Interactivity depth - Moderate with engaging tools */
+        
+        .resources-hero {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: white;
+            padding: var(--space-3xl) 0;
+            text-align: center;
+        }
+        
+        .resources-section {
+            padding: var(--space-3xl) 0;
+        }
+        
+        .resource-categories {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-2xl);
+            flex-wrap: wrap;
+        }
+        
+        .category-btn {
+            padding: var(--space-sm) var(--space-lg);
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+        
+        .category-btn:hover,
+        .category-btn.active {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+        
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-xl);
+            max-width: var(--content-max-width);
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+        
+        .resource-card {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .resource-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-2xl);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .resource-title {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--color-text);
+        }
+        
+        .resource-description {
+            color: var(--color-text-light);
+            line-height: var(--line-height-relaxed);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .resource-badge {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            padding: var(--space-xs) var(--space-sm);
+            background-color: var(--color-accent);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .tools-section {
+            background-color: var(--color-surface);
+            padding: var(--space-3xl) 0;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            max-width: var(--content-max-width);
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+        
+        .tool-card {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            text-align: center;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--color-primary);
+        }
+        
+        .tool-icon {
+            font-size: var(--text-3xl);
+            margin-bottom: var(--space-md);
+        }
+        
+        .calculator-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgb(0 0 0 / 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+        }
+        
+        .calculator-modal.active {
+            display: flex;
+        }
+        
+        .calculator-content {
+            background-color: var(--color-surface);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .calculator-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .result-display {
+            background-color: var(--color-surface);
+            border: 2px solid var(--color-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            text-align: center;
+            margin-top: var(--space-lg);
+        }
+        
+        .result-value {
+            font-size: var(--text-3xl);
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .guides-section {
+            padding: var(--space-3xl) 0;
+        }
+        
+        .guides-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+            max-width: var(--content-max-width);
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+        
+        .guide-card {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all var(--transition-normal);
+        }
+        
+        .guide-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .guide-image {
+            height: 120px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--text-2xl);
+        }
+        
+        .guide-content {
+            padding: var(--space-lg);
+        }
+        
+        .guide-title {
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            color: var(--color-text);
+        }
+        
+        .guide-meta {
+            font-size: var(--text-sm);
+            color: var(--color-text-light);
+            margin-bottom: var(--space-md);
+        }
+        
+        @media (max-width: 768px) {
+            .resources-grid,
+            .tool-grid,
+            .guides-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">SaaSFlow</a>
+            <button class="navbar-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="navbar-menu">
+                <li><a href="index.html" class="navbar-link">Home</a></li>
+                <li><a href="about.html" class="navbar-link">About</a></li>
+                <li><a href="services.html" class="navbar-link">Services</a></li>
+                <li><a href="pricing.html" class="navbar-link">Pricing</a></li>
+                <li><a href="blog.html" class="navbar-link">Blog</a></li>
+                <li><a href="contact.html" class="navbar-link">Contact</a></li>
+                <li><button class="theme-toggle" aria-label="Toggle theme">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Resources Hero -->
+    <header class="resources-hero">
+        <div class="container">
+            <h1 class="section-title">Free Resources & Tools</h1>
+            <p class="section-subtitle">Everything you need to maximize your business productivity</p>
+        </div>
+    </header>
+
+    <!-- Resources Section -->
+    <section class="resources-section">
+        <div class="resource-categories">
+            <a href="#" class="category-btn active">All</a>
+            <a href="#" class="category-btn">Tools</a>
+            <a href="#" class="category-btn">Templates</a>
+            <a href="#" class="category-btn">Guides</a>
+            <a href="#" class="category-btn">Calculators</a>
+        </div>
+        
+        <div class="resources-grid">
+            <!-- ROI Calculator -->
+            <div class="resource-card reveal" data-category="calculators">
+                <div class="resource-badge">Tool</div>
+                <div class="resource-icon">🧮</div>
+                <h3 class="resource-title">ROI Calculator</h3>
+                <p class="resource-description">Calculate the potential return on investment for implementing SaaSFlow in your organization.</p>
+                <button class="btn" onclick="openCalculator('roi')">Calculate ROI</button>
+            </div>
+            
+            <!-- Productivity Calculator -->
+            <div class="resource-card reveal" style="animation-delay: 0.1s" data-category="calculators">
+                <div class="resource-badge">Tool</div>
+                <div class="resource-icon">⚡</div>
+                <h3 class="resource-title">Productivity Calculator</h3>
+                <p class="resource-description">Estimate time savings and productivity gains from workflow automation.</p>
+                <button class="btn" onclick="openCalculator('productivity')">Calculate Savings</button>
+            </div>
+            
+            <!-- Project Template -->
+            <div class="resource-card reveal" style="animation-delay: 0.2s" data-category="templates">
+                <div class="resource-badge">Template</div>
+                <div class="resource-icon">📋</div>
+                <h3 class="resource-title">Project Management Template</h3>
+                <p class="resource-description">Complete project management template with workflows, checklists, and best practices.</p>
+                <button class="btn btn-secondary">Download Template</button>
+            </div>
+            
+            <!-- Automation Guide -->
+            <div class="resource-card reveal" style="animation-delay: 0.3s" data-category="guides">
+                <div class="resource-badge">Guide</div>
+                <div class="resource-icon">📚</div>
+                <h3 class="resource-title">Automation Playbook</h3>
+                <p class="resource-description">Step-by-step guide to identifying and automating business processes for maximum efficiency.</p>
+                <button class="btn btn-secondary">Download Guide</button>
+            </div>
+            
+            <!-- Analytics Template -->
+            <div class="resource-card reveal" style="animation-delay: 0.4s" data-category="templates">
+                <div class="resource-badge">Template</div>
+                <div class="resource-icon">📊</div>
+                <h3 class="resource-title">Dashboard Templates</h3>
+                <p class="resource-description">Pre-built dashboard templates for common business metrics and KPIs.</p>
+                <button class="btn btn-secondary">Get Templates</button>
+            </div>
+            
+            <!-- Implementation Checklist -->
+            <div class="resource-card reveal" style="animation-delay: 0.5s" data-category="templates">
+                <div class="resource-badge">Template</div>
+                <div class="resource-icon">✅</div>
+                <h3 class="resource-title">Implementation Checklist</h3>
+                <p class="resource-description">Comprehensive checklist for successful SaaSFlow implementation in your organization.</p>
+                <button class="btn btn-secondary">Download Checklist</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Tools Section -->
+    <section class="tools-section">
+        <div class="container">
+            <h2 class="section-title">Interactive Tools</h2>
+            <p class="section-subtitle">Try our interactive calculators and assessment tools</p>
+            
+            <div class="tool-grid">
+                <div class="tool-card reveal" onclick="openCalculator('roi')">
+                    <div class="tool-icon">💰</div>
+                    <h3>ROI Calculator</h3>
+                    <p>Calculate your potential return</p>
+                </div>
+                
+                <div class="tool-card reveal" style="animation-delay: 0.1s" onclick="openCalculator('productivity')">
+                    <div class="tool-icon">🚀</div>
+                    <h3>Time Saver</h3>
+                    <p>Estimate time savings</p>
+                </div>
+                
+                <div class="tool-card reveal" style="animation-delay: 0.2s" onclick="openCalculator('efficiency')">
+                    <div class="tool-icon">📈</div>
+                    <h3>Efficiency Meter</h3>
+                    <p>Measure your efficiency</p>
+                </div>
+                
+                <div class="tool-card reveal" style="animation-delay: 0.3s" onclick="openCalculator('cost')">
+                    <div class="tool-icon">💳</div>
+                    <h3>Cost Analyzer</h3>
+                    <p>Analyze operational costs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Guides Section -->
+    <section class="guides-section">
+        <div class="container">
+            <h2 class="section-title">Comprehensive Guides</h2>
+            <p class="section-subtitle">In-depth resources to help you succeed</p>
+            
+            <div class="guides-grid">
+                <article class="guide-card reveal">
+                    <div class="guide-image">📖</div>
+                    <div class="guide-content">
+                        <h3 class="guide-title">Getting Started Guide</h3>
+                        <div class="guide-meta">15 min read • Beginner</div>
+                        <p class="text-sm text-secondary">Everything you need to know to start using SaaSFlow effectively.</p>
+                        <a href="#" class="btn btn-sm" style="margin-top: var(--space-sm);">Read Guide</a>
+                    </div>
+                </article>
+                
+                <article class="guide-card reveal" style="animation-delay: 0.1s">
+                    <div class="guide-image">🔧</div>
+                    <div class="guide-content">
+                        <h3 class="guide-title">Advanced Automation</h3>
+                        <div class="guide-meta">25 min read • Advanced</div>
+                        <p class="text-sm text-secondary">Master advanced workflow automation techniques and best practices.</p>
+                        <a href="#" class="btn btn-sm" style="margin-top: var(--space-sm);">Read Guide</a>
+                    </div>
+                </article>
+                
+                <article class="guide-card reveal" style="animation-delay: 0.2s">
+                    <div class="guide-image">🎯</div>
+                    <div class="guide-content">
+                        <h3 class="guide-title">Analytics Mastery</h3>
+                        <div class="guide-meta">20 min read • Intermediate</div>
+                        <p class="text-sm text-secondary">Learn to extract maximum insights from your business data.</p>
+                        <a href="#" class="btn btn-sm" style="margin-top: var(--space-sm);">Read Guide</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculator Modal -->
+    <div id="calculatorModal" class="calculator-modal">
+        <div class="calculator-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
+                <h2 id="calculatorTitle">ROI Calculator</h2>
+                <button onclick="closeCalculator()" style="background: none; border: none; font-size: var(--text-xl); cursor: pointer;">×</button>
+            </div>
+            
+            <form id="calculatorForm" class="calculator-form">
+                <div id="calculatorFields">
+                    <!-- Fields will be dynamically inserted here -->
+                </div>
+                
+                <button type="submit" class="btn">Calculate</button>
+            </form>
+            
+            <div id="calculatorResult" class="result-display" style="display: none;">
+                <div class="result-value" id="resultValue">$0</div>
+                <div id="resultDescription">Your estimated savings</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="services.html">Features</a></li>
+                        <li><a href="pricing.html">Pricing</a></li>
+                        <li><a href="case-studies.html">Case Studies</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="help.html">Help Center</a></li>
+                        <li><a href="docs.html">Documentation</a></li>
+                        <li><a href="api.html">API</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="security.html">Security</a></li>
+                        <li><a href="compliance.html">Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SaaSFlow. All rights reserved.</p>
+                <div class="flex gap-md">
+                    <a href="#" aria-label="Twitter">𝕏</a>
+                    <a href="#" aria-label="LinkedIn">in</a>
+                    <a href="#" aria-label="GitHub">⚡</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    
+    <script>
+        // Calculator configurations
+        const calculators = {
+            roi: {
+                title: 'ROI Calculator',
+                fields: [
+                    { label: 'Current Monthly Revenue', name: 'revenue', type: 'number', placeholder: '50000' },
+                    { label: 'Team Size', name: 'teamSize', type: 'number', placeholder: '50' },
+                    { label: 'Hours Saved per Employee per Week', name: 'hoursSaved', type: 'number', placeholder: '5' },
+                    { label: 'Average Hourly Rate', name: 'hourlyRate', type: 'number', placeholder: '50' }
+                ],
+                calculate: (data) => {
+                    const monthlySavings = data.teamSize * data.hoursSaved * 4 * data.hourlyRate;
+                    const annualSavings = monthlySavings * 12;
+                    const roi = ((annualSavings / (data.revenue * 12)) * 100).toFixed(1);
+                    return {
+                        value: `$${annualSavings.toLocaleString()}`,
+                        description: `Annual savings with ${roi}% ROI`
+                    };
+                }
+            },
+            productivity: {
+                title: 'Productivity Calculator',
+                fields: [
+                    { label: 'Current Team Size', name: 'teamSize', type: 'number', placeholder: '25' },
+                    { label: 'Weekly Hours per Employee', name: 'weeklyHours', type: 'number', placeholder: '40' },
+                    { label: 'Expected Time Savings (%)', name: 'timeSavings', type: 'number', placeholder: '20' }
+                ],
+                calculate: (data) => {
+                    const hoursSavedPerWeek = data.teamSize * data.weeklyHours * (data.timeSavings / 100);
+                    const hoursSavedPerMonth = hoursSavedPerWeek * 4;
+                    const hoursSavedPerYear = hoursSavedPerMonth * 12;
+                    return {
+                        value: `${hoursSavedPerYear.toLocaleString()} hours`,
+                        description: 'Annual time savings for your team'
+                    };
+                }
+            }
+        };
+        
+        let currentCalculator = null;
+        
+        function openCalculator(type) {
+            currentCalculator = calculators[type];
+            const modal = document.getElementById('calculatorModal');
+            const title = document.getElementById('calculatorTitle');
+            const fields = document.getElementById('calculatorFields');
+            
+            title.textContent = currentCalculator.title;
+            
+            // Generate form fields
+            fields.innerHTML = currentCalculator.fields.map(field => `
+                <div class="form-group">
+                    <label class="form-label" for="${field.name}">${field.label}</label>
+                    <input type="${field.type}" id="${field.name}" name="${field.name}" 
+                           placeholder="${field.placeholder}" required>
+                </div>
+            `).join('');
+            
+            modal.classList.add('active');
+        }
+        
+        function closeCalculator() {
+            document.getElementById('calculatorModal').classList.remove('active');
+            document.getElementById('calculatorResult').style.display = 'none';
+            document.getElementById('calculatorForm').reset();
+        }
+        
+        // Handle calculator form submission
+        document.getElementById('calculatorForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!currentCalculator) return;
+            
+            const formData = new FormData(e.target);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                data[key] = parseFloat(value) || 0;
+            }
+            
+            const result = currentCalculator.calculate(data);
+            
+            document.getElementById('resultValue').textContent = result.value;
+            document.getElementById('resultDescription').textContent = result.description;
+            document.getElementById('calculatorResult').style.display = 'block';
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('calculatorModal').addEventListener('click', (e) => {
+            if (e.target.id === 'calculatorModal') {
+                closeCalculator();
+            }
+        });
+        
+        // Category filtering
+        document.addEventListener('DOMContentLoaded', () => {
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            const resourceCards = document.querySelectorAll('.resource-card');
+            
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    const category = btn.textContent.toLowerCase();
+                    
+                    if (category === 'all') {
+                        resourceCards.forEach(card => card.style.display = 'block');
+                    } else {
+                        resourceCards.forEach(card => {
+                            const cardCategory = card.dataset.category;
+                            card.style.display = cardCategory === category ? 'block' : 'none';
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

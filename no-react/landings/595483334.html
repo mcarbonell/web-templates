@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinet Core | High-Performance Motion Aesthetics</title>
+    <!-- 
+    TEMPLATE ID: 595483334
+    DESIGN CHOICES (Based on Seed 595483334):
+    1. Hero: Centered Minimalist with staggered entry (Digit 1: 5)
+    2. Palette: Surreal Monochrome + Acid Mint #1ef8e4 (Digit 2: 9 + Sub-roll)
+    3. Typography: Ultra-Bold Grotesk (Syncopate) + Minimalist Sans (Inter) (Digit 3: 5)
+    4. Feature: Interactive Background Canvas Particles (Digit 4: 4)
+    5. Animation: Sequential Staggered Fade + Slide (Digit 5: 8)
+    6. Corners: Medium Softness 12px (Digit 6: 3)
+    7. Density: Low Density / High White Space (Digit 7: 3)
+    8. Interaction: Micro-interactions & Reveal Effects (Digit 8: 3)
+    9. Graphics: Grainy Noise Overlay & Procedural SVGs (Digit 9: 4)
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* Theme: Dark (Default) */
+            --bg: #0a0a0a;
+            --fg: #ffffff;
+            --accent: #1ef8e4;
+            --surface: #1a1a1a;
+            --border: #333333;
+            --noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+
+            --font-display: 'Syncopate', sans-serif;
+            --font-body: 'Inter', sans-serif;
+
+            --radius: 12px;
+            --transition: 0.51s cubic-bezier(0.23, 1, 0.32, 1);
+            --border-width: 2px;
+            --spacing: clamp(2rem, 5vw, 6rem);
+        }
+
+        [data-theme="light"] {
+            --bg: #f5f5f5;
+            --fg: #0a0a0a;
+            --accent: #15b7a7;
+            /* Darker version for contrast */
+            --surface: #ffffff;
+            --border: #dddddd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            transition: background-color var(--transition), color var(--transition);
+        }
+
+        /* Grainy Overlay */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: var(--noise);
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        canvas#particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            color: white;
+            /* Always white due to mix-blend-mode difference */
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-small {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.7rem;
+        }
+
+        /* Layout Sections */
+        section {
+            padding: var(--spacing);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding-top: 20vh;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 12vw, 9rem);
+            line-height: 0.9;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: revealUp 0.8s var(--transition) forwards;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: revealUp 0.8s var(--transition) forwards 0.2s;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: revealUp 0.8s var(--transition) forwards 0.4s;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(30, 248, 228, 0.3);
+        }
+
+        .btn-outline {
+            border: var(--border-width) solid var(--border);
+            color: var(--fg);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Feature Grid */
+        .features {
+            background: var(--surface);
+            border-top: var(--border-width) solid var(--border);
+            border-bottom: var(--border-width) solid var(--border);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 4rem;
+        }
+
+        .feature-item {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .feature-id {
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+
+        .feature-item h3 {
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 1.8rem;
+        }
+
+        .feature-item p {
+            color: #888;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        /* Stats / Counter */
+        .stats {
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+
+        .stats-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 4rem;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 5rem;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            text-transform: uppercase;
+            font-weight: 800;
+            font-size: 0.8rem;
+            letter-spacing: 0.2rem;
+            opacity: 0.6;
+        }
+
+        /* Work / Showcase */
+        #work {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2px;
+            background: var(--border);
+            margin: 4rem -var(--spacing);
+        }
+
+        .work-item {
+            background: var(--bg);
+            aspect-ratio: 16/10;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .work-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            transform: translateY(101%);
+            transition: var(--transition);
+        }
+
+        .work-item:hover::after {
+            transform: translateY(0);
+        }
+
+        .work-content {
+            position: relative;
+            z-index: 2;
+            transition: var(--transition);
+        }
+
+        .work-item:hover .work-content {
+            color: #000;
+        }
+
+        .work-item h4 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        /* CTA */
+        .cta-banner {
+            background: var(--accent);
+            color: #000;
+            text-align: center;
+            padding: 10rem 2rem;
+            margin: 8rem 0;
+            border-radius: var(--radius);
+        }
+
+        .cta-banner h2 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 8vw, 6rem);
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        .cta-banner-btn {
+            background: black;
+            border-color: black;
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem var(--spacing);
+            border-top: var(--border-width) solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .footer-left h5 {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: #888;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-right-logo {
+            margin-bottom: 2rem;
+            mix-blend-mode: normal;
+            color: var(--fg);
+        }
+
+        .copyright {
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        /* Animations */
+        @keyframes revealUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-wrap {
+                flex-direction: column;
+            }
+
+            footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 3rem;
+            }
+
+            .hero {
+                padding-top: 15vh;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="noise-overlay"></div>
+    <canvas id="particleCanvas"></canvas>
+
+    <header>
+        <div class="logo">KINET CORE</div>
+        <div class="nav-actions">
+            <!-- Simplified Toggle Icon -->
+            <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light and dark mode">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" class="sun-icon">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+            <a href="#" class="btn btn-outline btn-small">Connect</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Kinet<br>Performance</h1>
+                <p>Architecting the future of modular motion systems. We provide high-fidelity components for the next
+                    generation of creative engines.</p>
+                <div class="cta-group">
+                    <a href="#work" class="btn btn-primary">Explorer Forge</a>
+                    <a href="#" class="btn btn-outline">Technical Specs</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <span class="feature-id">01 / CAPACITY</span>
+                        <h3>Reactive Integrity</h3>
+                        <p>Systems that respond to demand in real-time. Our core logic distributes load across 12
+                            distinct nodes for zero-latency execution.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-id">02 / CORE</span>
+                        <h3>Carbon Fiber Base</h3>
+                        <p>Material science meets digital precision. Every component is optimized for physical
+                            simulation and structural rigidity.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-id">03 / SYNC</span>
+                        <h3>Quantum Link</h3>
+                        <p>Unified data streams across all peripherals. Sync protocols that allow for sub-nanosecond
+                            coordination of assets.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="container">
+                <div class="stats-wrap">
+                    <div class="stat-card">
+                        <div class="stat-value">99.8</div>
+                        <div class="stat-label">Efficiency Delta</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">142K</div>
+                        <div class="stat-label">Active Modules</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">0.4ms</div>
+                        <div class="stat-label">Mean Response</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="work">
+            <div class="showcase-grid">
+                <div class="work-item">
+                    <div class="work-content">
+                        <h4>Flux-A</h4>
+                        <p>Experimental propulsion module</p>
+                    </div>
+                </div>
+                <div class="work-item">
+                    <div class="work-content">
+                        <h4>Nova-9</h4>
+                        <p>Decentralized grid controller</p>
+                    </div>
+                </div>
+                <div class="work-item">
+                    <div class="work-content">
+                        <h4>Zenith</h4>
+                        <p>Cloud-native physics engine</p>
+                    </div>
+                </div>
+                <div class="work-item">
+                    <div class="work-content">
+                        <h4>Aura-X</h4>
+                        <p>Visual telemetry interface</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="container">
+                <div class="cta-banner">
+                    <h2>Own the Future</h2>
+                    <a href="#" class="btn btn-outline cta-banner-btn">Initialize Protocol</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-left">
+            <h5>Stay Synced</h5>
+            <ul class="footer-links">
+                <li><a href="#">X (Twitter)</a></li>
+                <li><a href="#">Discord</a></li>
+                <li><a href="#">LinkedIn</a></li>
+                <li><a href="#">Github</a></li>
+            </ul>
+        </div>
+        <div class="footer-right">
+            <div class="logo footer-right-logo">KINET CORE</div>
+            <p class="copyright">&copy; 2026 Kinet Core Systems. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Particle System
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (mouse.x && mouse.y) {
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        this.x -= dx * 0.01;
+                        this.y -= dy * 0.01;
+                    }
+                }
+
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 150; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        resize();
+        initParticles();
+        animate();
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+
+            // Re-draw particles with new color
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        // Intersection Observer for Reveal Effects
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-item, .stat-card, .work-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.8s var(--transition), transform 0.8s var(--transition)';
+            observer.observe(el);
+        });
+    </script>
+</body>
+
+</html>

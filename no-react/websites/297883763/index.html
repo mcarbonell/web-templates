@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    =============================================================================
+    INDEX.HTML - Landing Page
+    Seed: 297883763
+    =============================================================================
+    
+    SEED DECOMPOSITION (Digit-by-Digit Design Decisions):
+    ╔══════════╦═══════╦══════════════════════════════════════════════════════════╗
+    ║ Position ║ Digit ║ Design Domain                                            ║
+    ╠══════════╬═══════╬══════════════════════════════════════════════════════════╣
+    ║    1     ║   2   ║ Color: Deep Ocean (Teals, Navy, Coral accents)          ║
+    ║    2     ║   9   ║ Typography: Ultra Modern (Space Grotesk + Inter)        ║
+    ║    3     ║   7   ║ Layout: Dense spacing (0.5rem increments)               ║
+    ║    4     ║   8   ║ Animation: Maximal (complex sequences, 3D)              ║
+    ║    5     ║   8   ║ Corners: Super-rounded (24px-32px radius)               ║
+    ║    6     ║   3   ║ Texture: Moderate layered (gradients + shadows)         ║
+    ║    7     ║   7   ║ Density: Compact (information-rich)                     ║
+    ║    8     ║   6   ║ Interaction: 3D depth, parallax, transforms             ║
+    ║    9     ║   3   ║ Geometry: Mixed angularity (some sharp accents)         ║
+    ╚══════════╩═══════╩══════════════════════════════════════════════════════════╝
+    
+    WEBSITE TYPE: E-commerce (Sum: 53, 53%5=3)
+    PAGE PURPOSE: Conversion-focused landing with maximal visual impact
+    =============================================================================
+  -->
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Oceanic - Premium E-commerce Experience. Dive into a world of exceptional products with cutting-edge design.">
+  <meta name="theme-color" content="#0f172a">
+  
+  <title>Oceanic | Premium E-commerce Experience</title>
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Critical CSS inlined for performance -->
+  <style>
+    /* Critical above-fold styles */
+    :root {
+      --color-primary-500: #14b8a6;
+      --color-secondary-950: #020617;
+      --text-primary: #f8fafc;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--color-secondary-950);
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: var(--color-secondary-950);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .loader__spinner {
+      width: 60px;
+      height: 60px;
+      position: relative;
+    }
+    
+    .loader__spinner::before,
+    .loader__spinner::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 3px solid transparent;
+    }
+    
+    .loader__spinner::before {
+      width: 100%;
+      height: 100%;
+      border-top-color: var(--color-primary-500);
+      border-right-color: var(--color-primary-500);
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  
+  <!-- Main stylesheets -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  
+  <!-- Page-specific critical styles -->
+  <style>
+    /* Hero Section - Maximal animation (digit 4 = 8) */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 120px 0 80px;
+    }
+    
+    .hero__bg {
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-depth);
+    }
+    
+    .hero__bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-glow);
+      opacity: 0.5;
+    }
+    
+    .hero__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    
+    @media (max-width: 1024px) {
+      .hero__grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+    
+    .hero__eyebrow {
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-widest);
+      color: var(--color-primary-400);
+      margin-bottom: var(--space-4);
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-expo-out) 0.2s forwards;
+    }
+    
+    .hero__title {
+      font-size: var(--text-6xl);
+      line-height: var(--leading-none);
+      margin-bottom: var(--space-6);
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-expo-out) 0.4s forwards;
+    }
+    
+    .hero__title-accent {
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero__description {
+      font-size: var(--text-lg);
+      color: var(--text-secondary);
+      max-width: 540px;
+      margin-bottom: var(--space-8);
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-expo-out) 0.6s forwards;
+    }
+    
+    .hero__actions {
+      display: flex;
+      gap: var(--space-4);
+      opacity: 0;
+      animation: fadeInUp 0.8s var(--ease-expo-out) 0.8s forwards;
+    }
+    
+    @media (max-width: 640px) {
+      .hero__actions {
+        flex-direction: column;
+      }
+    }
+    
+    .hero__visual {
+      position: relative;
+      opacity: 0;
+      animation: reveal-3d 1.2s var(--ease-spring) 0.4s forwards;
+      transform-style: preserve-3d;
+    }
+    
+    .hero__image {
+      width: 100%;
+      border-radius: var(--radius-3xl);
+      box-shadow: var(--shadow-xl);
+      transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+      transition: transform var(--duration-slow) var(--ease-spring);
+    }
+    
+    .hero__visual:hover .hero__image {
+      transform: perspective(1000px) rotateY(0) rotateX(0) scale(1.02);
+    }
+    
+    .hero__floating-card {
+      position: absolute;
+      background: var(--bg-secondary);
+      padding: var(--space-4);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      animation: float 4s ease-in-out infinite;
+    }
+    
+    .hero__floating-card--1 {
+      top: 10%;
+      right: -20px;
+      animation-delay: 0s;
+    }
+    
+    .hero__floating-card--2 {
+      bottom: 15%;
+      left: -30px;
+      animation-delay: 2s;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes reveal-3d {
+      from { 
+        opacity: 0; 
+        transform: perspective(1000px) rotateX(-15deg) translateY(30px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: perspective(1000px) rotateX(0) translateY(0); 
+      }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    /* Features Section */
+    .features {
+      padding: var(--space-24) 0;
+      position: relative;
+    }
+    
+    .section-header {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto var(--space-16);
+    }
+    
+    .section-header__eyebrow {
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-widest);
+      color: var(--color-primary-400);
+      margin-bottom: var(--space-4);
+    }
+    
+    .section-header__title {
+      margin-bottom: var(--space-4);
+    }
+    
+    .section-header__description {
+      color: var(--text-secondary);
+      font-size: var(--text-lg);
+    }
+    
+    .features__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+    
+    @media (max-width: 1024px) {
+      .features__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .features__grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .feature-card {
+      background: var(--bg-secondary);
+      padding: var(--space-8);
+      border-radius: var(--radius-2xl);
+      transition: all var(--duration-slow) var(--ease-spring);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-accent);
+      transform: scaleX(0);
+      transition: transform var(--duration-slow) var(--ease-out);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .feature-card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .feature-card__icon {
+      width: 56px;
+      height: 56px;
+      background: var(--gradient-ocean);
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary-300);
+      margin-bottom: var(--space-5);
+    }
+    
+    .feature-card__title {
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-2);
+    }
+    
+    .feature-card__description {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+    }
+    
+    /* Products Section */
+    .products {
+      padding: var(--space-24) 0;
+      background: var(--bg-secondary);
+    }
+    
+    .products__grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-6);
+    }
+    
+    @media (max-width: 1280px) {
+      .products__grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    @media (max-width: 1024px) {
+      .products__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .products__grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Stats Section */
+    .stats {
+      padding: var(--space-20) 0;
+      position: relative;
+    }
+    
+    .stats__grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-8);
+      text-align: center;
+    }
+    
+    @media (max-width: 1024px) {
+      .stats__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .stats__grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .stat__number {
+      font-family: var(--font-display);
+      font-size: var(--text-5xl);
+      font-weight: 700;
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--space-2);
+    }
+    
+    .stat__label {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wider);
+    }
+    
+    /* CTA Section */
+    .cta {
+      padding: var(--space-24) 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cta__bg {
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-ocean);
+      opacity: 0.1;
+    }
+    
+    .cta__content {
+      position: relative;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .cta__title {
+      font-size: var(--text-4xl);
+      margin-bottom: var(--space-6);
+    }
+    
+    .cta__description {
+      font-size: var(--text-lg);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-8);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader - Maximal animation (digit 4 = 8) -->
+  <div class="loader">
+    <div class="loader__spinner"></div>
+    <p class="loader__text">Loading Experience</p>
+  </div>
+
+  <!-- Skip Link for Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav__container">
+      <a href="index.html" class="nav__logo">
+        <svg class="nav__logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+          <path d="M10 16C10 16 12 10 16 10C20 10 22 16 22 16C22 16 20 22 16 22C12 22 10 16 10 16Z" stroke="currentColor" stroke-width="2"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+        </svg>
+        Oceanic
+      </a>
+      
+      <ul class="nav__menu" role="menubar">
+        <li role="none"><a href="index.html" class="nav__link nav__link--active" role="menuitem">Home</a></li>
+        <li role="none"><a href="about.html" class="nav__link" role="menuitem">About</a></li>
+        <li role="none"><a href="services.html" class="nav__link" role="menuitem">Services</a></li>
+        <li role="none"><a href="online-shop.html" class="nav__link" role="menuitem">Shop</a></li>
+        <li role="none"><a href="blog.html" class="nav__link" role="menuitem">Blog</a></li>
+        <li role="none"><a href="contact.html" class="nav__link" role="menuitem">Contact</a></li>
+      </ul>
+      
+      <div class="nav__actions">
+        <a href="login.html" class="btn btn--ghost btn--small">Sign In</a>
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+        <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main id="main-content">
+    <!-- Hero Section -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__bg" aria-hidden="true"></div>
+      <div class="container hero__grid">
+        <div class="hero__content">
+          <p class="hero__eyebrow">Premium E-commerce</p>
+          <h1 id="hero-title" class="hero__title">
+            Dive Into the <span class="hero__title-accent">Future</span> of Shopping
+          </h1>
+          <p class="hero__description">
+            Experience a curated collection of exceptional products with cutting-edge design, 
+            seamless navigation, and unparalleled customer service.
+          </p>
+          <div class="hero__actions">
+            <a href="online-shop.html" class="btn btn--primary btn--large">
+              Explore Shop
+              <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+            <a href="about.html" class="btn btn--outline btn--large">Learn More</a>
+          </div>
+        </div>
+        
+        <div class="hero__visual">
+          <!-- Placeholder for hero image -->
+          <div class="hero__image" style="background: linear-gradient(135deg, #134e4a 0%, #0f172a 100%); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center;">
+            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="color: #14b8a6; opacity: 0.5;">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              <path d="M2 12h20"/>
+            </svg>
+          </div>
+          
+          <!-- Floating cards - 3D depth (digit 8 = 6) -->
+          <div class="hero__floating-card hero__floating-card--1">
+            <div style="display: flex; align-items: center; gap: var(--space-3);">
+              <div style="width: 40px; height: 40px; background: var(--color-primary-500); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <div>
+                <p style="font-weight: 600; font-size: var(--text-sm);">Trusted by 50K+</p>
+                <p style="font-size: var(--text-xs); color: var(--text-muted);">Happy customers</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="hero__floating-card hero__floating-card--2">
+            <div style="display: flex; align-items: center; gap: var(--space-3);">
+              <div style="width: 40px; height: 40px; background: var(--color-accent-500); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              </div>
+              <div>
+                <p style="font-weight: 600; font-size: var(--text-sm);">4.9/5 Rating</p>
+                <p style="font-size: var(--text-xs); color: var(--text-muted);">Based on 2,000+ reviews</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" aria-labelledby="features-title">
+      <div class="container">
+        <header class="section-header reveal">
+          <p class="section-header__eyebrow">Why Choose Us</p>
+          <h2 id="features-title" class="section-header__title">Unmatched Quality & Service</h2>
+          <p class="section-header__description">
+            We've built our reputation on delivering exceptional products with a shopping experience that exceeds expectations.
+          </p>
+        </header>
+        
+        <div class="features__grid">
+          <!-- Feature 1 -->
+          <article class="feature-card reveal">
+            <div class="feature-card__icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <h3 class="feature-card__title">Secure Shopping</h3>
+            <p class="feature-card__description">
+              Your security is our priority. Advanced encryption and secure payment processing protect every transaction.
+            </p>
+          </article>
+          
+          <!-- Feature 2 -->
+          <article class="feature-card reveal">
+            <div class="feature-card__icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+              </svg>
+            </div>
+            <h3 class="feature-card__title">Fast Shipping</h3>
+            <p class="feature-card__description">
+              Express delivery worldwide. Track your order in real-time from our warehouse to your doorstep.
+            </p>
+          </article>
+          
+          <!-- Feature 3 -->
+          <article class="feature-card reveal">
+            <div class="feature-card__icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+              </svg>
+            </div>
+            <h3 class="feature-card__title">Premium Support</h3>
+            <p class="feature-card__description">
+              24/7 customer support from our dedicated team. We're here to help with any questions or concerns.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products" aria-labelledby="products-title">
+      <div class="container">
+        <header class="section-header reveal">
+          <p class="section-header__eyebrow">Featured Products</p>
+          <h2 id="products-title" class="section-header__title">Curated For Excellence</h2>
+          <p class="section-header__description">
+            Discover our handpicked selection of premium products designed to elevate your lifestyle.
+          </p>
+        </header>
+        
+        <div class="products__grid">
+          <!-- Product 1 -->
+          <article class="card card--product reveal">
+            <div style="aspect-ratio: 1; background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: var(--text-4xl); opacity: 0.3;">📦</span>
+            </div>
+            <div class="card__content">
+              <span class="badge badge--primary" style="margin-bottom: var(--space-2); display: inline-block;">New</span>
+              <h3 class="card__title">Ocean Pro Bundle</h3>
+              <p class="card__description" style="margin-bottom: var(--space-4);">Complete premium package with exclusive features</p>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span class="card__price">$299</span>
+                <button class="btn btn--primary btn--small">Add to Cart</button>
+              </div>
+            </div>
+          </article>
+          
+          <!-- Product 2 -->
+          <article class="card card--product reveal">
+            <div style="aspect-ratio: 1; background: linear-gradient(135deg, #be123c 0%, #881337 100%); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: var(--text-4xl); opacity: 0.3;">🎁</span>
+            </div>
+            <div class="card__content">
+              <span class="badge badge--accent" style="margin-bottom: var(--space-2); display: inline-block;">Popular</span>
+              <h3 class="card__title">Coral Essentials</h3>
+              <p class="card__description" style="margin-bottom: var(--space-4);">Our bestselling essentials collection</p>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span class="card__price">$149</span>
+                <button class="btn btn--primary btn--small">Add to Cart</button>
+              </div>
+            </div>
+          </article>
+          
+          <!-- Product 3 -->
+          <article class="card card--product reveal">
+            <div style="aspect-ratio: 1; background: linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: var(--text-4xl); opacity: 0.3;">✨</span>
+            </div>
+            <div class="card__content">
+              <span class="badge badge--secondary" style="margin-bottom: var(--space-2); display: inline-block;">Limited</span>
+              <h3 class="card__title">Abyss Collection</h3>
+              <p class="card__description" style="margin-bottom: var(--space-4);">Exclusive limited edition items</p>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span class="card__price">$499</span>
+                <button class="btn btn--primary btn--small">Add to Cart</button>
+              </div>
+            </div>
+          </article>
+          
+          <!-- Product 4 -->
+          <article class="card card--product reveal">
+            <div style="aspect-ratio: 1; background: linear-gradient(135deg, #059669 0%, #065f46 100%); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: var(--text-4xl); opacity: 0.3;">🌿</span>
+            </div>
+            <div class="card__content">
+              <span class="badge badge--success" style="margin-bottom: var(--space-2); display: inline-block;">Eco</span>
+              <h3 class="card__title">Sustainable Set</h3>
+              <p class="card__description" style="margin-bottom: var(--space-4);">Environmentally conscious choices</p>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span class="card__price">$199</span>
+                <button class="btn btn--primary btn--small">Add to Cart</button>
+              </div>
+            </div>
+          </article>
+        </div>
+        
+        <div style="text-align: center; margin-top: var(--space-12);">
+          <a href="online-shop.html" class="btn btn--secondary btn--large">
+            View All Products
+            <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats" aria-label="Company statistics">
+      <div class="container">
+        <div class="stats__grid">
+          <div class="stat reveal">
+            <div class="stat__number" data-counter="50000" data-suffix="+">0</div>
+            <p class="stat__label">Happy Customers</p>
+          </div>
+          <div class="stat reveal">
+            <div class="stat__number" data-counter="2500" data-suffix="+">0</div>
+            <p class="stat__label">Products Available</p>
+          </div>
+          <div class="stat reveal">
+            <div class="stat__number" data-counter="99" data-suffix="%">0</div>
+            <p class="stat__label">Satisfaction Rate</p>
+          </div>
+          <div class="stat reveal">
+            <div class="stat__number" data-counter="24" data-suffix="/7">0</div>
+            <p class="stat__label">Support Available</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" aria-labelledby="cta-title">
+      <div class="cta__bg" aria-hidden="true"></div>
+      <div class="container">
+        <div class="cta__content reveal">
+          <h2 id="cta-title" class="cta__title">Ready to Transform Your Experience?</h2>
+          <p class="cta__description">
+            Join thousands of satisfied customers who have discovered the Oceanic difference. 
+            Start your journey today.
+          </p>
+          <div style="display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap;">
+            <a href="register.html" class="btn btn--primary btn--large">Get Started Free</a>
+            <a href="contact.html" class="btn btn--outline btn--large">Contact Sales</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <a href="index.html" class="footer__logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="16" cy="16" r="14"/>
+              <path d="M10 16C10 16 12 10 16 10C20 10 22 16 22 16C22 16 20 22 16 22C12 22 10 16 10 16Z"/>
+              <circle cx="16" cy="16" r="3" fill="currentColor"/>
+            </svg>
+            Oceanic
+          </a>
+          <p class="footer__description">
+            Premium e-commerce experience with cutting-edge design, exceptional products, and unparalleled service.
+          </p>
+          <div class="footer__social">
+            <a href="#" class="footer__social-link" aria-label="Twitter">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+              </svg>
+            </a>
+            <a href="#" class="footer__social-link" aria-label="Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </a>
+            <a href="#" class="footer__social-link" aria-label="LinkedIn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                <rect x="2" y="9" width="4" height="12"/>
+                <circle cx="4" cy="4" r="2"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="footer__title">Shop</h4>
+          <ul class="footer__links">
+            <li><a href="online-shop.html" class="footer__link">All Products</a></li>
+            <li><a href="services.html" class="footer__link">Services</a></li>
+            <li><a href="pricing.html" class="footer__link">Pricing</a></li>
+            <li><a href="case-studies.html" class="footer__link">Case Studies</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="footer__title">Company</h4>
+          <ul class="footer__links">
+            <li><a href="about.html" class="footer__link">About Us</a></li>
+            <li><a href="blog.html" class="footer__link">Blog</a></li>
+            <li><a href="resources.html" class="footer__link">Resources</a></li>
+            <li><a href="contact.html" class="footer__link">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="footer__title">Support</h4>
+          <ul class="footer__links">
+            <li><a href="#" class="footer__link">Help Center</a></li>
+            <li><a href="#" class="footer__link">Terms of Service</a></li>
+            <li><a href="#" class="footer__link">Privacy Policy</a></li>
+            <li><a href="#" class="footer__link">Status</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer__bottom">
+        <p class="footer__copyright">© 2026 Oceanic. All rights reserved.</p>
+        <div class="footer__legal">
+          <a href="#" class="footer__legal-link">Terms</a>
+          <a href="#" class="footer__legal-link">Privacy</a>
+          <a href="#" class="footer__legal-link">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/main.js" defer></script>
+  <script src="js/components.js" defer></script>
+</body>
+</html>

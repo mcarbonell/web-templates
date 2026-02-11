@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Chroma Customs - Award-winning premium auto body and paint shop. We turn vehicles into rolling masterpieces.">
+    <title>Chroma Customs | Premium Auto Refinishing</title>
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=Syne:wght@700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* 
+        DESIGN CHOICES - SEED: 818001087
+        Business: Automotive (Body & Paint) - Chroma Customs
+        Layout: Floating Asymmetric
+        Palette: Cyber-Electric (Indigo, Cyan, Pink)
+        Feature: 3D Perspective Hover
+        Animation: Elastic GSAP
+        */
+
+        :root {
+            /* Dark Theme (Default) */
+            --bg: #0A0A0F;
+            --surface: #12121A;
+            --text: #F0F0F5;
+            --text-dim: #A0A0B0;
+            --accent: #00F2FF;
+            --accent-secondary: #FF006E;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            --font-main: 'Outfit', sans-serif;
+            --font-heading: 'Syne', sans-serif;
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        [data-theme="light"] {
+            --bg: #F8F9FA;
+            --surface: #FFFFFF;
+            --text: #1A1A2E;
+            --text-dim: #636E72;
+            --accent: #0984E3;
+            --accent-secondary: #D63031;
+            --glass: rgba(0, 0, 0, 0.03);
+            --border: rgba(0, 0, 0, 0.1);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* Accessibility: Skip to Content */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--accent);
+            color: var(--bg);
+            padding: 1rem;
+            z-index: 10000;
+            transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+            outline: 2px solid var(--text);
+        }
+
+        /* Accessibility: Focus States */
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 4px;
+        }
+
+        /* Header & Navigation */
+        .site-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            background: var(--glass);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            padding-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            flex: 1;
+            z-index: 2;
+            max-width: 600px;
+        }
+
+        .hero-content h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            font-weight: 900;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            margin-bottom: 2.5rem;
+            max-width: 500px;
+        }
+
+        .hero-visual {
+            flex: 1;
+            position: relative;
+            perspective: 1000px;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .car-card {
+            width: 100%;
+            height: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .car-card img {
+            width: 110%;
+            height: auto;
+            transform: translateZ(50px);
+            filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5));
+        }
+
+        .hero-bg-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 25vw;
+            font-weight: 900;
+            color: var(--glass);
+            z-index: 1;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Buttons */
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Services Section */
+        .section {
+            padding: 100px 5%;
+            position: relative;
+        }
+
+        .section-header {
+            margin-bottom: 4rem;
+        }
+
+        .tagline {
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            role: list;
+        }
+
+        .service-card {
+            background: var(--surface);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            role: listitem;
+        }
+
+        .service-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-10px);
+        }
+
+        .service-card i {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .service-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card p {
+            color: var(--text-dim);
+        }
+
+        /* Portfolio / Work */
+        .work-gallery {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+
+        .work-item {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--surface);
+            transition: var(--transition);
+        }
+
+        .work-item:nth-child(1) {
+            grid-column: span 8;
+            height: 500px;
+        }
+
+        .work-item:nth-child(2) {
+            grid-column: span 4;
+            height: 500px;
+        }
+
+        .work-item:nth-child(3) {
+            grid-column: span 4;
+            height: 400px;
+        }
+
+        .work-item:nth-child(4) {
+            grid-column: span 8;
+            height: 400px;
+        }
+
+        .work-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .work-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .work-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            color: white;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .work-item:hover .work-overlay {
+            opacity: 1;
+        }
+
+        /* Contact Section */
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            background: var(--surface);
+            border-radius: 30px;
+            padding: 4rem;
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dim);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+        }
+
+        /* Footer */
+        .site-footer {
+            padding: 5rem 5% 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .footer-info p {
+            color: var(--text-dim);
+            margin-top: 1rem;
+        }
+
+        .footer-links h4 {
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .copyright {
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        /* Theme Announcement */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 968px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding-top: 150px;
+            }
+
+            .hero-content {
+                max-width: 100%;
+            }
+
+            .hero-visual {
+                width: 100%;
+                height: 400px;
+            }
+
+            .contact-container {
+                grid-template-columns: 1fr;
+                padding: 2rem;
+            }
+
+            .work-item {
+                grid-column: span 12 !important;
+                height: 300px !important;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* prefers-reduced-motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+                transform: none !important;
+            }
+
+            body {
+                scroll-behavior: auto;
+            }
+        }
+    </style>
+</head>
+
+<body data-theme="dark">
+
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <header class="site-header" role="banner">
+        <a href="#" class="logo" aria-label="Chroma Customs Home">
+            <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="20" fill="currentColor" fill-opacity="0.1" />
+                <path d="M20 50L50 80L80 50L50 20L20 50Z" stroke="var(--accent)" stroke-width="8" />
+                <circle cx="50" cy="50" r="10" fill="var(--accent-secondary)" />
+            </svg>
+            CHROMA<span>CUSTOMS</span>
+        </a>
+
+        <nav role="navigation" aria-label="Main Navigation">
+            <ul class="nav-links" role="list">
+                <li role="listitem"><a href="#services">Services</a></li>
+                <li role="listitem"><a href="#work">Our Work</a></li>
+                <li role="listitem"><a href="#process">Process</a></li>
+                <li role="listitem"><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark theme">
+                <svg class="sun-icon sr-only" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.243 1.757a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414l-.707-.707a1 1 0 010-1.414zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zm-1.757 4.243a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM10 18a1 1 0 01-1-1v-1a1 1 0 112 0v1a1 1 0 01-1 1zm-4.243-1.757a1 1 0 01-1.414 0l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 010 1.414zM2 10a1 1 0 011-1h1a1 1 0 110 2H3a1 1 0 01-1-1zm1.757-4.243a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zM10 5a5 5 0 100 10 5 5 0 000-10z">
+                    </path>
+                </svg>
+                <svg class="moon-icon" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                </svg>
+            </button>
+            <a href="#contact" class="btn btn-primary" style="padding: 0.6rem 1.5rem; font-size: 0.8rem;">Book Quote</a>
+        </div>
+    </header>
+
+    <div id="theme-announcer" class="sr-only" aria-live="polite">Dark theme active</div>
+
+    <main id="main" role="main">
+        <!-- Hero -->
+        <section class="hero" role="region" aria-label="Introduction">
+            <div class="hero-bg-text">PAINT</div>
+            <div class="hero-content">
+                <span class="tagline">Established 2024</span>
+                <h1>ALCHEMISTS OF THE AUTOMOBILE</h1>
+                <p>Bespoke refinishing and high-performance paintwork for those who demand perfection in every
+                    reflection.</p>
+                <div class="cta-group">
+                    <a href="#work" class="btn btn-primary">View Gallery</a>
+                    <a href="#services" class="btn btn-outline">Our Services</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="car-card" id="heroCard">
+                    <!-- Symbolic SVG Illustration of a sleek car silhouette to avoid external image issues -->
+                    <svg width="400" height="200" viewBox="0 0 500 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="carGradient" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="var(--accent)" />
+                                <stop offset="100%" stop-color="var(--accent-secondary)" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M50 180C50 180 80 160 150 155C220 150 350 155 420 180H450V200H50V180Z"
+                            fill="var(--text)" fill-opacity="0.1" />
+                        <path d="M80 180C120 100 400 110 430 180" stroke="url(#carGradient)" stroke-width="4"
+                            stroke-linecap="round" />
+                        <circle cx="130" cy="180" r="25" stroke="var(--text)" stroke-width="2" />
+                        <circle cx="370" cy="180" r="25" stroke="var(--text)" stroke-width="2" />
+                        <circle cx="130" cy="180" r="15" fill="var(--accent)" />
+                        <circle cx="370" cy="180" r="15" fill="var(--accent)" />
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services -->
+        <section id="services" class="section" role="region" aria-labelledby="services-heading">
+            <div class="section-header">
+                <span class="tagline">What we do</span>
+                <h2 id="services-heading" class="section-title">Mastercraft Services</h2>
+            </div>
+            <div class="services-grid">
+                <article class="service-card">
+                    <div aria-hidden="true" class="icon">🎨</div>
+                    <h3>Custom Paint</h3>
+                    <p>From candy pearls to deep-tinted clears, we create colors that don't exist in nature.</p>
+                </article>
+                <article class="service-card">
+                    <div aria-hidden="true" class="icon">✨</div>
+                    <h3>Ceramic Pro</h3>
+                    <p>Aerospace-grade protection that ensures your masterpiece stays flawless for a decade.</p>
+                </article>
+                <article class="service-card">
+                    <div aria-hidden="true" class="icon">🛠️</div>
+                    <h3>Precision Restoration</h3>
+                    <p>concours-level bodywork reconstruction using original techniques and modern materials.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Portfolio -->
+        <section id="work" class="section" role="region" aria-labelledby="work-heading">
+            <div class="section-header" style="text-align: right;">
+                <span class="tagline">The Gallery</span>
+                <h2 id="work-heading" class="section-title">Recent Evolutions</h2>
+            </div>
+            <div class="work-gallery" role="list">
+                <div class="work-item" role="listitem">
+                    <img src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&q=80&w=1200"
+                        alt="Sleek black sports car with liquid-like finish">
+                    <div class="work-overlay">
+                        <h3>Onyx Project</h3>
+                        <p>12 layers of deep black clearcoat</p>
+                    </div>
+                </div>
+                <div class="work-item" role="listitem">
+                    <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=800"
+                        alt="Classic vintage car in metallic blue">
+                    <div class="work-overlay">
+                        <h3>Heritage Blue</h3>
+                        <p>Restoring a 1967 legend</p>
+                    </div>
+                </div>
+                <div class="work-item" role="listitem">
+                    <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&q=80&w=800"
+                        alt="Modern white sedan with matte finish">
+                    <div class="work-overlay">
+                        <h3>Satin Stealth</h3>
+                        <p>Full exterior matte conversion</p>
+                    </div>
+                </div>
+                <div class="work-item" role="listitem">
+                    <img src="https://images.unsplash.com/photo-1525609004556-c46c7d6cf048?auto=format&fit=crop&q=80&w=1200"
+                        alt="Close up of a vibrant orange car door">
+                    <div class="work-overlay">
+                        <h3>Solar Flare</h3>
+                        <p>Custom tri-stage pearl orange</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="section" role="region" aria-labelledby="contact-heading">
+            <div class="contact-container">
+                <div class="contact-info">
+                    <span class="tagline">Get in Touch</span>
+                    <h2 id="contact-heading" class="section-title">Let's build your dream.</h2>
+                    <p style="margin-bottom: 2rem; color: var(--text-dim);">Ready to elevate your vehicle? Schedule a
+                        consultation at our studio in the heart of the Automotive District.</p>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p>📍 102 Octane Avenue, Drift City</p>
+                        <p>📞 +1 (555) CHROMA-01</p>
+                        <p>✉️ hello@chromacustoms.io</p>
+                    </div>
+                </div>
+                <form class="contact-form" action="#" method="post">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicle">Vehicle Model</label>
+                        <input type="text" id="vehicle" name="vehicle" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Your Vision</label>
+                        <textarea id="message" name="message" class="form-control" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Initiate Project</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-grid">
+            <div class="footer-info">
+                <a href="#" class="logo">CHROMA<span>CUSTOMS</span></a>
+                <p>The intersection of automotive engineering and fine art.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Explore</h4>
+                <ul role="list">
+                    <li role="listitem"><a href="#services">Services</a></li>
+                    <li role="listitem"><a href="#work">Portfolio</a></li>
+                    <li role="listitem"><a href="#process">Technique</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Social</h4>
+                <ul role="list">
+                    <li role="listitem"><a href="#">Instagram</a></li>
+                    <li role="listitem"><a href="#">YouTube</a></li>
+                    <li role="listitem"><a href="#">Dribbble</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2026 Chroma Customs. Seed #818001087. Made with passion.</p>
+        </div>
+    </footer>
+
+    <script>
+        // GSAP Initialization
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('themeToggle');
+        const themeAnnouncer = document.getElementById('theme-announcer');
+        const root = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            themeAnnouncer.textContent = `${newTheme} theme active`;
+
+            // Animation for icons
+            gsap.to('.theme-toggle svg', {
+                rotation: '+=360',
+                duration: 0.5,
+                ease: "power2.inOut"
+            });
+        });
+
+        // 3D Perspective Hover Effect (SEED Feature 7)
+        const card = document.getElementById('heroCard');
+
+        document.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            const { innerWidth, innerHeight } = window;
+
+            const xRotation = ((clientY / innerHeight) - 0.5) * 20;
+            const yRotation = ((clientX / innerWidth) - 0.5) * -20;
+
+            gsap.to(card, {
+                rotationX: xRotation,
+                rotationY: yRotation,
+                duration: 0.8,
+                ease: "power2.out"
+            });
+        });
+
+        // Scroll Animations (SEED Animation Type 1: Elastic)
+        gsap.from(".hero-content > *", {
+            y: 100,
+            opacity: 0,
+            duration: 1.5,
+            stagger: 0.2,
+            ease: "elastic.out(1, 0.5)",
+            delay: 0.5
+        });
+
+        gsap.utils.toArray(".service-card").forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 85%",
+                },
+                y: 50,
+                opacity: 0,
+                scale: 0.9,
+                duration: 1,
+                ease: "elastic.out(1, 0.8)",
+                delay: i * 0.1
+            });
+        });
+
+        gsap.utils.toArray(".work-item").forEach((item, i) => {
+            gsap.from(item, {
+                scrollTrigger: {
+                    trigger: item,
+                    start: "top 90%",
+                },
+                opacity: 0,
+                x: i % 2 === 0 ? -100 : 100,
+                duration: 1.2,
+                ease: "power4.out"
+            });
+        });
+
+        // Parallax Effect for Background Text
+        gsap.to(".hero-bg-text", {
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: 2
+            },
+            x: -200
+        });
+
+    </script>
+</body>
+
+</html>

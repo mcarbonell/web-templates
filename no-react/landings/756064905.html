@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PureLife.co - Wellness & Massage Therapy</title>
+    <meta name="description" content="Experience transformative wellness at PureLife. Professional massage therapy and spa services for mind, body, and spirit.">
+    
+    <!-- GSAP for spring animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <style>
+        /* 
+        DESIGN CHOICES FOR LANDING #756064905
+        =====================================
+        Business: Massage Therapist / Spa / Wellness Center (Type 25)
+        Brand: PureLife.co
+        Layout: Floating Sections (5) - Cards with depth and elevation
+        Hero: Diagonal Cut (3) - Angular dynamic split design
+        Color: Teal/Turquoise (2) - Calming spa-like wellness palette
+        Density: Balanced (2) - Good information without overwhelming
+        Feature: Glassmorphism (4) - Frosted glass backdrop blur effects
+        Animation: Spring (1) - Natural bouncy spring-based motion
+        Typography: Modern Sans + Elegant Serif (3)
+        */
+        
+        /* CSS Reset & Base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        
+        :root {
+            /* Light theme - Teal/Turquoise wellness palette */
+            --primary: #14b8a6;
+            --primary-dark: #0d9488;
+            --primary-light: #5eead4;
+            --secondary: #06b6d4;
+            --accent: #f0fdfa;
+            --bg-main: #ffffff;
+            --bg-secondary: #f0fdfa;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: rgba(20, 184, 166, 0.2);
+            --shadow: rgba(20, 184, 166, 0.1);
+            --shadow-strong: rgba(20, 184, 166, 0.2);
+            --gradient-1: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
+            --gradient-2: linear-gradient(135deg, #5eead4 0%, #14b8a6 100%);
+        }
+        
+        [data-theme="dark"] {
+            /* Dark theme - Deep teal with contrast */
+            --primary: #5eead4;
+            --primary-dark: #14b8a6;
+            --primary-light: #99f6e4;
+            --secondary: #22d3ee;
+            --accent: #134e4a;
+            --bg-main: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-glass: rgba(30, 41, 59, 0.7);
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: rgba(94, 234, 212, 0.2);
+            --shadow: rgba(94, 234, 212, 0.1);
+            --shadow-strong: rgba(94, 234, 212, 0.2);
+            --gradient-1: linear-gradient(135deg, #5eead4 0%, #22d3ee 100%);
+            --gradient-2: linear-gradient(135deg, #99f6e4 0%, #5eead4 100%);
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Typography - Modern sans + elegant serif */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
+        
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        /* Skip to content link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            z-index: 10000;
+            border-radius: 0 0 4px 0;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+            outline: 2px solid var(--primary-light);
+            outline-offset: 2px;
+        }
+        
+        /* Focus styles for accessibility */
+        *:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        
+        /* Header with glassmorphism */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 4px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-list {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link:focus::after {
+            width: 100%;
+        }
+
+        
+        /* Theme toggle button */
+        .theme-toggle {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+        
+        .theme-toggle:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .theme-toggle:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-primary);
+            transition: fill 0.3s ease;
+        }
+        
+        .theme-toggle:hover svg {
+            fill: white;
+        }
+        
+        /* Mobile menu toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+        }
+        
+        .mobile-menu-toggle span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text-primary);
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+
+        
+        /* Hero section - Diagonal cut design */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 6rem 2rem 4rem;
+            background: var(--bg-secondary);
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60%;
+            height: 100%;
+            background: var(--gradient-1);
+            clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%);
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-text h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            margin-bottom: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-text p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 4px 20px var(--shadow-strong);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--shadow-strong);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+            backdrop-filter: blur(8px);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Hero image with glassmorphic frame */
+        .hero-image {
+            position: relative;
+            height: 600px;
+        }
+        
+        .hero-image-wrapper {
+            position: relative;
+            height: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            transform: rotate(-3deg);
+            box-shadow: 0 20px 60px var(--shadow-strong);
+        }
+        
+        .hero-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .hero-glass-card {
+            position: absolute;
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+        
+        .hero-glass-card.card-1 {
+            top: 10%;
+            left: -10%;
+            transform: rotate(5deg);
+        }
+        
+        .hero-glass-card.card-2 {
+            bottom: 10%;
+            right: -10%;
+            transform: rotate(-5deg);
+        }
+
+        
+        .hero-glass-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .hero-glass-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Floating sections with depth */
+        .section {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+        
+        .section-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .section-header p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Services grid with floating cards */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .service-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 40px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px var(--shadow-strong);
+        }
+        
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .service-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+        
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .service-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .service-card .price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Benefits section with diagonal layout */
+        .benefits {
+            background: var(--bg-secondary);
+            position: relative;
+        }
+        
+        .benefits::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: var(--gradient-2);
+            opacity: 0.05;
+            clip-path: polygon(0 0, 100% 0, 70% 100%, 0% 100%);
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        
+        .benefit-item {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .benefit-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+        
+        .benefit-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--primary);
+        }
+        
+        .benefit-item h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+        
+        .benefit-item p {
+            color: var(--text-secondary);
+        }
+        
+        /* Testimonials with glassmorphic cards */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        
+        .testimonial-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px var(--shadow);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px var(--shadow-strong);
+        }
+        
+        .testimonial-rating {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+        }
+
+        
+        .star {
+            width: 20px;
+            height: 20px;
+            fill: var(--primary);
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        
+        .author-info h4 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .author-info p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        /* Pricing section */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .pricing-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 40px var(--shadow);
+            position: relative;
+        }
+
+        
+        .pricing-card.featured {
+            border: 2px solid var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-1);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px var(--shadow-strong);
+        }
+        
+        .pricing-card.featured:hover {
+            transform: translateY(-10px) scale(1.07);
+        }
+        
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .pricing-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .pricing-period {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        
+        .pricing-features li {
+            padding: 0.75rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        
+        /* Gallery section */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .gallery-item {
+            position: relative;
+            height: 300px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px var(--shadow);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px var(--shadow-strong);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-glass);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        .gallery-overlay p {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        /* Contact section with glassmorphic form */
+        .contact {
+            background: var(--bg-secondary);
+        }
+        
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+        
+        .contact-info h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        
+        .contact-info p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.125rem;
+        }
+        
+        .contact-details {
+            list-style: none;
+        }
+        
+        .contact-details li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            color: var(--text-secondary);
+        }
+        
+        .contact-details svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary);
+        }
+        
+        .contact-form {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 40px var(--shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--shadow);
+        }
+
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-section h4 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .footer-section p,
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .social-link svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-primary);
+        }
+
+        
+        .social-link:hover svg {
+            fill: white;
+        }
+        
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        /* Announcement for theme changes */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 968px) {
+            .nav-list {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg-glass);
+                backdrop-filter: blur(12px);
+                flex-direction: column;
+                padding: 2rem;
+                border-bottom: 1px solid var(--border);
+            }
+            
+            .nav-list.active {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .hero-image {
+                height: 400px;
+            }
+            
+            .hero-glass-card.card-1,
+            .hero-glass-card.card-2 {
+                display: none;
+            }
+            
+            .contact-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .services-grid,
+            .benefits-grid,
+            .testimonials-grid,
+            .pricing-grid,
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        
+        @media (max-width: 640px) {
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .section {
+                padding: 4rem 1rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Screen reader announcement for theme changes -->
+    <div class="sr-only" role="status" aria-live="polite" aria-atomic="true" id="theme-announcement"></div>
+    
+    <!-- Header with glassmorphism -->
+    <header class="header" role="banner">
+        <div class="header-content">
+            <a href="#" class="logo" aria-label="PureLife.co Home">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 2C16 2 8 8 8 16C8 20.4183 11.5817 24 16 24C20.4183 24 24 20.4183 24 16C24 8 16 2 16 2Z" fill="currentColor"/>
+                    <circle cx="16" cy="16" r="4" fill="white"/>
+                    <path d="M16 24C16 24 12 26 12 28C12 29.1046 13.3431 30 15 30H17C18.6569 30 20 29.1046 20 28C20 26 16 24 16 24Z" fill="currentColor"/>
+                </svg>
+                PureLife.co
+            </a>
+            
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <ul class="nav-list" role="list">
+                    <li role="listitem"><a href="#services" class="nav-link">Services</a></li>
+                    <li role="listitem"><a href="#benefits" class="nav-link">Benefits</a></li>
+                    <li role="listitem"><a href="#testimonials" class="nav-link">Reviews</a></li>
+                    <li role="listitem"><a href="#pricing" class="nav-link">Pricing</a></li>
+                    <li role="listitem"><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+                
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="5"/>
+                        <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1m17.66-5.66l-4.24 4.24m-4.24 4.24l-4.24 4.24m12.72 0l-4.24-4.24m-4.24-4.24L4.34 4.34"/>
+                    </svg>
+                </button>
+                
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    
+    <!-- Hero Section with diagonal design -->
+    <section class="hero" role="main" id="main-content">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Restore Your Balance, Renew Your Spirit</h1>
+                <p>Experience transformative wellness through expert massage therapy and holistic spa treatments designed for your complete rejuvenation.</p>
+                <div class="hero-buttons">
+                    <a href="#contact" class="btn btn-primary">Book Appointment</a>
+                    <a href="#services" class="btn btn-secondary">Explore Services</a>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <div class="hero-image-wrapper">
+                    <svg width="100%" height="100%" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#14b8a6;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.3" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="600" height="600" fill="url(#heroGrad)"/>
+                        <circle cx="300" cy="250" r="120" fill="#14b8a6" opacity="0.2"/>
+                        <circle cx="200" cy="400" r="80" fill="#06b6d4" opacity="0.2"/>
+                        <circle cx="450" cy="350" r="100" fill="#5eead4" opacity="0.2"/>
+                        <path d="M150,150 Q300,50 450,150 T750,150" stroke="#14b8a6" stroke-width="3" fill="none" opacity="0.3"/>
+                        <text x="300" y="300" font-size="120" fill="#14b8a6" opacity="0.1" text-anchor="middle" font-family="Playfair Display">✨</text>
+                    </svg>
+                </div>
+                
+                <div class="hero-glass-card card-1">
+                    <h3>15+ Years</h3>
+                    <p>Expert Experience</p>
+                </div>
+                
+                <div class="hero-glass-card card-2">
+                    <h3>2000+</h3>
+                    <p>Happy Clients</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- Services Section -->
+    <section class="section" id="services" role="region" aria-labelledby="services-heading">
+        <div class="section-content">
+            <div class="section-header">
+                <h2 id="services-heading">Our Signature Services</h2>
+                <p>Tailored treatments designed to address your unique wellness needs</p>
+            </div>
+            
+            <div class="services-grid" role="list">
+                <div class="service-card" role="listitem">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                        </svg>
+                    </div>
+                    <h3>Deep Tissue Massage</h3>
+                    <p>Intensive therapy targeting chronic muscle tension and knots. Perfect for athletes and those with persistent pain.</p>
+                    <p class="price">From $95 / 60min</p>
+                </div>
+                
+                <div class="service-card" role="listitem">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.86-.96-7-5.54-7-10V8.3l7-3.11 7 3.11V10c0 4.46-3.14 9.04-7 10z"/>
+                        </svg>
+                    </div>
+                    <h3>Swedish Relaxation</h3>
+                    <p>Gentle, flowing strokes to promote relaxation and improve circulation. Ideal for stress relief and first-timers.</p>
+                    <p class="price">From $85 / 60min</p>
+                </div>
+                
+                <div class="service-card" role="listitem">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </div>
+                    <h3>Hot Stone Therapy</h3>
+                    <p>Heated stones melt away tension while promoting deep relaxation and energy flow throughout your body.</p>
+                    <p class="price">From $110 / 75min</p>
+                </div>
+                
+                <div class="service-card" role="listitem">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z"/>
+                        </svg>
+                    </div>
+                    <h3>Aromatherapy Massage</h3>
+                    <p>Essential oils combined with massage techniques to enhance mood, reduce stress, and promote healing.</p>
+                    <p class="price">From $100 / 60min</p>
+                </div>
+                
+                <div class="service-card" role="listitem">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h3>Prenatal Massage</h3>
+                    <p>Specialized care for expecting mothers, addressing pregnancy-related discomfort with safe, gentle techniques.</p>
+                    <p class="price">From $95 / 60min</p>
+                </div>
+                
+                <div class="service-card" role="listitem">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                    </div>
+                    <h3>Sports Recovery</h3>
+                    <p>Performance-focused treatment to prevent injuries, enhance flexibility, and accelerate muscle recovery.</p>
+                    <p class="price">From $105 / 60min</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- Benefits Section -->
+    <section class="section benefits" id="benefits" role="region" aria-labelledby="benefits-heading">
+        <div class="section-content">
+            <div class="section-header">
+                <h2 id="benefits-heading">Why Choose PureLife</h2>
+                <p>Experience the difference that professional care and attention to detail can make</p>
+            </div>
+            
+            <div class="benefits-grid" role="list">
+                <div class="benefit-item" role="listitem">
+                    <div class="benefit-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h3>Certified Therapists</h3>
+                    <p>All practitioners are licensed, insured, and continuously trained in the latest techniques</p>
+                </div>
+                
+                <div class="benefit-item" role="listitem">
+                    <div class="benefit-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                        </svg>
+                    </div>
+                    <h3>Premium Products</h3>
+                    <p>We use only organic, hypoallergenic oils and lotions for your safety and comfort</p>
+                </div>
+                
+                <div class="benefit-item" role="listitem">
+                    <div class="benefit-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                    </div>
+                    <h3>Flexible Scheduling</h3>
+                    <p>Evening and weekend appointments available to fit your busy lifestyle</p>
+                </div>
+                
+                <div class="benefit-item" role="listitem">
+                    <div class="benefit-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </div>
+                    <h3>Serene Environment</h3>
+                    <p>Tranquil treatment rooms designed to enhance your relaxation experience</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- Testimonials Section -->
+    <section class="section" id="testimonials" role="region" aria-labelledby="testimonials-heading">
+        <div class="section-content">
+            <div class="section-header">
+                <h2 id="testimonials-heading">What Our Clients Say</h2>
+                <p>Real experiences from people who've discovered their path to wellness</p>
+            </div>
+            
+            <div class="testimonials-grid" role="list">
+                <div class="testimonial-card" role="listitem">
+                    <div class="testimonial-rating" role="img" aria-label="5 star rating">
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </div>
+                    <p class="testimonial-text">"After years of chronic back pain, the deep tissue massage here has been life-changing. The therapists really know their craft and take time to understand your needs."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SM</div>
+                        <div class="author-info">
+                            <h4>Sarah Mitchell</h4>
+                            <p>Regular Client</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card" role="listitem">
+                    <div class="testimonial-rating" role="img" aria-label="5 star rating">
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </div>
+                    <p class="testimonial-text">"The prenatal massage during my pregnancy was incredible. They made me feel so comfortable and addressed all my aches. Highly recommend to any expecting mothers!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">JC</div>
+                        <div class="author-info">
+                            <h4>Jessica Chen</h4>
+                            <p>New Mom</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card" role="listitem">
+                    <div class="testimonial-rating" role="img" aria-label="5 star rating">
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </div>
+                    <p class="testimonial-text">"As a marathon runner, the sports recovery massage is essential to my training. They understand athletic needs and help me stay injury-free. Best investment in my performance!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MR</div>
+                        <div class="author-info">
+                            <h4>Marcus Rodriguez</h4>
+                            <p>Athlete</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- Pricing Section -->
+    <section class="section" id="pricing" role="region" aria-labelledby="pricing-heading">
+        <div class="section-content">
+            <div class="section-header">
+                <h2 id="pricing-heading">Membership Packages</h2>
+                <p>Save with our flexible membership options designed for regular wellness</p>
+            </div>
+            
+            <div class="pricing-grid" role="list">
+                <div class="pricing-card" role="listitem">
+                    <h3>Essential</h3>
+                    <div class="pricing-amount">$79</div>
+                    <p class="pricing-period">per month</p>
+                    <ul class="pricing-features" role="list">
+                        <li role="listitem">1 massage per month</li>
+                        <li role="listitem">60-minute sessions</li>
+                        <li role="listitem">10% off additional services</li>
+                        <li role="listitem">Flexible scheduling</li>
+                        <li role="listitem">Rollover unused sessions</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-secondary">Get Started</a>
+                </div>
+                
+                <div class="pricing-card featured" role="listitem">
+                    <h3>Premium</h3>
+                    <div class="pricing-amount">$139</div>
+                    <p class="pricing-period">per month</p>
+                    <ul class="pricing-features" role="list">
+                        <li role="listitem">2 massages per month</li>
+                        <li role="listitem">60 or 90-minute sessions</li>
+                        <li role="listitem">20% off additional services</li>
+                        <li role="listitem">Priority booking</li>
+                        <li role="listitem">Free aromatherapy upgrade</li>
+                        <li role="listitem">Guest pass included</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-primary">Most Popular</a>
+                </div>
+                
+                <div class="pricing-card" role="listitem">
+                    <h3>Wellness Elite</h3>
+                    <div class="pricing-amount">$249</div>
+                    <p class="pricing-period">per month</p>
+                    <ul class="pricing-features" role="list">
+                        <li role="listitem">4 massages per month</li>
+                        <li role="listitem">Any session length</li>
+                        <li role="listitem">30% off all services</li>
+                        <li role="listitem">VIP priority access</li>
+                        <li role="listitem">Complimentary upgrades</li>
+                        <li role="listitem">2 guest passes monthly</li>
+                        <li role="listitem">Free wellness consultation</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-secondary">Go Elite</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- Gallery Section -->
+    <section class="section" id="gallery" role="region" aria-labelledby="gallery-heading">
+        <div class="section-content">
+            <div class="section-header">
+                <h2 id="gallery-heading">Our Sanctuary</h2>
+                <p>Step into a space designed for your complete relaxation and renewal</p>
+            </div>
+            
+            <div class="gallery-grid" role="list">
+                <div class="gallery-item" role="listitem">
+                    <svg width="100%" height="100%" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="galleryGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#14b8a6;stop-opacity:0.6" />
+                                <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.6" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="400" height="300" fill="url(#galleryGrad1)"/>
+                        <circle cx="200" cy="150" r="80" fill="white" opacity="0.2"/>
+                        <text x="200" y="170" font-size="60" fill="white" opacity="0.3" text-anchor="middle">🧘</text>
+                    </svg>
+                    <div class="gallery-overlay">
+                        <p>Treatment Room</p>
+                    </div>
+                </div>
+                
+                <div class="gallery-item" role="listitem">
+                    <svg width="100%" height="100%" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="galleryGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#5eead4;stop-opacity:0.6" />
+                                <stop offset="100%" style="stop-color:#14b8a6;stop-opacity:0.6" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="400" height="300" fill="url(#galleryGrad2)"/>
+                        <circle cx="200" cy="150" r="80" fill="white" opacity="0.2"/>
+                        <text x="200" y="170" font-size="60" fill="white" opacity="0.3" text-anchor="middle">🕯️</text>
+                    </svg>
+                    <div class="gallery-overlay">
+                        <p>Relaxation Lounge</p>
+                    </div>
+                </div>
+                
+                <div class="gallery-item" role="listitem">
+                    <svg width="100%" height="100%" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="galleryGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.6" />
+                                <stop offset="100%" style="stop-color:#5eead4;stop-opacity:0.6" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="400" height="300" fill="url(#galleryGrad3)"/>
+                        <circle cx="200" cy="150" r="80" fill="white" opacity="0.2"/>
+                        <text x="200" y="170" font-size="60" fill="white" opacity="0.3" text-anchor="middle">🌿</text>
+                    </svg>
+                    <div class="gallery-overlay">
+                        <p>Wellness Garden</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- Contact Section -->
+    <section class="section contact" id="contact" role="region" aria-labelledby="contact-heading">
+        <div class="section-content">
+            <div class="section-header">
+                <h2 id="contact-heading">Book Your Appointment</h2>
+                <p>Begin your journey to wellness today</p>
+            </div>
+            
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Visit Us</h3>
+                    <p>We're here to answer your questions and help you find the perfect treatment for your needs.</p>
+                    
+                    <ul class="contact-details" role="list">
+                        <li role="listitem">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                            <span>123 Wellness Way, Suite 200<br>Your City, ST 12345</span>
+                        </li>
+                        <li role="listitem">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                            <span>(555) 123-4567</span>
+                        </li>
+                        <li role="listitem">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                            <span>hello@purelife.co</span>
+                        </li>
+                        <li role="listitem">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                            <span>Mon-Fri: 9am-8pm<br>Sat-Sun: 10am-6pm</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <form class="contact-form" aria-label="Contact form">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="service">Preferred Service</label>
+                        <select id="service" name="service" required aria-required="true">
+                            <option value="">Select a service</option>
+                            <option value="deep-tissue">Deep Tissue Massage</option>
+                            <option value="swedish">Swedish Relaxation</option>
+                            <option value="hot-stone">Hot Stone Therapy</option>
+                            <option value="aromatherapy">Aromatherapy Massage</option>
+                            <option value="prenatal">Prenatal Massage</option>
+                            <option value="sports">Sports Recovery</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message (Optional)</label>
+                        <textarea id="message" name="message" rows="4"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Request Appointment</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>PureLife.co</h4>
+                <p>Your sanctuary for wellness, relaxation, and rejuvenation. Experience the transformative power of professional massage therapy.</p>
+                <div class="social-links" role="list">
+                    <a href="#" class="social-link" aria-label="Facebook" role="listitem">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link" aria-label="Instagram" role="listitem">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link" aria-label="Twitter" role="listitem">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="#services">Services</a>
+                <a href="#benefits">Why Choose Us</a>
+                <a href="#testimonials">Testimonials</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#contact">Contact</a>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Services</h4>
+                <a href="#services">Deep Tissue</a>
+                <a href="#services">Swedish Massage</a>
+                <a href="#services">Hot Stone</a>
+                <a href="#services">Aromatherapy</a>
+                <a href="#services">Prenatal Care</a>
+                <a href="#services">Sports Recovery</a>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p>123 Wellness Way, Suite 200<br>Your City, ST 12345</p>
+                <p>(555) 123-4567</p>
+                <p>hello@purelife.co</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 PureLife.co. All rights reserved. | <a href="#" style="color: inherit;">Privacy Policy</a> | <a href="#" style="color: inherit;">Terms of Service</a></p>
+        </div>
+    </footer>
+
+    
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeAnnouncement = document.getElementById('theme-announcement');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+        themeToggle.setAttribute('aria-pressed', currentTheme === 'dark');
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeToggle.setAttribute('aria-pressed', newTheme === 'dark');
+            
+            // Announce theme change to screen readers
+            themeAnnouncement.textContent = `${newTheme === 'dark' ? 'Dark' : 'Light'} mode activated`;
+        });
+        
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const navList = document.querySelector('.nav-list');
+        
+        mobileMenuToggle.addEventListener('click', () => {
+            const isActive = navList.classList.toggle('active');
+            mobileMenuToggle.setAttribute('aria-expanded', isActive);
+        });
+        
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navList.classList.remove('active');
+                mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+        
+        // GSAP ScrollTrigger animations with spring physics
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Hero animations
+        gsap.from('.hero-text h1', {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            ease: 'elastic.out(1, 0.5)',
+            delay: 0.2
+        });
+        
+        gsap.from('.hero-text p', {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.5)',
+            delay: 0.4
+        });
+        
+        gsap.from('.hero-buttons', {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.5)',
+            delay: 0.6
+        });
+        
+        gsap.from('.hero-image-wrapper', {
+            opacity: 0,
+            scale: 0.8,
+            rotation: -10,
+            duration: 1.2,
+            ease: 'elastic.out(1, 0.5)',
+            delay: 0.3
+        });
+        
+        gsap.from('.hero-glass-card', {
+            opacity: 0,
+            scale: 0.5,
+            duration: 1,
+            ease: 'elastic.out(1, 0.5)',
+            stagger: 0.2,
+            delay: 0.8
+        });
+
+        
+        // Service cards animation
+        gsap.from('.service-card', {
+            scrollTrigger: {
+                trigger: '.services-grid',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 50,
+            scale: 0.9,
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.5)',
+            stagger: 0.1
+        });
+        
+        // Benefits animation
+        gsap.from('.benefit-item', {
+            scrollTrigger: {
+                trigger: '.benefits-grid',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 40,
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.5)',
+            stagger: 0.15
+        });
+        
+        // Testimonials animation
+        gsap.from('.testimonial-card', {
+            scrollTrigger: {
+                trigger: '.testimonials-grid',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            x: -50,
+            rotation: -5,
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.5)',
+            stagger: 0.2
+        });
+        
+        // Pricing cards animation
+        gsap.from('.pricing-card', {
+            scrollTrigger: {
+                trigger: '.pricing-grid',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 60,
+            scale: 0.8,
+            duration: 1,
+            ease: 'elastic.out(1, 0.5)',
+            stagger: 0.15
+        });
+        
+        // Gallery items animation
+        gsap.from('.gallery-item', {
+            scrollTrigger: {
+                trigger: '.gallery-grid',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            scale: 0.8,
+            rotation: 5,
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.5)',
+            stagger: 0.1
+        });
+        
+        // Contact section animation
+        gsap.from('.contact-info', {
+            scrollTrigger: {
+                trigger: '.contact-content',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            x: -50,
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.5)'
+        });
+        
+        gsap.from('.contact-form', {
+            scrollTrigger: {
+                trigger: '.contact-content',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            x: 50,
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.5)',
+            delay: 0.2
+        });
+
+        
+        // Header scroll effect
+        let lastScroll = 0;
+        const header = document.querySelector('.header');
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                header.style.padding = '0.5rem 2rem';
+                header.style.boxShadow = '0 4px 20px var(--shadow)';
+            } else {
+                header.style.padding = '1rem 2rem';
+                header.style.boxShadow = 'none';
+            }
+            
+            lastScroll = currentScroll;
+        });
+        
+        // Form submission handler
+        const contactForm = document.querySelector('.contact-form');
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(contactForm);
+            const data = Object.fromEntries(formData);
+            
+            // In a real application, you would send this to a server
+            console.log('Form submitted:', data);
+            
+            // Show success message
+            alert('Thank you for your appointment request! We will contact you shortly to confirm your booking.');
+            
+            // Reset form
+            contactForm.reset();
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add hover effect to service cards with spring animation
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                gsap.to(card, {
+                    y: -10,
+                    duration: 0.4,
+                    ease: 'elastic.out(1, 0.5)'
+                });
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    y: 0,
+                    duration: 0.4,
+                    ease: 'elastic.out(1, 0.5)'
+                });
+            });
+        });
+        
+        // Parallax effect for hero background
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroBackground = document.querySelector('.hero::before');
+            if (heroBackground) {
+                const parallax = scrolled * 0.5;
+                document.querySelector('.hero').style.backgroundPositionY = `${parallax}px`;
+            }
+        });
+    </script>
+</body>
+</html>

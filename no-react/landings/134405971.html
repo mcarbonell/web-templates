@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus | Modern Digital Experience</title>
+  
+  <!-- 
+    TEMPLATE ID: 134405971
+    DESIGN CHOICES EXPLAINED:
+    =======================
+    
+    1. GLASSMORPHISM STYLE (rolled 39%6=3)
+       - Semi-transparent backgrounds with backdrop-filter blur
+       - Creates depth through layered translucent surfaces
+       - Subtle white borders (1px) to define edges
+       - Modern, ethereal aesthetic popular in 2024-2025
+    
+    2. WARM EMERALD COLOR SCHEME (rolled 68%4=0, hue 136)
+       - Primary: #10b981 (emerald-500) - fresh, organic feel
+       - Derived from random hue 136 which sits in emerald/mint range
+       - Warm undertones create inviting, natural atmosphere
+       - High contrast maintained for accessibility
+    
+    3. CENTERED HERO WITH FLOATING ELEMENTS (rolled 12%4=0)
+       - Content centered both horizontally and vertically
+       - Decorative floating orbs using CSS animations
+       - Creates visual interest without cluttering message
+       - Max-width container maintains readability
+    
+    4. SCROLL-TRIGGERED REVEALS (rolled 65%4=1)
+       - Intersection Observer API for performant animations
+       - Elements fade up as they enter viewport
+       - Subtle parallax on floating elements
+       - No jarring animations - smooth 700ms transitions (rolled 54)
+    
+    5. TYPOGRAPHY MIX (rolled 55%4=3)
+       - Space Grotesk (sans-serif) for headings - modern geometric
+       - JetBrains Mono for accent text - tech-forward feel
+       - Creates visual hierarchy through font contrast
+       - Both loaded from Google Fonts for consistency
+    
+    6. OVERLAPPING CARD LAYOUT (rolled 2%4=2)
+       - Cards break grid with negative margins
+       - Creates dynamic, magazine-style composition
+       - Z-index layering adds depth perception
+       - Responsive: overlaps reduce on mobile
+    
+    7. OUTLINE BUTTONS WITH HOVER FILL (rolled 19%4=3)
+       - Clean, minimal default state
+       - Background fills on hover for tactile feedback
+       - 700ms transition timing (rolled 54%10+3=7)
+       - Consistent across all interactive elements
+    
+    8. FIXED NAVIGATION WITH BLUR (rolled 35%4=3)
+       - Stays visible during scroll
+       - backdrop-filter: blur(20px) for glass effect
+       - Theme toggle integrated seamlessly
+       - Mobile hamburger with smooth transform
+    
+    9. BORDER RADIUS: 18px (rolled 18 directly)
+       - Soft enough to feel friendly
+       - Sharp enough to maintain modern edge
+       - Applied consistently to cards and buttons
+    
+    10. DARK/LIGHT MODE
+        - CSS custom properties for easy theming
+        - Toggle persists in localStorage
+        - Smooth transition between modes
+        - Respects system preference as default
+    
+    TECHNICAL IMPLEMENTATION:
+    ========================
+    - Single HTML file for portability
+    - GSAP loaded from CDN for smooth animations
+    - Intersection Observer for scroll triggers (native, fast)
+    - CSS custom properties for maintainable theming
+    - No frameworks - vanilla JS for optimal performance
+    - Semantic HTML5 elements for accessibility
+    - Mobile-first responsive design
+  -->
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  
+  <style>
+    /* CSS Custom Properties for theming */
+    :root {
+      /* Colors - Light Mode */
+      --bg-primary: #fafaf9;
+      --bg-secondary: #f5f5f4;
+      --bg-tertiary: #e7e5e4;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --accent-primary: #10b981;
+      --accent-secondary: #065f46;
+      --accent-light: #a7f3d0;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.5);
+      --shadow-color: rgba(0, 0, 0, 0.08);
+      
+      /* Spacing */
+      --section-padding: 120px;
+      --container-max: 1280px;
+      --card-radius: 18px;
+      
+      /* Animation */
+      --transition-speed: 700ms;
+      
+      /* Typography */
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    
+    /* Dark Mode Override */
+    [data-theme="dark"] {
+      --bg-primary: #0c0a09;
+      --bg-secondary: #1c1917;
+      --bg-tertiary: #292524;
+      --text-primary: #fafaf9;
+      --text-secondary: #a8a29e;
+      --text-muted: #78716c;
+      --accent-primary: #34d399;
+      --accent-secondary: #6ee7b7;
+      --accent-light: #064e3b;
+      --glass-bg: rgba(28, 25, 23, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: var(--font-heading);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color var(--transition-speed) ease, 
+                  color var(--transition-speed) ease;
+    }
+    
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    
+    h1 {
+      font-size: clamp(3rem, 8vw, 6rem);
+    }
+    
+    h2 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+    }
+    
+    h3 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+    }
+    
+    .mono {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    .text-accent {
+      color: var(--accent-primary);
+    }
+    
+    .text-secondary {
+      color: var(--text-secondary);
+    }
+    
+    .text-muted {
+      color: var(--text-muted);
+    }
+    
+    /* Layout */
+    .container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 20px 0;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      transition: all var(--transition-speed) ease;
+    }
+    
+    .nav-scrolled {
+      padding: 12px 0;
+      box-shadow: 0 4px 30px var(--shadow-color);
+    }
+    
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent-primary);
+      border-radius: var(--card-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: var(--font-mono);
+      font-size: 1rem;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      list-style: none;
+    }
+    
+    .nav-link {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: color var(--transition-speed) ease;
+      position: relative;
+    }
+    
+    .nav-link:hover {
+      color: var(--accent-primary);
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-primary);
+      transition: width var(--transition-speed) ease;
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    .nav-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    
+    /* Theme Toggle */
+    .theme-toggle {
+      width: 48px;
+      height: 26px;
+      background: var(--bg-tertiary);
+      border-radius: 13px;
+      position: relative;
+      cursor: pointer;
+      border: none;
+      transition: background var(--transition-speed) ease;
+    }
+    
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform var(--transition-speed) ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    [data-theme="dark"] .theme-toggle::after {
+      transform: translateX(22px);
+    }
+    
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+    }
+    
+    .menu-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text-primary);
+      transition: all var(--transition-speed) ease;
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 32px;
+      border-radius: var(--card-radius);
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition-speed) ease;
+      border: 2px solid transparent;
+    }
+    
+    .btn-primary {
+      background: transparent;
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-color: var(--bg-tertiary);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--bg-tertiary);
+      transform: translateY(-2px);
+    }
+    
+    .btn-large {
+      padding: 18px 40px;
+      font-size: 1.125rem;
+    }
+    
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 120px 0;
+    }
+    
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.5;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    .orb-1 {
+      width: 600px;
+      height: 600px;
+      background: var(--accent-primary);
+      top: -200px;
+      right: -100px;
+      animation-delay: 0s;
+    }
+    
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: var(--accent-light);
+      bottom: -100px;
+      left: -100px;
+      animation-delay: -5s;
+    }
+    
+    .orb-3 {
+      width: 300px;
+      height: 300px;
+      background: var(--accent-secondary);
+      top: 50%;
+      left: 30%;
+      animation-delay: -10s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(50px, -50px) scale(1.1); }
+      50% { transform: translate(-30px, 30px) scale(0.95); }
+      75% { transform: translate(30px, 50px) scale(1.05); }
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 900px;
+    }
+    
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      margin-bottom: 32px;
+    }
+    
+    .hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .hero-title {
+      margin-bottom: 24px;
+    }
+    
+    .hero-title .line {
+      display: block;
+    }
+    
+    .hero-description {
+      font-size: clamp(1.125rem, 2vw, 1.375rem);
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid var(--glass-border);
+    }
+    
+    .hero-stat {
+      text-align: center;
+    }
+    
+    .hero-stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      font-family: var(--font-mono);
+    }
+    
+    .hero-stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+    
+    /* Section Base */
+    .section {
+      padding: var(--section-padding) 0;
+      position: relative;
+    }
+    
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 80px;
+    }
+    
+    .section-label {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--accent-light);
+      color: var(--accent-secondary);
+      border-radius: 50px;
+      margin-bottom: 16px;
+    }
+    
+    .section-title {
+      margin-bottom: 16px;
+    }
+    
+    .section-description {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+    }
+    
+    /* Features Section - Overlapping Cards Design */
+    .features {
+      background: var(--bg-secondary);
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+    }
+    
+    .feature-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--card-radius);
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition-speed) ease, 
+                  box-shadow var(--transition-speed) ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 30px 60px var(--shadow-color);
+    }
+    
+    .feature-card-large {
+      grid-column: span 7;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .feature-card-medium {
+      grid-column: span 5;
+      min-height: 400px;
+    }
+    
+    .feature-card-small {
+      grid-column: span 4;
+    }
+    
+    .feature-card-full {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    
+    .feature-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--accent-light);
+      border-radius: var(--card-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      margin-bottom: 24px;
+    }
+    
+    .feature-title {
+      margin-bottom: 12px;
+    }
+    
+    .feature-text {
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    
+    .feature-visual {
+      background: linear-gradient(135deg, var(--accent-light), var(--bg-tertiary));
+      border-radius: var(--card-radius);
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      margin-top: 24px;
+    }
+    
+    /* Stats Section */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    
+    .stat-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--card-radius);
+      padding: 40px 24px;
+      text-align: center;
+      transition: all var(--transition-speed) ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-primary);
+    }
+    
+    .stat-value {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      font-family: var(--font-mono);
+      margin-bottom: 8px;
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    /* Testimonials Section */
+    .testimonials {
+      background: var(--bg-secondary);
+    }
+    
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    
+    .testimonial-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--card-radius);
+      padding: 40px;
+      position: relative;
+    }
+    
+    .testimonial-card:nth-child(2) {
+      transform: translateY(40px);
+    }
+    
+    .testimonial-quote {
+      font-size: 3rem;
+      color: var(--accent-primary);
+      opacity: 0.3;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    
+    .testimonial-text {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      margin-bottom: 24px;
+      color: var(--text-secondary);
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+    
+    .testimonial-info h4 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+    
+    .testimonial-info p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    /* CTA Section */
+    .cta {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+      opacity: 0.1;
+    }
+    
+    .cta-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .cta-title {
+      margin-bottom: 24px;
+    }
+    
+    .cta-description {
+      color: var(--text-secondary);
+      font-size: 1.25rem;
+      margin-bottom: 40px;
+    }
+    
+    .cta-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    
+    .cta .btn-primary {
+      background: var(--accent-primary);
+      color: white;
+    }
+    
+    .cta .btn-primary:hover {
+      background: var(--accent-secondary);
+    }
+    
+    /* Footer */
+    .footer {
+      background: var(--bg-secondary);
+      padding: 80px 0 40px;
+      border-top: 1px solid var(--glass-border);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr);
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+    
+    .footer-brand p {
+      color: var(--text-secondary);
+      margin-top: 16px;
+      max-width: 300px;
+    }
+    
+    .footer-links h4 {
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+      color: var(--text-muted);
+    }
+    
+    .footer-links ul {
+      list-style: none;
+    }
+    
+    .footer-links li {
+      margin-bottom: 12px;
+    }
+    
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--transition-speed) ease;
+    }
+    
+    .footer-links a:hover {
+      color: var(--accent-primary);
+    }
+    
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 40px;
+      border-top: 1px solid var(--glass-border);
+    }
+    
+    .footer-copyright {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    .footer-social {
+      display: flex;
+      gap: 16px;
+    }
+    
+    .footer-social a {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all var(--transition-speed) ease;
+    }
+    
+    .footer-social a:hover {
+      background: var(--accent-primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    /* Scroll Reveal Animation Classes */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity var(--transition-speed) ease, 
+                  transform var(--transition-speed) ease;
+    }
+    
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 1024px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .feature-card-large,
+      .feature-card-medium,
+      .feature-card-small,
+      .feature-card-full {
+        grid-column: span 1;
+      }
+      
+      .feature-card-full {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .testimonial-card:nth-child(2) {
+        transform: none;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      :root {
+        --section-padding: 80px;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+      
+      .menu-toggle {
+        display: flex;
+      }
+      
+      .hero-stats {
+        flex-direction: column;
+        gap: 32px;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        gap: 24px;
+        text-align: center;
+      }
+      
+      .hero-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .hero-actions .btn {
+        width: 100%;
+      }
+      
+      .cta-actions {
+        flex-direction: column;
+      }
+      
+      .cta-actions .btn {
+        width: 100%;
+      }
+    }
+    
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="container nav-container">
+      <a href="#" class="logo">
+        <span class="logo-icon">N</span>
+        <span>Nexus</span>
+      </a>
+      
+      <ul class="nav-links">
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#stats" class="nav-link">Stats</a></li>
+        <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode"></button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          <span class="mono">Now in Public Beta</span>
+        </div>
+        
+        <h1 class="hero-title">
+          <span class="line">Build the</span>
+          <span class="line text-accent">future</span>
+          <span class="line">of digital</span>
+        </h1>
+        
+        <p class="hero-description">
+          Nexus empowers creators and developers to craft exceptional digital experiences 
+          with unprecedented speed, flexibility, and visual impact.
+        </p>
+        
+        <div class="hero-actions">
+          <a href="#" class="btn btn-primary btn-large">
+            Get Started Free
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a href="#features" class="btn btn-secondary btn-large">
+            Explore Features
+          </a>
+        </div>
+        
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-value">50K+</div>
+            <div class="hero-stat-label">Active Users</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">99.9%</div>
+            <div class="hero-stat-label">Uptime</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">4.9</div>
+            <div class="hero-stat-label">User Rating</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section features" id="features">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label mono">Features</span>
+        <h2 class="section-title">Everything you need to create</h2>
+        <p class="section-description">
+          Powerful tools designed for modern creators. Built for speed, 
+          flexibility, and stunning results.
+        </p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card feature-card-large reveal">
+          <div>
+            <div class="feature-icon">⚡</div>
+            <h3 class="feature-title">Lightning Fast Performance</h3>
+            <p class="feature-text">
+              Optimized for speed at every level. Our infrastructure ensures 
+              your content loads instantly, keeping your audience engaged 
+              and improving your search rankings.
+            </p>
+          </div>
+          <div class="feature-visual">🚀</div>
+        </div>
+        
+        <div class="feature-card feature-card-medium reveal">
+          <div class="feature-icon">🎨</div>
+          <h3 class="feature-title">Visual Editor</h3>
+          <p class="feature-text">
+            Design pixel-perfect layouts with our intuitive visual editor. 
+            No coding required—just drag, drop, and publish.
+          </p>
+          <div class="feature-visual" style="background: linear-gradient(135deg, #fce7f3, #ddd6fe);">✨</div>
+        </div>
+        
+        <div class="feature-card feature-card-small reveal">
+          <div class="feature-icon">🔒</div>
+          <h3 class="feature-title">Enterprise Security</h3>
+          <p class="feature-text">
+            Bank-grade encryption and compliance with SOC 2, GDPR, and CCPA.
+          </p>
+        </div>
+        
+        <div class="feature-card feature-card-small reveal">
+          <div class="feature-icon">🌍</div>
+          <h3 class="feature-title">Global CDN</h3>
+          <p class="feature-text">
+            Content delivered from 200+ edge locations worldwide for minimal latency.
+          </p>
+        </div>
+        
+        <div class="feature-card feature-card-small reveal">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Real-time Analytics</h3>
+          <p class="feature-text">
+            Track performance metrics and user behavior with detailed insights.
+          </p>
+        </div>
+        
+        <div class="feature-card feature-card-full reveal">
+          <div>
+            <div class="feature-icon">🔧</div>
+            <h3 class="feature-title">Developer-First API</h3>
+            <p class="feature-text">
+              Full-featured REST and GraphQL APIs with comprehensive documentation. 
+              Build custom integrations and automate your workflow with ease. 
+              Webhooks, CLI tools, and SDKs for all major languages.
+            </p>
+          </div>
+          <div class="feature-visual" style="font-family: var(--font-mono); font-size: 0.875rem; text-align: left; padding: 20px; background: #1c1917; color: #a7f3d0;">
+            <pre style="margin: 0;">curl https://api.nexus.io/v1/
+  -H "Authorization: Bearer key"
+  -d '{
+    "action": "create",
+    "type": "project"
+  }'</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="section" id="stats">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label mono">Impact</span>
+        <h2 class="section-title">Trusted by creators worldwide</h2>
+        <p class="section-description">
+          Join thousands of teams who have transformed their digital presence with Nexus.
+        </p>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card reveal">
+          <div class="stat-value">10M+</div>
+          <div class="stat-label">Projects Created</div>
+        </div>
+        <div class="stat-card reveal">
+          <div class="stat-value">150+</div>
+          <div class="stat-label">Countries</div>
+        </div>
+        <div class="stat-card reveal">
+          <div class="stat-value">2B+</div>
+          <div class="stat-label">Requests/Month</div>
+        </div>
+        <div class="stat-card reveal">
+          <div class="stat-value">0.1s</div>
+          <div class="stat-label">Avg Response</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="section testimonials" id="testimonials">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label mono">Testimonials</span>
+        <h2 class="section-title">Loved by creators</h2>
+        <p class="section-description">
+          See what our community has to say about their experience with Nexus.
+        </p>
+      </div>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">
+            Nexus completely transformed how we approach digital projects. 
+            The speed and flexibility are unmatched. We've cut our development 
+            time in half.
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">SM</div>
+            <div class="testimonial-info">
+              <h4>Sarah Mitchell</h4>
+              <p>CTO at TechFlow</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card reveal">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">
+            The visual editor is a game-changer. Our marketing team can now 
+            create stunning landing pages without waiting for developer resources. 
+            It's empowered us to move faster.
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">JC</div>
+            <div class="testimonial-info">
+              <h4>James Chen</h4>
+              <p>Marketing Director</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card reveal">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">
+            As a developer, I appreciate the clean APIs and excellent documentation. 
+            Integration was seamless, and the performance gains were immediate. 
+            Highly recommended.
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">EP</div>
+            <div class="testimonial-info">
+              <h4>Elena Petrova</h4>
+              <p>Lead Developer</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section cta" id="contact">
+    <div class="cta-bg"></div>
+    <div class="container">
+      <div class="cta-content reveal">
+        <h2 class="cta-title">Ready to start creating?</h2>
+        <p class="cta-description">
+          Join thousands of creators and developers who are already building 
+          the future with Nexus. Start free today.
+        </p>
+        <div class="cta-actions">
+          <a href="#" class="btn btn-primary btn-large">
+            Start Free Trial
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a href="#" class="btn btn-secondary btn-large">
+            Schedule Demo
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo">
+            <span class="logo-icon">N</span>
+            <span>Nexus</span>
+          </a>
+          <p>
+            Empowering creators to build exceptional digital experiences 
+            with unprecedented speed and flexibility.
+          </p>
+        </div>
+        
+        <div class="footer-links">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">Pricing</a></li>
+            <li><a href="#">Integrations</a></li>
+            <li><a href="#">Changelog</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-links">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">API Reference</a></li>
+            <li><a href="#">Community</a></li>
+            <li><a href="#">Support</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-links">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p class="footer-copyright">
+          © 2025 Nexus. All rights reserved. Template ID: 134405971
+        </p>
+        <div class="footer-social">
+          <a href="#" aria-label="Twitter">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          <a href="#" aria-label="GitHub">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
+          <a href="#" aria-label="LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    
+    // Check for saved theme preference or default to 'light'
+    const currentTheme = localStorage.getItem('theme') || 
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    html.setAttribute('data-theme', currentTheme);
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+    
+    // Navigation scroll effect
+    const nav = document.getElementById('nav');
+    let lastScroll = 0;
+    
+    window.addEventListener('scroll', { passive: true }, () => {
+      const currentScroll = window.pageYOffset;
+      
+      if (currentScroll > 50) {
+        nav.classList.add('nav-scrolled');
+      } else {
+        nav.classList.remove('nav-scrolled');
+      }
+      
+      lastScroll = currentScroll;
+    });
+    
+    // Scroll reveal animation using Intersection Observer
+    const revealElements = document.querySelectorAll('.reveal');
+    
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          // Add stagger delay for multiple elements
+          setTimeout(() => {
+            entry.target.classList.add('active');
+          }, index * 100);
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+    
+    revealElements.forEach(el => revealObserver.observe(el));
+    
+    // GSAP Animations (if available)
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+      
+      // Parallax effect for hero orbs
+      gsap.to('.orb-1', {
+        yPercent: -20,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+      
+      gsap.to('.orb-2', {
+        yPercent: 10,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+      
+      // Hero content animation on load
+      gsap.from('.hero-badge', {
+        opacity: 0,
+        y: 20,
+        duration: 0.8,
+        delay: 0.2,
+        ease: 'power2.out'
+      });
+      
+      gsap.from('.hero-title', {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        delay: 0.4,
+        ease: 'power2.out'
+      });
+      
+      gsap.from('.hero-description', {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        delay: 0.6,
+        ease: 'power2.out'
+      });
+      
+      gsap.from('.hero-actions', {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        delay: 0.8,
+        ease: 'power2.out'
+      });
+      
+      gsap.from('.hero-stats', {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        delay: 1,
+        ease: 'power2.out'
+      });
+    }
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

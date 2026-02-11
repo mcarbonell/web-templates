@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaTech - Next Generation Solutions</title>
+    <!-- 
+    DESIGN SEED: 115265083
+    Design Choices Based on Seed:
+    - Layout: Asymmetric grid-based hero with overlapping elements (digit 1)
+    - Color Scheme: Cyan/Turquoise (171°) + Orange/Coral (24°) cyberpunk palette (digit 1)
+    - Typography: Bold geometric sans-serif with tight tracking (digit 5)
+    - Animation: Smooth morphing transitions at 1054ms (digit 2)
+    - Sections: Diagonal/skewed dividers (digit 6)
+    - Cards: Glass morphism with 9px backdrop blur (digit 5)
+    - Buttons: Pill-shaped (31px radius) with gradient hover (digit 0)
+    - Navigation: Floating transparent nav with blur (digit 8)
+    - Accents: Animated gradient blobs (digit 3)
+    -->
+    <style>
+        /* CSS Reset & Base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-hue: 171;
+            --secondary-hue: 24;
+            --radius: 31px;
+            --blur: 9px;
+            --duration: 1054ms;
+            
+            /* Light Theme */
+            --bg-primary: hsl(0, 0%, 98%);
+            --bg-secondary: hsl(0, 0%, 100%);
+            --text-primary: hsl(0, 0%, 10%);
+            --text-secondary: hsl(0, 0%, 40%);
+            --accent-primary: hsl(var(--primary-hue), 70%, 50%);
+            --accent-secondary: hsl(var(--secondary-hue), 85%, 60%);
+            --glass-bg: hsla(0, 0%, 100%, 0.7);
+            --glass-border: hsla(0, 0%, 100%, 0.3);
+            --shadow: 0 8px 32px hsla(0, 0%, 0%, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: hsl(240, 15%, 8%);
+            --bg-secondary: hsl(240, 12%, 12%);
+            --text-primary: hsl(0, 0%, 95%);
+            --text-secondary: hsl(0, 0%, 65%);
+            --accent-primary: hsl(var(--primary-hue), 65%, 55%);
+            --accent-secondary: hsl(var(--secondary-hue), 80%, 65%);
+            --glass-bg: hsla(240, 12%, 15%, 0.7);
+            --glass-border: hsla(0, 0%, 100%, 0.1);
+            --shadow: 0 8px 32px hsla(0, 0%, 0%, 0.4);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background var(--duration) ease, color var(--duration) ease;
+        }
+
+        /* Animated Background Blobs */
+        .blob-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float var(--duration) infinite alternate ease-in-out;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-primary);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-secondary);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: 0.5s;
+        }
+
+        .blob-3 {
+            width: 350px;
+            height: 350px;
+            background: hsl(var(--primary-hue), 60%, 60%);
+            top: 50%;
+            right: 10%;
+            animation-delay: 1s;
+        }
+
+        @keyframes float {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(30px, 30px) scale(1.1); }
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 12px 24px;
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            box-shadow: var(--shadow);
+            transition: all var(--duration) ease;
+        }
+
+        .nav-logo {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: -0.02em;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-primary);
+        }
+
+        .theme-toggle {
+            background: var(--accent-primary);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, background 0.3s ease;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(180deg);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                width: calc(100% - 40px);
+                padding: 12px 16px;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--glass-bg);
+                backdrop-filter: blur(var(--blur));
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius);
+                margin-top: 10px;
+                padding: 16px;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            padding: 120px 80px 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 40px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: -0.02em;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            box-shadow: 0 4px 20px hsla(var(--primary-hue), 70%, 50%, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px hsla(var(--primary-hue), 70%, 50%, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur));
+            color: var(--text-primary);
+            border: 2px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .hero-visual {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            transform: rotate(-3deg);
+            transition: transform var(--duration) ease;
+        }
+
+        .hero-card:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+
+        .hero-card-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-card-text {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent-primary);
+            letter-spacing: -0.03em;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 968px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 100px 40px 60px;
+                gap: 40px;
+            }
+
+            .hero-visual {
+                order: -1;
+            }
+        }
+
+        /* Section Divider */
+        .section-divider {
+            height: 100px;
+            background: var(--bg-primary);
+            transform: skewY(-2deg);
+            margin: -50px 0;
+        }
+
+        /* Features Section */
+        .section {
+            padding: 100px 80px;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px hsla(0, 0%, 0%, 0.15);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .feature-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Showcase Section */
+        .showcase {
+            background: var(--bg-secondary);
+            transform: skewY(-2deg);
+            padding: 150px 80px;
+            margin: 50px 0;
+        }
+
+        .showcase-inner {
+            transform: skewY(2deg);
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .showcase-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .showcase-item:hover {
+            transform: scale(1.03);
+        }
+
+        .showcase-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            opacity: 0.8;
+        }
+
+        .showcase-content {
+            padding: 30px;
+        }
+
+        .showcase-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .showcase-text {
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 968px) {
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Testimonials Section */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .testimonial-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 32px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .testimonial-text {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 24px;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .testimonial-info {
+            flex: 1;
+        }
+
+        .testimonial-name {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .testimonial-role {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Pricing Section */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .pricing-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border: 2px solid var(--accent-primary);
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .pricing-card.featured:hover {
+            transform: translateY(-8px) scale(1.07);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .pricing-name {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.03em;
+        }
+
+        .pricing-period {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .pricing-feature {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pricing-feature::before {
+            content: '✓';
+            color: var(--accent-primary);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            padding: 100px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            color: white;
+            margin-bottom: 20px;
+            letter-spacing: -0.03em;
+        }
+
+        .cta-text {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
+        }
+
+        .cta-button {
+            background: white;
+            color: var(--accent-primary);
+            padding: 18px 48px;
+            border-radius: var(--radius);
+            font-weight: 800;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            padding: 80px 80px 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+
+        .footer-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .footer-title {
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-link {
+            margin-bottom: 12px;
+        }
+
+        .footer-link a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link a:hover {
+            color: var(--accent-primary);
+        }
+
+        .footer-bottom {
+            padding-top: 40px;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 968px) {
+            .section {
+                padding: 60px 40px;
+            }
+
+            .showcase {
+                padding: 100px 40px;
+            }
+
+            .cta {
+                padding: 60px 40px;
+            }
+
+            .footer {
+                padding: 60px 40px 30px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        /* Scroll Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity var(--duration) ease, transform var(--duration) ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background Blobs -->
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-logo">NovaTech</div>
+        <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+        <ul class="nav-links">
+            <li><a href="#features" class="nav-link">Features</a></li>
+            <li><a href="#showcase" class="nav-link">Showcase</a></li>
+            <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+            <li><a href="#pricing" class="nav-link">Pricing</a></li>
+        </ul>
+        <button class="theme-toggle" aria-label="Toggle theme">🌓</button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Transform Your Digital Future</h1>
+            <p class="hero-subtitle">
+                Cutting-edge solutions that empower businesses to innovate, scale, and succeed in the modern digital landscape.
+            </p>
+            <div class="hero-buttons">
+                <a href="#pricing" class="btn btn-primary">Get Started</a>
+                <a href="#showcase" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-card">
+                <h3 class="hero-card-title">Trusted by Industry Leaders</h3>
+                <p class="hero-card-text">Join thousands of companies already transforming their business with our platform.</p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">99.9%</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">50K+</div>
+                        <div class="stat-label">Users</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">24/7</div>
+                        <div class="stat-label">Support</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider"></div>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="section-header fade-in">
+            <h2 class="section-title">Powerful Features</h2>
+            <p class="section-subtitle">Everything you need to build, scale, and optimize your digital presence.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Lightning Fast</h3>
+                <p class="feature-text">Optimized performance with sub-second load times and instant interactions for the best user experience.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Enterprise Security</h3>
+                <p class="feature-text">Bank-level encryption and security protocols to keep your data safe and compliant with industry standards.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Advanced Analytics</h3>
+                <p class="feature-text">Real-time insights and detailed reports to help you make data-driven decisions and track your growth.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title">Customizable Design</h3>
+                <p class="feature-text">Fully customizable interface with drag-and-drop tools to match your brand identity perfectly.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">Seamless Integration</h3>
+                <p class="feature-text">Connect with your favorite tools and services through our extensive API and integration ecosystem.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🌐</div>
+                <h3 class="feature-title">Global Scale</h3>
+                <p class="feature-text">Deploy worldwide with our distributed infrastructure ensuring low latency and high availability everywhere.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Showcase Section -->
+    <section id="showcase" class="showcase">
+        <div class="showcase-inner">
+            <div class="section-header fade-in">
+                <h2 class="section-title">See It In Action</h2>
+                <p class="section-subtitle">Discover how our platform delivers exceptional results for businesses of all sizes.</p>
+            </div>
+            <div class="showcase-grid">
+                <div class="showcase-item fade-in">
+                    <div class="showcase-image">🚀</div>
+                    <div class="showcase-content">
+                        <h3 class="showcase-title">Rapid Deployment</h3>
+                        <p class="showcase-text">Launch your projects in minutes with our streamlined deployment pipeline and automated workflows.</p>
+                    </div>
+                </div>
+                <div class="showcase-item fade-in">
+                    <div class="showcase-image">💎</div>
+                    <div class="showcase-content">
+                        <h3 class="showcase-title">Premium Quality</h3>
+                        <p class="showcase-text">Enterprise-grade infrastructure with 99.9% uptime SLA and dedicated support teams.</p>
+                    </div>
+                </div>
+                <div class="showcase-item fade-in">
+                    <div class="showcase-image">🎯</div>
+                    <div class="showcase-content">
+                        <h3 class="showcase-title">Precision Targeting</h3>
+                        <p class="showcase-text">Advanced targeting capabilities to reach your ideal audience with personalized experiences.</p>
+                    </div>
+                </div>
+                <div class="showcase-item fade-in">
+                    <div class="showcase-image">📈</div>
+                    <div class="showcase-content">
+                        <h3 class="showcase-title">Growth Focused</h3>
+                        <p class="showcase-text">Built-in optimization tools and A/B testing to maximize conversions and revenue.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="section">
+        <div class="section-header fade-in">
+            <h2 class="section-title">What Our Clients Say</h2>
+            <p class="section-subtitle">Don't just take our word for it - hear from businesses that have transformed with NovaTech.</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card fade-in">
+                <p class="testimonial-text">"NovaTech completely transformed our digital strategy. The results exceeded all our expectations and the ROI has been incredible."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">SM</div>
+                    <div class="testimonial-info">
+                        <div class="testimonial-name">Sarah Mitchell</div>
+                        <div class="testimonial-role">CEO, TechCorp</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card fade-in">
+                <p class="testimonial-text">"The platform is incredibly intuitive and powerful. We've seen a 300% increase in productivity since switching to NovaTech."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">JD</div>
+                    <div class="testimonial-info">
+                        <div class="testimonial-name">James Davidson</div>
+                        <div class="testimonial-role">CTO, InnovateLabs</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card fade-in">
+                <p class="testimonial-text">"Outstanding support and reliability. NovaTech has become an essential part of our infrastructure and we couldn't be happier."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">ER</div>
+                    <div class="testimonial-info">
+                        <div class="testimonial-name">Emily Rodriguez</div>
+                        <div class="testimonial-role">Director, GrowthHub</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="section">
+        <div class="section-header fade-in">
+            <h2 class="section-title">Simple, Transparent Pricing</h2>
+            <p class="section-subtitle">Choose the perfect plan for your business needs. All plans include our core features.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card fade-in">
+                <h3 class="pricing-name">Starter</h3>
+                <div class="pricing-price">$29</div>
+                <div class="pricing-period">per month</div>
+                <ul class="pricing-features">
+                    <li class="pricing-feature">Up to 10,000 requests</li>
+                    <li class="pricing-feature">Basic analytics</li>
+                    <li class="pricing-feature">Email support</li>
+                    <li class="pricing-feature">99.9% uptime SLA</li>
+                    <li class="pricing-feature">Community access</li>
+                </ul>
+                <a href="#" class="btn btn-secondary" style="width: 100%;">Get Started</a>
+            </div>
+            <div class="pricing-card featured fade-in">
+                <div class="pricing-badge">Popular</div>
+                <h3 class="pricing-name">Professional</h3>
+                <div class="pricing-price">$99</div>
+                <div class="pricing-period">per month</div>
+                <ul class="pricing-features">
+                    <li class="pricing-feature">Up to 100,000 requests</li>
+                    <li class="pricing-feature">Advanced analytics</li>
+                    <li class="pricing-feature">Priority support</li>
+                    <li class="pricing-feature">99.99% uptime SLA</li>
+                    <li class="pricing-feature">Custom integrations</li>
+                    <li class="pricing-feature">Team collaboration</li>
+                </ul>
+                <a href="#" class="btn btn-primary" style="width: 100%;">Get Started</a>
+            </div>
+            <div class="pricing-card fade-in">
+                <h3 class="pricing-name">Enterprise</h3>
+                <div class="pricing-price">$299</div>
+                <div class="pricing-period">per month</div>
+                <ul class="pricing-features">
+                    <li class="pricing-feature">Unlimited requests</li>
+                    <li class="pricing-feature">Enterprise analytics</li>
+                    <li class="pricing-feature">24/7 dedicated support</li>
+                    <li class="pricing-feature">99.99% uptime SLA</li>
+                    <li class="pricing-feature">Custom development</li>
+                    <li class="pricing-feature">White-label options</li>
+                    <li class="pricing-feature">SLA guarantees</li>
+                </ul>
+                <a href="#" class="btn btn-secondary" style="width: 100%;">Contact Sales</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Get Started?</h2>
+            <p class="cta-text">Join thousands of businesses already transforming their digital presence with NovaTech.</p>
+            <a href="#pricing" class="cta-button">Start Your Free Trial</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div>
+                <div class="footer-brand">NovaTech</div>
+                <p class="footer-text">Empowering businesses with cutting-edge digital solutions. Transform your future with innovation and excellence.</p>
+            </div>
+            <div>
+                <h4 class="footer-title">Product</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#features">Features</a></li>
+                    <li class="footer-link"><a href="#pricing">Pricing</a></li>
+                    <li class="footer-link"><a href="#showcase">Showcase</a></li>
+                    <li class="footer-link"><a href="#">Documentation</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-title">Company</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">About Us</a></li>
+                    <li class="footer-link"><a href="#">Careers</a></li>
+                    <li class="footer-link"><a href="#">Blog</a></li>
+                    <li class="footer-link"><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-title">Legal</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">Privacy Policy</a></li>
+                    <li class="footer-link"><a href="#">Terms of Service</a></li>
+                    <li class="footer-link"><a href="#">Cookie Policy</a></li>
+                    <li class="footer-link"><a href="#">GDPR</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 NovaTech. All rights reserved. | Seed: 115265083</p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const theme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Scroll Animation Observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in elements
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add parallax effect to blobs on scroll
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const scrolled = window.pageYOffset;
+                    const blobs = document.querySelectorAll('.blob');
+                    blobs.forEach((blob, index) => {
+                        const speed = 0.5 + (index * 0.1);
+                        blob.style.transform = `translateY(${scrolled * speed}px)`;
+                    });
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Add hover effect to cards
+        const cards = document.querySelectorAll('.feature-card, .showcase-item, .testimonial-card, .pricing-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+        });
+
+        // Performance optimization: Reduce animations on low-end devices
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.querySelectorAll('.blob').forEach(blob => {
+                blob.style.animation = 'none';
+            });
+        }
+
+        // Log design seed for reference
+        console.log('%c🎨 Design Seed: 115265083', 'color: #00d4aa; font-size: 16px; font-weight: bold;');
+        console.log('%cDesign Parameters:', 'color: #ff6b35; font-size: 14px; font-weight: bold;');
+        console.log('Primary Hue: 171° (Cyan/Turquoise)');
+        console.log('Secondary Hue: 24° (Orange/Coral)');
+        console.log('Animation Duration: 1054ms');
+        console.log('Blur Intensity: 9px');
+        console.log('Border Radius: 31px');
+    </script>
+</body>
+</html>

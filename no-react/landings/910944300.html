@@ -1,0 +1,2421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aeroify - Digital Transformation Platform</title>
+  
+  <!-- 
+    DESIGN CHOICES (Seed: 910944300):
+    ================================
+    Color Scheme: 0 - Deep Purple & Cyan (Cyberpunk aesthetic)
+      - Primary: hsl(210, 85%, 25%) - Deep navy/purple
+      - Secondary: hsl(180, 90%, 45%) - Bright cyan
+      - Accent: hsl(30, 95%, 55%) - Warm amber
+    
+    Hero Layout: 2 - Asymmetric Grid
+      - Two overlapping content zones
+      - Diagonal visual flow
+      - Off-center focal point
+    
+    Special Feature: 3 - Morphing SVG Shapes
+      - Organic blob animations
+      - Continuous morphing between states
+      - Layered depth with blur effects
+    
+    Animation Style: 0 - Spring Physics
+      - Elastic overshoot on hover
+      - Natural damping feel
+      - Staggered reveal sequences
+    
+    Brand: Aeroify.app (Prefix: Aero + Suffix: ify + Domain: .app)
+    
+    Typography: Inter (Google Fonts) - Modern, geometric, highly legible
+  -->
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ========== CSS CUSTOM PROPERTIES ========== */
+    :root {
+      /* Generated color palette based on seed 910944300 */
+      --primary-hue: 210;
+      --secondary-hue: 180;
+      --accent-hue: 30;
+      
+      /* Light theme (default) */
+      --bg-primary: hsl(0, 0%, 98%);
+      --bg-secondary: hsl(210, 30%, 96%);
+      --bg-card: hsl(0, 0%, 100%);
+      --text-primary: hsl(210, 40%, 15%);
+      --text-secondary: hsl(210, 20%, 45%);
+      --text-muted: hsl(210, 15%, 60%);
+      --brand-primary: hsl(var(--primary-hue), 85%, 25%);
+      --brand-secondary: hsl(var(--secondary-hue), 90%, 42%);
+      --brand-accent: hsl(var(--accent-hue), 95%, 50%);
+      --border-color: hsl(210, 20%, 90%);
+      --shadow-sm: 0 1px 2px 0 hsl(210 30% 10% / 0.05);
+      --shadow-md: 0 4px 6px -1px hsl(210 30% 10% / 0.1), 0 2px 4px -2px hsl(210 30% 10% / 0.1);
+      --shadow-lg: 0 10px 15px -3px hsl(210 30% 10% / 0.1), 0 4px 6px -4px hsl(210 30% 10% / 0.1);
+      --shadow-xl: 0 20px 25px -5px hsl(210 30% 10% / 0.1), 0 8px 10px -6px hsl(210 30% 10% / 0.1);
+      --shadow-glow: 0 0 40px hsl(var(--secondary-hue), 90%, 50% / 0.3);
+      --gradient-hero: linear-gradient(135deg, hsl(var(--primary-hue), 70%, 15%) 0%, hsl(var(--primary-hue), 60%, 25%) 50%, hsl(var(--secondary-hue), 70%, 35%) 100%);
+      --gradient-text: linear-gradient(135deg, hsl(var(--secondary-hue), 90%, 45%) 0%, hsl(var(--accent-hue), 95%, 55%) 100%);
+      
+      /* Animation timing - Spring physics based */
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+      --duration-fast: 150ms;
+      --duration-normal: 300ms;
+      --duration-slow: 500ms;
+      --stagger-delay: 80ms;
+    }
+    
+    /* Dark theme overrides */
+    [data-theme="dark"] {
+      --bg-primary: hsl(210, 35%, 8%);
+      --bg-secondary: hsl(210, 30%, 12%);
+      --bg-card: hsl(210, 25%, 15%);
+      --text-primary: hsl(210, 20%, 95%);
+      --text-secondary: hsl(210, 20%, 70%);
+      --text-muted: hsl(210, 15%, 50%);
+      --brand-primary: hsl(var(--secondary-hue), 90%, 55%);
+      --brand-secondary: hsl(var(--secondary-hue), 95%, 60%);
+      --brand-accent: hsl(var(--accent-hue), 95%, 60%);
+      --border-color: hsl(210, 20%, 25%);
+      --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+      --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4), 0 2px 4px -2px hsl(0 0% 0% / 0.4);
+      --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.5), 0 4px 6px -4px hsl(0 0% 0% / 0.5);
+      --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.6), 0 8px 10px -6px hsl(0 0% 0% / 0.6);
+      --shadow-glow: 0 0 60px hsl(var(--secondary-hue), 90%, 50% / 0.4);
+    }
+    
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color var(--duration-normal) var(--ease-smooth),
+                  color var(--duration-normal) var(--ease-smooth);
+    }
+    
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    
+    ul, ol {
+      list-style: none;
+    }
+    
+    /* ========== UTILITY CLASSES ========== */
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    
+    @media (min-width: 640px) {
+      .container {
+        padding: 0 2rem;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .container {
+        padding: 0 3rem;
+      }
+    }
+    
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    
+    /* ========== ANIMATIONS ========== */
+    @keyframes morphBlob1 {
+      0%, 100% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+      }
+      25% {
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+        transform: translate(30px, -30px) rotate(90deg) scale(1.05);
+      }
+      50% {
+        border-radius: 50% 60% 30% 60% / 30% 40% 70% 60%;
+        transform: translate(-20px, 20px) rotate(180deg) scale(0.95);
+      }
+      75% {
+        border-radius: 60% 40% 60% 30% / 70% 30% 50% 60%;
+        transform: translate(20px, 30px) rotate(270deg) scale(1.02);
+      }
+    }
+    
+    @keyframes morphBlob2 {
+      0%, 100% {
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+        transform: translate(0, 0) rotate(0deg);
+      }
+      33% {
+        border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+        transform: translate(-40px, 40px) rotate(120deg);
+      }
+      66% {
+        border-radius: 30% 60% 30% 70% / 60% 40% 30% 60%;
+        transform: translate(40px, -20px) rotate(240deg);
+      }
+    }
+    
+    @keyframes morphBlob3 {
+      0%, 100% {
+        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+        transform: translate(0, 0) scale(1);
+      }
+      50% {
+        border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%;
+        transform: translate(-30px, -20px) scale(1.1);
+      }
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% {
+        opacity: 0.5;
+        filter: blur(60px);
+      }
+      50% {
+        opacity: 0.8;
+        filter: blur(80px);
+      }
+    }
+    
+    @keyframes gradient-shift {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    
+    @keyframes reveal-up {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes reveal-scale {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes spin-slow {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    /* ========== NAVIGATION ========== */
+    .navigation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: hsl(210 35% 8% / 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid hsl(210 20% 20% / 0.3);
+      transition: all var(--duration-normal) var(--ease-smooth);
+    }
+    
+    .navigation-scrolled {
+      background: hsl(210 35% 8% / 0.95);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .navigation-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-text);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px hsl(var(--secondary-hue), 90%, 50% / 0.4);
+    }
+    
+    .logo-icon svg {
+      width: 24px;
+      height: 24px;
+      color: white;
+    }
+    
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 2rem;
+    }
+    
+    @media (min-width: 768px) {
+      .nav-links {
+        display: flex;
+      }
+    }
+    
+    .nav-link {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color var(--duration-fast) var(--ease-smooth);
+      position: relative;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--brand-secondary);
+      transition: width var(--duration-normal) var(--ease-spring);
+    }
+    
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .theme-toggle {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: all var(--duration-fast) var(--ease-smooth);
+    }
+    
+    .theme-toggle:hover {
+      color: var(--brand-secondary);
+      border-color: var(--brand-secondary);
+      transform: scale(1.05);
+    }
+    
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      transition: transform var(--duration-slow) var(--ease-spring);
+    }
+    
+    [data-theme="dark"] .theme-toggle .sun-icon {
+      display: block;
+    }
+    
+    [data-theme="dark"] .theme-toggle .moon-icon {
+      display: none;
+    }
+    
+    .theme-toggle .sun-icon {
+      display: none;
+    }
+    
+    .nav-cta {
+      display: none;
+      padding: 0.625rem 1.25rem;
+      background: var(--gradient-text);
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: 10px;
+      transition: all var(--duration-fast) var(--ease-smooth);
+      box-shadow: 0 4px 15px hsl(var(--secondary-hue), 90%, 50% / 0.3);
+    }
+    
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px hsl(var(--secondary-hue), 90%, 50% / 0.5);
+    }
+    
+    @media (min-width: 640px) {
+      .nav-cta {
+        display: inline-flex;
+      }
+    }
+    
+    .mobile-menu-btn {
+      display: flex;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+    }
+    
+    @media (min-width: 768px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+    
+    /* ========== HERO SECTION ========== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 72px;
+      overflow: hidden;
+      background: var(--gradient-hero);
+    }
+    
+    /* Morphing blob backgrounds - Special Feature */
+    .hero-blob {
+      position: absolute;
+      pointer-events: none;
+      filter: blur(60px);
+      opacity: 0.6;
+    }
+    
+    .hero-blob-primary {
+      width: 600px;
+      height: 600px;
+      top: -200px;
+      right: -100px;
+      background: hsl(var(--secondary-hue), 90%, 50%);
+      animation: morphBlob1 20s ease-in-out infinite, pulse-glow 8s ease-in-out infinite;
+    }
+    
+    .hero-blob-secondary {
+      width: 500px;
+      height: 500px;
+      bottom: -150px;
+      left: -100px;
+      background: hsl(var(--accent-hue), 95%, 55%);
+      animation: morphBlob2 25s ease-in-out infinite;
+      opacity: 0.4;
+    }
+    
+    .hero-blob-tertiary {
+      width: 400px;
+      height: 400px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: hsl(var(--primary-hue), 70%, 40%);
+      animation: morphBlob3 18s ease-in-out infinite;
+      opacity: 0.3;
+    }
+    
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(hsl(210 20% 50% / 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, hsl(210 20% 50% / 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+    }
+    
+    /* Asymmetric Grid Layout */
+    .hero-grid-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    
+    @media (min-width: 1024px) {
+      .hero-grid-layout {
+        grid-template-columns: 1.2fr 1fr;
+        gap: 4rem;
+      }
+    }
+    
+    .hero-text-content {
+      animation: reveal-up 0.8s var(--ease-spring) forwards;
+      animation-delay: 0.2s;
+      opacity: 0;
+    }
+    
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: hsl(210 20% 20% / 0.5);
+      border: 1px solid hsl(210 20% 30% / 0.5);
+      border-radius: 100px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: hsl(180, 90%, 70%);
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(10px);
+    }
+    
+    .hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      background: hsl(var(--secondary-hue), 90%, 50%);
+      border-radius: 50%;
+      animation: pulse-glow 2s ease-in-out infinite;
+      box-shadow: 0 0 10px hsl(var(--secondary-hue), 90%, 50%);
+    }
+    
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: white;
+      margin-bottom: 1.5rem;
+    }
+    
+    .hero-title-accent {
+      background: var(--gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero-description {
+      font-size: 1.125rem;
+      color: hsl(210, 20%, 75%);
+      max-width: 540px;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .hero-cta-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: var(--gradient-text);
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 12px;
+      transition: all var(--duration-fast) var(--ease-spring);
+      box-shadow: 0 4px 20px hsl(var(--secondary-hue), 90%, 50% / 0.4);
+    }
+    
+    .hero-cta-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 30px hsl(var(--secondary-hue), 90%, 50% / 0.6);
+    }
+    
+    .hero-cta-primary svg {
+      width: 18px;
+      height: 18px;
+      transition: transform var(--duration-normal) var(--ease-spring);
+    }
+    
+    .hero-cta-primary:hover svg {
+      transform: translateX(4px);
+    }
+    
+    .hero-cta-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: transparent;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: 1px solid hsl(210 20% 40% / 0.5);
+      transition: all var(--duration-fast) var(--ease-smooth);
+    }
+    
+    .hero-cta-secondary:hover {
+      background: hsl(210 20% 20% / 0.5);
+      border-color: hsl(var(--secondary-hue), 90%, 50%);
+      transform: translateY(-2px);
+    }
+    
+    /* Hero Visual Side */
+    .hero-visual {
+      position: relative;
+      animation: reveal-scale 0.8s var(--ease-spring) forwards;
+      animation-delay: 0.4s;
+      opacity: 0;
+    }
+    
+    .hero-dashboard {
+      position: relative;
+      background: hsl(210 20% 12% / 0.8);
+      border: 1px solid hsl(210 20% 25% / 0.5);
+      border-radius: 20px;
+      padding: 1.5rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 
+        0 25px 50px -12px hsl(0 0% 0% / 0.5),
+        0 0 0 1px hsl(210 20% 30% / 0.3) inset;
+      transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+      transition: transform var(--duration-slow) var(--ease-spring);
+    }
+    
+    .hero-dashboard:hover {
+      transform: perspective(1000px) rotateY(-2deg) rotateX(2deg);
+    }
+    
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .dashboard-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .dashboard-dot-red { background: #ff5f57; }
+    .dashboard-dot-yellow { background: #febc2e; }
+    .dashboard-dot-green { background: #28c840; }
+    
+    .dashboard-content {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    
+    .dashboard-card {
+      background: hsl(210 20% 18% / 0.8);
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid hsl(210 20% 25% / 0.3);
+    }
+    
+    .dashboard-card-large {
+      grid-column: span 2;
+    }
+    
+    .dashboard-label {
+      font-size: 0.75rem;
+      color: hsl(210, 20%, 60%);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .dashboard-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .dashboard-value-accent {
+      color: hsl(var(--secondary-hue), 90%, 60%);
+    }
+    
+    .dashboard-chart {
+      height: 60px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      margin-top: 0.75rem;
+    }
+    
+    .chart-bar {
+      flex: 1;
+      background: linear-gradient(to top, hsl(var(--secondary-hue), 90%, 40%), hsl(var(--secondary-hue), 90%, 60%));
+      border-radius: 2px;
+      transition: height var(--duration-slow) var(--ease-spring);
+    }
+    
+    .floating-element {
+      position: absolute;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: var(--shadow-xl);
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-element-1 {
+      top: -30px;
+      right: -30px;
+      animation-delay: 0s;
+    }
+    
+    .floating-element-2 {
+      bottom: 20px;
+      left: -40px;
+      animation-delay: 1.5s;
+    }
+    
+    .floating-element-3 {
+      bottom: -20px;
+      right: 20%;
+      animation-delay: 3s;
+    }
+    
+    .stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      background: hsl(var(--accent-hue), 95%, 55% / 0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: hsl(var(--accent-hue), 95%, 55%);
+    }
+    
+    .stat-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .stat-value {
+      font-weight: 700;
+      font-size: 1.125rem;
+      color: var(--text-primary);
+    }
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    /* ========== LOGOS SECTION ========== */
+    .logos-section {
+      padding: 4rem 0;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .logos-title {
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 2rem;
+    }
+    
+    .logos-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 3rem;
+      opacity: 0.5;
+    }
+    
+    .logo-item {
+      height: 32px;
+      width: auto;
+      filter: grayscale(100%);
+      transition: all var(--duration-fast) var(--ease-smooth);
+    }
+    
+    .logo-item:hover {
+      filter: grayscale(0%);
+      opacity: 1;
+    }
+    
+    /* ========== FEATURES SECTION ========== */
+    .features-section {
+      padding: 6rem 0;
+      background: var(--bg-primary);
+    }
+    
+    .section-header {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 4rem;
+    }
+    
+    .section-label {
+      display: inline-block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--brand-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    
+    .section-description {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    @media (min-width: 640px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .feature-card {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2rem;
+      transition: all var(--duration-normal) var(--ease-spring);
+      overflow: hidden;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-text);
+      transform: scaleX(0);
+      transition: transform var(--duration-normal) var(--ease-spring);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-xl);
+      border-color: hsl(var(--secondary-hue), 90%, 50% / 0.3);
+    }
+    
+    .feature-card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      color: var(--brand-secondary);
+      transition: all var(--duration-normal) var(--ease-spring);
+    }
+    
+    .feature-card:hover .feature-icon {
+      background: var(--gradient-text);
+      color: white;
+      transform: scale(1.1) rotate(-5deg);
+    }
+    
+    .feature-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+    
+    .feature-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    
+    .feature-description {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    
+    /* ========== SHOWCASE SECTION ========== */
+    .showcase-section {
+      padding: 6rem 0;
+      background: var(--bg-secondary);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    
+    @media (min-width: 1024px) {
+      .showcase-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 6rem;
+      }
+    }
+    
+    .showcase-visual {
+      position: relative;
+      order: 2;
+    }
+    
+    @media (min-width: 1024px) {
+      .showcase-visual {
+        order: 1;
+      }
+    }
+    
+    .showcase-content {
+      order: 1;
+    }
+    
+    @media (min-width: 1024px) {
+      .showcase-content {
+        order: 2;
+      }
+    }
+    
+    .showcase-image-wrapper {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .showcase-image {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      background: linear-gradient(135deg, hsl(var(--primary-hue), 60%, 30%) 0%, hsl(var(--secondary-hue), 60%, 40%) 100%);
+    }
+    
+    .showcase-image svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .showcase-stats {
+      position: absolute;
+      bottom: -30px;
+      right: 30px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .showcase-stat {
+      text-align: center;
+    }
+    
+    .showcase-stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--brand-primary);
+      line-height: 1;
+    }
+    
+    .showcase-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.25rem;
+    }
+    
+    .feature-list {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .feature-list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      font-size: 1rem;
+      color: var(--text-secondary);
+    }
+    
+    .feature-list-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--brand-secondary);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    
+    /* ========== TESTIMONIALS SECTION ========== */
+    .testimonials-section {
+      padding: 6rem 0;
+      background: var(--bg-primary);
+    }
+    
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+      .testimonials-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .testimonials-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .testimonial-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2rem;
+      transition: all var(--duration-normal) var(--ease-spring);
+    }
+    
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .testimonial-card.featured {
+      background: var(--gradient-hero);
+      border-color: transparent;
+      color: white;
+    }
+    
+    .testimonial-card.featured .testimonial-text,
+    .testimonial-card.featured .testimonial-author-name,
+    .testimonial-card.featured .testimonial-author-role {
+      color: white;
+    }
+    
+    .testimonial-stars {
+      display: flex;
+      gap: 0.25rem;
+      margin-bottom: 1rem;
+      color: hsl(var(--accent-hue), 95%, 55%);
+    }
+    
+    .testimonial-stars svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .testimonial-text {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gradient-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.125rem;
+      color: white;
+    }
+    
+    .testimonial-author-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .testimonial-author-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .testimonial-author-role {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    /* ========== PRICING SECTION ========== */
+    .pricing-section {
+      padding: 6rem 0;
+      background: var(--bg-secondary);
+    }
+    
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    @media (min-width: 768px) {
+      .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .pricing-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 2.5rem;
+      transition: all var(--duration-normal) var(--ease-spring);
+      position: relative;
+    }
+    
+    .pricing-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .pricing-card.popular {
+      border-color: var(--brand-secondary);
+      box-shadow: 0 0 0 2px var(--brand-secondary), var(--shadow-xl);
+    }
+    
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--gradient-text);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.5rem 1rem;
+      border-radius: 100px;
+    }
+    
+    .pricing-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .pricing-description {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    
+    .pricing-price {
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .pricing-currency {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .pricing-amount {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    
+    .pricing-period {
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+    
+    .pricing-features {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    
+    .pricing-feature {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+    }
+    
+    .pricing-feature-check {
+      width: 20px;
+      height: 20px;
+      color: var(--brand-secondary);
+      flex-shrink: 0;
+    }
+    
+    .pricing-cta {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      font-weight: 600;
+      border-radius: 12px;
+      transition: all var(--duration-fast) var(--ease-spring);
+    }
+    
+    .pricing-cta-primary {
+      background: var(--gradient-text);
+      color: white;
+      box-shadow: 0 4px 15px hsl(var(--secondary-hue), 90%, 50% / 0.3);
+    }
+    
+    .pricing-cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px hsl(var(--secondary-hue), 90%, 50% / 0.5);
+    }
+    
+    .pricing-cta-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .pricing-cta-secondary:hover {
+      background: var(--border-color);
+      transform: translateY(-2px);
+    }
+    
+    /* ========== CTA SECTION ========== */
+    .cta-section {
+      padding: 6rem 0;
+      background: var(--gradient-hero);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cta-blob {
+      position: absolute;
+      pointer-events: none;
+      filter: blur(100px);
+      opacity: 0.4;
+    }
+    
+    .cta-blob-1 {
+      width: 500px;
+      height: 500px;
+      top: -200px;
+      left: -100px;
+      background: hsl(var(--secondary-hue), 90%, 50%);
+      animation: morphBlob1 20s ease-in-out infinite;
+    }
+    
+    .cta-blob-2 {
+      width: 400px;
+      height: 400px;
+      bottom: -150px;
+      right: -50px;
+      background: hsl(var(--accent-hue), 95%, 55%);
+      animation: morphBlob2 18s ease-in-out infinite;
+    }
+    
+    .cta-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    
+    .cta-title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      color: white;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    
+    .cta-description {
+      font-size: 1.25rem;
+      color: hsl(210, 20%, 80%);
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+    
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1.25rem 2.5rem;
+      background: white;
+      color: hsl(var(--primary-hue), 85%, 20%);
+      font-weight: 700;
+      font-size: 1.125rem;
+      border-radius: 14px;
+      transition: all var(--duration-fast) var(--ease-spring);
+      box-shadow: 0 10px 40px hsl(0 0% 0% / 0.3);
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 50px hsl(0 0% 0% / 0.4);
+    }
+    
+    /* ========== FOOTER ========== */
+    .footer {
+      padding: 4rem 0 2rem;
+      background: hsl(210, 35%, 8%);
+      border-top: 1px solid hsl(210, 20%, 20%);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+    
+    @media (min-width: 640px) {
+      .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .footer-grid {
+        grid-template-columns: 2fr repeat(3, 1fr);
+      }
+    }
+    
+    .footer-brand {
+      max-width: 320px;
+    }
+    
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: white;
+      margin-bottom: 1rem;
+    }
+    
+    .footer-description {
+      font-size: 0.9375rem;
+      color: hsl(210, 20%, 60%);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    
+    .footer-social {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .footer-social-link {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: hsl(210, 20%, 18%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: hsl(210, 20%, 60%);
+      transition: all var(--duration-fast) var(--ease-smooth);
+    }
+    
+    .footer-social-link:hover {
+      background: var(--brand-secondary);
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .footer-social-link svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .footer-column-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+    }
+    
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .footer-link {
+      font-size: 0.9375rem;
+      color: hsl(210, 20%, 60%);
+      transition: color var(--duration-fast) var(--ease-smooth);
+    }
+    
+    .footer-link:hover {
+      color: white;
+    }
+    
+    .footer-bottom {
+      padding-top: 2rem;
+      border-top: 1px solid hsl(210, 20%, 20%);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      text-align: center;
+    }
+    
+    @media (min-width: 640px) {
+      .footer-bottom {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+    }
+    
+    .footer-copyright {
+      font-size: 0.875rem;
+      color: hsl(210, 20%, 50%);
+    }
+    
+    .footer-legal {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .footer-legal-link {
+      font-size: 0.875rem;
+      color: hsl(210, 20%, 50%);
+      transition: color var(--duration-fast) var(--ease-smooth);
+    }
+    
+    .footer-legal-link:hover {
+      color: white;
+    }
+    
+    /* ========== SCROLL REVEAL ANIMATION ========== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s var(--ease-spring), transform 0.6s var(--ease-spring);
+    }
+    
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* ========== RESPONSIVE ADJUSTMENTS ========== */
+    @media (max-width: 768px) {
+      .hero-dashboard {
+        transform: none;
+      }
+      
+      .floating-element {
+        display: none;
+      }
+      
+      .showcase-stats {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        margin-top: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navigation" id="navigation">
+    <div class="container">
+      <div class="navigation-inner">
+        <a href="#" class="logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          Aeroify
+        </a>
+        
+        <div class="nav-links">
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#showcase" class="nav-link">Showcase</a>
+          <a href="#testimonials" class="nav-link">Testimonials</a>
+          <a href="#pricing" class="nav-link">Pricing</a>
+        </div>
+        
+        <div class="nav-actions">
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </button>
+          <a href="#cta" class="nav-cta">Get Started</a>
+          <button class="mobile-menu-btn" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <!-- Morphing blob backgrounds - Special Feature based on seed -->
+    <div class="hero-blob hero-blob-primary"></div>
+    <div class="hero-blob hero-blob-secondary"></div>
+    <div class="hero-blob hero-blob-tertiary"></div>
+    <div class="hero-grid"></div>
+    
+    <div class="container hero-content">
+      <div class="hero-grid-layout">
+        <div class="hero-text-content">
+          <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            Now in Public Beta
+          </div>
+          <h1 class="hero-title">
+            Transform Your <span class="hero-title-accent">Digital</span> Workflow
+          </h1>
+          <p class="hero-description">
+            Aeroify combines cutting-edge AI with intuitive design to streamline your operations, 
+            boost productivity, and unlock new possibilities for your business.
+          </p>
+          <div class="hero-cta-group">
+            <a href="#cta" class="hero-cta-primary">
+              Start Free Trial
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </a>
+            <a href="#showcase" class="hero-cta-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="10 8 16 12 10 16 10 8"/>
+              </svg>
+              Watch Demo
+            </a>
+          </div>
+        </div>
+        
+        <div class="hero-visual">
+          <div class="hero-dashboard">
+            <div class="dashboard-header">
+              <span class="dashboard-dot dashboard-dot-red"></span>
+              <span class="dashboard-dot dashboard-dot-yellow"></span>
+              <span class="dashboard-dot dashboard-dot-green"></span>
+            </div>
+            <div class="dashboard-content">
+              <div class="dashboard-card dashboard-card-large">
+                <div class="dashboard-label">Revenue Growth</div>
+                <div class="dashboard-value dashboard-value-accent">+147.3%</div>
+                <div class="dashboard-chart">
+                  <div class="chart-bar" style="height: 40%"></div>
+                  <div class="chart-bar" style="height: 55%"></div>
+                  <div class="chart-bar" style="height: 45%"></div>
+                  <div class="chart-bar" style="height: 70%"></div>
+                  <div class="chart-bar" style="height: 60%"></div>
+                  <div class="chart-bar" style="height: 85%"></div>
+                  <div class="chart-bar" style="height: 100%"></div>
+                </div>
+              </div>
+              <div class="dashboard-card">
+                <div class="dashboard-label">Active Users</div>
+                <div class="dashboard-value">24.5K</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="dashboard-label">Conversion</div>
+                <div class="dashboard-value">8.2%</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Floating elements with spring animation -->
+          <div class="floating-element floating-element-1 stat-badge">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">99.9%</span>
+              <span class="stat-label">Uptime</span>
+            </div>
+          </div>
+          
+          <div class="floating-element floating-element-2 stat-badge">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">12K+</span>
+              <span class="stat-label">Teams</span>
+            </div>
+          </div>
+          
+          <div class="floating-element floating-element-3 stat-badge">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">3x</span>
+              <span class="stat-label">Faster</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logos Section -->
+  <section class="logos-section">
+    <div class="container">
+      <p class="logos-title reveal">Trusted by innovative teams worldwide</p>
+      <div class="logos-grid reveal">
+        <!-- SVG placeholder logos -->
+        <svg class="logo-item" viewBox="0 0 120 32" fill="currentColor">
+          <rect x="0" y="8" width="32" height="16" rx="4"/>
+          <text x="40" y="22" font-size="14" font-weight="600" fill="currentColor">TechCorp</text>
+        </svg>
+        <svg class="logo-item" viewBox="0 0 120 32" fill="currentColor">
+          <circle cx="16" cy="16" r="12"/>
+          <text x="36" y="22" font-size="14" font-weight="600" fill="currentColor">Orbital</text>
+        </svg>
+        <svg class="logo-item" viewBox="0 0 120 32" fill="currentColor">
+          <polygon points="16,4 28,28 4,28"/>
+          <text x="36" y="22" font-size="14" font-weight="600" fill="currentColor">Vertex</text>
+        </svg>
+        <svg class="logo-item" viewBox="0 0 120 32" fill="currentColor">
+          <rect x="4" y="4" width="24" height="24" rx="6"/>
+          <text x="36" y="22" font-size="14" font-weight="600" fill="currentColor">Quantum</text>
+        </svg>
+        <svg class="logo-item" viewBox="0 0 120 32" fill="currentColor">
+          <path d="M4 16 L16 4 L28 16 L16 28 Z"/>
+          <text x="36" y="22" font-size="14" font-weight="600" fill="currentColor">Nexus</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Features</span>
+        <h2 class="section-title">Everything you need to scale</h2>
+        <p class="section-description">
+          Powerful tools designed to streamline your workflow and accelerate growth. 
+          Built for teams that demand excellence.
+        </p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">AI-Powered Insights</h3>
+          <p class="feature-description">
+            Harness the power of machine learning to uncover hidden patterns and make data-driven decisions.
+          </p>
+        </div>
+        
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Team Collaboration</h3>
+          <p class="feature-description">
+            Real-time collaboration tools that keep everyone aligned and moving forward together.
+          </p>
+        </div>
+        
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="9" y1="21" x2="9" y2="9"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Smart Automation</h3>
+          <p class="feature-description">
+            Automate repetitive tasks and workflows to free up your team for strategic work.
+          </p>
+        </div>
+        
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Advanced Analytics</h3>
+          <p class="feature-description">
+            Deep analytics dashboard with customizable reports and predictive modeling.
+          </p>
+        </div>
+        
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Enterprise Security</h3>
+          <p class="feature-description">
+            Bank-grade encryption and compliance certifications to keep your data safe.
+          </p>
+        </div>
+        
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Global CDN</h3>
+          <p class="feature-description">
+            Lightning-fast performance with edge locations in 200+ cities worldwide.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Showcase Section -->
+  <section class="showcase-section" id="showcase">
+    <div class="container">
+      <div class="showcase-grid">
+        <div class="showcase-visual reveal">
+          <div class="showcase-image-wrapper">
+            <div class="showcase-image">
+              <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+                <defs>
+                  <linearGradient id="showcaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:hsl(210,70%,30%)"/>
+                    <stop offset="50%" style="stop-color:hsl(195,80%,40%)"/>
+                    <stop offset="100%" style="stop-color:hsl(180,70%,45%)"/>
+                  </linearGradient>
+                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                  </pattern>
+                </defs>
+                <rect width="800" height="600" fill="url(#showcaseGrad)"/>
+                <rect width="800" height="600" fill="url(#grid)"/>
+                <circle cx="200" cy="150" r="80" fill="rgba(255,255,255,0.1)"/>
+                <circle cx="600" cy="400" r="120" fill="rgba(255,255,255,0.08)"/>
+                <rect x="100" y="300" width="200" height="150" rx="20" fill="rgba(255,255,255,0.15)"/>
+                <rect x="400" y="100" width="250" height="180" rx="20" fill="rgba(255,255,255,0.12)"/>
+                <rect x="500" y="350" width="180" height="120" rx="15" fill="rgba(255,255,255,0.1)"/>
+              </svg>
+            </div>
+          </div>
+          <div class="showcase-stats">
+            <div class="showcase-stat">
+              <div class="showcase-stat-value">500+</div>
+              <div class="showcase-stat-label">Integrations</div>
+            </div>
+            <div class="showcase-stat">
+              <div class="showcase-stat-value">50M+</div>
+              <div class="showcase-stat-label">Requests/day</div>
+            </div>
+            <div class="showcase-stat">
+              <div class="showcase-stat-value">&lt;50ms</div>
+              <div class="showcase-stat-label">Latency</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="showcase-content reveal">
+          <span class="section-label">Why Aeroify</span>
+          <h2 class="section-title">Built for performance at scale</h2>
+          <p class="section-description">
+            Our infrastructure is designed to handle millions of requests while maintaining 
+            sub-50ms latency. Experience the difference that true performance makes.
+          </p>
+          
+          <ul class="feature-list">
+            <li class="feature-list-item">
+              <svg class="feature-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Auto-scaling infrastructure that adapts to your traffic
+            </li>
+            <li class="feature-list-item">
+              <svg class="feature-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Real-time data synchronization across all devices
+            </li>
+            <li class="feature-list-item">
+              <svg class="feature-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Advanced caching with instant cache invalidation
+            </li>
+            <li class="feature-list-item">
+              <svg class="feature-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              99.99% uptime SLA with automatic failover
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="testimonials-section" id="testimonials">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Testimonials</span>
+        <h2 class="section-title">Loved by teams everywhere</h2>
+        <p class="section-description">
+          See why thousands of companies trust Aeroify to power their digital transformation.
+        </p>
+      </div>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <p class="testimonial-text">
+            "Aeroify transformed how we handle data. What used to take weeks now happens in real-time. 
+            The ROI has been incredible."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">SK</div>
+            <div class="testimonial-author-info">
+              <span class="testimonial-author-name">Sarah Kim</span>
+              <span class="testimonial-author-role">CTO at TechStart</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card featured reveal">
+          <div class="testimonial-stars">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <p class="testimonial-text">
+            "The best platform we've ever used. Period. Aeroify helped us scale from 10K to 1M users 
+            without any hiccups. Their support team is world-class."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">MR</div>
+            <div class="testimonial-author-info">
+              <span class="testimonial-author-name">Michael Rodriguez</span>
+              <span class="testimonial-author-role">VP Engineering at ScaleUp</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <p class="testimonial-text">
+            "Implementation was seamless. We were up and running in days, not months. 
+            Our team productivity increased by 40%."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">EJ</div>
+            <div class="testimonial-author-info">
+              <span class="testimonial-author-name">Emily Johnson</span>
+              <span class="testimonial-author-role">Product Lead at InnovateCo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing-section" id="pricing">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Pricing</span>
+        <h2 class="section-title">Simple, transparent pricing</h2>
+        <p class="section-description">
+          Choose the plan that's right for you. All plans include a 14-day free trial.
+        </p>
+      </div>
+      
+      <div class="pricing-grid">
+        <div class="pricing-card reveal">
+          <h3 class="pricing-name">Starter</h3>
+          <p class="pricing-description">Perfect for individuals and small projects</p>
+          <div class="pricing-price">
+            <span class="pricing-currency">$</span>
+            <span class="pricing-amount">19</span>
+            <span class="pricing-period">/month</span>
+          </div>
+          <ul class="pricing-features">
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Up to 5 team members
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              10GB storage
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Basic analytics
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Email support
+            </li>
+          </ul>
+          <a href="#cta" class="pricing-cta pricing-cta-secondary">Get Started</a>
+        </div>
+        
+        <div class="pricing-card popular reveal">
+          <span class="pricing-badge">Most Popular</span>
+          <h3 class="pricing-name">Professional</h3>
+          <p class="pricing-description">For growing teams that need more power</p>
+          <div class="pricing-price">
+            <span class="pricing-currency">$</span>
+            <span class="pricing-amount">49</span>
+            <span class="pricing-period">/month</span>
+          </div>
+          <ul class="pricing-features">
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Up to 25 team members
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              100GB storage
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Advanced analytics
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Priority support
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              API access
+            </li>
+          </ul>
+          <a href="#cta" class="pricing-cta pricing-cta-primary">Get Started</a>
+        </div>
+        
+        <div class="pricing-card reveal">
+          <h3 class="pricing-name">Enterprise</h3>
+          <p class="pricing-description">For large organizations with custom needs</p>
+          <div class="pricing-price">
+            <span class="pricing-currency">$</span>
+            <span class="pricing-amount">149</span>
+            <span class="pricing-period">/month</span>
+          </div>
+          <ul class="pricing-features">
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Unlimited team members
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Unlimited storage
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Custom analytics
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              24/7 dedicated support
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Custom integrations
+            </li>
+            <li class="pricing-feature">
+              <svg class="pricing-feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              SLA guarantee
+            </li>
+          </ul>
+          <a href="#cta" class="pricing-cta pricing-cta-secondary">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section" id="cta">
+    <div class="cta-blob cta-blob-1"></div>
+    <div class="cta-blob cta-blob-2"></div>
+    
+    <div class="container">
+      <div class="cta-content reveal">
+        <h2 class="cta-title">Ready to transform your workflow?</h2>
+        <p class="cta-description">
+          Join thousands of teams already using Aeroify to build better products, faster.
+          Start your free trial today.
+        </p>
+        <a href="#" class="cta-button" onclick="event.preventDefault(); alert('Thank you for your interest! This is a demo landing page.');">
+          Get Started Free
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="footer-logo">
+            <div class="logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            Aeroify
+          </a>
+          <p class="footer-description">
+            The modern platform for digital transformation. Build faster, scale smarter, 
+            and deliver exceptional experiences.
+          </p>
+          <div class="footer-social">
+            <a href="#" class="footer-social-link" aria-label="Twitter">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+              </svg>
+            </a>
+            <a href="#" class="footer-social-link" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                <rect x="2" y="9" width="4" height="12"/>
+                <circle cx="4" cy="4" r="2"/>
+              </svg>
+            </a>
+            <a href="#" class="footer-social-link" aria-label="GitHub">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+              </svg>
+            </a>
+            <a href="#" class="footer-social-link" aria-label="YouTube">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
+                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h4 class="footer-column-title">Product</h4>
+          <ul class="footer-links">
+            <li><a href="#features" class="footer-link">Features</a></li>
+            <li><a href="#pricing" class="footer-link">Pricing</a></li>
+            <li><a href="#" class="footer-link">Integrations</a></li>
+            <li><a href="#" class="footer-link">Changelog</a></li>
+            <li><a href="#" class="footer-link">Documentation</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4 class="footer-column-title">Company</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">About</a></li>
+            <li><a href="#" class="footer-link">Blog</a></li>
+            <li><a href="#" class="footer-link">Careers</a></li>
+            <li><a href="#" class="footer-link">Press</a></li>
+            <li><a href="#" class="footer-link">Partners</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4 class="footer-column-title">Support</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">Help Center</a></li>
+            <li><a href="#" class="footer-link">Contact</a></li>
+            <li><a href="#" class="footer-link">Status</a></li>
+            <li><a href="#" class="footer-link">Community</a></li>
+            <li><a href="#" class="footer-link">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p class="footer-copyright">© 2026 Aeroify.app. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="#" class="footer-legal-link">Privacy</a>
+          <a href="#" class="footer-legal-link">Terms</a>
+          <a href="#" class="footer-legal-link">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ===== THEME TOGGLE =====
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    
+    // Check for saved theme preference or default to dark
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+    
+    // ===== NAVIGATION SCROLL EFFECT =====
+    const navigation = document.getElementById('navigation');
+    let lastScroll = 0;
+    
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      
+      if (currentScroll > 50) {
+        navigation.classList.add('navigation-scrolled');
+      } else {
+        navigation.classList.remove('navigation-scrolled');
+      }
+      
+      lastScroll = currentScroll;
+    });
+    
+    // ===== SCROLL REVEAL ANIMATION =====
+    const revealElements = document.querySelectorAll('.reveal');
+    
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 80); // Stagger delay based on seed
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+    
+    revealElements.forEach(el => revealObserver.observe(el));
+    
+    // ===== SMOOTH SCROLL FOR ANCHOR LINKS =====
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href !== '#') {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) {
+            const offsetTop = target.offsetTop - 80;
+            window.scrollTo({
+              top: offsetTop,
+              behavior: 'smooth'
+            });
+          }
+        }
+      });
+    });
+    
+    // ===== ANIMATE CHART BARS =====
+    const chartBars = document.querySelectorAll('.chart-bar');
+    const originalHeights = Array.from(chartBars).map(bar => bar.style.height);
+    
+    const chartObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          chartBars.forEach((bar, index) => {
+            bar.style.height = '0%';
+            setTimeout(() => {
+              bar.style.height = originalHeights[index];
+            }, index * 100);
+          });
+          chartObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    const dashboard = document.querySelector('.hero-dashboard');
+    if (dashboard) {
+      chartObserver.observe(dashboard);
+    }
+    
+    // ===== DYNAMIC YEAR IN FOOTER =====
+    const yearElement = document.querySelector('.footer-copyright');
+    if (yearElement) {
+      yearElement.innerHTML = `© ${new Date().getFullYear()} Aeroify.app. All rights reserved.`;
+    }
+  </script>
+</body>
+</html>

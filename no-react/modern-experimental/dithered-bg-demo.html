@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dithered Backgrounds Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2rem, 8vw, 5rem);
+            margin-bottom: 1rem;
+            z-index: 10;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            z-index: 10;
+            max-width: 600px;
+        }
+        
+        .dither-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .section {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            z-index: 10;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .section-desc {
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 2rem;
+            z-index: 10;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .gradient-1 { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
+        .gradient-2 { background: linear-gradient(135deg, #2d132c 0%, #801336 50%, #c72c41 100%); }
+        .gradient-3 { background: linear-gradient(135deg, #1b262c 0%, #0f4c75 50%, #3282b8 100%); }
+        .gradient-4 { background: linear-gradient(135deg, #000000 0%, #434343 100%); }
+        .gradient-5 { background: linear-gradient(135deg, #2c003e 0%, #5c2a9d 50%, #ff6b6b 100%); }
+        .gradient-6 { background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #2d2d5a 100%); }
+        
+        .content-card {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 600px;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .noise-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section with Animated Gradient Dither -->
+    <section class="hero gradient-1">
+        <canvas class="dither-canvas" id="heroCanvas"></canvas>
+        <h1>Dithered Realities</h1>
+        <p>Exploring the beauty of retro digital aesthetics through modern web technologies</p>
+    </section>
+    
+    <!-- Section 2: Bayer Matrix Dithering -->
+    <section class="section gradient-2">
+        <canvas class="dither-canvas" id="bayerCanvas"></canvas>
+        <h2 class="section-title">Bayer Matrix</h2>
+        <p class="section-desc">Ordered dithering using a Bayer matrix creates a structured, patterned noise effect that mimics traditional print halftoning.</p>
+        <div class="content-card">
+            <p>The Bayer matrix distributes quantization error across pixels in a specific pattern, creating smooth gradients with limited color palettes.</p>
+        </div>
+    </section>
+    
+    <!-- Section 3: Floyd-Steinberg Error Diffusion -->
+    <section class="section gradient-3">
+        <canvas class="dither-canvas" id="floydCanvas"></canvas>
+        <h2 class="section-title">Error Diffusion</h2>
+        <p class="section-desc">Floyd-Steinberg dithering diffuses quantization errors to neighboring pixels, creating organic, flowing patterns.</p>
+        <div class="content-card">
+            <p>This technique spreads the error of each pixel to its unprocessed neighbors, resulting in more natural-looking gradients.</p>
+        </div>
+    </section>
+    
+    <!-- Section 4: Blue Noise Dithering -->
+    <section class="section gradient-4">
+        <canvas class="dither-canvas" id="blueCanvas"></canvas>
+        <h2 class="section-title">Blue Noise</h2>
+        <p class="section-desc">Blue noise patterns provide a more visually pleasing dither with high-frequency noise that the human eye finds less objectionable.</p>
+        <div class="content-card">
+            <p>Unlike white noise, blue noise has minimal low-frequency components, creating a finer, more uniform texture.</p>
+        </div>
+    </section>
+    
+    <!-- Section 5: Animated Flow Dither -->
+    <section class="section gradient-5">
+        <canvas class="dither-canvas" id="flowCanvas"></canvas>
+        <h2 class="section-title">Flow Fields</h2>
+        <p class="section-desc">Combining dithering techniques with animated flow fields creates mesmerizing, ever-changing patterns.</p>
+        <div class="content-card">
+            <p>Perlin noise and flow fields guide the dithering patterns, creating organic movement across the canvas.</p>
+        </div>
+    </section>
+    
+    <!-- Section 6: Retro CRT Effect -->
+    <section class="section gradient-6">
+        <canvas class="dither-canvas" id="crtCanvas"></canvas>
+        <canvas class="noise-overlay" id="noiseCanvas"></canvas>
+        <h2 class="section-title">Retro CRT</h2>
+        <p class="section-desc">Simulating the scanline and phosphor glow effects of vintage CRT displays combined with dithering.</p>
+        <div class="content-card">
+            <p>The combination of scanlines, phosphor persistence simulation, and dithering creates an authentic retro computing aesthetic.</p>
+        </div>
+    </section>
+
+    <script>
+        // Utility functions
+        function resizeCanvas(canvas) {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        
+        // 4x4 Bayer Matrix
+        const bayerMatrix = [
+            [0, 8, 2, 10],
+            [12, 4, 14, 6],
+            [3, 11, 1, 9],
+            [15, 7, 13, 5]
+        ];
+        
+        // Normalize Bayer matrix to 0-1 range
+        const normalizedBayer = bayerMatrix.map(row => 
+            row.map(val => val / 16)
+        );
+        
+        // Generate blue noise (simplified - using pre-computed pattern)
+        function generateBlueNoise(width, height) {
+            const noise = new Float32Array(width * height);
+            // Simple blue noise approximation using multiple octaves
+            for (let i = 0; i < noise.length; i++) {
+                const x = i % width;
+                const y = Math.floor(i / width);
+                noise[i] = (Math.sin(x * 0.1) * Math.cos(y * 0.1) * 0.5 + 
+                           Math.sin(x * 0.05 + y * 0.03) * 0.3 +
+                           Math.random() * 0.2 + 0.5) % 1;
+            }
+            return noise;
+        }
+        
+        // Simple Perlin-like noise
+        function noise(x, y) {
+            return (Math.sin(x) + Math.sin(y) + Math.sin(x * 0.5 + y * 0.5)) / 3;
+        }
+        
+        // ============ HERO SECTION - Animated Gradient Dither ============
+        const heroCanvas = document.getElementById('heroCanvas');
+        let heroCtx, heroAnimationId;
+        
+        function initHero() {
+            resizeCanvas(heroCanvas);
+            heroCtx = heroCanvas.getContext('2d');
+        }
+        
+        function renderHero(time) {
+            const ctx = heroCtx;
+            const w = heroCanvas.width;
+            const h = heroCanvas.height;
+            const imageData = ctx.createImageData(w, h);
+            const data = imageData.data;
+            
+            for (let y = 0; y < h; y += 2) {
+                for (let x = 0; x < w; x += 2) {
+                    // Animated gradient
+                    const t = time * 0.0001;
+                    const cx = x / w - 0.5;
+                    const cy = y / h - 0.5;
+                    const dist = Math.sqrt(cx * cx + cy * cy);
+                    
+                    const r = Math.sin(dist * 5 - t) * 0.5 + 0.5;
+                    const g = Math.sin(dist * 5 - t + 2) * 0.5 + 0.5;
+                    const b = Math.sin(dist * 5 - t + 4) * 0.5 + 0.5;
+                    
+                    // Apply Bayer dithering
+                    const threshold = normalizedBayer[y % 4][x % 4];
+                    const ditheredR = r > threshold ? 1 : 0;
+                    const ditheredG = g > threshold ? 1 : 0;
+                    const ditheredB = b > threshold ? 1 : 0;
+                    
+                    // Reduced color palette (8 colors)
+                    const paletteR = ditheredR * 255;
+                    const paletteG = ditheredG * 255;
+                    const paletteB = ditheredB * 255;
+                    
+                    // Fill 2x2 block
+                    for (let dy = 0; dy < 2 && y + dy < h; dy++) {
+                        for (let dx = 0; dx < 2 && x + dx < w; dx++) {
+                            const idx = ((y + dy) * w + (x + dx)) * 4;
+                            data[idx] = paletteR * 0.3 + 26;     // Dark blue base
+                            data[idx + 1] = paletteG * 0.3 + 26;
+                            data[idx + 2] = paletteB * 0.5 + 46;
+                            data[idx + 3] = 255;
+                        }
+                    }
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+            heroAnimationId = requestAnimationFrame(renderHero);
+        }
+        
+        // ============ BAYER SECTION - Ordered Dithering ============
+        const bayerCanvas = document.getElementById('bayerCanvas');
+        let bayerCtx;
+        
+        function initBayer() {
+            resizeCanvas(bayerCanvas);
+            bayerCtx = bayerCanvas.getContext('2d');
+            renderBayer();
+        }
+        
+        function renderBayer() {
+            const ctx = bayerCtx;
+            const w = bayerCanvas.width;
+            const h = bayerCanvas.height;
+            const imageData = ctx.createImageData(w, h);
+            const data = imageData.data;
+            
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    // Radial gradient
+                    const cx = x / w - 0.5;
+                    const cy = y / h - 0.5;
+                    const dist = Math.sqrt(cx * cx + cy * cy) * 2;
+                    
+                    const brightness = Math.max(0, 1 - dist);
+                    const threshold = normalizedBayer[y % 4][x % 4];
+                    
+                    // 4-level dithering
+                    let level;
+                    if (brightness > threshold * 0.75 + 0.25) {
+                        level = 1;
+                    } else if (brightness > threshold * 0.5) {
+                        level = 0.66;
+                    } else if (brightness > threshold * 0.25) {
+                        level = 0.33;
+                    } else {
+                        level = 0;
+                    }
+                    
+                    const idx = (y * w + x) * 4;
+                    data[idx] = level * 199 + 45;     // Red tint
+                    data[idx + 1] = level * 44 + 19;
+                    data[idx + 2] = level * 65 + 54;
+                    data[idx + 3] = 255;
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+        
+        // ============ FLOYD-STEINBERG SECTION ============
+        const floydCanvas = document.getElementById('floydCanvas');
+        let floydCtx;
+        
+        function initFloyd() {
+            resizeCanvas(floydCanvas);
+            floydCtx = floydCanvas.getContext('2d');
+            renderFloyd();
+        }
+        
+        function renderFloyd() {
+            const ctx = floydCtx;
+            const w = floydCanvas.width;
+            const h = floydCanvas.height;
+            const imageData = ctx.createImageData(w, h);
+            const data = imageData.data;
+            
+            // Create grayscale gradient
+            const grayscale = new Float32Array(w * h);
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const t = (x / w + y / h) / 2;
+                    grayscale[y * w + x] = t;
+                }
+            }
+            
+            // Apply Floyd-Steinberg dithering
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const idx = y * w + x;
+                    const oldPixel = grayscale[idx];
+                    const newPixel = oldPixel > 0.5 ? 1 : 0;
+                    const error = oldPixel - newPixel;
+                    
+                    grayscale[idx] = newPixel;
+                    
+                    // Distribute error
+                    if (x + 1 < w) grayscale[idx + 1] += error * 7 / 16;
+                    if (x - 1 >= 0 && y + 1 < h) grayscale[idx + w - 1] += error * 3 / 16;
+                    if (y + 1 < h) grayscale[idx + w] += error * 5 / 16;
+                    if (x + 1 < w && y + 1 < h) grayscale[idx + w + 1] += error * 1 / 16;
+                }
+            }
+            
+            // Render with blue tint
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const idx = (y * w + x) * 4;
+                    const val = grayscale[y * w + x] * 255;
+                    data[idx] = val * 0.2 + 27;
+                    data[idx + 1] = val * 0.5 + 75;
+                    data[idx + 2] = val * 0.9 + 184;
+                    data[idx + 3] = 255;
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+        
+        // ============ BLUE NOISE SECTION ============
+        const blueCanvas = document.getElementById('blueCanvas');
+        let blueCtx, blueNoisePattern;
+        
+        function initBlue() {
+            resizeCanvas(blueCanvas);
+            blueCtx = blueCanvas.getContext('2d');
+            blueNoisePattern = generateBlueNoise(64, 64);
+            renderBlue();
+        }
+        
+        function renderBlue() {
+            const ctx = blueCtx;
+            const w = blueCanvas.width;
+            const h = blueCanvas.height;
+            const imageData = ctx.createImageData(w, h);
+            const data = imageData.data;
+            
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    // Diagonal gradient
+                    const t = (x / w + y / h) / 2;
+                    
+                    // Sample blue noise
+                    const noiseIdx = (y % 64) * 64 + (x % 64);
+                    const noiseVal = blueNoisePattern[noiseIdx];
+                    
+                    // Apply dithering with blue noise
+                    const dithered = t > noiseVal ? 1 : 0;
+                    const val = dithered * 255;
+                    
+                    const idx = (y * w + x) * 4;
+                    data[idx] = val;
+                    data[idx + 1] = val;
+                    data[idx + 2] = val;
+                    data[idx + 3] = 255;
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+        
+        // ============ FLOW FIELD SECTION ============
+        const flowCanvas = document.getElementById('flowCanvas');
+        let flowCtx, flowAnimationId;
+        let flowTime = 0;
+        
+        function initFlow() {
+            resizeCanvas(flowCanvas);
+            flowCtx = flowCanvas.getContext('2d');
+        }
+        
+        function renderFlow(time) {
+            flowTime += 0.005;
+            const ctx = flowCtx;
+            const w = flowCanvas.width;
+            const h = flowCanvas.height;
+            const imageData = ctx.createImageData(w, h);
+            const data = imageData.data;
+            
+            for (let y = 0; y < h; y += 2) {
+                for (let x = 0; x < w; x += 2) {
+                    // Flow field based on sine waves
+                    const scale = 0.005;
+                    const angle = noise(x * scale + flowTime, y * scale) * Math.PI * 2;
+                    const flowVal = (Math.sin(angle) + 1) / 2;
+                    
+                    // Apply Bayer dithering
+                    const threshold = normalizedBayer[y % 4][x % 4];
+                    const dithered = flowVal > threshold ? 1 : 0;
+                    
+                    // Purple/pink palette
+                    const r = dithered * 255;
+                    const g = dithered * 107 + 42;
+                    const b = dithered * 155 + 157;
+                    
+                    // Fill 2x2 block
+                    for (let dy = 0; dy < 2 && y + dy < h; dy++) {
+                        for (let dx = 0; dx < 2 && x + dx < w; dx++) {
+                            const idx = ((y + dy) * w + (x + dx)) * 4;
+                            data[idx] = r * 0.4 + 44;
+                            data[idx + 1] = g * 0.3;
+                            data[idx + 2] = b * 0.6 + 62;
+                            data[idx + 3] = 255;
+                        }
+                    }
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+            flowAnimationId = requestAnimationFrame(renderFlow);
+        }
+        
+        // ============ CRT SECTION ============
+        const crtCanvas = document.getElementById('crtCanvas');
+        const noiseCanvas = document.getElementById('noiseCanvas');
+        let crtCtx, noiseCtx, crtAnimationId;
+        
+        function initCRT() {
+            resizeCanvas(crtCanvas);
+            resizeCanvas(noiseCanvas);
+            crtCtx = crtCanvas.getContext('2d');
+            noiseCtx = noiseCanvas.getContext('2d');
+        }
+        
+        function renderCRT(time) {
+            const ctx = crtCtx;
+            const w = crtCanvas.width;
+            const h = crtCanvas.height;
+            const imageData = ctx.createImageData(w, h);
+            const data = imageData.data;
+            
+            for (let y = 0; y < h; y++) {
+                // Scanline effect
+                const scanline = (y % 3) === 0 ? 0.3 : 1;
+                
+                for (let x = 0; x < w; x++) {
+                    // Phosphor glow simulation
+                    const cx = x / w - 0.5;
+                    const cy = y / h - 0.5;
+                    const dist = Math.sqrt(cx * cx + cy * cy);
+                    
+                    let brightness = (1 - dist) * scanline;
+                    
+                    // Apply Bayer dithering
+                    const threshold = normalizedBayer[y % 4][x % 4];
+                    brightness = brightness > threshold ? 1 : 0;
+                    
+                    // Phosphor color
+                    const idx = (y * w + x) * 4;
+                    data[idx] = brightness * 100;       // Low red
+                    data[idx + 1] = brightness * 150;   // Medium green
+                    data[idx + 2] = brightness * 255;   // High blue
+                    data[idx + 3] = 255;
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+            
+            // Render noise overlay
+            const noiseImageData = noiseCtx.createImageData(w, h);
+            const noiseData = noiseImageData.data;
+            for (let i = 0; i < noiseData.length; i += 4) {
+                const n = Math.random() * 50;
+                noiseData[i] = n;
+                noiseData[i + 1] = n;
+                noiseData[i + 2] = n;
+                noiseData[i + 3] = 30;
+            }
+            noiseCtx.putImageData(noiseImageData, 0, 0);
+            
+            crtAnimationId = requestAnimationFrame(renderCRT);
+        }
+        
+        // ============ INITIALIZATION ============
+        function init() {
+            initHero();
+            initBayer();
+            initFloyd();
+            initBlue();
+            initFlow();
+            initCRT();
+            
+            // Start animations
+            requestAnimationFrame(renderHero);
+            requestAnimationFrame(renderFlow);
+            requestAnimationFrame(renderCRT);
+        }
+        
+        // Handle resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                init();
+            }, 200);
+        });
+        
+        // Start
+        init();
+    </script>
+</body>
+</html>

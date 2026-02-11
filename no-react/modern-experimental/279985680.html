@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-EXPERIMENTAL // 279985680</title>
+    <!--
+    DESIGN GENESIS // SEED: 279985680
+    -----------------------------------
+    1. Layout Strategy: Kinetic Typography + Experimental Bauhaus (Digit 2 % 3 = 2)
+    2. Primary Technique: Scroll-Driven Animations + Stroke Text (Digit 7 % 5 = 2)
+    3. Secondary Technique: Aurora Blobs Animated (Digit 9 % 5 = 4)
+    4. Typography: Sans-Serif Bold Variable (Digit 9 % 3 = 0)
+    5. Color Direction: Monochrome Brutalism w/ Electric Blue (Digit 8 % 4 = 0)
+    6. Micro-interaction: Scroll-triggered Text Scramble (Digit 5 % 3 = 2)
+    7. Content: Hard Sectioning / Brutalist (Digit 6 % 2 = 0)
+    8. Theme Toggle: Glitch Switch (Digit 8 % 2 = 0)
+    9. Logo: Geometric Symbol (Digit 0)
+
+    AESTHETIC CHOICES:
+    - High contrast, intentional white space.
+    - Massive stroke text that fills on scroll.
+    - Magnetic feel to navigation elements.
+    - Grainy aurora blobs for depth without traditional "gradients".
+    - Fully semantic HTML5.
+    -->
+
+    <!-- External Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- GSAP for Experimental Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #0a0a0a;
+            --accent: #0047ff;
+            --secondary: #e0e0e0;
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Outfit', sans-serif;
+            --noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3Detailed-filter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --text: #ffffff;
+            --accent: #22d3ee;
+            --secondary: #1a1a1a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        /* --- BACKGROUND NOISE & AURORA --- */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.15;
+            z-index: 9999;
+            pointer-events: none;
+            background-image: var(--noise);
+        }
+
+        .aurora-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            filter: blur(100px);
+            opacity: 0.4;
+            overflow: hidden;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--accent);
+            width: 40vw;
+            height: 40vw;
+            animation: drift 20s infinite alternate;
+        }
+
+        .aurora-blob:nth-child(2) {
+            background: var(--text);
+            opacity: 0.2;
+            width: 30vw;
+            height: 30vw;
+            right: 0;
+            bottom: 0;
+            animation-duration: 25s;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(-20%, -20%) rotate(0deg);
+            }
+
+            to {
+                transform: translate(20%, 20%) rotate(360deg);
+            }
+        }
+
+        /* --- HEADER & NAV --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--text);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .theme-toggle:hover {
+            background: var(--text);
+            color: var(--bg);
+            transform: skewX(-10deg);
+        }
+
+        /* --- SECTIONS --- */
+        section {
+            min-height: 100vh;
+            padding: 8rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .hero {
+            display: flex;
+            align-items: flex-start;
+            padding-top: 12rem;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 15vw, 12rem);
+            line-height: 0.85;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+        }
+
+        .stroke-text {
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--text);
+            transition: color 0.5s;
+        }
+
+        .sub-hero {
+            margin-top: 2rem;
+            max-width: 600px;
+            font-size: 1.25rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        /* --- KINETIC GRID --- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: minmax(300px, auto);
+            gap: 1rem;
+            margin-top: 4rem;
+        }
+
+        .bento-item {
+            background: var(--secondary);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bento-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .bento-item.tall {
+            grid-row: span 2;
+        }
+
+        .bento-item h3 {
+            font-size: 2rem;
+            text-transform: uppercase;
+            font-family: var(--font-display);
+        }
+
+        .scramble {
+            display: inline-block;
+        }
+
+        /* --- ANIMATIONS --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1.5rem 3rem;
+            background: var(--text);
+            color: var(--bg);
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-top: 3rem;
+            font-family: var(--font-display);
+            position: relative;
+            border: none;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: "CLICK CLICK CLICK";
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .cta-button:hover::before {
+            transform: translateY(-100%);
+        }
+
+        /* --- MOBILE ADAPTATION --- */
+        @media (max-width: 768px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bento-item.large,
+            .bento-item.tall {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+
+            h1 {
+                font-size: 5rem;
+            }
+
+            header {
+                padding: 1rem;
+            }
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+            mix-blend-mode: difference;
+        }
+
+        /* --- UTILS --- */
+        .magnetic {
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="noise-overlay"></div>
+    <div class="aurora-container">
+        <div class="aurora-blob"></div>
+        <div class="aurora-blob"></div>
+    </div>
+    <div class="cursor"></div>
+
+    <header>
+        <div class="logo magnetic" data-force="0.5">X-UNIT</div>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="theme-btn">Light Mode</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section class="hero" id="home">
+            <h1 class="reveal"><span class="stroke-text">Modern</span><br>Experimental</h1>
+            <p class="sub-hero reveal">We build digital structures that defy the mundane. A kinetic exploration of
+                space, time, and bold typography. Seeded by randomness, designed by logic.</p>
+            <div class="reveal">
+                <a href="#work" class="cta-button">Explore Labs</a>
+            </div>
+        </section>
+
+        <!-- BENTO SECTION -->
+        <section id="work">
+            <h2 class="reveal stroke-text"
+                style="font-size: 5rem; font-family: var(--font-display); font-weight: 900; text-transform: uppercase;">
+                Selected Artifacts</h2>
+            <div class="bento-grid">
+                <div class="bento-item large reveal">
+                    <p class="scramble" data-text="AESTHETIC-01">AESTHETIC-01</p>
+                    <h3>Fluid<br>Dynamics</h3>
+                    <p>Physics-based layouts for the modern web.</p>
+                </div>
+                <div class="bento-item reveal">
+                    <p>SYSTEM</p>
+                    <h3>Core</h3>
+                </div>
+                <div class="bento-item tall reveal">
+                    <p>METRICS</p>
+                    <h3 style="font-size: 4rem;">99%</h3>
+                    <p>Precision in experimental rendering techniques.</p>
+                </div>
+                <div class="bento-item reveal">
+                    <p>STATUS</p>
+                    <h3>Live</h3>
+                </div>
+                <div class="bento-item reveal">
+                    <p>PROTOCOL</p>
+                    <h3>X-27</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- KINETIC TYPO SECTION -->
+        <section id="vision">
+            <div class="kinetic-text-wrap">
+                <h2 class="reveal" style="font-size: clamp(3rem, 10vw, 8rem); font-weight: 900; line-height: 1;">
+                    <span class="stroke-text">BEYOND</span> LIMITS<br>
+                    <span class="stroke-text">BREAK</span> RULES<br>
+                    <span class="stroke-text">CREATE</span> FUTURE
+                </h2>
+            </div>
+            <p class="sub-hero reveal" style="margin-top: 4rem;">Architecture is not just about buildings; it's about
+                the space between thoughts. Our code is the catalyst.</p>
+        </section>
+
+        <!-- FOOTER -->
+        <footer
+            style="padding: 4rem 2rem; background: var(--secondary); display: flex; flex-direction: column; align-items: center; gap: 2rem;">
+            <p style="font-weight: 900; text-transform: uppercase; letter-spacing: 2px;">PROJECT: 279985680</p>
+            <p style="font-size: 0.8rem; opacity: 0.6;">© 2026 AWARD-WINNING AGENCY. NO RIGHTS RESERVED.</p>
+        </footer>
+    </main>
+
+    <script>
+        // Init Smooth Scroll (Lenis)
+        const lenis = new Lenis();
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // GSAP Plugins
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Theme Toggle
+        const themeBtn = document.getElementById('theme-btn');
+        const body = document.body;
+        let isDark = true;
+
+        // Set default to dark
+        body.setAttribute('data-theme', 'dark');
+        themeBtn.innerText = 'Light Mode';
+
+        themeBtn.addEventListener('click', () => {
+            isDark = !isDark;
+            body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            themeBtn.innerText = isDark ? 'Light Mode' : 'Dark Mode';
+
+            // Glitch effect on toggle
+            gsap.to("body", {
+                opacity: 0.5,
+                duration: 0.05,
+                repeat: 3,
+                yoyo: true,
+                onComplete: () => gsap.to("body", { opacity: 1, duration: 0.1 })
+            });
+        });
+
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, {
+                x: e.clientX - 10,
+                y: e.clientY - 10,
+                duration: 0.1
+            });
+        });
+
+        document.querySelectorAll('a, button, .magnetic').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(cursor, { scale: 3, background: 'var(--accent)', opacity: 0.3 });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursor, { scale: 1, background: 'transparent', opacity: 1 });
+            });
+        });
+
+        // Magnetic Effect
+        document.querySelectorAll('.magnetic').forEach(el => {
+            const force = el.dataset.force || 0.3;
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = (e.clientX - rect.left - rect.width / 2) * force;
+                const y = (e.clientY - rect.top - rect.height / 2) * force;
+                gsap.to(el, { x, y, duration: 0.3 });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(el, { x: 0, y: 0, duration: 0.3 });
+            });
+        });
+
+        // Reveal Animations: Changed to .to because CSS already sets opacity to 0
+        document.querySelectorAll('.reveal').forEach(el => {
+            gsap.to(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 90%",
+                },
+                y: 0,
+                opacity: 1,
+                duration: 1.2,
+                ease: "expo.out"
+            });
+        });
+
+        // Stroke to Fill Scroll Animation
+        gsap.to('.hero h1 .stroke-text', {
+            scrollTrigger: {
+                trigger: '.hero',
+                start: "top top",
+                end: "bottom center",
+                scrub: true
+            },
+            color: 'var(--text)',
+            webkitTextStroke: '0px var(--text)'
+        });
+
+        // Text Scramble Effect
+        function scrambleText(element) {
+            const originalText = element.dataset.text;
+            const chars = '!<>-_\\/[]{}—=+*^?#________';
+            let iteration = 0;
+
+            const interval = setInterval(() => {
+                element.innerText = originalText.split('')
+                    .map((char, index) => {
+                        if (index < iteration) return originalText[index];
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    })
+                    .join('');
+
+                if (iteration >= originalText.length) clearInterval(interval);
+                iteration += 1 / 3;
+            }, 30);
+        }
+
+        document.querySelectorAll('.scramble').forEach(el => {
+            ScrollTrigger.create({
+                trigger: el,
+                onEnter: () => scrambleText(el)
+            });
+        });
+
+        // Parallax Aurora
+        window.addEventListener('scroll', () => {
+            const scroll = window.pageYOffset;
+            gsap.to('.aurora-blob', {
+                y: scroll * 0.2,
+                duration: 0.5
+            });
+        });
+
+    </script>
+</body>
+
+</html>

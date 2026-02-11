@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOCTURNE // CRYSTAL — Seed 129958952</title>
+    <meta name="description"
+        content="A unique 3D landing page experience generated with seed 129958952 featuring crystalline fluid dynamics and neo-brutalist design.">
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;700;900&family=Playfair+Display:ital,wght@1,700;1,900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* 
+        DESIGN CHOICES - SEED: 129958952
+        1 (Palette): Deep Nocturne - High contrast black/blue with cyan accents.
+        2 (3D Scene): Crystalline Fluid - Refractive morphing geometry.
+        9 (Typography): Neo-Brutalist - Overlapping 'Outfit' and 'Playfair Display'.
+        9 (Animation): Hyper-Elastic - High energy, springy transitions.
+        5 (Layout): Fragmented Core - Non-linear content arrangement.
+        8 (Interaction): Magnetism - Dynamic cursor distortion.
+        */
+
+        :root {
+            --bg: #03040a;
+            --accent: #00f2ff;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --font-main: 'Outfit', sans-serif;
+            --font-accent: 'Playfair Display', serif;
+            --glare: rgba(0, 242, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            line-height: 1.4;
+        }
+
+        canvas#webgl {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            color: var(--accent);
+        }
+
+        .nav-toggle {
+            width: 30px;
+            height: 2px;
+            background: var(--text-primary);
+            position: relative;
+        }
+
+        .nav-toggle::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 0;
+            width: 20px;
+            height: 2px;
+            background: var(--text-primary);
+        }
+
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10vw;
+            position: relative;
+        }
+
+        .hero {
+            padding-top: 20vh;
+        }
+
+        .hero h1 {
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 0.8;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .hero h1 span.italic {
+            font-family: var(--font-accent);
+            display: block;
+            margin-left: 20vw;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--accent);
+        }
+
+        .hero .desc {
+            max-width: 400px;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .fragment-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+            margin-top: 10vh;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            grid-column: span 6;
+            transition: border-color 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+        }
+
+        .card h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 8vw, 5rem);
+            margin-bottom: 4rem;
+        }
+
+        .magnetic-btn {
+            display: inline-block;
+            padding: 1.5rem 3rem;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s ease;
+        }
+
+        .magnetic-btn:hover {
+            color: var(--bg);
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--accent);
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: -1;
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .magnetic-btn:hover::before {
+            width: 300%;
+            height: 300%;
+        }
+
+        footer {
+            padding: 4rem 10vw;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 span.italic {
+                margin-left: 0;
+            }
+
+            .card {
+                grid-column: span 12;
+            }
+
+            .hero .desc {
+                text-align: left;
+                margin-left: 0;
+            }
+        }
+
+        /* Distortion mask for custom cursor effect */
+        .cursor-blob {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--glare) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="cursor-blob" id="blob"></div>
+    <canvas id="webgl"></canvas>
+
+    <header>
+        <div class="logo">NC.129958952</div>
+        <div class="nav-toggle"></div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 id="hero-title">
+                Beyond <br>
+                <span class="italic">Substance</span>
+            </h1>
+            <p class="desc">
+                Engaging the digital landscape through generative crystalline structures and fluid interactive
+                experiences.
+            </p>
+            <a href="#" class="magnetic-btn">Explore Grid</a>
+        </section>
+
+        <section id="vision">
+            <h2 class="section-title">The Vision</h2>
+            <div class="fragment-grid">
+                <div class="card reveal">
+                    <h3>01 // Form</h3>
+                    <p>Minimalist geometry meets organic movement. Every interaction reshapes the void into a concrete
+                        reality.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>02 // Light</h3>
+                    <p>Refraction as a medium. We use light to guide the user through complex data structures
+                        effortlessly.</p>
+                </div>
+                <div class="card reveal" style="grid-column: span 4;">
+                    <h3>03 // Velocity</h3>
+                    <p>Optimized at every level to ensure 60FPS on even the most delicate mobile devices.</p>
+                </div>
+                <div class="card reveal" style="grid-column: span 8;">
+                    <h3>04 // Synesthesia</h3>
+                    <p>Visual movement translated into a sensory experience for the browser. A new paradigm of web
+                        interaction.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="cta">
+            <h2 class="section-title">Connect <br> <span
+                    style="font-family: var(--font-accent); font-style: italic;">Reality.</span></h2>
+            <p style="max-width: 600px; margin-bottom: 2rem;">Ready to transcend standard web limitations? Let's build
+                the future together.</p>
+            <a href="mailto:hello@nocturne.xyz" class="magnetic-btn">Send Signal</a>
+        </section>
+    </main>
+
+    <footer>
+        <div>© 2026 NOCTURNE AGENCY</div>
+        <div>SEED: 129958952 // 3D RENDER ENGINE</div>
+    </footer>
+
+    <!-- Three.js Scene Setup -->
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({
+            canvas: document.querySelector('#webgl'),
+            antialias: true,
+            alpha: true
+        });
+
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // Geometry - Seed Choice: Crystalline Fluid
+        const geometry = new THREE.IcosahedronGeometry(2, 40);
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x00f2ff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.15,
+            shininess: 100
+        });
+
+        const sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
+
+        // Lights
+        const pointLight = new THREE.PointLight(0x00f2ff, 2);
+        pointLight.position.x = 2;
+        pointLight.position.y = 3;
+        pointLight.position.z = 4;
+        scene.add(pointLight);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+        scene.add(ambientLight);
+
+        camera.position.z = 5;
+
+        // Animation Loop Variables
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) - 0.5;
+            mouseY = (event.clientY / window.innerHeight) - 0.5;
+
+            // Magnetic Blob
+            gsap.to('#blob', {
+                duration: 0.6,
+                x: event.clientX,
+                y: event.clientY,
+                ease: 'power2.out'
+            });
+        });
+
+        const originalPositions = geometry.attributes.position.array.slice();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = Date.now() * 0.001;
+
+            // Morphing Crystal Effect
+            const positions = geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = originalPositions[i];
+                const y = originalPositions[i + 1];
+                const z = originalPositions[i + 2];
+
+                const noise = Math.sin(x * 1.5 + time) * 0.2 + Math.cos(y * 1.5 + time) * 0.2;
+                positions[i] = x * (1 + noise);
+                positions[i + 1] = y * (1 + noise);
+                positions[i + 2] = z * (1 + noise);
+            }
+            geometry.attributes.position.needsUpdate = true;
+
+            // Interaction Rotation
+            sphere.rotation.y += 0.005;
+            sphere.rotation.x += 0.005;
+
+            gsap.to(sphere.rotation, {
+                y: mouseX * 2,
+                x: -mouseY * 2,
+                duration: 2,
+                ease: 'power2.out'
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle Window Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // GSAP Scroll Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.to(sphere.position, {
+            z: -2,
+            y: -1,
+            scrollTrigger: {
+                trigger: 'body',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 1
+            }
+        });
+
+        gsap.from('#hero-title', {
+            y: 100,
+            opacity: 0,
+            duration: 1.5,
+            ease: "elastic.out(1, 0.75)"
+        });
+
+        gsap.utils.toArray('.reveal').forEach(card => {
+            gsap.from(card, {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>

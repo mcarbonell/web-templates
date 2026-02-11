@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | Alex Chen - Creative Developer</title>
+  <meta name="description" content="Get in touch with Alex Chen for your next digital project. Let's create something amazing together.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  
+  <!-- Page-specific Critical CSS -->
+  <style>
+    /* Page Header */
+    .page-header {
+      padding: calc(var(--header-height) + var(--space-2xl)) 0 var(--space-xl);
+      text-align: center;
+      position: relative;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-mesh);
+      opacity: 0.5;
+      z-index: 0;
+    }
+    
+    .page-header-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .page-header h1 {
+      margin-bottom: var(--space-md);
+    }
+    
+    .page-header p {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Contact Layout (Digit 5 = 2: Slightly rounded, moderate density) */
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: var(--space-3xl);
+      align-items: start;
+    }
+    
+    /* Contact Info Sidebar */
+    .contact-info {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-lg));
+    }
+    
+    .contact-method {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-md);
+      border-radius: var(--radius-md);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .contact-method:hover {
+      background: var(--color-bg-card);
+    }
+    
+    .contact-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient-hero);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    
+    .contact-method-content h3 {
+      font-size: 1.125rem;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .contact-method-content p {
+      font-size: 0.9375rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .contact-method-content a {
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+    
+    /* Social Links */
+    .contact-social {
+      margin-top: var(--space-xl);
+      padding-top: var(--space-xl);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .contact-social h3 {
+      font-size: 1.125rem;
+      margin-bottom: var(--space-md);
+    }
+    
+    .social-grid {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .social-grid a {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .social-grid a:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    
+    /* Contact Form */
+    .contact-form-wrapper {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-2xl);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .contact-form-wrapper h2 {
+      margin-bottom: var(--space-md);
+    }
+    
+    .contact-form-wrapper > p {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    
+    .form-field.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    .form-field label {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+    
+    .form-field label span {
+      color: var(--color-secondary);
+    }
+    
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      padding: var(--space-md);
+      background: var(--color-bg-dark);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-md);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary);
+      font-size: 1rem;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      background: var(--color-bg-elevated);
+    }
+    
+    .form-field textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+    
+    .form-field select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0a0b0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--space-md) center;
+      padding-right: calc(var(--space-md) + 20px);
+    }
+    
+    .budget-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+    
+    .budget-option {
+      position: relative;
+    }
+    
+    .budget-option input {
+      position: absolute;
+      opacity: 0;
+    }
+    
+    .budget-option label {
+      display: block;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-bg-dark);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+      font-size: 0.9375rem;
+    }
+    
+    .budget-option input:checked + label {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-bg-darker);
+    }
+    
+    .form-submit {
+      margin-top: var(--space-xl);
+    }
+    
+    .form-submit .btn {
+      width: 100%;
+      padding: var(--space-md) var(--space-xl);
+    }
+    
+    /* Map Section */
+    .map-section {
+      background: var(--color-bg-darker);
+    }
+    
+    .map-container {
+      height: 400px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .map-placeholder {
+      width: 100%;
+      height: 100%;
+      background: var(--color-bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    
+    .map-placeholder-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--gradient-hero);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    /* Availability Status */
+    .availability-status {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(0,245,255,0.1);
+      border: 1px solid rgba(0,245,255,0.2);
+      border-radius: var(--radius-xl);
+      font-size: 0.875rem;
+      color: var(--color-primary);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .availability-status::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--color-primary);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* FAQ Mini */
+    .faq-mini {
+      margin-top: var(--space-2xl);
+      padding-top: var(--space-xl);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .faq-mini h3 {
+      font-size: 1.125rem;
+      margin-bottom: var(--space-md);
+    }
+    
+    .faq-mini-list {
+      list-style: none;
+    }
+    
+    .faq-mini-list li {
+      padding: var(--space-sm) 0;
+    }
+    
+    .faq-mini-list a {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .faq-mini-list a::before {
+      content: '→';
+      color: var(--color-primary);
+    }
+    
+    .faq-mini-list a:hover {
+      color: var(--color-primary);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .contact-layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-2xl);
+      }
+      
+      .contact-info {
+        position: relative;
+        top: 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-md);
+      }
+      
+      .contact-method {
+        margin-bottom: 0;
+      }
+      
+      .contact-social {
+        grid-column: 1 / -1;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .contact-info {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .contact-form-wrapper {
+        padding: var(--space-lg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header" data-header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">
+          <span class="logo-text">AC</span>
+        </a>
+        
+        <nav class="main-nav" data-main-nav>
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="about.html" class="nav-link">About</a></li>
+            <li><a href="services.html" class="nav-link">Services</a></li>
+            <li><a href="case-studies.html" class="nav-link">Work</a></li>
+            <li><a href="blog.html" class="nav-link">Blog</a></li>
+            <li><a href="contact.html" class="nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+            <span class="theme-icon">🌙</span>
+          </button>
+          <a href="contact.html" class="btn btn-primary btn-sm">Let's Talk</a>
+          <button class="mobile-toggle" data-mobile-toggle aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <main>
+    <!-- Page Header -->
+    <section class="page-header">
+      <div class="container">
+        <div class="page-header-content reveal">
+          <h1>Let's <span class="text-gradient">Connect</span></h1>
+          <p>Have a project in mind? I'd love to hear about it. Let's discuss how we can work together to bring your vision to life.</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section class="section">
+      <div class="container">
+        <div class="contact-layout">
+          <!-- Contact Info -->
+          <aside class="contact-info reveal">
+            <div class="contact-method">
+              <div class="contact-icon">📧</div>
+              <div class="contact-method-content">
+                <h3>Email</h3>
+                <p>Best for project inquiries</p>
+                <a href="mailto:hello@alexchen.dev">hello@alexchen.dev</a>
+              </div>
+            </div>
+            
+            <div class="contact-method">
+              <div class="contact-icon">📱</div>
+              <div class="contact-method-content">
+                <h3>Phone</h3>
+                <p>Mon-Fri, 9am-6pm PST</p>
+                <a href="tel:+1234567890">+1 (234) 567-890</a>
+              </div>
+            </div>
+            
+            <div class="contact-method">
+              <div class="contact-icon">📍</div>
+              <div class="contact-method-content">
+                <h3>Location</h3>
+                <p>Based in</p>
+                <span style="color: var(--color-primary); font-weight: 600;">San Francisco, CA</span>
+              </div>
+            </div>
+            
+            <div class="contact-method">
+              <div class="contact-icon">💬</div>
+              <div class="contact-method-content">
+                <h3>Calendly</h3>
+                <p>Schedule a call</p>
+                <a href="#">Book a 30-min call</a>
+              </div>
+            </div>
+            
+            <div class="contact-social">
+              <h3>Follow Me</h3>
+              <div class="social-grid">
+                <a href="#" aria-label="Twitter">𝕏</a>
+                <a href="#" aria-label="LinkedIn">in</a>
+                <a href="#" aria-label="GitHub">⌘</a>
+                <a href="#" aria-label="Dribbble">🏀</a>
+                <a href="#" aria-label="Instagram">📷</a>
+              </div>
+            </div>
+          </aside>
+          
+          <!-- Contact Form -->
+          <div class="contact-form-wrapper reveal">
+            <div class="availability-status">Currently accepting new projects</div>
+            <h2>Send a Message</h2>
+            <p>Fill out the form below and I'll get back to you within 24 hours.</p>
+            
+            <form class="contact-form" data-validate>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="name">Name <span>*</span></label>
+                  <input type="text" id="name" name="name" placeholder="Your name" data-validate-field="required" required>
+                </div>
+                
+                <div class="form-field">
+                  <label for="email">Email <span>*</span></label>
+                  <input type="email" id="email" name="email" placeholder="your@email.com" data-validate-field="email" required>
+                </div>
+                
+                <div class="form-field">
+                  <label for="company">Company</label>
+                  <input type="text" id="company" name="company" placeholder="Your company">
+                </div>
+                
+                <div class="form-field">
+                  <label for="service">Service Interested In</label>
+                  <select id="service" name="service">
+                    <option value="">Select a service</option>
+                    <option value="web-dev">Web Development</option>
+                    <option value="design">UI/UX Design</option>
+                    <option value="branding">Branding</option>
+                    <option value="consulting">Consulting</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <div class="form-field full-width">
+                  <label>Budget Range</label>
+                  <div class="budget-options">
+                    <div class="budget-option">
+                      <input type="radio" id="budget-1" name="budget" value="2-5k">
+                      <label for="budget-1">$2k - $5k</label>
+                    </div>
+                    <div class="budget-option">
+                      <input type="radio" id="budget-2" name="budget" value="5-10k">
+                      <label for="budget-2">$5k - $10k</label>
+                    </div>
+                    <div class="budget-option">
+                      <input type="radio" id="budget-3" name="budget" value="10-25k">
+                      <label for="budget-3">$10k - $25k</label>
+                    </div>
+                    <div class="budget-option">
+                      <input type="radio" id="budget-4" name="budget" value="25k+">
+                      <label for="budget-4">$25k+</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="form-field full-width">
+                  <label for="message">Project Details <span>*</span></label>
+                  <textarea id="message" name="message" placeholder="Tell me about your project, goals, and timeline..." data-validate-field="required" required></textarea>
+                </div>
+              </div>
+              
+              <div class="form-submit">
+                <button type="submit" class="btn btn-primary">Send Message</button>
+              </div>
+            </form>
+            
+            <div class="faq-mini">
+              <h3>Quick Links</h3>
+              <ul class="faq-mini-list">
+                <li><a href="services.html">View all services</a></li>
+                <li><a href="pricing.html">Check pricing</a></li>
+                <li><a href="case-studies.html">See my work</a></li>
+                <li><a href="resources.html">Download resources</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Map Section -->
+    <section class="section map-section">
+      <div class="container">
+        <div class="section-header reveal text-center">
+          <h2>Find <span class="text-gradient">Me</span></h2>
+          <p>Based in San Francisco, working with clients worldwide.</p>
+        </div>
+        
+        <div class="map-container reveal">
+          <div class="map-placeholder">
+            <div class="map-placeholder-icon">📍</div>
+            <p>San Francisco, California</p>
+            <p style="color: var(--color-text-muted);">Available for remote work worldwide</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-text">AC</span>
+          </a>
+          <p>Creative developer & designer crafting digital experiences that make an impact.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="GitHub">⌘</a>
+            <a href="#" aria-label="Dribbble">🏀</a>
+          </div>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="case-studies.html">Work</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="services.html">Web Development</a></li>
+            <li><a href="services.html">UI/UX Design</a></li>
+            <li><a href="services.html">Branding</a></li>
+            <li><a href="services.html">Consulting</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hello@alexchen.dev">hello@alexchen.dev</a></li>
+            <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
+            <li>San Francisco, CA</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Alex Chen. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  
+  <!-- Shared Component Styles -->
+  <style>
+    /* Header Styles */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: var(--header-height);
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+    
+    .header.is-scrolled {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .header.is-hidden {
+      transform: translateY(-100%);
+    }
+    
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+    
+    .logo {
+      font-family: var(--font-primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    
+    .logo-text {
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .main-nav {
+      display: flex;
+    }
+    
+    .nav-list {
+      display: flex;
+      gap: var(--space-xl);
+      list-style: none;
+    }
+    
+    .nav-link {
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      position: relative;
+      padding: var(--space-sm) 0;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-hero);
+      transition: width var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .nav-link:hover,
+    .nav-link.is-active {
+      color: var(--color-text-primary);
+    }
+    
+    .nav-link:hover::after,
+    .nav-link.is-active::after {
+      width: 100%;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: var(--color-primary);
+    }
+    
+    .btn-sm {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.875rem;
+    }
+    
+    .mobile-toggle {
+      display: none;
+      width: 40px;
+      height: 40px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    
+    .mobile-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--color-text-primary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    /* Footer Styles */
+    .footer {
+      background: var(--color-bg-darker);
+      padding: var(--space-2xl) 0 var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .footer-brand p {
+      margin: var(--space-md) 0 var(--space-lg);
+      font-size: 1rem;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .social-links a:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    
+    .footer-nav h4 {
+      font-size: 1rem;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text-primary);
+    }
+    
+    .footer-nav ul {
+      list-style: none;
+    }
+    
+    .footer-nav li {
+      margin-bottom: var(--space-sm);
+    }
+    
+    .footer-nav a {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+      transition: color var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .footer-nav a:hover {
+      color: var(--color-primary);
+    }
+    
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-bottom p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    .footer-legal {
+      display: flex;
+      gap: var(--space-lg);
+    }
+    
+    .footer-legal a {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-nav {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        background: var(--color-bg-card);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: var(--space-lg);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--duration-normal) var(--ease-out-expo);
+      }
+      
+      .main-nav.is-open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .nav-list {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+      
+      .mobile-toggle {
+        display: flex;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-md);
+        text-align: center;
+      }
+    }
+  </style>
+</body>
+</html>

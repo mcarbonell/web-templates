@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitalHub.fit - Wellness & Spa Sanctuary</title>
+    <!-- 
+    DESIGN CHOICES FOR LANDING #879510048
+    =====================================
+    Business Type: Massage therapists, spas, wellness centers
+    Brand: VitalHub.fit
+    
+    Hero Layout (6): Split-screen diagonal with overlapping elements
+    Color Scheme (3): Earthy terracotta (#D4745E) & sage green (#8B9D83) with cream (#F5F1E8)
+    Typography (1): Modern serif (Playfair Display) + clean sans-serif (Inter)
+    Special Feature (4): Smooth scroll-triggered reveal animations
+    Animation (5): Elastic easing with staggered delays
+    Section Layout (3): Asymmetric grid with floating cards
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --terracotta: #D4745E;
+            --sage: #8B9D83;
+            --cream: #F5F1E8;
+            --dark: #2C2C2C;
+            --light: #FFFFFF;
+            --accent: #E8A87C;
+            --shadow: rgba(0, 0, 0, 0.1);
+            
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            
+            --transition: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        [data-theme="dark"] {
+            --terracotta: #E88B75;
+            --sage: #A4B89D;
+            --cream: #1A1A1A;
+            --dark: #F5F1E8;
+            --light: #0F0F0F;
+            --accent: #F0B890;
+            --shadow: rgba(255, 255, 255, 0.05);
+        }
+        
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--cream);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--cream);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--terracotta);
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--terracotta);
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--dark);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s var(--transition);
+        }
+        
+        .theme-toggle:hover {
+            transform: rotate(180deg);
+            border-color: var(--terracotta);
+        }
+        
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--dark);
+        }
+        
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .mobile-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: var(--dark);
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+        
+        /* Hero Section - Split Diagonal */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            padding: 4rem;
+            z-index: 2;
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: slideInLeft 1s var(--transition) forwards;
+        }
+        
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--terracotta);
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            color: var(--sage);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+        
+        .hero-text {
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            max-width: 500px;
+            line-height: 1.8;
+        }
+        
+        .cta-group {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s var(--transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: var(--terracotta);
+            color: var(--light);
+        }
+        
+        .btn-primary:hover {
+            background: var(--sage);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--dark);
+            border: 2px solid var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--dark);
+            color: var(--cream);
+            transform: translateY(-3px);
+        }
+        
+        .hero-visual {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideInRight 1s var(--transition) 0.3s forwards;
+        }
+        
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .hero-image-wrapper {
+            position: relative;
+            width: 80%;
+            aspect-ratio: 3/4;
+            clip-path: polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%);
+            background: linear-gradient(135deg, var(--terracotta), var(--sage));
+            overflow: hidden;
+        }
+        
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+        }
+        
+        .floating-card {
+            position: absolute;
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px var(--shadow);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .floating-card-1 {
+            top: 10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-card-2 {
+            bottom: 15%;
+            right: -10%;
+            animation-delay: 2s;
+        }
+        
+        .card-number {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            color: var(--terracotta);
+            font-weight: 700;
+        }
+        
+        .card-label {
+            font-size: 0.9rem;
+            color: var(--sage);
+            font-weight: 600;
+        }
+        
+        /* Services Section - Asymmetric Grid */
+        .services {
+            padding: 8rem 0;
+            background: var(--light);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+        
+        .section-tag {
+            font-size: 0.9rem;
+            color: var(--sage);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-description {
+            font-size: 1.2rem;
+            color: var(--sage);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+        
+        .service-card {
+            background: var(--cream);
+            padding: 3rem;
+            border-radius: 30px;
+            transition: all 0.5s var(--transition);
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .service-card.reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px var(--shadow);
+        }
+        
+        .service-card:nth-child(1) { transition-delay: 0.1s; }
+        .service-card:nth-child(2) { transition-delay: 0.2s; }
+        .service-card:nth-child(3) { transition-delay: 0.3s; }
+        .service-card:nth-child(4) { transition-delay: 0.4s; }
+        .service-card:nth-child(5) { transition-delay: 0.5s; }
+        .service-card:nth-child(6) { transition-delay: 0.6s; }
+        
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--terracotta), var(--sage));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .service-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--light);
+        }
+        
+        .service-title {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .service-description {
+            color: var(--sage);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .service-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--terracotta);
+        }
+        
+        /* About Section */
+        .about {
+            padding: 8rem 0;
+            background: var(--cream);
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+        
+        .about-image-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.8s var(--transition);
+        }
+        
+        .about-image-grid.reveal {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .about-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 20px;
+        }
+        
+        .about-img:nth-child(1) {
+            grid-row: span 2;
+            height: 100%;
+        }
+        
+        .about-text {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.8s var(--transition);
+        }
+        
+        .about-text.reveal {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .about-text h2 {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin-bottom: 2rem;
+            color: var(--dark);
+        }
+        
+        .about-text p {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            color: var(--sage);
+            margin-bottom: 1.5rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            color: var(--terracotta);
+            font-weight: 700;
+        }
+        
+        .stat-label {
+            color: var(--sage);
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 8rem 0;
+            background: var(--light);
+        }
+        
+        .testimonials-slider {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+        
+        .testimonial-card {
+            background: var(--cream);
+            padding: 3rem;
+            border-radius: 30px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s var(--transition);
+        }
+        
+        .testimonial-card.reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .testimonial-card:nth-child(1) { transition-delay: 0.1s; }
+        .testimonial-card:nth-child(2) { transition-delay: 0.2s; }
+        .testimonial-card:nth-child(3) { transition-delay: 0.3s; }
+        
+        .quote-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--terracotta), var(--sage));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .quote-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--light);
+        }
+        
+        .testimonial-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--dark);
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--terracotta), var(--sage));
+        }
+        
+        .author-info h4 {
+            color: var(--dark);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .author-info p {
+            color: var(--sage);
+            font-size: 0.9rem;
+        }
+        
+        .rating {
+            display: flex;
+            gap: 0.25rem;
+            margin-top: 1rem;
+        }
+        
+        .star {
+            width: 20px;
+            height: 20px;
+            fill: var(--terracotta);
+        }
+        
+        /* Gallery */
+        .gallery {
+            padding: 8rem 0;
+            background: var(--cream);
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 4rem;
+        }
+        
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 1;
+            overflow: hidden;
+            border-radius: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.6s var(--transition);
+        }
+        
+        .gallery-item.reveal {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .gallery-item:nth-child(1) { transition-delay: 0.1s; }
+        .gallery-item:nth-child(2) { transition-delay: 0.2s; }
+        .gallery-item:nth-child(3) { transition-delay: 0.3s; }
+        .gallery-item:nth-child(4) { transition-delay: 0.4s; }
+        .gallery-item:nth-child(5) { transition-delay: 0.5s; }
+        .gallery-item:nth-child(6) { transition-delay: 0.6s; }
+        
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .gallery-item:hover .gallery-img {
+            transform: scale(1.1);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        .gallery-title {
+            color: var(--light);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        /* Pricing */
+        .pricing {
+            padding: 8rem 0;
+            background: var(--light);
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+        
+        .pricing-card {
+            background: var(--cream);
+            padding: 3rem;
+            border-radius: 30px;
+            text-align: center;
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s var(--transition);
+        }
+        
+        .pricing-card.reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .pricing-card:nth-child(1) { transition-delay: 0.1s; }
+        .pricing-card:nth-child(2) { transition-delay: 0.2s; }
+        .pricing-card:nth-child(3) { transition-delay: 0.3s; }
+        
+        .pricing-card.featured {
+            background: linear-gradient(135deg, var(--terracotta), var(--sage));
+            color: var(--light);
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.featured.reveal {
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.featured:hover {
+            transform: scale(1.08);
+        }
+        
+        .pricing-badge {
+            position: absolute;
+            top: -15px;
+            right: 30px;
+            background: var(--terracotta);
+            color: var(--light);
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .pricing-card.featured .pricing-badge {
+            background: var(--light);
+            color: var(--terracotta);
+        }
+        
+        .pricing-name {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .pricing-amount {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--terracotta);
+            margin: 2rem 0;
+        }
+        
+        .pricing-card.featured .pricing-amount {
+            color: var(--light);
+        }
+        
+        .pricing-duration {
+            font-size: 1rem;
+            color: var(--sage);
+            margin-bottom: 2rem;
+        }
+        
+        .pricing-card.featured .pricing-duration {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        
+        .pricing-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            fill: var(--sage);
+        }
+        
+        .pricing-card.featured .check-icon {
+            fill: var(--light);
+        }
+        
+        /* Contact */
+        .contact {
+            padding: 8rem 0;
+            background: var(--cream);
+        }
+        
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            margin-top: 4rem;
+        }
+        
+        .contact-info {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s var(--transition);
+        }
+        
+        .contact-info.reveal {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .contact-info h3 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--dark);
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--terracotta), var(--sage));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .contact-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--light);
+        }
+        
+        .contact-details h4 {
+            color: var(--dark);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .contact-details p {
+            color: var(--sage);
+            line-height: 1.6;
+        }
+        
+        .contact-form {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.8s var(--transition);
+        }
+        
+        .contact-form.reveal {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--shadow);
+            border-radius: 15px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            background: var(--light);
+            color: var(--dark);
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--terracotta);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: var(--cream);
+            padding: 4rem 0 2rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-section h3 {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--terracotta);
+        }
+        
+        .footer-section p,
+        .footer-section a {
+            color: var(--cream);
+            line-height: 1.8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-section a:hover {
+            color: var(--terracotta);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: var(--terracotta);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background: var(--sage);
+            transform: translateY(-3px);
+        }
+        
+        .social-link svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--light);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: var(--sage);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding-top: 100px;
+            }
+            
+            .hero-content {
+                padding: 2rem;
+            }
+            
+            .hero-visual {
+                padding: 2rem;
+                margin-top: 3rem;
+            }
+            
+            .about-content,
+            .contact-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: var(--cream);
+                flex-direction: column;
+                padding: 3rem;
+                transition: left 0.3s ease;
+            }
+            
+            .nav-links.active {
+                left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .cta-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .services-grid,
+            .testimonials-slider,
+            .gallery-grid,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .floating-card {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#" class="logo">VitalHub</a>
+            <ul class="nav-links">
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#testimonials">Reviews</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </button>
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Restore Your Balance</h1>
+            <p class="hero-subtitle">Premium Wellness & Spa Experience</p>
+            <p class="hero-text">
+                Discover tranquility and rejuvenation at VitalHub. Our expert therapists combine 
+                ancient healing techniques with modern wellness practices to help you achieve 
+                optimal health and relaxation.
+            </p>
+            <div class="cta-group">
+                <a href="#contact" class="btn btn-primary">Book Appointment</a>
+                <a href="#services" class="btn btn-secondary">View Services</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-image-wrapper">
+                <svg class="hero-image" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#D4745E;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:#8B9D83;stop-opacity:0.3" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="400" height="600" fill="url(#grad1)"/>
+                    <circle cx="200" cy="200" r="80" fill="#8B9D83" opacity="0.4"/>
+                    <circle cx="150" cy="350" r="60" fill="#D4745E" opacity="0.3"/>
+                    <circle cx="280" cy="450" r="70" fill="#8B9D83" opacity="0.35"/>
+                    <path d="M100,100 Q200,150 300,100" stroke="#D4745E" stroke-width="3" fill="none" opacity="0.5"/>
+                    <path d="M80,300 Q200,250 320,300" stroke="#8B9D83" stroke-width="3" fill="none" opacity="0.5"/>
+                </svg>
+            </div>
+            <div class="floating-card floating-card-1">
+                <div class="card-number">15+</div>
+                <div class="card-label">Years Experience</div>
+            </div>
+            <div class="floating-card floating-card-2">
+                <div class="card-number">5K+</div>
+                <div class="card-label">Happy Clients</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Our Services</div>
+                <h2 class="section-title">Tailored Wellness Solutions</h2>
+                <p class="section-description">
+                    From therapeutic massage to holistic spa treatments, we offer a comprehensive 
+                    range of services designed to nurture your body, mind, and spirit.
+                </p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Deep Tissue Massage</h3>
+                    <p class="service-description">
+                        Target chronic muscle tension and knots with our therapeutic deep tissue massage. 
+                        Perfect for athletes and those with persistent pain.
+                    </p>
+                    <div class="service-price">$95</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.86-.96-7-5.54-7-10V8.3l7-3.11 7 3.11V10c0 4.46-3.14 9.04-7 10z"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Swedish Relaxation</h3>
+                    <p class="service-description">
+                        Experience ultimate relaxation with gentle, flowing strokes designed to 
+                        reduce stress and promote overall wellness.
+                    </p>
+                    <div class="service-price">$85</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Hot Stone Therapy</h3>
+                    <p class="service-description">
+                        Heated stones melt away tension and improve circulation, creating a 
+                        deeply soothing and therapeutic experience.
+                    </p>
+                    <div class="service-price">$110</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Aromatherapy Session</h3>
+                    <p class="service-description">
+                        Combine massage with essential oils to enhance relaxation, reduce anxiety, 
+                        and promote emotional balance.
+                    </p>
+                    <div class="service-price">$100</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Prenatal Massage</h3>
+                    <p class="service-description">
+                        Specially designed for expectant mothers to relieve pregnancy-related 
+                        discomfort and promote relaxation.
+                    </p>
+                    <div class="service-price">$95</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Couples Retreat</h3>
+                    <p class="service-description">
+                        Share a relaxing experience with your partner in our private couples suite 
+                        with synchronized treatments.
+                    </p>
+                    <div class="service-price">$180</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-image-grid">
+                    <svg class="about-img" viewBox="0 0 300 500" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="300" height="500" fill="#8B9D83" opacity="0.2"/>
+                        <circle cx="150" cy="150" r="80" fill="#D4745E" opacity="0.3"/>
+                        <circle cx="100" cy="350" r="60" fill="#8B9D83" opacity="0.4"/>
+                    </svg>
+                    <svg class="about-img" viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="300" height="250" fill="#D4745E" opacity="0.2"/>
+                        <circle cx="150" cy="125" r="50" fill="#8B9D83" opacity="0.4"/>
+                    </svg>
+                    <svg class="about-img" viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="300" height="250" fill="#8B9D83" opacity="0.25"/>
+                        <path d="M50,125 Q150,75 250,125" stroke="#D4745E" stroke-width="3" fill="none" opacity="0.5"/>
+                    </svg>
+                </div>
+                <div class="about-text">
+                    <div class="section-tag">About Us</div>
+                    <h2>Your Journey to Wellness Starts Here</h2>
+                    <p>
+                        Founded in 2009, VitalHub has been a sanctuary for those seeking balance, 
+                        healing, and rejuvenation. Our team of certified therapists brings over 
+                        15 years of combined experience in various massage modalities and holistic 
+                        wellness practices.
+                    </p>
+                    <p>
+                        We believe that true wellness encompasses body, mind, and spirit. That's why 
+                        we've created a serene environment where you can escape the stresses of daily 
+                        life and reconnect with your inner peace.
+                    </p>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-number">5000+</div>
+                            <div class="stat-label">Happy Clients</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">15+</div>
+                            <div class="stat-label">Years Experience</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">98%</div>
+                            <div class="stat-label">Satisfaction Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Testimonials</div>
+                <h2 class="section-title">What Our Clients Say</h2>
+                <p class="section-description">
+                    Don't just take our word for it. Hear from our satisfied clients about 
+                    their transformative experiences at VitalHub.
+                </p>
+            </div>
+            <div class="testimonials-slider">
+                <div class="testimonial-card">
+                    <div class="quote-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+                        </svg>
+                    </div>
+                    <p class="testimonial-text">
+                        "The deep tissue massage was exactly what I needed after months of back pain. 
+                        The therapist was incredibly skilled and attentive. I left feeling like a 
+                        new person!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <h4>Sarah Mitchell</h4>
+                            <p>Marketing Director</p>
+                        </div>
+                    </div>
+                    <div class="rating">
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="quote-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+                        </svg>
+                    </div>
+                    <p class="testimonial-text">
+                        "My partner and I booked the couples retreat for our anniversary. The 
+                        experience was magical - from the ambiance to the synchronized massage. 
+                        Highly recommend!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <h4>James Rodriguez</h4>
+                            <p>Software Engineer</p>
+                        </div>
+                    </div>
+                    <div class="rating">
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="quote-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+                        </svg>
+                    </div>
+                    <p class="testimonial-text">
+                        "As a pregnant woman, finding a comfortable massage was challenging until 
+                        I discovered VitalHub. Their prenatal massage is gentle yet effective. 
+                        I feel so much better!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <h4>Emily Chen</h4>
+                            <p>Teacher</p>
+                        </div>
+                    </div>
+                    <div class="rating">
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery" id="gallery">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Gallery</div>
+                <h2 class="section-title">Our Serene Space</h2>
+                <p class="section-description">
+                    Take a virtual tour of our tranquil wellness center designed for your comfort and relaxation.
+                </p>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <svg class="gallery-img" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="400" fill="#8B9D83" opacity="0.3"/>
+                        <circle cx="200" cy="200" r="100" fill="#D4745E" opacity="0.4"/>
+                        <text x="200" y="210" text-anchor="middle" fill="#2C2C2C" font-size="20" font-family="Arial">Treatment Room</text>
+                    </svg>
+                    <div class="gallery-overlay">
+                        <h3 class="gallery-title">Treatment Room</h3>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <svg class="gallery-img" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="400" fill="#D4745E" opacity="0.3"/>
+                        <circle cx="200" cy="200" r="80" fill="#8B9D83" opacity="0.4"/>
+                        <text x="200" y="210" text-anchor="middle" fill="#2C2C2C" font-size="20" font-family="Arial">Reception Area</text>
+                    </svg>
+                    <div class="gallery-overlay">
+                        <h3 class="gallery-title">Reception Area</h3>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <svg class="gallery-img" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="400" fill="#8B9D83" opacity="0.25"/>
+                        <circle cx="150" cy="150" r="60" fill="#D4745E" opacity="0.3"/>
+                        <circle cx="280" cy="280" r="70" fill="#8B9D83" opacity="0.4"/>
+                        <text x="200" y="210" text-anchor="middle" fill="#2C2C2C" font-size="20" font-family="Arial">Relaxation Lounge</text>
+                    </svg>
+                    <div class="gallery-overlay">
+                        <h3 class="gallery-title">Relaxation Lounge</h3>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <svg class="gallery-img" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="400" fill="#D4745E" opacity="0.25"/>
+                        <path d="M100,200 Q200,100 300,200 Q200,300 100,200" fill="#8B9D83" opacity="0.4"/>
+                        <text x="200" y="210" text-anchor="middle" fill="#2C2C2C" font-size="20" font-family="Arial">Couples Suite</text>
+                    </svg>
+                    <div class="gallery-overlay">
+                        <h3 class="gallery-title">Couples Suite</h3>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <svg class="gallery-img" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="400" fill="#8B9D83" opacity="0.3"/>
+                        <circle cx="200" cy="150" r="50" fill="#D4745E" opacity="0.4"/>
+                        <circle cx="200" cy="280" r="60" fill="#8B9D83" opacity="0.5"/>
+                        <text x="200" y="210" text-anchor="middle" fill="#2C2C2C" font-size="20" font-family="Arial">Aromatherapy Room</text>
+                    </svg>
+                    <div class="gallery-overlay">
+                        <h3 class="gallery-title">Aromatherapy Room</h3>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <svg class="gallery-img" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="400" fill="#D4745E" opacity="0.3"/>
+                        <rect x="100" y="100" width="200" height="200" fill="#8B9D83" opacity="0.4" rx="20"/>
+                        <text x="200" y="210" text-anchor="middle" fill="#2C2C2C" font-size="20" font-family="Arial">Meditation Space</text>
+                    </svg>
+                    <div class="gallery-overlay">
+                        <h3 class="gallery-title">Meditation Space</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Pricing</div>
+                <h2 class="section-title">Membership Plans</h2>
+                <p class="section-description">
+                    Choose the perfect plan for your wellness journey. All plans include access 
+                    to our relaxation lounge and complimentary herbal tea.
+                </p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3 class="pricing-name">Essential</h3>
+                    <div class="pricing-amount">$99</div>
+                    <p class="pricing-duration">per month</p>
+                    <ul class="pricing-features">
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>2 Massages per month</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>10% off additional services</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Lounge access</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Priority booking</span>
+                        </li>
+                    </ul>
+                    <a href="#contact" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Get Started</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Most Popular</div>
+                    <h3 class="pricing-name">Premium</h3>
+                    <div class="pricing-amount">$179</div>
+                    <p class="pricing-duration">per month</p>
+                    <ul class="pricing-features">
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>4 Massages per month</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>20% off additional services</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Unlimited lounge access</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Free aromatherapy upgrade</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Guest passes (2/month)</span>
+                        </li>
+                    </ul>
+                    <a href="#contact" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Get Started</a>
+                </div>
+                <div class="pricing-card">
+                    <h3 class="pricing-name">Elite</h3>
+                    <div class="pricing-amount">$299</div>
+                    <p class="pricing-duration">per month</p>
+                    <ul class="pricing-features">
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Unlimited massages</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>30% off all services</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>VIP lounge access</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Complimentary upgrades</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Personal wellness consultant</span>
+                        </li>
+                        <li>
+                            <svg class="check-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Guest passes (5/month)</span>
+                        </li>
+                    </ul>
+                    <a href="#contact" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Contact Us</div>
+                <h2 class="section-title">Book Your Appointment</h2>
+                <p class="section-description">
+                    Ready to begin your wellness journey? Get in touch with us today.
+                </p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Visit Us</h3>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Address</h4>
+                            <p>123 Wellness Boulevard<br>Serenity District, CA 90210</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Phone</h4>
+                            <p>(555) 123-4567<br>Mon-Sat: 9AM - 8PM</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Email</h4>
+                            <p>hello@vitalhub.fit<br>info@vitalhub.fit</p>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="service">Preferred Service</label>
+                        <input type="text" id="service" name="service" placeholder="e.g., Deep Tissue Massage">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" placeholder="Tell us about your wellness goals..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>VitalHub</h3>
+                    <p>
+                        Your sanctuary for wellness, healing, and rejuvenation. 
+                        Experience the perfect balance of ancient wisdom and modern techniques.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                                <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="#services">Services</a>
+                    <a href="#about">About Us</a>
+                    <a href="#testimonials">Testimonials</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <a href="#services">Deep Tissue Massage</a>
+                    <a href="#services">Swedish Relaxation</a>
+                    <a href="#services">Hot Stone Therapy</a>
+                    <a href="#services">Aromatherapy</a>
+                    <a href="#services">Prenatal Massage</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Hours</h3>
+                    <p>Monday - Friday: 9AM - 8PM</p>
+                    <p>Saturday: 10AM - 6PM</p>
+                    <p>Sunday: Closed</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 VitalHub.fit. All rights reserved. | Privacy Policy | Terms of Service</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const theme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        });
+        
+        // Mobile Menu Toggle
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navLinks = document.querySelector('.nav-links');
+        
+        mobileToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+        
+        // Scroll Reveal Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all animated elements
+        document.querySelectorAll('.service-card, .testimonial-card, .gallery-item, .pricing-card, .about-image-grid, .about-text, .contact-info, .contact-form').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Form Submission
+        const contactForm = document.querySelector('.contact-form');
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Thank you for your message! We will get back to you within 24 hours.');
+            contactForm.reset();
+        });
+        
+        // Navbar scroll effect
+        let lastScroll = 0;
+        const nav = document.querySelector('.nav');
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                nav.style.boxShadow = '0 2px 20px var(--shadow)';
+            } else {
+                nav.style.boxShadow = 'none';
+            }
+            
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>

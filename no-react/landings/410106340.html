@@ -1,0 +1,1016 @@
+<!--
+  LANDING PAGE - SEED: 410106340
+  
+  SEED DECOMPOSITION & DESIGN CHOICES:
+  =====================================
+  4 → Primary: Teal/Cyan (#0891b2, hsl 187°)
+  1 → Layout: Asymmetric diagonal cuts
+  0 → Animation: Subtle fade-in transitions
+  1 → Typography: Space Grotesk (geometric)
+  0 → Cards: Glassmorphism blur effect
+  6 → Accent: Warm Coral (#f97316)
+  3 → Grid: 3-column asymmetric layouts
+  4 → Buttons: Pill-shaped with glow
+  0 → Spacing: Extra generous whitespace
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Vertex — Digital Innovation Platform</title>
+    <meta name="description" content="Next-generation digital solutions for modern enterprises">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* SEED 410106340: CSS Variables derived from decomposition */
+        :root {
+            --primary: #0891b2;
+            /* Digit 4: Cyan/Teal */
+            --primary-dark: #0e7490;
+            --accent: #f97316;
+            /* Digit 6: Coral */
+            --accent-light: #fb923c;
+            --bg: #fafafa;
+            --bg-alt: #f0f9ff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --border: rgba(8, 145, 178, 0.1);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            --glow: 0 0 40px rgba(8, 145, 178, 0.3);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0c1222;
+            --bg-alt: #111827;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(17, 24, 39, 0.8);
+            --border: rgba(8, 145, 178, 0.2);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 60px rgba(8, 145, 178, 0.4);
+        }
+
+        /* Digit 0: Subtle animation base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            /* Digit 1: Geometric font */
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.4s, color 0.4s;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            /* Digit 0: Glassmorphism */
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            width: 48px;
+            height: 26px;
+            background: var(--border);
+            border-radius: 13px;
+            cursor: pointer;
+            position: relative;
+            border: none;
+            transition: background 0.3s;
+        }
+
+        .theme-toggle::after {
+            content: '☀️';
+            position: absolute;
+            left: 3px;
+            top: 2px;
+            width: 22px;
+            height: 22px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: 0.3s;
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+        }
+
+        [data-theme="dark"] .theme-toggle::after {
+            left: 23px;
+            content: '🌙';
+        }
+
+        /* HERO - Digit 1: Asymmetric diagonal */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 150%;
+            background: var(--bg-alt);
+            transform: rotate(-12deg);
+            /* Digit 1: Diagonal cut */
+            z-index: -1;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            right: 10%;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: var(--primary);
+            opacity: 0.1;
+            filter: blur(80px);
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            /* Digit 4: Pill shape */
+            font-size: 0.875rem;
+            color: var(--primary);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .hero-tag::before {
+            content: '✦';
+            color: var(--accent);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            /* Digit 0: Generous spacing */
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 480px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 50px;
+            /* Digit 4: Pill buttons */
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--glow);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Hero Visual */
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            /* Digit 0: Glassmorphism */
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .hero-card-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot:nth-child(1) {
+            background: #ef4444;
+        }
+
+        .dot:nth-child(2) {
+            background: #eab308;
+        }
+
+        .dot:nth-child(3) {
+            background: #22c55e;
+        }
+
+        .code-block {
+            background: var(--bg-alt);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .code-block .keyword {
+            color: var(--primary);
+        }
+
+        .code-block .string {
+            color: var(--accent);
+        }
+
+        /* STATS */
+        .stats {
+            padding: 80px 0;
+            background: var(--bg-alt);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            /* Digit 3 influenced */
+            gap: 32px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+        }
+
+        /* FEATURES - Digit 3: 3-column grid */
+        .features {
+            padding: 120px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto 80px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            /* Digit 3: 3 columns */
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px 32px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-alt);
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* SHOWCASE */
+        .showcase {
+            padding: 120px 0;
+            background: var(--bg-alt);
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .showcase-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .showcase-content p {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            margin-bottom: 32px;
+        }
+
+        .check-list {
+            list-style: none;
+        }
+
+        .check-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            color: var(--text);
+        }
+
+        .check-list li::before {
+            content: '✓';
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .showcase-visual {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .showcase-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+        }
+
+        .showcase-card:nth-child(2) {
+            transform: translateY(40px);
+        }
+
+        .showcase-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .showcase-card h4 {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .showcase-card p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* TESTIMONIALS */
+        .testimonials {
+            padding: 120px 0;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .testimonial-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+        }
+
+        .testimonial-card p {
+            font-size: 1.05rem;
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .author-info h5 {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .author-info span {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* CTA */
+        .cta {
+            padding: 120px 0;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.05;
+        }
+
+        .cta h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .cta p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .cta .btn-primary {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: none;
+        }
+
+        .cta .btn-primary:hover {
+            background: #f0f0f0;
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 80px 0 40px;
+            background: var(--bg-alt);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand .logo {
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            max-width: 280px;
+        }
+
+        .footer-col h4 {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .footer-col a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 6px 0;
+            transition: color 0.3s;
+        }
+
+        .footer-col a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Digit 0 - Fade-in animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+
+            .hero-content,
+            .showcase-grid {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+
+            .features-grid,
+            .testimonial-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links a:not(:last-child) {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+
+            .features-grid,
+            .testimonial-grid,
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .showcase-visual {
+                grid-template-columns: 1fr;
+            }
+
+            .showcase-card:nth-child(2) {
+                transform: none;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-brand p {
+                margin: 0 auto;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .section-header h2,
+            .showcase-content h2 {
+                font-size: 2rem;
+            }
+
+            .cta h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- NAV -->
+    <nav>
+        <div class="container">
+            <div class="logo">Vertex<span>.</span></div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#showcase">Solutions</a>
+                <a href="#testimonials">Clients</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="fade-in">
+                    <span class="hero-tag">Launching Innovation</span>
+                    <h1>Build the <span class="gradient">Future</span> of Digital</h1>
+                    <p>Transform your ideas into powerful digital experiences with our cutting-edge platform designed
+                        for modern creators.</p>
+                    <div class="btn-group">
+                        <a href="#" class="btn btn-primary">Start Free Trial</a>
+                        <a href="#" class="btn btn-secondary">Watch Demo</a>
+                    </div>
+                </div>
+                <div class="hero-visual fade-in">
+                    <div class="hero-card">
+                        <div class="hero-card-header"><span class="dot"></span><span class="dot"></span><span
+                                class="dot"></span></div>
+                        <div class="code-block">
+                            <span class="keyword">const</span> vertex = <span class="keyword">await</span> <span
+                                class="string">init</span>();<br><br>
+                            vertex.<span class="string">deploy</span>({<br>
+                            &nbsp;&nbsp;scale: <span class="string">'infinite'</span>,<br>
+                            &nbsp;&nbsp;speed: <span class="string">'blazing'</span><br>
+                            });
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item fade-in">
+                    <div class="stat-value">10K+</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-item fade-in">
+                    <div class="stat-value">99.9%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+                <div class="stat-item fade-in">
+                    <div class="stat-value">50M+</div>
+                    <div class="stat-label">API Requests</div>
+                </div>
+                <div class="stat-item fade-in">
+                    <div class="stat-value">150+</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header fade-in">
+                <span class="section-tag">Features</span>
+                <h2>Everything You Need to Scale</h2>
+                <p>Powerful tools and integrations to accelerate your development workflow.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Optimized performance with edge computing and global CDN distribution.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure by Default</h3>
+                    <p>Enterprise-grade security with end-to-end encryption and compliance.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📊</div>
+                    <h3>Real-time Analytics</h3>
+                    <p>Deep insights and metrics to understand your users and optimize growth.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔌</div>
+                    <h3>Easy Integration</h3>
+                    <p>Connect with 200+ tools and services through our powerful API.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Global Scale</h3>
+                    <p>Deploy worldwide with automatic scaling and load balancing.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI-Powered</h3>
+                    <p>Intelligent automation and machine learning built into every feature.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SHOWCASE -->
+    <section class="showcase" id="showcase">
+        <div class="container">
+            <div class="showcase-grid">
+                <div class="showcase-content fade-in">
+                    <span class="section-tag">Solutions</span>
+                    <h2>Built for Teams of All Sizes</h2>
+                    <p>From startups to enterprises, our platform scales with your ambitions.</p>
+                    <ul class="check-list">
+                        <li>Collaborative workspaces for teams</li>
+                        <li>Advanced permissions and access control</li>
+                        <li>Custom workflows and automation</li>
+                        <li>24/7 dedicated support</li>
+                    </ul>
+                </div>
+                <div class="showcase-visual fade-in">
+                    <div class="showcase-card">
+                        <div class="showcase-card-icon">🚀</div>
+                        <h4>Startups</h4>
+                        <p>Launch faster with our starter toolkit</p>
+                    </div>
+                    <div class="showcase-card">
+                        <div class="showcase-card-icon">🏢</div>
+                        <h4>Enterprise</h4>
+                        <p>Scale securely with custom solutions</p>
+                    </div>
+                    <div class="showcase-card">
+                        <div class="showcase-card-icon">👩‍💻</div>
+                        <h4>Developers</h4>
+                        <p>Build with powerful APIs & SDKs</p>
+                    </div>
+                    <div class="showcase-card">
+                        <div class="showcase-card-icon">🎨</div>
+                        <h4>Creators</h4>
+                        <p>Design stunning experiences easily</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header fade-in">
+                <span class="section-tag">Testimonials</span>
+                <h2>Trusted by Industry Leaders</h2>
+                <p>See what our clients say about working with us.</p>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card fade-in">
+                    <p>"Vertex transformed our development workflow. We shipped 3x faster and with better quality."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SK</div>
+                        <div class="author-info">
+                            <h5>Sarah Kim</h5><span>CTO, TechFlow</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card fade-in">
+                    <p>"The best platform we've ever used. The support team is incredible and the features are
+                        unmatched."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MR</div>
+                        <div class="author-info">
+                            <h5>Marcus Rivera</h5><span>Lead Dev, Innovate</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card fade-in">
+                    <p>"Scaling our application globally was seamless. Vertex handled everything automatically."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AL</div>
+                        <div class="author-info">
+                            <h5>Anna Liu</h5><span>Founder, CloudScale</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Transform Your Workflow?</h2>
+            <p>Join thousands of teams building the future with Vertex.</p>
+            <a href="#" class="btn btn-primary">Get Started Free</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="logo">Vertex<span>.</span></span>
+                    <p>Empowering developers and teams to build exceptional digital experiences.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Product</h4><a href="#">Features</a><a href="#">Pricing</a><a href="#">API</a><a
+                        href="#">Docs</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4><a href="#">About</a><a href="#">Blog</a><a href="#">Careers</a><a
+                        href="#">Contact</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Security</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 Vertex. All rights reserved.</span>
+                <span>Seed: 410106340</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const toggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        const stored = localStorage.getItem('theme');
+        if (stored) html.setAttribute('data-theme', stored);
+        else if (window.matchMedia('(prefers-color-scheme: dark)').matches) html.setAttribute('data-theme', 'dark');
+        toggle.addEventListener('click', () => {
+            const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        });
+
+        // Fade-in on scroll - Digit 0: Subtle animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>

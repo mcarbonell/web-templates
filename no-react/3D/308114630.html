@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Nexus - Digital Innovation Studio</title>
+    
+    <!-- 
+    ============================================
+    DESIGN CHOICES EXPLANATION - Template ID: 308114630
+    ============================================
+    
+    COLOR PALETTE (Roll 1): CYBERPUNK NEON
+    - Primary: Electric Blue (#00f3ff) - represents technology and innovation
+    - Secondary: Hot Pink (#ff00ff) - adds energy and vibrancy
+    - Dark: Deep Purple (#0a0a1a) - creates depth and mystery
+    - Accent: Bright Cyan (#00ffff) - for highlights and glows
+    - Light mode: Clean white with subtle neon tints
+    
+    3D STYLE (Roll 3): MORPHING GEOMETRIC PRISMS
+    - Central wireframe icosahedron using Three.js
+    - Morphs between icosahedron, torus knot, and octahedron
+    - Mouse parallax tracking for immersive depth
+    - Particle constellation field in background
+    - Wireframe aesthetic for digital/tech feel
+    
+    ANIMATION PHILOSOPHY (Roll 2): GLITCH/DISTORTION EFFECTS
+    - Text elements feature cyber-glitch animations on hover
+    - Random glitch bursts on the 3D object
+    - Scanline overlay effect in dark mode
+    - Digital noise texture overlay
+    - GSAP-powered smooth transitions between states
+    
+    LAYOUT STRUCTURE (Roll 2): RADIAL HERO WITH ORBITING ELEMENTS
+    - Central 3D object as focal point
+    - Content cards orbit around center in elliptical paths
+    - Staggered reveal animations radiating from center
+    - Navigation floats at top with glassmorphism
+    - Sections arranged in circular flow pattern
+    
+    ADDITIONAL DESIGN DECISIONS:
+    - Font: Space Grotesk for headers (futuristic), Inter for body
+    - Glassmorphism cards with backdrop blur
+    - Neon glow effects using CSS box-shadows
+    - Mobile: Simplified orbital layout with vertical stack
+    - Performance: requestAnimationFrame for smooth 60fps
+    ============================================
+    -->
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        /* ============================================
+           CSS VARIABLES & THEME SYSTEM
+           ============================================ */
+        :root {
+            /* Dark Mode (Default) - Cyberpunk Neon */
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12121f;
+            --bg-tertiary: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8d1;
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-purple: #b829dd;
+            --glass-bg: rgba(26, 26, 46, 0.7);
+            --glass-border: rgba(0, 243, 255, 0.2);
+            --shadow-glow: rgba(0, 243, 255, 0.3);
+            --scanline-opacity: 0.03;
+            --glitch-intensity: 1;
+        }
+        
+        [data-theme="light"] {
+            /* Light Mode - Clean Minimal with Neon Accents */
+            --bg-primary: #fafafa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f0f0f5;
+            --text-primary: #0a0a1a;
+            --text-secondary: #5a5a6e;
+            --neon-cyan: #0088ff;
+            --neon-pink: #ff0080;
+            --neon-purple: #7c3aed;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(0, 136, 255, 0.3);
+            --shadow-glow: rgba(0, 136, 255, 0.15);
+            --scanline-opacity: 0;
+            --glitch-intensity: 0.3;
+        }
+        
+        /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            min-height: 100vh;
+        }
+        
+        /* Scanline Effect - Dark Mode Only */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, var(--scanline-opacity)),
+                rgba(0, 0, 0, var(--scanline-opacity)) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        /* ============================================
+           TYPOGRAPHY
+           ============================================ */
+        .heading-display {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+        }
+        
+        .heading-section {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        
+        .heading-card {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+            line-height: 1.3;
+        }
+        
+        .text-body {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+        
+        .text-small {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        
+        /* ============================================
+           GLITCH TEXT EFFECT
+           ============================================ */
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.1s ease;
+        }
+        
+        .glitch-text::before {
+            color: var(--neon-cyan);
+            z-index: -1;
+        }
+        
+        .glitch-text::after {
+            color: var(--neon-pink);
+            z-index: -2;
+        }
+        
+        .glitch-text.active::before {
+            opacity: var(--glitch-intensity);
+            animation: glitch-1 0.3s infinite linear alternate-reverse;
+        }
+        
+        .glitch-text.active::after {
+            opacity: var(--glitch-intensity);
+            animation: glitch-2 0.3s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-1 {
+            0% { clip-path: inset(40% 0 61% 0); transform: translate(-2px, 2px); }
+            20% { clip-path: inset(92% 0 1% 0); transform: translate(2px, -2px); }
+            40% { clip-path: inset(43% 0 1% 0); transform: translate(-2px, 2px); }
+            60% { clip-path: inset(25% 0 58% 0); transform: translate(2px, -2px); }
+            80% { clip-path: inset(54% 0 7% 0); transform: translate(-2px, 2px); }
+            100% { clip-path: inset(58% 0 43% 0); transform: translate(2px, -2px); }
+        }
+        
+        @keyframes glitch-2 {
+            0% { clip-path: inset(65% 0 25% 0); transform: translate(2px, -2px); }
+            20% { clip-path: inset(15% 0 4% 0); transform: translate(-2px, 2px); }
+            40% { clip-path: inset(89% 0 11% 0); transform: translate(2px, -2px); }
+            60% { clip-path: inset(33% 0 68% 0); transform: translate(-2px, 2px); }
+            80% { clip-path: inset(71% 0 29% 0); transform: translate(2px, -2px); }
+            100% { clip-path: inset(4% 0 95% 0); transform: translate(-2px, 2px); }
+        }
+        
+        /* ============================================
+           NEON GLOW EFFECTS
+           ============================================ */
+        .neon-glow-cyan {
+            text-shadow: 
+                0 0 10px var(--neon-cyan),
+                0 0 20px var(--neon-cyan),
+                0 0 40px var(--neon-cyan);
+        }
+        
+        .neon-glow-pink {
+            text-shadow: 
+                0 0 10px var(--neon-pink),
+                0 0 20px var(--neon-pink),
+                0 0 40px var(--neon-pink);
+        }
+        
+        .neon-border {
+            border: 1px solid var(--glass-border);
+            box-shadow: 
+                0 0 20px var(--shadow-glow),
+                inset 0 0 20px rgba(0, 243, 255, 0.05);
+        }
+        
+        /* ============================================
+           GLASSMORPHISM COMPONENTS
+           ============================================ */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--neon-cyan);
+            box-shadow: 
+                0 20px 60px var(--shadow-glow),
+                0 0 40px rgba(0, 243, 255, 0.1);
+        }
+        
+        /* ============================================
+           NAVIGATION
+           ============================================ */
+        .navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, transparent 100%);
+        }
+        
+        .nav-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-logo-icon {
+            width: 40px;
+            height: 40px;
+            position: relative;
+        }
+        
+        .nav-logo-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+        
+        .nav-link {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Theme Toggle Button */
+        .theme-toggle {
+            width: 60px;
+            height: 32px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--neon-cyan);
+        }
+        
+        .theme-toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            border-radius: 50%;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .theme-toggle-slider svg {
+            width: 14px;
+            height: 14px;
+            fill: white;
+        }
+        
+        [data-theme="light"] .theme-toggle-slider {
+            transform: translateX(28px);
+        }
+        
+        /* ============================================
+           HERO SECTION - RADIAL LAYOUT
+           ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 8rem 2rem 4rem;
+            overflow: hidden;
+        }
+        
+        .hero-canvas-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        #hero-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 900px;
+        }
+        
+        .hero-eyebrow {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 100px;
+            color: var(--neon-cyan);
+            margin-bottom: 1.5rem;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 243, 255, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(0, 243, 255, 0.6); }
+        }
+        
+        .hero-title {
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-title-accent {
+            color: var(--neon-cyan);
+        }
+        
+        .hero-description {
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            opacity: 0.9;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 1rem 2.5rem;
+            border-radius: 100px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            color: white;
+            box-shadow: 0 4px 30px rgba(0, 243, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px rgba(0, 243, 255, 0.5);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--glass-border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
+        }
+        
+        /* ============================================
+           ORBITING CARDS SECTION
+           ============================================ */
+        .features-section {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+        
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 4rem;
+        }
+        
+        .section-eyebrow {
+            color: var(--neon-pink);
+            margin-bottom: 1rem;
+        }
+        
+        .orbital-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 700px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .orbital-center {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--neon-cyan) 0%, transparent 70%);
+            opacity: 0.3;
+            filter: blur(40px);
+            animation: breathe 4s ease-in-out infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+        }
+        
+        .orbital-card {
+            position: absolute;
+            width: 280px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: transform 0.4s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .orbital-card:hover {
+            transform: scale(1.05) translateY(-10px);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 20px 60px var(--shadow-glow);
+            z-index: 100;
+        }
+        
+        .orbital-card-icon {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .orbital-card-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+        
+        .orbital-card:nth-child(1) { top: 5%; left: 10%; }
+        .orbital-card:nth-child(2) { top: 5%; right: 10%; }
+        .orbital-card:nth-child(3) { top: 40%; left: 5%; }
+        .orbital-card:nth-child(4) { top: 40%; right: 5%; }
+        .orbital-card:nth-child(5) { bottom: 5%; left: 20%; }
+        .orbital-card:nth-child(6) { bottom: 5%; right: 20%; }
+        
+        /* Floating Animation for Cards */
+        .orbital-card:nth-child(odd) {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .orbital-card:nth-child(even) {
+            animation: float 6s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        /* ============================================
+           SHOWCASE SECTION
+           ============================================ */
+        .showcase-section {
+            padding: 6rem 2rem;
+            background: var(--bg-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .showcase-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), transparent);
+        }
+        
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .showcase-item {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            cursor: pointer;
+        }
+        
+        .showcase-item-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .showcase-item:hover .showcase-item-image {
+            transform: scale(1.1);
+        }
+        
+        .showcase-item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 26, 0.9) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .showcase-item:hover .showcase-item-overlay {
+            opacity: 1;
+        }
+        
+        .showcase-item-title {
+            color: white;
+            margin-bottom: 0.5rem;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+        
+        .showcase-item:hover .showcase-item-title {
+            transform: translateY(0);
+        }
+        
+        .showcase-item-category {
+            color: var(--neon-cyan);
+            font-size: 0.875rem;
+            transform: translateY(20px);
+            transition: transform 0.4s ease 0.1s;
+        }
+        
+        .showcase-item:hover .showcase-item-category {
+            transform: translateY(0);
+        }
+        
+        /* ============================================
+           STATS SECTION
+           ============================================ */
+        .stats-section {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        /* ============================================
+           CTA SECTION
+           ============================================ */
+        .cta-section {
+            padding: 8rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 243, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 10;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta-description {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            padding: 3rem 2rem;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        
+        .footer-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: var(--neon-cyan);
+        }
+        
+        .footer-copyright {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* ============================================
+           PARTICLE BACKGROUND
+           ============================================ */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: particle-float 20s infinite linear;
+        }
+        
+        @keyframes particle-float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+        }
+        
+        /* ============================================
+           MOBILE RESPONSIVE
+           ============================================ */
+        @media (max-width: 1024px) {
+            .hero-canvas-container {
+                width: 400px;
+                height: 400px;
+            }
+            
+            .orbital-container {
+                min-height: auto;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+            
+            .orbital-card {
+                position: relative;
+                width: 100%;
+                top: auto !important;
+                left: auto !important;
+                right: auto !important;
+                bottom: auto !important;
+                animation: none !important;
+            }
+            
+            .orbital-center {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navigation {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                padding: 6rem 1rem 3rem;
+            }
+            
+            .hero-canvas-container {
+                width: 300px;
+                height: 300px;
+                opacity: 0.6;
+            }
+            
+            .hero-cta {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .features-section,
+            .showcase-section,
+            .stats-section,
+            .cta-section {
+                padding: 4rem 1rem;
+            }
+            
+            .orbital-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+        
+        /* ============================================
+           REDUCED MOTION
+           ============================================ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .particle {
+                display: none;
+            }
+        }
+        
+        /* ============================================
+           SELECTION STYLES
+           ============================================ */
+        ::selection {
+            background: var(--neon-cyan);
+            color: var(--bg-primary);
+        }
+        
+        /* ============================================
+           SCROLLBAR
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-cyan);
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Background -->
+    <div class="particles-container" id="particles"></div>
+    
+    <!-- Navigation -->
+    <nav class="navigation">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-icon">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="20,2 38,12 38,30 20,38 2,30 2,12" fill="none" stroke="url(#logoGradient)" stroke-width="2"/>
+                    <polygon points="20,10 30,16 30,26 20,32 10,26 10,16" fill="url(#logoGradient)" opacity="0.5"/>
+                    <defs>
+                        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00f3ff"/>
+                            <stop offset="100%" style="stop-color:#ff00ff"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            NEON NEXUS
+        </a>
+        
+        <ul class="nav-links">
+            <li><a href="#features" class="nav-link">Features</a></li>
+            <li><a href="#showcase" class="nav-link">Showcase</a></li>
+            <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+        
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+            <div class="theme-toggle-slider">
+                <svg viewBox="0 0 24 24" id="theme-icon">
+                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+            </div>
+        </button>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-canvas-container">
+            <canvas id="hero-canvas"></canvas>
+        </div>
+        
+        <div class="hero-content">
+            <span class="hero-eyebrow text-small">Digital Innovation Studio</span>
+            <h1 class="hero-title heading-display">
+                We Craft <br>
+                <span class="hero-title-accent neon-glow-cyan glitch-text" data-text="Digital">Digital</span> 
+                <span class="glitch-text" data-text="Realities">Realities</span>
+            </h1>
+            <p class="hero-description text-body">
+                Pushing the boundaries of web experiences with cutting-edge 3D technologies, 
+                immersive animations, and bold design that captivates and converts.
+            </p>
+            <div class="hero-cta">
+                <a href="#showcase" class="btn btn-primary">
+                    View Our Work
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="#contact" class="btn btn-secondary">Get in Touch</a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section - Orbital Layout -->
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <span class="section-eyebrow text-small">What We Do</span>
+            <h2 class="heading-section">Services in Orbit</h2>
+            <p class="text-body">Comprehensive digital solutions that propel your brand into the future.</p>
+        </div>
+        
+        <div class="orbital-container">
+            <div class="orbital-center"></div>
+            
+            <div class="orbital-card glass-card">
+                <div class="orbital-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <h3 class="heading-card">3D Web Experiences</h3>
+                <p class="text-body">Immersive three-dimensional interfaces using Three.js and WebGL technologies.</p>
+            </div>
+            
+            <div class="orbital-card glass-card">
+                <div class="orbital-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3zm0 0l-7-7-3 3 7 7 3-3zm0 0V5"/></svg>
+                </div>
+                <h3 class="heading-card">Motion Design</h3>
+                <p class="text-body">Fluid animations and micro-interactions that bring interfaces to life.</p>
+            </div>
+            
+            <div class="orbital-card glass-card">
+                <div class="orbital-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                </div>
+                <h3 class="heading-card">Brand Identity</h3>
+                <p class="text-body">Distinctive visual systems that capture your brand's unique essence.</p>
+            </div>
+            
+            <div class="orbital-card glass-card">
+                <div class="orbital-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                </div>
+                <h3 class="heading-card">Web Development</h3>
+                <p class="text-body">High-performance, accessible websites built with modern technologies.</p>
+            </div>
+            
+            <div class="orbital-card glass-card">
+                <div class="orbital-card-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+                <h3 class="heading-card">Real-time 3D</h3>
+                <p class="text-body">Interactive product configurators and virtual showrooms.</p>
+            </div>
+            
+            <div class="orbital-card glass-card">
+                <div class="orbital-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <h3 class="heading-card">UI/UX Design</h3>
+                <p class="text-body">User-centered design that delights and drives conversion.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Showcase Section -->
+    <section class="showcase-section" id="showcase">
+        <div class="section-header">
+            <span class="section-eyebrow text-small">Selected Work</span>
+            <h2 class="heading-section glitch-text" data-text="Project Showcase">Project Showcase</h2>
+            <p class="text-body">A curated selection of our most impactful digital experiences.</p>
+        </div>
+        
+        <div class="showcase-grid">
+            <div class="showcase-item">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80" alt="Abstract 3D geometric shapes" class="showcase-item-image">
+                <div class="showcase-item-overlay">
+                    <h3 class="showcase-item-title heading-card">Vertex Finance</h3>
+                    <span class="showcase-item-category">Web Platform / 3D</span>
+                </div>
+            </div>
+            
+            <div class="showcase-item">
+                <img src="https://images.unsplash.com/photo-1634017839464-5c339bbe3c35?w=800&q=80" alt="Neon cyberpunk cityscape" class="showcase-item-image">
+                <div class="showcase-item-overlay">
+                    <h3 class="showcase-item-title heading-card">Neon Horizons</h3>
+                    <span class="showcase-item-category">Brand Identity / Motion</span>
+                </div>
+            </div>
+            
+            <div class="showcase-item">
+                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80" alt="Retro futuristic interface" class="showcase-item-image">
+                <div class="showcase-item-overlay">
+                    <h3 class="showcase-item-title heading-card">Cyber Interface</h3>
+                    <span class="showcase-item-category">UI Design / Development</span>
+                </div>
+            </div>
+            
+            <div class="showcase-item">
+                <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?w=800&q=80" alt="Fluid abstract art" class="showcase-item-image">
+                <div class="showcase-item-overlay">
+                    <h3 class="showcase-item-title heading-card">Flux Agency</h3>
+                    <span class="showcase-item-category">Web Experience / 3D</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="stats-section" id="about">
+        <div class="section-header">
+            <span class="section-eyebrow text-small">By The Numbers</span>
+            <h2 class="heading-section">Impact in Digits</h2>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-target="150">0</div>
+                <div class="stat-label">Projects Delivered</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="50">0</div>
+                <div class="stat-label">Happy Clients</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="12">0</div>
+                <div class="stat-label">Awards Won</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="8">0</div>
+                <div class="stat-label">Years Active</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section" id="contact">
+        <div class="cta-content">
+            <span class="section-eyebrow text-small">Start Your Project</span>
+            <h2 class="cta-title heading-section">Ready to Create Something <span class="glitch-text neon-glow-cyan" data-text="Extraordinary?">Extraordinary?</span></h2>
+            <p class="cta-description text-body">
+                Let's collaborate and build digital experiences that push boundaries 
+                and leave lasting impressions.
+            </p>
+            <a href="mailto:hello@neonnexus.studio" class="btn btn-primary">
+                Start a Conversation
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">NEON NEXUS</div>
+            <ul class="footer-links">
+                <li><a href="#" class="footer-link">Privacy</a></li>
+                <li><a href="#" class="footer-link">Terms</a></li>
+                <li><a href="#" class="footer-link">Twitter</a></li>
+                <li><a href="#" class="footer-link">LinkedIn</a></li>
+            </ul>
+            <p class="footer-copyright">© 2026 Neon Nexus Studio. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // ============================================
+        // THEME TOGGLE
+        // ============================================
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+        
+        // Moon icon path
+        const moonPath = 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z';
+        // Sun icon path
+        const sunPath = 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z';
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', newTheme);
+            
+            // Update icon with animation
+            gsap.to(themeIcon, {
+                opacity: 0,
+                scale: 0.5,
+                duration: 0.15,
+                onComplete: () => {
+                    themeIcon.querySelector('path').setAttribute('d', newTheme === 'light' ? moonPath : sunPath);
+                    gsap.to(themeIcon, {
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.15
+                    });
+                }
+            });
+        });
+        
+        // ============================================
+        // THREE.JS HERO ANIMATION
+        // ============================================
+        const canvas = document.getElementById('hero-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        
+        renderer.setSize(600, 600);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        // Create wireframe geometries
+        const geometries = [
+            new THREE.IcosahedronGeometry(2, 1),
+            new THREE.TorusKnotGeometry(1.5, 0.4, 100, 16),
+            new THREE.OctahedronGeometry(2, 1)
+        ];
+        
+        const material = new THREE.MeshBasicMaterial({
+            color: 0x00f3ff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.6
+        });
+        
+        const secondaryMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff00ff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+        
+        const mainMesh = new THREE.Mesh(geometries[0], material);
+        const secondaryMesh = new THREE.Mesh(geometries[1], secondaryMaterial);
+        secondaryMesh.scale.set(0.8, 0.8, 0.8);
+        
+        scene.add(mainMesh);
+        scene.add(secondaryMesh);
+        
+        camera.position.z = 6;
+        
+        // Particle system
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 150;
+        const posArray = new Float32Array(particlesCount * 3);
+        
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 15;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.05,
+            color: 0x00f3ff,
+            transparent: true,
+            opacity: 0.6
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        // Mouse tracking
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX) / 2000;
+            mouseY = (event.clientY - windowHalfY) / 2000;
+        });
+        
+        // Animation variables
+        let currentGeometryIndex = 0;
+        let geometryTransition = 0;
+        let time = 0;
+        
+        // Morph geometries periodically
+        setInterval(() => {
+            currentGeometryIndex = (currentGeometryIndex + 1) % geometries.length;
+            
+            gsap.to(mainMesh.scale, {
+                x: 0.1, y: 0.1, z: 0.1,
+                duration: 0.3,
+                onComplete: () => {
+                    mainMesh.geometry = geometries[currentGeometryIndex];
+                    gsap.to(mainMesh.scale, {
+                        x: 1, y: 1, z: 1,
+                        duration: 0.5,
+                        ease: "elastic.out(1, 0.5)"
+                    });
+                }
+            });
+        }, 4000);
+        
+        // Random glitch effect on mesh
+        function triggerGlitch() {
+            const originalOpacity = material.opacity;
+            
+            gsap.to(material, {
+                opacity: 1,
+                duration: 0.05,
+                yoyo: true,
+                repeat: 3,
+                onComplete: () => {
+                    material.opacity = originalOpacity;
+                }
+            });
+            
+            gsap.to(mainMesh.position, {
+                x: (Math.random() - 0.5) * 0.3,
+                y: (Math.random() - 0.5) * 0.3,
+                duration: 0.05,
+                yoyo: true,
+                repeat: 3,
+                onComplete: () => {
+                    mainMesh.position.set(0, 0, 0);
+                }
+            });
+        }
+        
+        setInterval(triggerGlitch, 8000);
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            time += 0.01;
+            
+            // Smooth mouse follow
+            targetX += (mouseX - targetX) * 0.05;
+            targetY += (mouseY - targetY) * 0.05;
+            
+            // Rotate main mesh
+            mainMesh.rotation.x += 0.003;
+            mainMesh.rotation.y += 0.005;
+            mainMesh.rotation.x += targetY * 0.5;
+            mainMesh.rotation.y += targetX * 0.5;
+            
+            // Rotate secondary mesh in opposite direction
+            secondaryMesh.rotation.x -= 0.004;
+            secondaryMesh.rotation.y -= 0.006;
+            secondaryMesh.rotation.z = Math.sin(time) * 0.3;
+            
+            // Animate particles
+            particlesMesh.rotation.y = time * 0.1;
+            particlesMesh.rotation.x = time * 0.05;
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Update material colors when theme changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'data-theme') {
+                    const isLight = body.getAttribute('data-theme') === 'light';
+                    material.color.setHex(isLight ? 0x0088ff : 0x00f3ff);
+                    secondaryMaterial.color.setHex(isLight ? 0xff0080 : 0xff00ff);
+                    particlesMaterial.color.setHex(isLight ? 0x0088ff : 0x00f3ff);
+                }
+            });
+        });
+        
+        observer.observe(body, { attributes: true });
+        
+        // ============================================
+        // GSAP ANIMATIONS
+        // ============================================
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Hero entrance animation
+        const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+        
+        heroTl
+            .from('.hero-eyebrow', { opacity: 0, y: 30, duration: 0.8 }, 0.2)
+            .from('.hero-title', { opacity: 0, y: 50, duration: 1 }, 0.4)
+            .from('.hero-description', { opacity: 0, y: 30, duration: 0.8 }, 0.6)
+            .from('.hero-cta', { opacity: 0, y: 30, duration: 0.8 }, 0.8)
+            .from('.hero-canvas-container', { opacity: 0, scale: 0.8, duration: 1.5, ease: "elastic.out(1, 0.5)" }, 0);
+        
+        // Glitch text activation
+        document.querySelectorAll('.glitch-text').forEach(el => {
+            el.addEventListener('mouseenter', () => el.classList.add('active'));
+            el.addEventListener('mouseleave', () => el.classList.remove('active'));
+        });
+        
+        // Orbital cards scroll animation
+        gsap.from('.orbital-card', {
+            scrollTrigger: {
+                trigger: '.orbital-container',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 50,
+            rotation: 10,
+            stagger: 0.1,
+            duration: 0.8,
+            ease: "power3.out"
+        });
+        
+        // Showcase items
+        gsap.from('.showcase-item', {
+            scrollTrigger: {
+                trigger: '.showcase-grid',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 60,
+            stagger: 0.15,
+            duration: 0.8,
+            ease: "power3.out"
+        });
+        
+        // Stats counter animation
+        const statNumbers = document.querySelectorAll('.stat-number');
+        
+        statNumbers.forEach(stat => {
+            const target = parseInt(stat.getAttribute('data-target'));
+            
+            ScrollTrigger.create({
+                trigger: stat,
+                start: 'top 85%',
+                onEnter: () => {
+                    gsap.to(stat, {
+                        innerHTML: target,
+                        duration: 2,
+                        ease: "power2.out",
+                        snap: { innerHTML: 1 },
+                        onUpdate: function() {
+                            stat.innerHTML = Math.round(this.targets()[0].innerHTML) + '+';
+                        }
+                    });
+                },
+                once: true
+            });
+        });
+        
+        // CTA section animation
+        gsap.from('.cta-content', {
+            scrollTrigger: {
+                trigger: '.cta-section',
+                start: 'top 70%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            ease: "power3.out"
+        });
+        
+        // ============================================
+        // PARTICLE BACKGROUND
+        // ============================================
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 25;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+        
+        // ============================================
+        // NAVIGATION SCROLL EFFECT
+        // ============================================
+        let lastScroll = 0;
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            const nav = document.querySelector('.navigation');
+            
+            if (currentScroll > 100) {
+                nav.style.background = 'rgba(10, 10, 26, 0.9)';
+                nav.style.backdropFilter = 'blur(20px)';
+            } else {
+                nav.style.background = 'linear-gradient(180deg, var(--bg-primary) 0%, transparent 100%)';
+                nav.style.backdropFilter = 'none';
+            }
+            
+            lastScroll = currentScroll;
+        }, { passive: true });
+        
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // ============================================
+        // RANDOM GLITCH TRIGGERS
+        // ============================================
+        function randomGlitch() {
+            const glitchTexts = document.querySelectorAll('.glitch-text');
+            const randomText = glitchTexts[Math.floor(Math.random() * glitchTexts.length)];
+            
+            randomText.classList.add('active');
+            setTimeout(() => {
+                randomText.classList.remove('active');
+            }, 300);
+            
+            // Schedule next random glitch
+            setTimeout(randomGlitch, Math.random() * 5000 + 3000);
+        }
+        
+        // Start random glitches after initial load
+        setTimeout(randomGlitch, 3000);
+        
+        // ============================================
+        // MOBILE OPTIMIZATION
+        // ============================================
+        if (window.matchMedia('(pointer: coarse)').matches) {
+            // Reduce particle count on mobile
+            particlesContainer.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Disable complex mouse tracking
+            document.removeEventListener('mousemove', () => {});
+        }
+    </script>
+</body>
+</html>

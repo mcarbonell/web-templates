@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA - Digital Experience</title>
+    
+    <!--
+    ============================================================
+    DESIGN SYSTEM EXPLANATION - Seed #623104005
+    ============================================================
+    
+    SEED DECOMPOSITION:
+    - Primary Hue: (623104005 % 360) = 45° (Gold/Amber spectrum)
+    - Secondary Hue: (623104005 % 180) + 180 = 225° (Deep Blue)
+    - Animation Density: (623104005 % 5) + 1 = 1 (Slow, deliberate)
+    - Grid Complexity: (623104005 % 5) + 3 = 8 (8-cell bento grid)
+    - Accent Pattern: (623104005 % 4) = 1 (Aurora with glassmorphism)
+    - Typography Mode: (623104005 % 3) = 0 (Kinetic with scramble)
+    
+    TECHNIQUES IMPLEMENTED:
+    1. ASCII-TO-CANVAS (Mandatory) - Real-time character-based rendering
+    2. Gradient Animated Text - CSS keyframe animations on background-clip
+    3. Aurora Gradient Blobs - Animated radial gradients with blur
+    4. Glassmorphism - Backdrop-filter blur with transparency
+    5. Magnetic Buttons - CSS transform on hover with transition
+    6. Kinetic Typography - Variable font weight animation
+    7. Bento Grid - Asymmetric grid layout
+    8. Scroll-Driven Animations - Intersection Observer API
+    
+    COLOR PALETTE (Derived from seed):
+    - Light Mode: Cream (#faf8f5), Gold (#d4a574), Charcoal (#1a1a2e)
+    - Dark Mode: Deep Space (#0a0a0f), Neon Gold (#ffd700), Electric Blue (#00d4ff)
+    
+    BOLD DESIGN DECISIONS:
+    - Massive kinetic typography as hero (viewport-sized)
+    - Full-screen ASCII canvas overlay on scroll
+    - Bento grid with 3D hover transforms
+    - Dark mode uses pure black with neon accents
+    - Light mode uses warm cream with metallic gold
+    - All buttons are magnetic with liquid hover states
+    ============================================================
+    -->
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Seed-derived colors */
+            --primary-hue: 45;
+            --secondary-hue: 225;
+            
+            /* Light mode (default) */
+            --bg-primary: #faf8f5;
+            --bg-secondary: #f5f0e8;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a5a;
+            --accent-gold: hsl(var(--primary-hue), 70%, 55%);
+            --accent-gold-light: hsl(var(--primary-hue), 60%, 75%);
+            --accent-blue: hsl(var(--secondary-hue), 80%, 55%);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --shadow-color: rgba(26, 26, 46, 0.1);
+            --ascii-color: #1a1a2e;
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --accent-gold: #ffd700;
+            --accent-gold-light: #ffed4a;
+            --accent-blue: #00d4ff;
+            --glass-bg: rgba(20, 20, 30, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --ascii-color: #00d4ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+        
+        /* Aurora Background */
+        .aurora-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: aurora-move 20s ease-in-out infinite;
+        }
+        
+        .aurora-blob:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-light));
+            top: -200px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+        
+        .aurora-blob:nth-child(2) {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, var(--accent-blue), hsl(var(--secondary-hue), 60%, 70%));
+            bottom: -150px;
+            left: -100px;
+            animation-delay: -7s;
+        }
+        
+        .aurora-blob:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, hsl(var(--primary-hue), 50%, 60%), var(--accent-gold));
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
+        }
+        
+        @keyframes aurora-move {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(50px, -30px) scale(1.1);
+            }
+            50% {
+                transform: translate(-30px, 50px) scale(0.9);
+            }
+            75% {
+                transform: translate(-50px, -20px) scale(1.05);
+            }
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: var(--glass-bg);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-gold);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            width: 60px;
+            height: 30px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--glass-border);
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+        
+        [data-theme="dark"] .theme-toggle::after {
+            transform: translateX(30px);
+            background: var(--accent-blue);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 6rem 2rem 2rem;
+            overflow: hidden;
+        }
+        
+        .kinetic-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 12vw, 10rem);
+            font-weight: 800;
+            text-align: center;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .kinetic-title .line {
+            display: block;
+            background: linear-gradient(
+                90deg,
+                var(--text-primary) 0%,
+                var(--accent-gold) 25%,
+                var(--accent-blue) 50%,
+                var(--accent-gold) 75%,
+                var(--text-primary) 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 8s linear infinite;
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+        
+        .kinetic-title .stroke-text {
+            -webkit-text-stroke: 2px var(--text-primary);
+            -webkit-text-fill-color: transparent;
+            background: none;
+            animation: none;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-top: 2rem;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-cta {
+            margin-top: 3rem;
+            display: flex;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Magnetic Buttons */
+        .btn {
+            padding: 1rem 2.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-light));
+            color: var(--bg-primary);
+            box-shadow: 0 10px 40px rgba(212, 165, 116, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(212, 165, 116, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-3px) scale(1.02);
+            background: var(--bg-secondary);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* ASCII Canvas Section */
+        .ascii-section {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 2rem;
+            background: var(--bg-secondary);
+        }
+        
+        .ascii-canvas {
+            width: 100%;
+            max-width: 900px;
+            height: 500px;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--bg-primary);
+            box-shadow: 0 30px 60px var(--shadow-color);
+        }
+        
+        #asciiCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .ascii-overlay {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            right: 2rem;
+            text-align: center;
+        }
+        
+        .ascii-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .ascii-desc {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        /* Bento Grid */
+        .bento-section {
+            padding: 6rem 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 200px);
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .bento-cell {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(20px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bento-cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .bento-cell:hover::before {
+            opacity: 1;
+        }
+        
+        .bento-cell:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 60px var(--shadow-color);
+        }
+        
+        .bento-cell:nth-child(1) {
+            grid-column: span 2;
+            grid-row: span 2;
+            background: linear-gradient(135deg, var(--accent-gold), hsl(var(--primary-hue), 60%, 50%));
+            color: var(--bg-primary);
+        }
+        
+        .bento-cell:nth-child(2) {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+        
+        .bento-cell:nth-child(3) {
+            grid-column: span 1;
+            grid-row: span 2;
+            background: var(--bg-secondary);
+        }
+        
+        .bento-cell:nth-child(4) {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+        
+        .bento-cell:nth-child(5) {
+            grid-column: span 2;
+            grid-row: span 1;
+            background: linear-gradient(135deg, var(--accent-blue), hsl(var(--secondary-hue), 70%, 40%));
+            color: var(--bg-primary);
+        }
+        
+        .bento-cell:nth-child(6) {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+        
+        .bento-cell:nth-child(7) {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+        
+        .bento-cell:nth-child(8) {
+            grid-column: span 2;
+            grid-row: span 1;
+            background: var(--bg-secondary);
+        }
+        
+        .cell-number {
+            font-family: 'Syne', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            opacity: 0.3;
+            line-height: 1;
+        }
+        
+        .cell-content h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .cell-content p {
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+        
+        .cell-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Features Section */
+        .features-section {
+            padding: 6rem 2rem;
+            background: var(--bg-secondary);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            padding: 2.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-blue));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px var(--shadow-color);
+        }
+        
+        .feature-card:hover::after {
+            transform: scaleX(1);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 4rem 2rem 2rem;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        
+        .footer-brand {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-gold);
+        }
+        
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 3rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* Scramble Text Effect */
+        .scramble-text {
+            display: inline-block;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: auto;
+            }
+            
+            .bento-cell:nth-child(1) {
+                grid-column: span 2;
+                grid-row: span 2;
+            }
+            
+            .bento-cell:nth-child(3) {
+                grid-column: span 1;
+                grid-row: span 2;
+            }
+            
+            .bento-cell:nth-child(5) {
+                grid-column: span 2;
+            }
+            
+            .bento-cell:nth-child(8) {
+                grid-column: span 2;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .nav-links a:not(.theme-toggle-wrapper) {
+                display: none;
+            }
+            
+            .hero {
+                padding: 5rem 1rem 2rem;
+            }
+            
+            .hero-cta {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .bento-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .bento-cell {
+                grid-column: span 1 !important;
+                grid-row: span 1 !important;
+                min-height: 180px;
+            }
+            
+            .ascii-canvas {
+                height: 300px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        /* Scroll reveal animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-gold-light);
+        }
+    </style>
+</head>
+<body>
+    <!-- Aurora Background -->
+    <div class="aurora-container">
+        <div class="aurora-blob"></div>
+        <div class="aurora-blob"></div>
+        <div class="aurora-blob"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">NOVA</div>
+        <div class="nav-links">
+            <a href="#work">Work</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+            <div class="theme-toggle-wrapper">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode"></button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="kinetic-title">
+            <span class="line">DIGITAL</span>
+            <span class="line stroke-text">EXPERIENCE</span>
+            <span class="line">DESIGN</span>
+        </h1>
+        <p class="hero-subtitle">We craft immersive digital experiences that blur the line between art and technology. Award-winning design meets cutting-edge development.</p>
+        <div class="hero-cta">
+            <button class="btn btn-primary magnetic-btn">Start Project</button>
+            <button class="btn btn-secondary magnetic-btn">View Work</button>
+        </div>
+    </section>
+    
+    <!-- ASCII Canvas Section -->
+    <section class="ascii-section" id="asciiSection">
+        <div class="ascii-canvas reveal">
+            <canvas id="asciiCanvas"></canvas>
+        </div>
+        <div class="ascii-overlay reveal">
+            <h2 class="ascii-title">ASCII ART RENDERING</h2>
+            <p class="ascii-desc">Real-time character-based rendering using HTML5 Canvas. Move your mouse to interact.</p>
+        </div>
+    </section>
+    
+    <!-- Bento Grid Section -->
+    <section class="bento-section" id="work">
+        <div class="section-header reveal">
+            <span class="section-tag">Selected Work</span>
+            <h2 class="section-title">Featured Projects</h2>
+        </div>
+        <div class="bento-grid">
+            <div class="bento-cell reveal" data-delay="0">
+                <span class="cell-number">01</span>
+                <div class="cell-content">
+                    <div class="cell-icon">◈</div>
+                    <h3 class="scramble-trigger" data-text="Aurora Finance">Aurora Finance</h3>
+                    <p>Complete brand identity and web platform for a next-generation fintech startup.</p>
+                </div>
+            </div>
+            <div class="bento-cell reveal" data-delay="100">
+                <span class="cell-number">02</span>
+                <div class="cell-content">
+                    <div class="cell-icon">◉</div>
+                    <h3 class="scramble-trigger" data-text="Nexus Labs">Nexus Labs</h3>
+                    <p>AI research platform</p>
+                </div>
+            </div>
+            <div class="bento-cell reveal" data-delay="200">
+                <span class="cell-number">03</span>
+                <div class="cell-content">
+                    <div class="cell-icon">◆</div>
+                    <h3 class="scramble-trigger" data-text="Velvet Studio">Velvet Studio</h3>
+                    <p>Immersive 3D experiences and motion design for global brands.</p>
+                </div>
+            </div>
+            <div class="bento-cell reveal" data-delay="300">
+                <span class="cell-number">04</span>
+                <div class="cell-content">
+                    <div class="cell-icon">◇</div>
+                    <h3 class="scramble-trigger" data-text="Echo Audio">Echo Audio</h3>
+                    <p>Music streaming app</p>
+                </div>
+            </div>
+            <div class="bento-cell reveal" data-delay="400">
+                <span class="cell-number">05</span>
+                <div class="cell-content">
+                    <div class="cell-icon">✦</div>
+                    <h3 class="scramble-trigger" data-text="Stellar Ventures">Stellar Ventures</h3>
+                    <p>Venture capital firm website with interactive data visualization.</p>
+                </div>
+            </div>
+            <div class="bento-cell reveal" data-delay="500">
+                <span class="cell-number">06</span>
+                <div class="cell-content">
+                    <div class="cell-icon">○</div>
+                    <h3 class="scramble-trigger" data-text="Pulse Health">Pulse Health</h3>
+                    <p>Healthcare dashboard</p>
+                </div>
+            </div>
+            <div class="bento-cell reveal" data-delay="600">
+                <span class="cell-number">07</span>
+                <div class="cell-content">
+                    <div class="cell-icon">□</div>
+                    <h3 class="scramble-trigger" data-text="Cipher Security">Cipher Security</h3>
+                    <p>Cybersecurity firm</p>
+                </div>
+            </div>
+            <div class="bento-cell reveal" data-delay="700">
+                <span class="cell-number">08</span>
+                <div class="cell-content">
+                    <div class="cell-icon">△</div>
+                    <h3 class="scramble-trigger" data-text="Zenith Agency">Zenith Agency</h3>
+                    <p>Creative collective portfolio with WebGL experiments.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features-section" id="about">
+        <div class="section-header reveal">
+            <span class="section-tag">Our Approach</span>
+            <h2 class="section-title">What We Do</h2>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card reveal" data-delay="0">
+                <div class="feature-icon">◐</div>
+                <h3>Brand Strategy</h3>
+                <p>We develop comprehensive brand identities that resonate with your audience and stand the test of time. From naming to visual systems.</p>
+            </div>
+            <div class="feature-card reveal" data-delay="100">
+                <div class="feature-icon">◑</div>
+                <h3>Web Development</h3>
+                <p>Cutting-edge development using modern technologies. Performance-optimized, accessible, and built for scale.</p>
+            </div>
+            <div class="feature-card reveal" data-delay="200">
+                <div class="feature-icon">◒</div>
+                <h3>Motion Design</h3>
+                <p>Breathing life into interfaces with purposeful animation. Micro-interactions to full cinematic experiences.</p>
+            </div>
+            <div class="feature-card reveal" data-delay="300">
+                <div class="feature-icon">◓</div>
+                <h3>Creative Direction</h3>
+                <p>Guiding projects from concept to completion with artistic vision and strategic thinking.</p>
+            </div>
+            <div class="feature-card reveal" data-delay="400">
+                <div class="feature-icon">◔</div>
+                <h3>3D & WebGL</h3>
+                <p>Immersive 3D experiences and real-time graphics that push the boundaries of web technology.</p>
+            </div>
+            <div class="feature-card reveal" data-delay="500">
+                <div class="feature-icon">◕</div>
+                <h3>UX Research</h3>
+                <p>Data-driven design decisions backed by thorough user research and testing methodologies.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-content reveal">
+            <div class="footer-brand">NOVA</div>
+            <div class="footer-links">
+                <a href="#">Twitter</a>
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">Dribbble</a>
+            </div>
+        </div>
+        <div class="footer-bottom reveal">
+            <p>&copy; 2026 NOVA Design Agency. All rights reserved. Crafted with passion.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or default to 'light'
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+        
+        // Magnetic Buttons
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px) scale(1.02)`;
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0) scale(1)';
+            });
+        });
+        
+        // ASCII Canvas Rendering
+        const canvas = document.getElementById('asciiCanvas');
+        const ctx = canvas.getContext('2d');
+        let mouseX = 0;
+        let mouseY = 0;
+        let animationId;
+        
+        // ASCII characters from dark to light
+        const asciiChars = '@%#*+=-:. ';
+        
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+        
+        let time = 0;
+        
+        function drawAscii() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const fontSize = 14;
+            const cols = Math.floor(width / fontSize);
+            const rows = Math.floor(height / fontSize);
+            
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg-primary');
+            ctx.fillRect(0, 0, width, height);
+            
+            const asciiColor = getComputedStyle(document.body).getPropertyValue('--ascii-color').trim();
+            ctx.fillStyle = asciiColor;
+            ctx.font = `${fontSize}px 'Space Mono', monospace`;
+            
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const posX = x * fontSize;
+                    const posY = y * fontSize;
+                    
+                    // Distance from mouse
+                    const dx = posX - mouseX;
+                    const dy = posY - mouseY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // Create wave pattern
+                    const wave = Math.sin(x * 0.1 + time) * Math.cos(y * 0.1 + time * 0.5);
+                    const mouseEffect = Math.max(0, 1 - distance / 150) * 2;
+                    
+                    const charIndex = Math.floor(((wave + 1) / 2 + mouseEffect) * (asciiChars.length - 1)) % asciiChars.length;
+                    const char = asciiChars[Math.min(charIndex, asciiChars.length - 1)];
+                    
+                    // Opacity based on mouse proximity
+                    const alpha = 0.3 + mouseEffect * 0.7;
+                    ctx.globalAlpha = alpha;
+                    
+                    ctx.fillText(char, posX, posY);
+                }
+            }
+            
+            ctx.globalAlpha = 1;
+            time += 0.03;
+            animationId = requestAnimationFrame(drawAscii);
+        }
+        
+        // Start ASCII animation when section is visible
+        const asciiObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    drawAscii();
+                } else {
+                    cancelAnimationFrame(animationId);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        asciiObserver.observe(document.getElementById('asciiSection'));
+        
+        // Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.reveal');
+        
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = entry.target.dataset.delay || 0;
+                    setTimeout(() => {
+                        entry.target.classList.add('active');
+                    }, delay);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        
+        revealElements.forEach(el => revealObserver.observe(el));
+        
+        // Scramble Text Effect
+        class ScrambleText {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                this.originalText = el.dataset.text || el.innerText;
+                this.update = this.update.bind(this);
+            }
+            
+            scramble() {
+                this.queue = [];
+                const length = this.originalText.length;
+                
+                for (let i = 0; i < length; i++) {
+                    const from = this.el.innerText[i] || '';
+                    const to = this.originalText[i];
+                    const start = Math.floor(Math.random() * 20);
+                    const end = start + Math.floor(Math.random() * 20);
+                    this.queue.push({ from, to, start, end });
+                }
+                
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+            }
+            
+            update() {
+                let output = '';
+                let complete = 0;
+                
+                for (let i = 0; i < this.queue.length; i++) {
+                    let { from, to, start, end } = this.queue[i];
+                    let char = this.queue[i].char;
+                    
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.chars[Math.floor(Math.random() * this.chars.length)];
+                            this.queue[i].char = char;
+                        }
+                        output += char;
+                    } else {
+                        output += from;
+                    }
+                }
+                
+                this.el.innerText = output;
+                
+                if (complete === this.queue.length) {
+                    return;
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+        }
+        
+        // Initialize scramble on hover
+        document.querySelectorAll('.scramble-trigger').forEach(el => {
+            const scrambler = new ScrambleText(el);
+            el.addEventListener('mouseenter', () => scrambler.scramble());
+        });
+        
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

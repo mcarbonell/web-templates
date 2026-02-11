@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    =============================================================================
+    SERVICES.HTML - Services Overview Page
+    Seed: 297883763
+    =============================================================================
+    
+    SEED DECOMPOSITION:
+    ╔══════════╦═══════╦══════════════════════════════════════════════════════════╗
+    ║ Position ║ Digit ║ Design Domain                                            ║
+    ╠══════════╬═══════╬══════════════════════════════════════════════════════════╣
+    ║    1     ║   2   ║ Color: Deep Ocean (Teals, Navy, Coral accents)          ║
+    ║    2     ║   9   ║ Typography: Ultra Modern (Space Grotesk + Inter)        ║
+    ║    3     ║   7   ║ Layout: Dense spacing (0.5rem increments)               ║
+    ║    4     ║   8   ║ Animation: Maximal (complex sequences, 3D)              ║
+    ║    5     ║   8   ║ Corners: Super-rounded (24px-32px radius)               ║
+    ║    6     ║   3   ║ Cards: Grid-based service cards (digit 6 = 3 layout)    ║
+    ║    7     ║   7   ║ Density: Compact information-rich cards                 ║
+    ║    8     ║   6   ║ Interaction: 3D hover effects on cards                  ║
+    ║    9     ║   3   ║ Geometry: Mixed angularity accents                      ║
+    ╚══════════╩═══════╩══════════════════════════════════════════════════════════╝
+    
+    PAGE PURPOSE: Service catalog with interactive card grid
+    =============================================================================
+  -->
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore our comprehensive range of premium services designed to help your business thrive.">
+  <meta name="theme-color" content="#0f172a">
+  
+  <title>Our Services | Oceanic</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  
+  <style>
+    .page-header {
+      padding: 160px 0 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .page-header__bg {
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-glow);
+      opacity: 0.3;
+    }
+    
+    .page-header__content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .page-header__title {
+      font-size: var(--text-5xl);
+      margin-bottom: var(--space-4);
+    }
+    
+    .page-header__description {
+      font-size: var(--text-xl);
+      color: var(--text-secondary);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    
+    .services-section {
+      padding: var(--space-20) 0;
+    }
+    
+    /* Services Grid - 3 columns (digit 6 = 3) */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+    
+    @media (max-width: 1024px) {
+      .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .service-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-3xl);
+      overflow: hidden;
+      transition: all var(--duration-slow) var(--ease-spring);
+      transform-style: preserve-3d;
+      position: relative;
+    }
+    
+    .service-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 2px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    
+    .service-card:hover {
+      transform: translateY(-12px) rotateX(5deg);
+      box-shadow: var(--shadow-xl), 0 0 60px rgba(20, 184, 166, 0.15);
+    }
+    
+    .service-card__image {
+      aspect-ratio: 16/10;
+      background: var(--gradient-ocean);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .service-card__icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(255,255,255,0.1);
+      border-radius: var(--radius-2xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary-300);
+      transition: transform var(--duration-slow) var(--ease-spring);
+    }
+    
+    .service-card:hover .service-card__icon {
+      transform: scale(1.1);
+    }
+    
+    .service-card__content {
+      padding: var(--space-6);
+    }
+    
+    .service-card__eyebrow {
+      font-family: var(--font-display);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wider);
+      color: var(--color-primary-400);
+      margin-bottom: var(--space-2);
+    }
+    
+    .service-card__title {
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-3);
+    }
+    
+    .service-card__description {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      margin-bottom: var(--space-4);
+    }
+    
+    .service-card__features {
+      list-style: none;
+      margin-bottom: var(--space-5);
+    }
+    
+    .service-card__features li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-2);
+    }
+    
+    .service-card__features li svg {
+      color: var(--color-primary-500);
+      flex-shrink: 0;
+    }
+    
+    .service-card__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-primary-400);
+      text-decoration: none;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+    
+    .service-card__cta:hover {
+      color: var(--color-primary-300);
+      gap: var(--space-3);
+    }
+    
+    .service-card__cta svg {
+      transition: transform var(--duration-fast) var(--ease-out);
+    }
+    
+    .service-card__cta:hover svg {
+      transform: translateX(4px);
+    }
+    
+    /* Process Section */
+    .process-section {
+      padding: var(--space-24) 0;
+      background: var(--bg-secondary);
+    }
+    
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-8);
+      margin-top: var(--space-16);
+      position: relative;
+    }
+    
+    .process-grid::before {
+      content: '';
+      position: absolute;
+      top: 40px;
+      left: 12.5%;
+      right: 12.5%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--color-primary-500) 0%, var(--color-accent-500) 100%);
+      opacity: 0.3;
+    }
+    
+    @media (max-width: 1024px) {
+      .process-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .process-grid::before {
+        display: none;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .process-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .process-step {
+      text-align: center;
+      position: relative;
+    }
+    
+    .process-step__number {
+      width: 80px;
+      height: 80px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--color-primary-400);
+      margin: 0 auto var(--space-5);
+      border: 3px solid var(--color-primary-500);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .process-step__title {
+      font-size: var(--text-lg);
+      margin-bottom: var(--space-2);
+    }
+    
+    .process-step__description {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+    
+    /* CTA Section */
+    .cta-section {
+      padding: var(--space-24) 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cta-section__bg {
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-ocean);
+      opacity: 0.1;
+    }
+    
+    .cta-content {
+      position: relative;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav__container">
+      <a href="index.html" class="nav__logo">
+        <svg class="nav__logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+          <path d="M10 16C10 16 12 10 16 10C20 10 22 16 22 16C22 16 20 22 16 22C12 22 10 16 10 16Z" stroke="currentColor" stroke-width="2"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+        </svg>
+        Oceanic
+      </a>
+      
+      <ul class="nav__menu" role="menubar">
+        <li role="none"><a href="index.html" class="nav__link" role="menuitem">Home</a></li>
+        <li role="none"><a href="about.html" class="nav__link" role="menuitem">About</a></li>
+        <li role="none"><a href="services.html" class="nav__link nav__link--active" role="menuitem">Services</a></li>
+        <li role="none"><a href="online-shop.html" class="nav__link" role="menuitem">Shop</a></li>
+        <li role="none"><a href="blog.html" class="nav__link" role="menuitem">Blog</a></li>
+        <li role="none"><a href="contact.html" class="nav__link" role="menuitem">Contact</a></li>
+      </ul>
+      
+      <div class="nav__actions">
+        <a href="login.html" class="btn btn--ghost btn--small">Sign In</a>
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+        <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+    <!-- Page Header -->
+    <header class="page-header">
+      <div class="page-header__bg" aria-hidden="true"></div>
+      <div class="container page-header__content">
+        <p class="section-header__eyebrow" style="margin-bottom: var(--space-4);">What We Offer</p>
+        <h1 class="page-header__title">Our Services</h1>
+        <p class="page-header__description">
+          Comprehensive solutions designed to elevate your business and drive growth. 
+          From strategy to execution, we've got you covered.
+        </p>
+      </div>
+    </header>
+
+    <!-- Services Grid -->
+    <section class="services-section" aria-labelledby="services-title">
+      <div class="container">
+        <div class="services-grid">
+          <!-- Service 1 -->
+          <article class="service-card reveal">
+            <div class="service-card__image">
+              <div class="service-card__icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+            </div>
+            <div class="service-card__content">
+              <p class="service-card__eyebrow">Strategy</p>
+              <h3 class="service-card__title">Digital Consulting</h3>
+              <p class="service-card__description">
+                Strategic guidance to help you navigate the digital landscape and achieve your business objectives.
+              </p>
+              <ul class="service-card__features">
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Market Analysis
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Growth Strategy
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Digital Transformation
+                </li>
+              </ul>
+              <a href="service-detail.html" class="service-card__cta">
+                Learn More
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Service 2 -->
+          <article class="service-card reveal">
+            <div class="service-card__image" style="background: linear-gradient(135deg, #be123c 0%, #881337 100%);">
+              <div class="service-card__icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                  <line x1="8" y1="21" x2="16" y2="21"/>
+                  <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+              </div>
+            </div>
+            <div class="service-card__content">
+              <p class="service-card__eyebrow">Development</p>
+              <h3 class="service-card__title">Web Development</h3>
+              <p class="service-card__description">
+                Custom web solutions built with cutting-edge technologies for optimal performance and user experience.
+              </p>
+              <ul class="service-card__features">
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Custom Applications
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  E-commerce Solutions
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  API Integration
+                </li>
+              </ul>
+              <a href="service-detail.html" class="service-card__cta">
+                Learn More
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Service 3 -->
+          <article class="service-card reveal">
+            <div class="service-card__image" style="background: linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%);">
+              <div class="service-card__icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 6v6l4 2"/>
+                </svg>
+              </div>
+            </div>
+            <div class="service-card__content">
+              <p class="service-card__eyebrow">Design</p>
+              <h3 class="service-card__title">UI/UX Design</h3>
+              <p class="service-card__description">
+                User-centered design that creates intuitive, engaging, and memorable digital experiences.
+              </p>
+              <ul class="service-card__features">
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  User Research
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Interface Design
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Prototyping
+                </li>
+              </ul>
+              <a href="service-detail.html" class="service-card__cta">
+                Learn More
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Service 4 -->
+          <article class="service-card reveal">
+            <div class="service-card__image" style="background: linear-gradient(135deg, #059669 0%, #065f46 100%);">
+              <div class="service-card__icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M18 20V10M12 20V4M6 20v-6"/>
+                </svg>
+              </div>
+            </div>
+            <div class="service-card__content">
+              <p class="service-card__eyebrow">Marketing</p>
+              <h3 class="service-card__title">Digital Marketing</h3>
+              <p class="service-card__description">
+                Data-driven marketing strategies that increase visibility, engagement, and conversions.
+              </p>
+              <ul class="service-card__features">
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  SEO Optimization
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Content Strategy
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Analytics & Reporting
+                </li>
+              </ul>
+              <a href="service-detail.html" class="service-card__cta">
+                Learn More
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Service 5 -->
+          <article class="service-card reveal">
+            <div class="service-card__image" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
+              <div class="service-card__icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+            </div>
+            <div class="service-card__content">
+              <p class="service-card__eyebrow">Support</p>
+              <h3 class="service-card__title">Managed Services</h3>
+              <p class="service-card__description">
+                End-to-end management and support to keep your digital assets running smoothly.
+              </p>
+              <ul class="service-card__features">
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  24/7 Monitoring
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Security Updates
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Performance Optimization
+                </li>
+              </ul>
+              <a href="service-detail.html" class="service-card__cta">
+                Learn More
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Service 6 -->
+          <article class="service-card reveal">
+            <div class="service-card__image" style="background: linear-gradient(135deg, #ea580c 0%, #9a3412 100%);">
+              <div class="service-card__icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                  <line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+              </div>
+            </div>
+            <div class="service-card__content">
+              <p class="service-card__eyebrow">Solutions</p>
+              <h3 class="service-card__title">Cloud Solutions</h3>
+              <p class="service-card__description">
+                Scalable cloud infrastructure and migration services for modern businesses.
+              </p>
+              <ul class="service-card__features">
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Cloud Migration
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Infrastructure Setup
+                </li>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  DevOps Consulting
+                </li>
+              </ul>
+              <a href="service-detail.html" class="service-card__cta">
+                Learn More
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process-section" aria-labelledby="process-title">
+      <div class="container">
+        <header class="section-header reveal">
+          <p class="section-header__eyebrow">How We Work</p>
+          <h2 id="process-title" class="section-header__title">Our Process</h2>
+          <p class="section-header__description">
+            A proven methodology that delivers results. From discovery to delivery, we ensure every step counts.
+          </p>
+        </header>
+        
+        <div class="process-grid">
+          <div class="process-step reveal">
+            <div class="process-step__number">01</div>
+            <h3 class="process-step__title">Discovery</h3>
+            <p class="process-step__description">We dive deep to understand your goals, challenges, and vision.</p>
+          </div>
+          
+          <div class="process-step reveal">
+            <div class="process-step__number">02</div>
+            <h3 class="process-step__title">Strategy</h3>
+            <p class="process-step__description">We craft a tailored roadmap aligned with your business objectives.</p>
+          </div>
+          
+          <div class="process-step reveal">
+            <div class="process-step__number">03</div>
+            <h3 class="process-step__title">Execution</h3>
+            <p class="process-step__description">We bring the strategy to life with precision and excellence.</p>
+          </div>
+          
+          <div class="process-step reveal">
+            <div class="process-step__number">04</div>
+            <h3 class="process-step__title">Optimize</h3>
+            <p class="process-step__description">We continuously refine and improve based on data and feedback.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" aria-labelledby="cta-title">
+      <div class="cta-section__bg" aria-hidden="true"></div>
+      <div class="container">
+        <div class="cta-content reveal">
+          <h2 id="cta-title" class="cta__title" style="font-size: var(--text-4xl); margin-bottom: var(--space-6);">Ready to Start Your Project?</h2>
+          <p class="cta__description" style="font-size: var(--text-lg); color: var(--text-secondary); margin-bottom: var(--space-8);">
+            Let's discuss how our services can help you achieve your business goals. 
+            Get in touch for a free consultation.
+          </p>
+          <div style="display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap;">
+            <a href="contact.html" class="btn btn--primary btn--large">Start a Project</a>
+            <a href="case-studies.html" class="btn btn--outline btn--large">View Our Work</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <a href="index.html" class="footer__logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="16" cy="16" r="14"/>
+              <path d="M10 16C10 16 12 10 16 10C20 10 22 16 22 16C22 16 20 22 16 22C12 22 10 16 10 16Z"/>
+              <circle cx="16" cy="16" r="3" fill="currentColor"/>
+            </svg>
+            Oceanic
+          </a>
+          <p class="footer__description">
+            Premium e-commerce experience with cutting-edge design, exceptional products, and unparalleled service.
+          </p>
+          <div class="footer__social">
+            <a href="#" class="footer__social-link" aria-label="Twitter">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+              </svg>
+            </a>
+            <a href="#" class="footer__social-link" aria-label="Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </a>
+            <a href="#" class="footer__social-link" aria-label="LinkedIn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                <rect x="2" y="9" width="4" height="12"/>
+                <circle cx="4" cy="4" r="2"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="footer__title">Shop</h4>
+          <ul class="footer__links">
+            <li><a href="online-shop.html" class="footer__link">All Products</a></li>
+            <li><a href="services.html" class="footer__link">Services</a></li>
+            <li><a href="pricing.html" class="footer__link">Pricing</a></li>
+            <li><a href="case-studies.html" class="footer__link">Case Studies</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="footer__title">Company</h4>
+          <ul class="footer__links">
+            <li><a href="about.html" class="footer__link">About Us</a></li>
+            <li><a href="blog.html" class="footer__link">Blog</a></li>
+            <li><a href="resources.html" class="footer__link">Resources</a></li>
+            <li><a href="contact.html" class="footer__link">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="footer__title">Support</h4>
+          <ul class="footer__links">
+            <li><a href="#" class="footer__link">Help Center</a></li>
+            <li><a href="#" class="footer__link">Terms of Service</a></li>
+            <li><a href="#" class="footer__link">Privacy Policy</a></li>
+            <li><a href="#" class="footer__link">Status</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer__bottom">
+        <p class="footer__copyright">&copy; 2026 Oceanic. All rights reserved.</p>
+        <div class="footer__legal">
+          <a href="#" class="footer__legal-link">Terms</a>
+          <a href="#" class="footer__legal-link">Privacy</a>
+          <a href="#" class="footer__legal-link">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js" defer></script>
+  <script src="js/components.js" defer></script>
+</body>
+</html>

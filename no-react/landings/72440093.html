@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+    DESIGN SEED DECOMPOSITION: 72440093
+    ------------------------------------
+    7: Asymmetric Rhythm - Layout elements are offset by 7% or 7vw to break the traditional grid.
+    2: Mode Duality - Deep focus on the Light/Dark transition, using CSS variables for a total atmosphere shift.
+    4: Core Geometry - 4-point polygon clipping masks and 4px sharp/soft border pairings.
+    4: Interaction Layers - 4 distinct animation states: Hover Scale, Scroll Fade, Mouse Parallax, and Path-Following cursors.
+    0: Zero Gravity - Floating elements with no fixed anchor, creating a weightless browsing experience.
+    0: Zero Friction - Ultra-smooth momentum scrolling and liquid-like transitions.
+    9: Saturation Index - Using 90% saturated accents against monochromatic backgrounds for a "Vapor-Brutalist" visual pop.
+    3: Spatial Depth - 3-level Z-index stacking (Background Fluid, Content Layer, Floating UI Orbs).
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHER // 72440093</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Outfit:wght@200;600;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --text: #0a0a0a;
+            --accent: #ff3e00;
+            --accent-soft: rgba(255, 62, 0, 0.1);
+            --surface: #ffffff;
+            --glass: rgba(255, 255, 255, 0.7);
+            --border: #e0e0e0;
+            --transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            --font-main: 'Space Grotesk', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg: #050505;
+            --text: #ffffff;
+            --accent: #00f3ff;
+            --accent-soft: rgba(0, 243, 255, 0.1);
+            --surface: #0f0f0f;
+            --glass: rgba(15, 15, 15, 0.7);
+            --border: #222222;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            transition: var(--transition);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- Custom Cursor (Seed '4' Interaction) --- */
+        #cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        #cursor-follower {
+            position: fixed;
+            width: 50px;
+            height: 50px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 400;
+            position: relative;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        /* --- Theme Toggle --- */
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            width: 60px;
+            height: 30px;
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+        }
+
+        .toggle-dot {
+            width: 22px;
+            height: 22px;
+            background: var(--accent);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        [data-theme="dark"] .toggle-dot {
+            transform: translateX(28px);
+        }
+
+        /* --- Hero Section (Seed '7' & '9' Impact) --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 7%;
+            position: relative;
+        }
+
+        .hero-title {
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 15vw, 12rem);
+            font-weight: 900;
+            line-height: 0.85;
+            margin-bottom: 2rem;
+            z-index: 2;
+        }
+
+        .hero-title span {
+            display: block;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--text);
+        }
+
+        .hero-description {
+            max-width: 500px;
+            margin-left: 7%;
+            font-size: 1.25rem;
+            opacity: 0.8;
+            border-left: 2px solid var(--accent);
+            padding-left: 2rem;
+        }
+
+        /* --- Floating Orbs (Seed '0' & '3') --- */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            top: 10%;
+            right: -5%;
+            animation: float 10s infinite alternate;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: #bc00ff;
+            bottom: 10%;
+            left: -5%;
+            animation: float 15s infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(50px, 100px);
+            }
+        }
+
+        /* --- Sections --- */
+        section {
+            padding: 10rem 7%;
+            position: relative;
+        }
+
+        .section-header {
+            margin-bottom: 5rem;
+            display: flex;
+            align-items: flex-end;
+            gap: 2rem;
+        }
+
+        .section-header h2 {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 8vw, 5rem);
+            line-height: 0.9;
+        }
+
+        /* --- Grid (Seed '4' Features) --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 3rem 2rem;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%);
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-10px) rotate(1deg);
+        }
+
+        .card-num {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            font-weight: 700;
+        }
+
+        .card h3 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* --- Visual Section (Seed '7' Offset) --- */
+        .visual-split {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            align-items: center;
+            gap: 5rem;
+        }
+
+        @media (max-width: 900px) {
+            .visual-split {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .visual-box {
+            aspect-ratio: 16/9;
+            background: var(--accent-soft);
+            position: relative;
+            margin-left: 7%;
+            border: 1px solid var(--border);
+        }
+
+        .visual-inner {
+            position: absolute;
+            top: 7%;
+            left: -7%;
+            width: 100%;
+            height: 100%;
+            background: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg);
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .visual-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1) contrast(1.2);
+            mix-blend-mode: luminosity;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 5rem 7%;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .footer-logo h4 {
+            font-family: var(--font-heading);
+            font-size: 4rem;
+            font-weight: 900;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-block;
+            padding: 1.2rem 2.5rem;
+            background: var(--text);
+            color: var(--bg);
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            transition: var(--transition);
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            transform: translateX(10px);
+        }
+
+        /* --- Scroll Text (Novelty) --- */
+        .horizontal-scroll {
+            white-space: nowrap;
+            overflow: hidden;
+            background: var(--text);
+            color: var(--bg);
+            padding: 1rem 0;
+            margin: 5rem 0;
+        }
+
+        .scroll-track {
+            display: inline-block;
+            animation: scroll 20s linear infinite;
+        }
+
+        .scroll-track span {
+            font-family: var(--font-heading);
+            font-size: 6rem;
+            font-weight: 900;
+            margin-right: 2rem;
+            text-transform: uppercase;
+        }
+
+        @keyframes scroll {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* --- Image Styles --- */
+        .img-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--border), var(--surface));
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+
+    <nav>
+        <div class="logo">Aether // 72440093</div>
+        <div class="nav-links">
+            <a href="#work">Our Essence</a>
+            <a href="#about">The Lab</a>
+            <a href="#contact">Synchronize</a>
+        </div>
+        <div class="theme-toggle" id="modeToggle" title="Toggle Reality">
+            <div class="toggle-dot"></div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+
+            <h1 class="hero-title">
+                LIMIT<span>LESS</span>
+                FUTURE
+            </h1>
+            <div class="hero-description">
+                Deconstructing visual paradigms using seed index 72440093. A digital experience built on asymmetric
+                rhythm and structural duality.
+            </div>
+
+            <div style="margin-top: 4rem; margin-left: 7%;">
+                <a href="#" class="btn">Explore Flux</a>
+            </div>
+        </section>
+
+        <!-- Scrolling Banner -->
+        <div class="horizontal-scroll">
+            <div class="scroll-track">
+                <span>REDEFINE • MODERNITY • ASYMMETRY • DIGITAL • </span>
+                <span>REDEFINE • MODERNITY • ASYMMETRY • DIGITAL • </span>
+                <span>REDEFINE • MODERNITY • ASYMMETRY • DIGITAL • </span>
+                <span>REDEFINE • MODERNITY • ASYMMETRY • DIGITAL • </span>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <section id="work">
+            <div class="section-header">
+                <div class="card-num">SECTION.01</div>
+                <h2>CORE<br>SYSTEMS</h2>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <span class="card-num">01/04</span>
+                    <div>
+                        <h3>Neural<br>Architect</h3>
+                        <p>Leveraging seed-based randomness to generate unique spatial layouts.</p>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 7vh;">
+                    <span class="card-num">02/04</span>
+                    <div>
+                        <h3>Liquid<br>Motion</h3>
+                        <p>Animations following natural fluid dynamics and user momentum.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <span class="card-num">03/04</span>
+                    <div>
+                        <h3>Brutalist<br>Glass</h3>
+                        <p>High contrast surfaces meeting soft transparency effects.</p>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 7vh;">
+                    <span class="card-num">04/04</span>
+                    <div>
+                        <h3>Spatial<br>Query</h3>
+                        <p>Z-index depth layering for an immersive 3D browsing field.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visual Split Section -->
+        <section id="about">
+            <div class="visual-split">
+                <div class="visual-box">
+                    <div class="visual-inner">
+                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200"
+                            alt="Liquid Glass Abstract">
+                    </div>
+                </div>
+                <div class="visual-content">
+                    <div class="card-num" style="margin-bottom: 2rem;">SECTION.02</div>
+                    <h2 style="font-family: var(--font-heading); font-size: 4rem; line-height: 1; margin-bottom: 2rem;">
+                        THE<br>SYMMETRY<br>VOID</h2>
+                    <p style="margin-bottom: 3rem; font-size: 1.1rem; opacity: 0.7;">We break the 7th-degree grid
+                        intentionally to force visual focus on the content that matters. This is the 72440093 paradigm.
+                    </p>
+                    <a href="#" class="btn">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA Section -->
+        <section style="text-align: center; background: var(--accent-soft);">
+            <h2 style="font-family: var(--font-heading); font-size: clamp(3rem, 10vw, 8rem); margin-bottom: 2rem;">READY
+                TO<br>FLUX?</h2>
+            <a href="#" class="btn" style="background: var(--accent); color: white;">Synchronize Now</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-logo">
+            <h4>AETHER</h4>
+            <p>© 2026 // SEED 72440093</p>
+        </div>
+        <div style="display: flex; gap: 4rem;">
+            <div>
+                <p style="font-weight: 700; margin-bottom: 1rem;">SOCIAL</p>
+                <p>INSTAGRAM</p>
+                <p>TWITTER</p>
+            </div>
+            <div>
+                <p style="font-weight: 700; margin-bottom: 1rem;">LEGAL</p>
+                <p>PRIVACY</p>
+                <p>ETHEREAL</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- Theme Toggle Logic ---
+        const modeToggle = document.getElementById('modeToggle');
+        const body = document.body;
+
+        modeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+        });
+
+        // --- Custom Cursor Logic (Seed '4') ---
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
+
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+
+            // Immediate cursor
+            cursor.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
+            // Lagging follower
+            setTimeout(() => {
+                follower.style.transform = `translate3d(${x - 15}px, ${y - 15}px, 0)`;
+            }, 50);
+        });
+
+        // Hover Effect on buttons/links
+        const links = document.querySelectorAll('a, .theme-toggle, .card');
+        links.forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                follower.style.transform = `scale(2) translate3d(${window.lastX - 7.5}px, ${window.lastY - 7.5}px, 0)`;
+                follower.style.background = 'var(--accent-soft)';
+            });
+            link.addEventListener('mouseleave', () => {
+                follower.style.transform = `scale(1) translate3d(${window.lastX - 15}px, ${window.lastY - 15}px, 0)`;
+                follower.style.background = 'transparent';
+            });
+        });
+
+        // Track last position for scale logic
+        window.lastX = 0;
+        window.lastY = 0;
+        document.addEventListener('mousemove', (e) => {
+            window.lastX = e.clientX;
+            window.lastY = e.clientY;
+        });
+
+        // --- Intersection Observer for Scroll Animations ---
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0) scale(1)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section, .card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(50px) scale(0.95)';
+            el.style.transition = 'all 1s cubic-bezier(0.23, 1, 0.32, 1)';
+            observer.observe(el);
+        });
+
+    </script>
+</body>
+
+</html>

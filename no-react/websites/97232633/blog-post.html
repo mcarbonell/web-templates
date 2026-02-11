@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Ultimate Guide to Web Performance Optimization in 2024 | Alex Chen</title>
+  <meta name="description" content="Learn the latest techniques for achieving sub-second load times, from Core Web Vitals optimization to advanced caching strategies.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  
+  <!-- Page-specific Critical CSS -->
+  <style>
+    /* Article Header */
+    .article-header {
+      padding: calc(var(--header-height) + var(--space-2xl)) 0 var(--space-xl);
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .article-meta {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+      font-size: 0.9375rem;
+      color: var(--color-text-muted);
+      flex-wrap: wrap;
+    }
+    
+    .article-category {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+    
+    .article-header h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: var(--space-md);
+      line-height: 1.2;
+    }
+    
+    .article-excerpt {
+      font-size: 1.25rem;
+      color: var(--color-text-secondary);
+      font-family: var(--font-secondary);
+      font-style: italic;
+    }
+    
+    /* Hero Image */
+    .article-hero-image {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto var(--space-2xl);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    
+    .article-hero-image img {
+      width: 100%;
+      height: auto;
+    }
+    
+    /* Article Layout */
+    .article-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: var(--space-3xl);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    /* Article Content (Digit 2 = 7: Geometric + Serif typography) */
+    .article-content {
+      font-size: 1.125rem;
+      line-height: 1.8;
+    }
+    
+    .article-content h2 {
+      font-size: 2rem;
+      margin: var(--space-2xl) 0 var(--space-lg);
+      color: var(--color-text-primary);
+    }
+    
+    .article-content h3 {
+      font-size: 1.5rem;
+      margin: var(--space-xl) 0 var(--space-md);
+      color: var(--color-text-primary);
+    }
+    
+    .article-content p {
+      margin-bottom: var(--space-lg);
+      color: var(--color-text-secondary);
+    }
+    
+    .article-content ul,
+    .article-content ol {
+      margin-bottom: var(--space-lg);
+      padding-left: var(--space-xl);
+    }
+    
+    .article-content li {
+      margin-bottom: var(--space-sm);
+      color: var(--color-text-secondary);
+    }
+    
+    .article-content strong {
+      color: var(--color-text-primary);
+      font-weight: 600;
+    }
+    
+    .article-content a {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    
+    .article-content blockquote {
+      border-left: 4px solid var(--color-primary);
+      padding-left: var(--space-lg);
+      margin: var(--space-xl) 0;
+      font-family: var(--font-secondary);
+      font-style: italic;
+      font-size: 1.25rem;
+      color: var(--color-text-primary);
+    }
+    
+    .article-content code {
+      background: var(--color-bg-card);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      color: var(--color-primary);
+    }
+    
+    .article-content pre {
+      background: var(--color-bg-card);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      margin: var(--space-lg) 0;
+    }
+    
+    .article-content pre code {
+      background: none;
+      padding: 0;
+      color: var(--color-text-secondary);
+    }
+    
+    /* Table of Contents */
+    .toc {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-lg));
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .toc h4 {
+      font-size: 1rem;
+      margin-bottom: var(--space-md);
+      color: var(--color-primary);
+    }
+    
+    .toc ul {
+      list-style: none;
+    }
+    
+    .toc li {
+      margin-bottom: var(--space-sm);
+    }
+    
+    .toc a {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+      transition: color var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .toc a:hover,
+    .toc a.is-active {
+      color: var(--color-primary);
+    }
+    
+    /* Author Box */
+    .author-box {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      padding: var(--space-xl);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      margin: var(--space-2xl) 0;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .author-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--gradient-hero);
+      flex-shrink: 0;
+    }
+    
+    .author-info h4 {
+      margin-bottom: var(--space-xs);
+    }
+    
+    .author-info p {
+      font-size: 0.9375rem;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .author-social {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .author-social a {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+    }
+    
+    /* Share */
+    .share-section {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-lg) 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: var(--space-xl);
+    }
+    
+    .share-label {
+      font-size: 0.9375rem;
+      color: var(--color-text-muted);
+    }
+    
+    .share-buttons {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .share-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .share-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    
+    /* Related Posts */
+    .related-posts {
+      background: var(--color-bg-darker);
+      padding: var(--space-2xl) 0;
+      margin-top: var(--space-2xl);
+    }
+    
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+    }
+    
+    /* Navigation */
+    .article-navigation {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--space-xl) 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: var(--space-xl);
+    }
+    
+    .article-nav-link {
+      display: flex;
+      flex-direction: column;
+      max-width: 300px;
+    }
+    
+    .article-nav-link.next {
+      text-align: right;
+      align-items: flex-end;
+    }
+    
+    .article-nav-label {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .article-nav-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .article-layout {
+        grid-template-columns: 1fr;
+      }
+      
+      .toc {
+        position: relative;
+        top: 0;
+        order: -1;
+        margin-bottom: var(--space-xl);
+      }
+      
+      .related-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .author-box {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .related-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .article-navigation {
+        flex-direction: column;
+        gap: var(--space-lg);
+      }
+      
+      .article-nav-link.next {
+        text-align: left;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header" data-header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">
+          <span class="logo-text">AC</span>
+        </a>
+        
+        <nav class="main-nav" data-main-nav>
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="about.html" class="nav-link">About</a></li>
+            <li><a href="services.html" class="nav-link">Services</a></li>
+            <li><a href="case-studies.html" class="nav-link">Work</a></li>
+            <li><a href="blog.html" class="nav-link">Blog</a></li>
+            <li><a href="contact.html" class="nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+            <span class="theme-icon">🌙</span>
+          </button>
+          <a href="contact.html" class="btn btn-primary btn-sm">Let's Talk</a>
+          <button class="mobile-toggle" data-mobile-toggle aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <main>
+    <!-- Article Header -->
+    <header class="article-header reveal">
+      <div class="container">
+        <div class="article-meta">
+          <span class="article-category">Development</span>
+          <span>January 15, 2024</span>
+          <span>8 min read</span>
+        </div>
+        <h1>The Ultimate Guide to Web Performance Optimization in 2024</h1>
+        <p class="article-excerpt">Learn the latest techniques for achieving sub-second load times, from Core Web Vitals optimization to advanced caching strategies that actually work.</p>
+      </div>
+    </header>
+    
+    <!-- Hero Image -->
+    <div class="article-hero-image reveal">
+      <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&h=600&fit=crop" alt="Web Performance">
+    </div>
+    
+    <!-- Article Content -->
+    <article class="section">
+      <div class="container">
+        <div class="article-layout">
+          <div class="article-content reveal">
+            <p>Web performance has never been more critical. With Google's Core Web Vitals now a ranking factor and users expecting instant experiences, optimizing your site's speed is no longer optional—it's essential for success.</p>
+            
+            <p>In this comprehensive guide, I'll share the techniques I've used to achieve 99/100 Lighthouse scores and sub-second load times for clients across various industries.</p>
+            
+            <h2>Understanding Core Web Vitals</h2>
+            
+            <p>Before diving into optimization techniques, let's understand what we're measuring. Core Web Vitals are three specific metrics that Google considers essential for user experience:</p>
+            
+            <ul>
+              <li><strong>Largest Contentful Paint (LCP):</strong> Measures loading performance. Should occur within 2.5 seconds.</li>
+              <li><strong>First Input Delay (FID):</strong> Measures interactivity. Should be less than 100 milliseconds.</li>
+              <li><strong>Cumulative Layout Shift (CLS):</strong> Measures visual stability. Should be less than 0.1.</li>
+            </ul>
+            
+            <blockquote>
+              "Performance is not just a technical metric—it's a fundamental part of user experience and business success."
+            </blockquote>
+            
+            <h2>Image Optimization</h2>
+            
+            <p>Images are often the largest assets on a webpage. Here's how to optimize them effectively:</p>
+            
+            <h3>1. Use Modern Formats</h3>
+            
+            <p>WebP and AVIF offer significantly better compression than JPEG and PNG without sacrificing quality. Serve these formats with fallbacks:</p>
+            
+            <pre><code><picture>
+  <source srcset="image.avif" type="image/avif">
+  <source srcset="image.webp" type="image/webp">
+  <img src="image.jpg" alt="Description">
+</picture></code></pre>
+            
+            <h3>2. Implement Responsive Images</h3>
+            
+            <p>Don't serve desktop-sized images to mobile devices. Use the <code>sizes</code> and <code>srcset</code> attributes:</p>
+            
+            <pre><code><img 
+  srcset="small.jpg 400w, medium.jpg 800w, large.jpg 1200w"
+  sizes="(max-width: 600px) 400px, (max-width: 1000px) 800px, 1200px"
+  src="large.jpg" 
+  alt="Description"></code></pre>
+            
+            <h3>3. Lazy Loading</h3>
+            
+            <p>Defer offscreen images with native lazy loading:</p>
+            
+            <pre><code><img src="image.jpg" loading="lazy" alt="Description"></code></pre>
+            
+            <h2>JavaScript Optimization</h2>
+            
+            <p>JavaScript is often the biggest culprit for slow interactions. Here's how to minimize its impact:</p>
+            
+            <ul>
+              <li><strong>Code Splitting:</strong> Break your bundle into smaller chunks</li>
+              <li><strong>Tree Shaking:</strong> Remove unused code automatically</li>
+              <li><strong>Dynamic Imports:</strong> Load code only when needed</li>
+              <li><strong>Defer Non-Critical JS:</strong> Use <code>defer</code> or <code>async</code> attributes</li>
+            </ul>
+            
+            <h2>Advanced Caching Strategies</h2>
+            
+            <p>Effective caching can make repeat visits lightning-fast:</p>
+            
+            <ol>
+              <li>Implement service workers for offline functionality</li>
+              <li>Use Cache-Control headers strategically</li>
+              <li>Consider stale-while-revalidate patterns</li>
+              <li>Preload critical resources</li>
+            </ol>
+            
+            <h2>Measuring and Monitoring</h2>
+            
+            <p>Optimization is an ongoing process. Set up monitoring with:</p>
+            
+            <ul>
+              <li>Google Search Console Core Web Vitals report</li>
+              <li>Chrome User Experience Report (CrUX)</li>
+              <li>Real User Monitoring (RUM) tools</li>
+              <li>Automated Lighthouse CI checks</li>
+            </ul>
+            
+            <h2>Conclusion</h2>
+            
+            <p>Web performance optimization is a continuous journey, not a one-time task. By implementing these techniques and monitoring your metrics regularly, you'll provide better experiences for your users and improve your search rankings.</p>
+            
+            <p>Start with the biggest wins—image optimization and JavaScript reduction—then progressively implement more advanced techniques. Your users (and your business) will thank you.</p>
+            
+            <!-- Author Box -->
+            <div class="author-box">
+              <div class="author-avatar"></div>
+              <div class="author-info">
+                <h4>Written by Alex Chen</h4>
+                <p>Creative developer passionate about performance and user experience. Helping businesses create faster, better web experiences.</p>
+                <div class="author-social">
+                  <a href="#">Twitter</a>
+                  <a href="#">LinkedIn</a>
+                  <a href="#">GitHub</a>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Share -->
+            <div class="share-section">
+              <span class="share-label">Share this article:</span>
+              <div class="share-buttons">
+                <a href="#" class="share-btn" aria-label="Share on Twitter">𝕏</a>
+                <a href="#" class="share-btn" aria-label="Share on LinkedIn">in</a>
+                <a href="#" class="share-btn" aria-label="Share on Facebook">f</a>
+                <a href="#" class="share-btn" aria-label="Copy link">🔗</a>
+              </div>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="article-navigation">
+              <a href="blog-post.html" class="article-nav-link">
+                <span class="article-nav-label">← Previous</span>
+                <span class="article-nav-title">Building Scalable Design Systems</span>
+              </a>
+              <a href="blog-post.html" class="article-nav-link next">
+                <span class="article-nav-label">Next →</span>
+                <span class="article-nav-title">From Employee to Freelancer</span>
+              </a>
+            </nav>
+          </div>
+          
+          <!-- Sidebar -->
+          <aside class="article-sidebar reveal">
+            <div class="toc">
+              <h4>Table of Contents</h4>
+              <ul>
+                <li><a href="#understanding">Understanding Core Web Vitals</a></li>
+                <li><a href="#images">Image Optimization</a></li>
+                <li><a href="#javascript">JavaScript Optimization</a></li>
+                <li><a href="#caching">Advanced Caching</a></li>
+                <li><a href="#measuring">Measuring & Monitoring</a></li>
+                <li><a href="#conclusion">Conclusion</a></li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </article>
+    
+    <!-- Related Posts -->
+    <section class="related-posts">
+      <div class="container">
+        <h2 class="reveal" style="text-align: center; margin-bottom: var(--space-xl);">More Articles</h2>
+        <div class="related-grid stagger-children">
+          <article class="blog-card card reveal">
+            <div class="blog-card-image">
+              <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=250&fit=crop" alt="Design Systems">
+            </div>
+            <div class="blog-card-content">
+              <div class="blog-meta">
+                <span class="blog-category">Design</span>
+                <span>Jan 10, 2024</span>
+              </div>
+              <h3 style="font-size: 1.125rem;">Building Scalable Design Systems</h3>
+              <a href="blog-post.html" class="blog-read-more">Read Article</a>
+            </div>
+          </article>
+          
+          <article class="blog-card card reveal">
+            <div class="blog-card-image">
+              <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=250&fit=crop" alt="Freelancing">
+            </div>
+            <div class="blog-card-content">
+              <div class="blog-meta">
+                <span class="blog-category">Career</span>
+                <span>Jan 5, 2024</span>
+              </div>
+              <h3 style="font-size: 1.125rem;">From Employee to Freelancer</h3>
+              <a href="blog-post.html" class="blog-read-more">Read Article</a>
+            </div>
+          </article>
+          
+          <article class="blog-card card reveal">
+            <div class="blog-card-image">
+              <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=250&fit=crop" alt="React">
+            </div>
+            <div class="blog-card-content">
+              <div class="blog-meta">
+                <span class="blog-category">Tutorials</span>
+                <span>Dec 28, 2023</span>
+              </div>
+              <h3 style="font-size: 1.125rem;">Advanced React Patterns</h3>
+              <a href="blog-post.html" class="blog-read-more">Read Article</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-text">AC</span>
+          </a>
+          <p>Creative developer & designer crafting digital experiences that make an impact.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="GitHub">⌘</a>
+            <a href="#" aria-label="Dribbble">🏀</a>
+          </div>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="case-studies.html">Work</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="services.html">Web Development</a></li>
+            <li><a href="services.html">UI/UX Design</a></li>
+            <li><a href="services.html">Branding</a></li>
+            <li><a href="services.html">Consulting</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hello@alexchen.dev">hello@alexchen.dev</a></li>
+            <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
+            <li>San Francisco, CA</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Alex Chen. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  
+  <!-- Shared Component Styles -->
+  <style>
+    /* Header Styles */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: var(--header-height);
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+    
+    .header.is-scrolled {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .header.is-hidden {
+      transform: translateY(-100%);
+    }
+    
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+    
+    .logo {
+      font-family: var(--font-primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    
+    .logo-text {
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .main-nav {
+      display: flex;
+    }
+    
+    .nav-list {
+      display: flex;
+      gap: var(--space-xl);
+      list-style: none;
+    }
+    
+    .nav-link {
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      position: relative;
+      padding: var(--space-sm) 0;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-hero);
+      transition: width var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .nav-link:hover,
+    .nav-link.is-active {
+      color: var(--color-text-primary);
+    }
+    
+    .nav-link:hover::after,
+    .nav-link.is-active::after {
+      width: 100%;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: var(--color-primary);
+    }
+    
+    .btn-sm {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.875rem;
+    }
+    
+    .mobile-toggle {
+      display: none;
+      width: 40px;
+      height: 40px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    
+    .mobile-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--color-text-primary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    /* Footer Styles */
+    .footer {
+      background: var(--color-bg-darker);
+      padding: var(--space-2xl) 0 var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .footer-brand p {
+      margin: var(--space-md) 0 var(--space-lg);
+      font-size: 1rem;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .social-links a:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    
+    .footer-nav h4 {
+      font-size: 1rem;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text-primary);
+    }
+    
+    .footer-nav ul {
+      list-style: none;
+    }
+    
+    .footer-nav li {
+      margin-bottom: var(--space-sm);
+    }
+    
+    .footer-nav a {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+      transition: color var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .footer-nav a:hover {
+      color: var(--color-primary);
+    }
+    
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-bottom p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    .footer-legal {
+      display: flex;
+      gap: var(--space-lg);
+    }
+    
+    .footer-legal a {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-nav {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        background: var(--color-bg-card);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: var(--space-lg);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--duration-normal) var(--ease-out-expo);
+      }
+      
+      .main-nav.is-open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .nav-list {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+      
+      .mobile-toggle {
+        display: flex;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-md);
+        text-align: center;
+      }
+    }
+  </style>
+</body>
+</html>

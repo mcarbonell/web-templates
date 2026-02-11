@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lumina - Modern Collaboration Platform</title>
+  <meta name="description" content="Streamline your team's workflow with intelligent collaboration tools.">
+  
+  <!-- Google Fonts: Typography Pairing from Seed Position 2 (Digit 6) -->
+  <!-- Pairing 6: Playfair Display + Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* =========================================================
+       SEED DECOMPOSITION SUMMARY: 569536930
+       Position 1: 5 → Color Palette: Warm Sunset (Orange/Pink/Deep Purple)
+       Position 2: 6 → Typography: Playfair Display + Inter
+       Position 3: 9 → Layout Rhythm: Ultra-dense spacing (compact)
+       Position 4: 3 → Animation: Moderate (smooth reveals, subtle parallax)
+       Position 5: 6 → Corner Treatment: Medium-rounded (16-24px)
+       Position 6: 9 → Visual Texture: Rich layered (gradients, shadows, depth)
+       Position 7: 3 → Content Density: Moderate (balanced)
+       Position 8: 0 → Interaction Depth: Static (no 3D transforms)
+       Position 9: 0 → Accent Geometry: Circular (borders, buttons, avatars)
+       ========================================================= */
+
+    :root {
+      /* Seed Position 1 (Digit 5): Warm Sunset Palette */
+      --color-primary: #FF6B35;
+      --color-primary-light: #FF8A5B;
+      --color-secondary: #E94E77;
+      --color-accent: #7B2D8E;
+      --color-accent-light: #9B4FA8;
+      
+      --color-bg: #FDF8F5;
+      --color-surface: #FFFFFF;
+      --color-surface-elevated: #FFF5F0;
+      --color-text: #2D1F1A;
+      --color-text-muted: #6B5A52;
+      --color-text-subtle: #9B8B82;
+      
+      /* Seed Position 5 (Digit 6): Medium-rounded corners */
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+      
+      /* Seed Position 3 (Digit 9): Ultra-dense spacing */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+      --space-16: 64px;
+      
+      /* Typography Scale */
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      
+      /* Seed Position 6 (Digit 9): Rich layered textures */
+      --shadow-sm: 0 2px 8px rgba(45, 31, 26, 0.08);
+      --shadow-md: 0 4px 16px rgba(45, 31, 26, 0.12);
+      --shadow-lg: 0 8px 32px rgba(45, 31, 26, 0.16);
+      --shadow-xl: 0 16px 64px rgba(45, 31, 26, 0.2);
+      
+      --gradient-hero: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 50%, var(--color-accent) 100%);
+      --gradient-surface: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%);
+      --gradient-accent: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(233, 78, 119, 0.1) 100%);
+      
+      --transition-fast: 150ms ease;
+      --transition-base: 300ms ease;
+      --transition-slow: 500ms ease;
+    }
+
+    [data-theme="dark"] {
+      --color-bg: #1A1412;
+      --color-surface: #2D2420;
+      --color-surface-elevated: #3D3230;
+      --color-text: #FDF8F5;
+      --color-text-muted: #B5A8A0;
+      --color-text-subtle: #8B7B72;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+      --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.6);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color var(--transition-base), color var(--transition-base);
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+    }
+
+    h2 {
+      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    }
+
+    h3 {
+      font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    }
+
+    p {
+      font-size: clamp(0.9375rem, 1.5vw, 1rem);
+      color: var(--color-text-muted);
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 var(--space-5);
+    }
+
+    /* =========================================================
+       NAVIGATION
+       ========================================================= */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(253, 248, 245, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(45, 31, 26, 0.1);
+      transition: all var(--transition-base);
+    }
+
+    [data-theme="dark"] .nav {
+      background: rgba(26, 20, 18, 0.9);
+      border-bottom-color: rgba(253, 248, 245, 0.1);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: var(--space-8);
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      transition: color var(--transition-fast);
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary);
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-5);
+      background: var(--gradient-hero);
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: var(--radius-full);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .theme-toggle {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(45, 31, 26, 0.15);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+
+    .theme-toggle:hover {
+      background: var(--color-surface-elevated);
+    }
+
+    .theme-icon {
+      width: 20px;
+      height: 20px;
+      fill: var(--color-text);
+    }
+
+    /* Mobile Nav */
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-2);
+    }
+
+    .mobile-menu-btn span {
+      width: 24px;
+      height: 2px;
+      background: var(--color-text);
+      transition: all var(--transition-fast);
+      border-radius: 2px;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+    }
+
+    /* =========================================================
+       HERO SECTION
+       Seed Position 1 (5): Warm Sunset palette
+       Seed Position 4 (3): Moderate animation - smooth reveals
+       Seed Position 6 (9): Rich layered texture with gradients
+       ========================================================= */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 72px;
+      overflow: hidden;
+    }
+
+    /* Abstract geometric background pattern from Seed Position 9 (0): Circular geometry */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .hero-blob {
+      position: absolute;
+      border-radius: var(--radius-full);
+      filter: blur(80px);
+      opacity: 0.6;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .hero-blob-1 {
+      width: 600px;
+      height: 600px;
+      background: var(--color-primary);
+      top: -200px;
+      right: -100px;
+      animation-delay: 0s;
+    }
+
+    .hero-blob-2 {
+      width: 500px;
+      height: 500px;
+      background: var(--color-secondary);
+      bottom: -150px;
+      left: -100px;
+      animation-delay: -7s;
+    }
+
+    .hero-blob-3 {
+      width: 400px;
+      height: 400px;
+      background: var(--color-accent);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -14s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -30px) scale(1.05); }
+      50% { transform: translate(-20px, 20px) scale(0.95); }
+      75% { transform: translate(-30px, -20px) scale(1.02); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+      align-items: center;
+    }
+
+    .hero-text {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--gradient-accent);
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-bottom: var(--space-5);
+    }
+
+    .hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--color-primary);
+      border-radius: var(--radius-full);
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    .hero h1 {
+      margin-bottom: var(--space-5);
+      color: var(--color-text);
+    }
+
+    .hero h1 span {
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subheadline {
+      font-size: 1.125rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-8);
+      max-width: 480px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-6);
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--gradient-hero);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+      background: var(--color-surface);
+      color: var(--color-text);
+      border: 1px solid rgba(45, 31, 26, 0.15);
+    }
+
+    [data-theme="dark"] .btn-secondary {
+      border-color: rgba(253, 248, 245, 0.15);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-surface-elevated);
+    }
+
+    .trust-indicator {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .trust-avatars {
+      display: flex;
+    }
+
+    /* Seed Position 9 (0): Circular geometry for avatars */
+    .trust-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: 3px solid var(--color-surface);
+      margin-left: -12px;
+      object-fit: cover;
+    }
+
+    .trust-avatar:first-child {
+      margin-left: 0;
+    }
+
+    .trust-text {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+    }
+
+    .trust-text strong {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    .hero-visual {
+      position: relative;
+      opacity: 0;
+      transform: translateX(30px);
+      animation: fadeLeft 0.8s ease 0.3s forwards;
+    }
+
+    .hero-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8);
+      box-shadow: var(--shadow-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-hero);
+    }
+
+    .hero-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--space-2);
+      height: 200px;
+      margin-bottom: var(--space-5);
+    }
+
+    .hero-chart-bar {
+      flex: 1;
+      background: var(--gradient-hero);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      opacity: 0.8;
+      transition: all var(--transition-base);
+    }
+
+    .hero-chart-bar:hover {
+      opacity: 1;
+    }
+
+    .hero-chart-bar:nth-child(1) { height: 60%; }
+    .hero-chart-bar:nth-child(2) { height: 80%; }
+    .hero-chart-bar:nth-child(3) { height: 45%; }
+    .hero-chart-bar:nth-child(4) { height: 95%; }
+    .hero-chart-bar:nth-child(5) { height: 70%; }
+    .hero-chart-bar:nth-child(6) { height: 100%; }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat-value {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-stat-label {
+      font-size: 0.75rem;
+      color: var(--color-text-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeLeft {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @media (max-width: 968px) {
+      .hero-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      
+      .hero-subheadline {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .hero-ctas {
+        justify-content: center;
+      }
+      
+      .trust-indicator {
+        justify-content: center;
+      }
+      
+      .hero-visual {
+        order: -1;
+      }
+    }
+
+    /* =========================================================
+       SOCIAL PROOF SECTION
+       Seed Position 5 (6): Medium-rounded card shapes
+       Seed Position 6 (9): Rich layered shadows
+       ========================================================= */
+    .social-proof {
+      padding: var(--space-16) 0;
+      background: var(--color-surface);
+    }
+
+    .logos-section {
+      text-align: center;
+      margin-bottom: var(--space-16);
+    }
+
+    .logos-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-subtle);
+      margin-bottom: var(--space-6);
+    }
+
+    .logos-grid {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-10);
+      flex-wrap: wrap;
+    }
+
+    .logo-item {
+      height: 32px;
+      opacity: 0.4;
+      filter: grayscale(100%);
+      transition: all var(--transition-base);
+    }
+
+    .logo-item:hover {
+      opacity: 1;
+      filter: grayscale(0%);
+    }
+
+    .testimonial-section {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+
+    .testimonial-card {
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      padding: var(--space-8);
+      position: relative;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-base);
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .testimonial-quote {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-style: italic;
+      color: var(--color-text);
+      margin-bottom: var(--space-6);
+      line-height: 1.5;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-full);
+      object-fit: cover;
+    }
+
+    .testimonial-info h4 {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .testimonial-info p {
+      font-size: 0.8125rem;
+      color: var(--color-text-subtle);
+    }
+
+    @media (max-width: 968px) {
+      .testimonial-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* =========================================================
+       FEATURE GRID SECTION
+       Seed Position 3 (9): High-density spacing
+       Seed Position 7 (3): Moderate content density
+       Seed Position 9 (0): Circular icons
+       ========================================================= */
+    .features {
+      padding: var(--space-16) 0;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto var(--space-12);
+    }
+
+    .section-label {
+      display: inline-block;
+      padding: var(--space-1) var(--space-3);
+      background: var(--gradient-accent);
+      color: var(--color-primary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-4);
+    }
+
+    .section-header h2 {
+      margin-bottom: var(--space-4);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+
+    .feature-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      padding: var(--space-8);
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-base);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--gradient-accent);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-5);
+    }
+
+    .feature-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--color-primary);
+    }
+
+    .feature-card h3 {
+      margin-bottom: var(--space-2);
+      font-family: var(--font-body);
+      font-weight: 600;
+    }
+
+    @media (max-width: 968px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* =========================================================
+       BENEFITS SHOWCASE
+       Seed Position 4 (3): Moderate animation - smooth reveals
+       Seed Position 6 (9): Rich layered textures
+       ========================================================= */
+    .benefits {
+      padding: var(--space-16) 0;
+      background: var(--color-surface);
+    }
+
+    .benefit-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+      align-items: center;
+      margin-bottom: var(--space-16);
+    }
+
+    .benefit-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .benefit-row:nth-child(even) .benefit-content {
+      order: 2;
+    }
+
+    .benefit-content h3 {
+      margin-bottom: var(--space-4);
+      font-family: var(--font-body);
+      font-size: 1.75rem;
+      font-weight: 600;
+    }
+
+    .benefit-content > p {
+      margin-bottom: var(--space-6);
+      font-size: 1rem;
+    }
+
+    .benefit-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .benefit-list li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-size: 0.9375rem;
+      color: var(--color-text-muted);
+    }
+
+    .benefit-check {
+      width: 20px;
+      height: 20px;
+      background: var(--gradient-hero);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .benefit-check svg {
+      width: 12px;
+      height: 12px;
+      stroke: white;
+      stroke-width: 2;
+    }
+
+    .benefit-visual {
+      position: relative;
+    }
+
+    .benefit-image-wrapper {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .benefit-image-wrapper img {
+      width: 100%;
+      height: auto;
+    }
+
+    .benefit-float {
+      position: absolute;
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .benefit-float-1 {
+      top: -20px;
+      right: -20px;
+    }
+
+    .benefit-float-2 {
+      bottom: -20px;
+      left: -20px;
+    }
+
+    @media (max-width: 968px) {
+      .benefit-row {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+      }
+      
+      .benefit-row:nth-child(even) .benefit-content {
+        order: 0;
+      }
+      
+      .benefit-float {
+        display: none;
+      }
+    }
+
+    /* =========================================================
+       PRICING SECTION
+       Seed Position 5 (6): Medium-rounded cards
+       Seed Position 7 (3): Moderate density - balanced info
+       ========================================================= */
+    .pricing {
+      padding: var(--space-16) 0;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8);
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-base);
+      position: relative;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .pricing-card.featured {
+      background: var(--gradient-hero);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .pricing-card.featured h3,
+    .pricing-card.featured .pricing-price,
+    .pricing-card.featured .pricing-period,
+    .pricing-card.featured .pricing-feature {
+      color: white;
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-accent);
+      color: white;
+      padding: var(--space-1) var(--space-4);
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+    }
+
+    .pricing-card h3 {
+      font-family: var(--font-body);
+      font-size: 1.25rem;
+      margin-bottom: var(--space-2);
+    }
+
+    .pricing-desc {
+      font-size: 0.875rem;
+      color: var(--color-text-subtle);
+      margin-bottom: var(--space-5);
+    }
+
+    .pricing-card.featured .pricing-desc {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .pricing-price {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-1);
+    }
+
+    .pricing-period {
+      font-size: 0.875rem;
+      color: var(--color-text-subtle);
+      margin-bottom: var(--space-6);
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .pricing-feature {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+
+    .pricing-feature svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    .pricing-card.featured .pricing-feature svg {
+      stroke: white;
+    }
+
+    .pricing-cta {
+      width: 100%;
+    }
+
+    .pricing-card.featured .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    @media (max-width: 968px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+      }
+      
+      .pricing-card.featured {
+        transform: scale(1);
+      }
+    }
+
+    /* =========================================================
+       FAQ SECTION
+       Seed Position 5 (6): Accordion style (medium density)
+       Seed Position 4 (3): Moderate animation - smooth height
+       ========================================================= */
+    .faq {
+      padding: var(--space-16) 0;
+      background: var(--color-surface);
+    }
+
+    .faq-grid {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .faq-item {
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .faq-question {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-5) var(--space-6);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text);
+      text-align: left;
+      transition: color var(--transition-fast);
+    }
+
+    .faq-question:hover {
+      color: var(--color-primary);
+    }
+
+    .faq-icon {
+      width: 20px;
+      height: 20px;
+      stroke: var(--color-text-subtle);
+      transition: transform var(--transition-base);
+      flex-shrink: 0;
+      margin-left: var(--space-3);
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--transition-base), padding var(--transition-base);
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 200px;
+      padding: 0 var(--space-6) var(--space-5);
+    }
+
+    .faq-answer p {
+      font-size: 0.9375rem;
+      color: var(--color-text-muted);
+    }
+
+    /* =========================================================
+       FINAL CTA SECTION
+       Seed Position 1 (5): Warm sunset gradient
+       Seed Position 4 (3): Moderate animation
+       Seed Position 6 (9): Rich layered texture
+       ========================================================= */
+    .final-cta {
+      padding: var(--space-16) 0;
+    }
+
+    .cta-box {
+      background: var(--gradient-hero);
+      border-radius: var(--radius-lg);
+      padding: var(--space-16) var(--space-8);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-box h2 {
+      color: white;
+      margin-bottom: var(--space-4);
+    }
+
+    .cta-box > p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.125rem;
+      margin-bottom: var(--space-8);
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-white {
+      background: white;
+      color: var(--color-primary);
+    }
+
+    .btn-white:hover {
+      background: var(--color-bg);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* =========================================================
+       FOOTER
+       Seed Position 6 (9): Rich layered texture
+       Seed Position 9 (0): Circular social icons
+       ========================================================= */
+    .footer {
+      padding: var(--space-16) 0 var(--space-8);
+      background: var(--color-text);
+      color: var(--color-text-muted);
+    }
+
+    [data-theme="dark"] .footer {
+      background: #0D0A09;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr);
+      gap: var(--space-10);
+      margin-bottom: var(--space-12);
+    }
+
+    .footer-brand p {
+      color: var(--color-text-subtle);
+      margin-bottom: var(--space-5);
+      max-width: 280px;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: var(--space-4);
+      display: inline-block;
+    }
+
+    .social-links {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .social-link {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+
+    .social-link:hover {
+      background: var(--color-primary);
+      transform: translateY(-2px);
+    }
+
+    .social-link svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+
+    .footer-column h4 {
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: white;
+      margin-bottom: var(--space-5);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .footer-links a {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      transition: color var(--transition-fast);
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      padding-top: var(--space-8);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .footer-bottom p {
+      font-size: 0.8125rem;
+      color: var(--color-text-subtle);
+    }
+
+    @media (max-width: 968px) {
+      .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* =========================================================
+       REVEAL ANIMATIONS
+       Seed Position 4 (3): Moderate animation intensity
+       ========================================================= */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Content visibility for below-fold sections */
+    .content-vis {
+      content-visibility: auto;
+      contain-intrinsic-size: 0 500px;
+    }
+
+    /* Utility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="#" class="nav-logo">Lumina</a>
+      <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#benefits" class="nav-link">Benefits</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <button class="theme-toggle" aria-label="Toggle theme" id="themeToggle">
+          <svg class="theme-icon" viewBox="0 0 24 24" id="themeIcon">
+            <path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z"/>
+            <path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <a href="#pricing" class="nav-cta">Get Started</a>
+      </div>
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <!--
+    SEED-DERIVED HERO DESIGN:
+    - Position 1 (5): Warm Sunset gradient palette (orange/pink/deep purple)
+    - Position 4 (3): Moderate animation - smooth fade-up reveals
+    - Position 6 (9): Rich layered texture with floating gradient blobs
+    - Position 9 (0): Circular geometry for avatars and decorative elements
+  -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-blob hero-blob-1"></div>
+      <div class="hero-blob hero-blob-2"></div>
+      <div class="hero-blob hero-blob-3"></div>
+    </div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            Now with AI-powered insights
+          </div>
+          <h1>Transform Your <span>Workflow</span> With Intelligent Collaboration</h1>
+          <p class="hero-subheadline">Streamline your team's productivity with our all-in-one platform. Connect, create, and deliver faster than ever before.</p>
+          <div class="hero-ctas">
+            <a href="#pricing" class="btn btn-primary">Start Free Trial</a>
+            <a href="#features" class="btn btn-secondary">Explore Features</a>
+          </div>
+          <div class="trust-indicator">
+            <div class="trust-avatars">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face" alt="User" class="trust-avatar">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face" alt="User" class="trust-avatar">
+              <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face" alt="User" class="trust-avatar">
+              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" alt="User" class="trust-avatar">
+            </div>
+            <p class="trust-text">Trusted by <strong>10,000+</strong> teams worldwide</p>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-card">
+            <div class="hero-chart">
+              <div class="hero-chart-bar"></div>
+              <div class="hero-chart-bar"></div>
+              <div class="hero-chart-bar"></div>
+              <div class="hero-chart-bar"></div>
+              <div class="hero-chart-bar"></div>
+              <div class="hero-chart-bar"></div>
+            </div>
+            <div class="hero-stats">
+              <div class="hero-stat">
+                <div class="hero-stat-value">98%</div>
+                <div class="hero-stat-label">Satisfaction</div>
+              </div>
+              <div class="hero-stat">
+                <div class="hero-stat-value">3x</div>
+                <div class="hero-stat-label">Faster Delivery</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof Section -->
+  <!--
+    SEED-DERIVED SOCIAL PROOF:
+    - Position 5 (6): Medium-rounded card shapes (16px radius)
+    - Position 6 (9): Rich layered shadows for depth
+    - Position 9 (0): Circular avatar geometry
+  -->
+  <section class="social-proof content-vis">
+    <div class="container">
+      <div class="logos-section">
+        <p class="logos-label">Trusted by innovative teams at</p>
+        <div class="logos-grid">
+          <svg class="logo-item" viewBox="0 0 120 30" fill="currentColor">
+            <text x="0" y="22" font-family="Inter, sans-serif" font-size="18" font-weight="700">Stripe</text>
+          </svg>
+          <svg class="logo-item" viewBox="0 0 120 30" fill="currentColor">
+            <text x="0" y="22" font-family="Inter, sans-serif" font-size="18" font-weight="700">Notion</text>
+          </svg>
+          <svg class="logo-item" viewBox="0 0 120 30" fill="currentColor">
+            <text x="0" y="22" font-family="Inter, sans-serif" font-size="18" font-weight="700">Figma</text>
+          </svg>
+          <svg class="logo-item" viewBox="0 0 120 30" fill="currentColor">
+            <text x="0" y="22" font-family="Inter, sans-serif" font-size="18" font-weight="700">Linear</text>
+          </svg>
+          <svg class="logo-item" viewBox="0 0 120 30" fill="currentColor">
+            <text x="0" y="22" font-family="Inter, sans-serif" font-size="18" font-weight="700">Vercel</text>
+          </svg>
+        </div>
+      </div>
+      
+      <div class="testimonial-section">
+        <div class="testimonial-card reveal">
+          <p class="testimonial-quote">"Lumina has completely transformed how our team collaborates. We've cut meeting time in half and increased productivity by 40%."</p>
+          <div class="testimonial-author">
+            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&h=80&fit=crop&crop=face" alt="Sarah Chen" class="testimonial-avatar">
+            <div class="testimonial-info">
+              <h4>Sarah Chen</h4>
+              <p>CEO, TechStart Inc.</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal">
+          <p class="testimonial-quote">"The intuitive interface and powerful features make Lumina an essential tool for our design workflow. Absolutely game-changing."</p>
+          <div class="testimonial-author">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face" alt="Marcus Johnson" class="testimonial-avatar">
+            <div class="testimonial-info">
+              <h4>Marcus Johnson</h4>
+              <p>Lead Designer, Creative Co.</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal">
+          <p class="testimonial-quote">"Best investment we've made this year. The ROI was visible within the first month. Our team can't imagine working without it."</p>
+          <div class="testimonial-author">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop&crop=face" alt="Emily Rodriguez" class="testimonial-avatar">
+            <div class="testimonial-info">
+              <h4>Emily Rodriguez</h4>
+              <p>Operations Director, ScaleUp</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <!--
+    SEED-DERIVED FEATURES GRID:
+    - Position 3 (9): High-density spacing system
+    - Position 7 (3): Moderate content density (balanced cards)
+    - Position 9 (0): Circular icon containers
+  -->
+  <section id="features" class="features content-vis">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Features</span>
+        <h2>Everything You Need to Succeed</h2>
+        <p>Powerful tools designed to help your team collaborate seamlessly, automate workflows, and deliver exceptional results.</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+              <path d="M2 17L12 22L22 17"/>
+              <path d="M2 12L12 17L22 12"/>
+            </svg>
+          </div>
+          <h3>Smart Workflows</h3>
+          <p>Automate repetitive tasks with intelligent workflows that adapt to your team's unique processes and save hours every week.</p>
+        </div>
+        
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13"/>
+              <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88"/>
+            </svg>
+          </div>
+          <h3>Team Collaboration</h3>
+          <p>Real-time collaboration tools that keep everyone aligned. Comment, edit, and share feedback instantly with your entire team.</p>
+        </div>
+        
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M21 16V8A2 2 0 0 0 19 6H5A2 2 0 0 0 3 8V16A2 2 0 0 0 5 18H19A2 2 0 0 0 21 16Z"/>
+              <path d="M7 10H7.01"/>
+              <path d="M11 10H11.01"/>
+              <path d="M15 10H15.01"/>
+              <path d="M7 14H7.01"/>
+              <path d="M11 14H11.01"/>
+              <path d="M15 14H15.01"/>
+            </svg>
+          </div>
+          <h3>Analytics Dashboard</h3>
+          <p>Gain deep insights into your team's performance with comprehensive analytics and customizable reporting dashboards.</p>
+        </div>
+        
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M12 22S3 18 3 12V5L12 2L21 5V12C21 18 12 22 12 22Z"/>
+              <path d="M9 12L11 14L15 10"/>
+            </svg>
+          </div>
+          <h3>Enterprise Security</h3>
+          <p>Bank-level encryption and compliance certifications ensure your data stays protected. SOC 2 Type II certified.</p>
+        </div>
+        
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <h3>Cross-Platform</h3>
+          <p>Access your workspace from anywhere. Native apps for iOS, Android, Mac, Windows, and Linux keep you connected.</p>
+        </div>
+        
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <h3>Custom Integrations</h3>
+          <p>Connect with 200+ tools you already use. Seamless integrations with Slack, Jira, GitHub, Figma, and more.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <!--
+    SEED-DERIVED BENEFITS SHOWCASE:
+    - Position 4 (3): Moderate animation - simple fade reveals
+    - Position 6 (9): Rich layered texture with floating elements
+    - Position 7 (3): Moderate content density
+  -->
+  <section id="benefits" class="benefits content-vis">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Why Lumina</span>
+        <h2>Built for Modern Teams</h2>
+        <p>Discover why thousands of teams choose Lumina to power their collaboration and productivity.</p>
+      </div>
+      
+      <div class="benefit-row reveal">
+        <div class="benefit-content">
+          <h3>Work Smarter, Not Harder</h3>
+          <p>Our AI-powered automation learns your workflow patterns and suggests optimizations that save you hours every week.</p>
+          <ul class="benefit-list">
+            <li>
+              <span class="benefit-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </span>
+              Automated task prioritization
+            </li>
+            <li>
+              <span class="benefit-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </span>
+              Smart meeting scheduling
+            </li>
+            <li>
+              <span class="benefit-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </span>
+              Intelligent document suggestions
+            </li>
+          </ul>
+        </div>
+        <div class="benefit-visual">
+          <div class="benefit-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&h=600&fit=crop" alt="Team collaboration dashboard">
+          </div>
+          <div class="benefit-float benefit-float-1">
+            <div style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--color-primary);">+47%</div>
+            <div style="font-size: 0.75rem; color: var(--color-text-subtle);">Productivity</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="benefit-row reveal">
+        <div class="benefit-content">
+          <h3>Stay in Sync, Always</h3>
+          <p>Real-time updates ensure everyone on your team is always working with the latest information, no matter where they are.</p>
+          <ul class="benefit-list">
+            <li>
+              <span class="benefit-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </span>
+              Live cursor presence
+            </li>
+            <li>
+              <span class="benefit-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </span>
+              Instant comment threads
+            </li>
+            <li>
+              <span class="benefit-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </span>
+              Notification management
+            </li>
+          </ul>
+        </div>
+        <div class="benefit-visual">
+          <div class="benefit-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=600&fit=crop" alt="Team meeting">
+          </div>
+          <div class="benefit-float benefit-float-2">
+            <div style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--color-secondary);">100%</div>
+            <div style="font-size: 0.75rem; color: var(--color-text-subtle);">Real-time</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <!--
+    SEED-DERIVED PRICING:
+    - Position 5 (6): Medium-rounded card shapes
+    - Position 7 (3): Moderate density - balanced tier information
+    - Position 1 (5): Warm sunset gradient for featured plan
+  -->
+  <section id="pricing" class="pricing content-vis">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Pricing</span>
+        <h2>Simple, Transparent Pricing</h2>
+        <p>Choose the plan that fits your team's needs. All plans include a 14-day free trial.</p>
+      </div>
+      
+      <div class="pricing-grid">
+        <div class="pricing-card reveal">
+          <h3>Starter</h3>
+          <p class="pricing-desc">Perfect for individuals and small projects</p>
+          <div class="pricing-price">$0</div>
+          <p class="pricing-period">Free forever</p>
+          <ul class="pricing-features">
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Up to 3 projects
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              5GB storage
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Basic analytics
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Email support
+            </li>
+          </ul>
+          <button class="btn btn-secondary pricing-cta">Get Started</button>
+        </div>
+        
+        <div class="pricing-card featured reveal">
+          <span class="pricing-badge">Most Popular</span>
+          <h3>Professional</h3>
+          <p class="pricing-desc">For growing teams that need more power</p>
+          <div class="pricing-price">$12</div>
+          <p class="pricing-period">per user / month</p>
+          <ul class="pricing-features">
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Unlimited projects
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              100GB storage
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Advanced analytics
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Priority support
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Custom integrations
+            </li>
+          </ul>
+          <button class="btn btn-secondary pricing-cta">Start Free Trial</button>
+        </div>
+        
+        <div class="pricing-card reveal">
+          <h3>Enterprise</h3>
+          <p class="pricing-desc">For large organizations with advanced needs</p>
+          <div class="pricing-price">$29</div>
+          <p class="pricing-period">per user / month</p>
+          <ul class="pricing-features">
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Everything in Pro
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Unlimited storage
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              SSO & advanced security
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Dedicated success manager
+            </li>
+            <li class="pricing-feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Custom contracts
+            </li>
+          </ul>
+          <button class="btn btn-secondary pricing-cta">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <!--
+    SEED-DERIVED FAQ:
+    - Position 5 (6): Accordion style with medium density
+    - Position 4 (3): Moderate animation - smooth height transitions
+  -->
+  <section id="faq" class="faq content-vis">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">FAQ</span>
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about Lumina. Can't find what you're looking for? Contact our support team.</p>
+      </div>
+      
+      <div class="faq-grid">
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            How does the 14-day free trial work?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>Start your free trial with full access to all Professional features. No credit card required. At the end of 14 days, choose the plan that works best for you or continue with our free Starter plan.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            Can I change my plan later?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>Absolutely! You can upgrade, downgrade, or cancel your plan at any time. Changes take effect immediately, and we'll prorate any charges or credits.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            What integrations does Lumina support?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>We integrate with 200+ popular tools including Slack, Microsoft Teams, Jira, GitHub, Figma, Adobe Creative Suite, Google Workspace, and many more. Custom integrations available on Enterprise plans.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            Is my data secure?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>Security is our top priority. We use bank-level 256-bit encryption, are SOC 2 Type II certified, GDPR compliant, and offer SSO and advanced security features on Enterprise plans.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            Do you offer discounts for nonprofits or education?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>Yes! We offer special pricing for registered nonprofits, educational institutions, and open-source projects. Contact our sales team to learn more about our discount programs.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            How do I get support?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>All plans include email support. Professional plans get priority support with faster response times. Enterprise customers receive a dedicated success manager and 24/7 phone support.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Section -->
+  <!--
+    SEED-DERIVED FINAL CTA:
+    - Position 1 (5): High contrast warm sunset gradient
+    - Position 4 (3): Moderate animation
+    - Position 6 (9): Rich layered texture with pattern overlay
+  -->
+  <section class="final-cta content-vis">
+    <div class="container">
+      <div class="cta-box reveal">
+        <div class="cta-content">
+          <h2>Ready to Transform Your Workflow?</h2>
+          <p>Join 10,000+ teams already using Lumina to collaborate smarter and deliver faster.</p>
+          <div class="cta-buttons">
+            <a href="#pricing" class="btn btn-white">Start Free Trial</a>
+            <a href="#features" class="btn btn-ghost">Learn More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <!--
+    SEED-DERIVED FOOTER:
+    - Position 6 (9): Rich layered texture on dark background
+    - Position 9 (0): Circular social icon geometry
+  -->
+  <footer class="footer content-vis">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="footer-logo">Lumina</a>
+          <p>Empowering teams to collaborate, create, and deliver exceptional work together.</p>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Twitter">
+              <svg viewBox="0 0 24 24">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                <rect x="2" y="9" width="4" height="12"/>
+                <circle cx="4" cy="4" r="2"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="GitHub">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Instagram">
+              <svg viewBox="0 0 24 24">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#">Integrations</a></li>
+            <li><a href="#">Changelog</a></li>
+            <li><a href="#">Roadmap</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Press</a></li>
+            <li><a href="#">Partners</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Resources</h4>
+          <ul class="footer-links">
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Community</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Status</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2026 Lumina. All rights reserved.</p>
+        <p>
+          <a href="#" style="color: inherit; margin-right: var(--space-5);">Privacy Policy</a>
+          <a href="#" style="color: inherit;">Terms of Service</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+    
+    // Check for saved theme or system preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme) {
+      html.setAttribute('data-theme', savedTheme);
+      updateThemeIcon(savedTheme);
+    } else if (systemPrefersDark) {
+      html.setAttribute('data-theme', 'dark');
+      updateThemeIcon('dark');
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    });
+    
+    function updateThemeIcon(theme) {
+      if (theme === 'dark') {
+        // Moon icon
+        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+      } else {
+        // Sun icon
+        themeIcon.innerHTML = '<path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z"/><path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      }
+    }
+    
+    // FAQ Accordion
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question');
+      
+      question.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+        
+        // Close all other items
+        faqItems.forEach(otherItem => {
+          otherItem.classList.remove('active');
+          otherItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        });
+        
+        // Toggle current item
+        if (!isActive) {
+          item.classList.add('active');
+          question.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+    
+    // Scroll Reveal Animation
+    const revealElements = document.querySelectorAll('.reveal');
+    
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('active');
+          }, index * 100);
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+    
+    revealElements.forEach(el => revealObserver.observe(el));
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+    
+    // Navigation background on scroll
+    const nav = document.querySelector('.nav');
+    let lastScroll = 0;
+    
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      
+      if (currentScroll > 100) {
+        nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+      } else {
+        nav.style.boxShadow = 'none';
+      }
+      
+      lastScroll = currentScroll;
+    });
+  </script>
+</body>
+</html>

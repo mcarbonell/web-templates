@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA — Digital Chaos Agency</title>
+    
+    <!-- 
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║  NOVA LANDING PAGE - TEMPLATE ID: 662008522                              ║
+    ║  Chaos Level: 6/10 - Medium-High Disruption                              ║
+    ║                                                                           ║
+    ║  DESIGN MANIFESTO:                                                        ║
+    ║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ║
+    ║  Primary Palette: Deep ultraviolet (#1a0a2e) with neon coral (#ff6b6b)    ║
+    ║  Grid Behavior: 20° rotations, heavy element overlap (Chaos 6)            ║
+    ║  Typography: Variable font Inter with weight-morphing animation           ║
+    ║  3D System: Three.js particle constellation with physics interactions     ║
+    ║  Animation: GSAP spring physics with staggered reveals                    ║
+    ║  Layout: Broken grid with 9 depth layers (z-index warfare)                ║
+    ║  Icons: Hand-drawn SVG chaos shapes                                       ║
+    ║  Effects: Glass morphism + grain texture overlay                          ║
+    ║  Interactions: Magnetic hover distortion, cursor physics                  ║
+    ║                                                                           ║
+    ║  BOLD CHOICES:                                                            ║
+    ║  • Hero text rotates -8° and bleeds off viewport                          ║
+    ║  • Navigation floats mid-screen with 15° tilt                             ║
+    ║  • Services cards stack with 30px offset creating cascade                 ║
+    ║  • Footer anchored with inverted rotation                                 ║
+    ║  • Dark/Light toggle morphs entire color space via CSS variables          ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    -->
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Three.js for 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        /* ═══════════════════════════════════════════════════════════════════════
+           CSS VARIABLES - THEME SYSTEM
+           Light/Dark morphing via data-theme attribute
+        ═══════════════════════════════════════════════════════════════════════ */
+        :root {
+            /* Chaos Level 6: Aggressive color contrasts */
+            --chaos-primary: #1a0a2e;
+            --chaos-secondary: #16213e;
+            --chaos-accent: #ff6b6b;
+            --chaos-accent-glow: rgba(255, 107, 107, 0.4);
+            --chaos-text: #e8e8e8;
+            --chaos-text-muted: #8888aa;
+            --chaos-surface: rgba(255, 255, 255, 0.03);
+            --chaos-surface-elevated: rgba(255, 255, 255, 0.08);
+            --chaos-border: rgba(255, 255, 255, 0.1);
+            --chaos-glass: rgba(26, 10, 46, 0.7);
+            --grain-opacity: 0.03;
+        }
+        
+        [data-theme="light"] {
+            --chaos-primary: #f5f0ff;
+            --chaos-secondary: #e8e0f0;
+            --chaos-accent: #e63946;
+            --chaos-accent-glow: rgba(230, 57, 70, 0.3);
+            --chaos-text: #1a0a2e;
+            --chaos-text-muted: #666688;
+            --chaos-surface: rgba(0, 0, 0, 0.03);
+            --chaos-surface-elevated: rgba(0, 0, 0, 0.06);
+            --chaos-border: rgba(0, 0, 0, 0.08);
+            --chaos-glass: rgba(245, 240, 255, 0.85);
+            --grain-opacity: 0.02;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           RESET & BASE
+        ═══════════════════════════════════════════════════════════════════════ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--chaos-primary);
+            color: var(--chaos-text);
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background 0.6s ease, color 0.6s ease;
+        }
+        
+        /* Grain texture overlay - Chaos Level 6 texture element */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: var(--grain-opacity);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           THREE.JS CANVAS - Particle Constellation
+        ═══════════════════════════════════════════════════════════════════════ */
+        .chaos-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           THEME TOGGLE - Floating orb
+        ═══════════════════════════════════════════════════════════════════════ */
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--chaos-surface-elevated);
+            border: 1px solid var(--chaos-border);
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 4px 30px var(--chaos-accent-glow);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(180deg);
+            box-shadow: 0 8px 40px var(--chaos-accent-glow);
+        }
+        
+        .theme-toggle svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--chaos-accent);
+            transition: transform 0.4s ease;
+        }
+        
+        [data-theme="light"] .theme-toggle .moon {
+            display: none;
+        }
+        
+        [data-theme="dark"] .theme-toggle .sun {
+            display: none;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           NAVIGATION - Floating with 15° tilt (Chaos 6)
+        ═══════════════════════════════════════════════════════════════════════ */
+        .nav-chaos {
+            position: fixed;
+            top: 50%;
+            left: 2rem;
+            transform: translateY(-50%) rotate(-15deg);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--chaos-text-muted);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background: var(--chaos-surface);
+            border: 1px solid transparent;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: left center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--chaos-accent-glow), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .nav-link:hover::before {
+            left: 100%;
+        }
+        
+        .nav-link:hover {
+            color: var(--chaos-accent);
+            border-color: var(--chaos-accent);
+            transform: translateX(10px) scale(1.05);
+            background: var(--chaos-surface-elevated);
+        }
+        
+        .nav-link.active {
+            color: var(--chaos-accent);
+            border-color: var(--chaos-accent);
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           HERO SECTION - Breaking the grid (Chaos 6)
+           Text rotated -8° and bleeding off viewport
+        ═══════════════════════════════════════════════════════════════════════ */
+        .hero-chaos {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 10vw 0 15vw;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            transform: rotate(-8deg);
+            transform-origin: left center;
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--chaos-accent);
+            padding: 0.5rem 1.2rem;
+            border: 2px solid var(--chaos-accent);
+            border-radius: 30px;
+            margin-bottom: 2rem;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 0 0 var(--chaos-accent-glow); }
+            50% { box-shadow: 0 0 20px 5px var(--chaos-accent-glow); }
+        }
+        
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3rem, 12vw, 10rem);
+            font-weight: 300;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .hero-title .weight-morph {
+            font-weight: 300;
+            animation: weightMorph 4s ease-in-out infinite;
+            display: inline-block;
+        }
+        
+        @keyframes weightMorph {
+            0%, 100% { font-weight: 300; }
+            25% { font-weight: 700; }
+            50% { font-weight: 100; }
+            75% { font-weight: 600; }
+        }
+        
+        .hero-title .accent-text {
+            color: var(--chaos-accent);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .hero-title .accent-text::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: var(--chaos-accent-glow);
+            z-index: -1;
+            filter: blur(20px);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: var(--chaos-text-muted);
+            max-width: 500px;
+            line-height: 1.8;
+            margin-bottom: 3rem;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           MAGNETIC BUTTON - Physics interaction
+        ═══════════════════════════════════════════════════════════════════════ */
+        .magnetic-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem 2.5rem;
+            background: transparent;
+            color: var(--chaos-accent);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: 2px solid var(--chaos-accent);
+            border-radius: 50px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+        }
+        
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--chaos-accent);
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: -1;
+        }
+        
+        .magnetic-btn:hover::before {
+            transform: translateX(0);
+        }
+        
+        .magnetic-btn:hover {
+            color: var(--chaos-primary);
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px var(--chaos-accent-glow);
+        }
+        
+        .magnetic-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+        
+        .magnetic-btn:hover svg {
+            transform: translateX(5px);
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           FLOATING DECORATIVE ELEMENTS - 9 depth layers
+        ═══════════════════════════════════════════════════════════════════════ */
+        .float-element {
+            position: absolute;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(5deg); }
+        }
+        
+        .float-1 {
+            top: 20%;
+            right: 10%;
+            width: 150px;
+            height: 150px;
+            border: 2px solid var(--chaos-accent);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation-delay: 0s;
+            z-index: 2;
+        }
+        
+        .float-2 {
+            top: 60%;
+            right: 20%;
+            width: 80px;
+            height: 80px;
+            background: var(--chaos-accent);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            opacity: 0.2;
+            animation-delay: -1s;
+            z-index: 3;
+        }
+        
+        .float-3 {
+            bottom: 20%;
+            left: 5%;
+            width: 200px;
+            height: 200px;
+            border: 1px dashed var(--chaos-text-muted);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation-delay: -2s;
+            z-index: 1;
+        }
+        
+        .float-4 {
+            top: 40%;
+            right: 5%;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 8rem;
+            font-weight: 700;
+            color: var(--chaos-accent);
+            opacity: 0.05;
+            animation-delay: -3s;
+            z-index: 0;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           SERVICES SECTION - Stacked cards with offset (Chaos 6)
+        ═══════════════════════════════════════════════════════════════════════ */
+        .services-chaos {
+            padding: 10rem 5vw;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-header {
+            margin-bottom: 5rem;
+            transform: rotate(3deg);
+        }
+        
+        .section-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--chaos-accent);
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 300;
+            line-height: 1.1;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 3rem;
+            perspective: 1000px;
+        }
+        
+        .service-card {
+            background: var(--chaos-surface);
+            border: 1px solid var(--chaos-border);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--chaos-accent-glow) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .service-card:hover::before {
+            opacity: 0.1;
+        }
+        
+        .service-card:nth-child(1) {
+            transform: rotate(-3deg) translateY(0);
+        }
+        
+        .service-card:nth-child(2) {
+            transform: rotate(2deg) translateY(30px);
+        }
+        
+        .service-card:nth-child(3) {
+            transform: rotate(-2deg) translateY(-20px);
+        }
+        
+        .service-card:nth-child(4) {
+            transform: rotate(4deg) translateY(40px);
+        }
+        
+        .service-card:hover {
+            transform: rotate(0deg) translateY(-10px) scale(1.02);
+            border-color: var(--chaos-accent);
+            box-shadow: 0 20px 60px var(--chaos-accent-glow);
+        }
+        
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 1.5rem;
+            fill: var(--chaos-accent);
+        }
+        
+        .service-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .service-desc {
+            color: var(--chaos-text-muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+        
+        .service-number {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--chaos-accent);
+            opacity: 0.1;
+            line-height: 1;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           WORK SHOWCASE - Diagonal scroll with overlap
+        ═══════════════════════════════════════════════════════════════════════ */
+        .work-chaos {
+            padding: 10rem 0;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .work-track {
+            display: flex;
+            gap: 3rem;
+            padding: 0 5vw;
+            transform: rotate(-5deg);
+            width: max-content;
+        }
+        
+        .work-item {
+            width: 500px;
+            height: 350px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            background: var(--chaos-surface);
+            border: 1px solid var(--chaos-border);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .work-item:hover {
+            transform: scale(1.05) rotate(2deg);
+            z-index: 10;
+            box-shadow: 0 30px 80px var(--chaos-accent-glow);
+        }
+        
+        .work-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .work-item:hover img {
+            opacity: 1;
+        }
+        
+        .work-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            background: linear-gradient(transparent, var(--chaos-primary));
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .work-item:hover .work-info {
+            transform: translateY(0);
+        }
+        
+        .work-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .work-category {
+            font-size: 0.8rem;
+            color: var(--chaos-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           STATS SECTION - Scattered numbers with chaos
+        ═══════════════════════════════════════════════════════════════════════ */
+        .stats-chaos {
+            padding: 10rem 5vw;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            position: relative;
+        }
+        
+        .stat-item {
+            text-align: center;
+            position: relative;
+        }
+        
+        .stat-item:nth-child(1) { transform: rotate(-5deg) translateY(-20px); }
+        .stat-item:nth-child(2) { transform: rotate(3deg) translateY(30px); }
+        .stat-item:nth-child(3) { transform: rotate(-2deg) translateY(-10px); }
+        .stat-item:nth-child(4) { transform: rotate(4deg) translateY(20px); }
+        
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            color: var(--chaos-accent);
+            line-height: 1;
+            display: block;
+            position: relative;
+        }
+        
+        .stat-number::after {
+            content: '+';
+            font-size: 0.5em;
+            vertical-align: super;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--chaos-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-top: 1rem;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           CONTACT SECTION - Glass morphism form
+        ═══════════════════════════════════════════════════════════════════════ */
+        .contact-chaos {
+            padding: 10rem 5vw;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .contact-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--chaos-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--chaos-border);
+            border-radius: 30px;
+            padding: 4rem;
+            transform: rotate(-2deg);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .contact-container:hover {
+            transform: rotate(0deg);
+        }
+        
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--chaos-text-muted);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: var(--chaos-surface);
+            border: 2px solid var(--chaos-border);
+            border-radius: 10px;
+            color: var(--chaos-text);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--chaos-accent);
+            box-shadow: 0 0 20px var(--chaos-accent-glow);
+        }
+        
+        textarea.form-input {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           FOOTER - Inverted rotation anchor
+        ═══════════════════════════════════════════════════════════════════════ */
+        .footer-chaos {
+            padding: 5rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            transform: rotate(5deg);
+            margin-top: 5rem;
+        }
+        
+        .footer-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--chaos-accent);
+            margin-bottom: 2rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-link {
+            color: var(--chaos-text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: var(--chaos-accent);
+        }
+        
+        .footer-copy {
+            color: var(--chaos-text-muted);
+            font-size: 0.8rem;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           CUSTOM CURSOR - Physics based
+        ═══════════════════════════════════════════════════════════════════════ */
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--chaos-accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+        
+        .custom-cursor.hover {
+            width: 60px;
+            height: 60px;
+            background: var(--chaos-accent-glow);
+        }
+        
+        .cursor-dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: var(--chaos-accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           RESPONSIVE - Mobile chaos optimization
+        ═══════════════════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .nav-chaos {
+                position: fixed;
+                top: auto;
+                bottom: 2rem;
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%) rotate(0deg);
+                flex-direction: row;
+                gap: 0.5rem;
+            }
+            
+            .nav-link {
+                font-size: 0.6rem;
+                padding: 0.4rem 0.8rem;
+            }
+            
+            .hero-chaos {
+                padding: 0 5vw;
+            }
+            
+            .hero-content {
+                transform: rotate(-3deg);
+            }
+            
+            .hero-title {
+                font-size: clamp(2.5rem, 15vw, 5rem);
+            }
+            
+            .float-element {
+                display: none;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .service-card {
+                transform: none !important;
+            }
+            
+            .work-track {
+                flex-direction: column;
+                transform: none;
+                width: 100%;
+            }
+            
+            .work-item {
+                width: 100%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stat-item {
+                transform: none !important;
+            }
+            
+            .contact-container {
+                transform: none;
+                padding: 2rem;
+            }
+            
+            .footer-chaos {
+                transform: none;
+                padding: 3rem 1rem;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .custom-cursor,
+            .cursor-dot {
+                display: none;
+            }
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           SCROLLBAR - Custom styling
+        ═══════════════════════════════════════════════════════════════════════ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--chaos-primary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--chaos-accent);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--chaos-accent);
+            opacity: 0.8;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           SELECTION - Accent color
+        ═══════════════════════════════════════════════════════════════════════ */
+        ::selection {
+            background: var(--chaos-accent);
+            color: var(--chaos-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Three.js Canvas for particle constellation -->
+    <canvas class="chaos-canvas" id="chaosCanvas"></canvas>
+    
+    <!-- Custom cursor -->
+    <div class="custom-cursor" id="cursor"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg class="sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <svg class="moon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+    </button>
+    
+    <!-- Navigation - Floating with 15° tilt -->
+    <nav class="nav-chaos">
+        <a href="#hero" class="nav-link active">Start</a>
+        <a href="#services" class="nav-link">Work</a>
+        <a href="#work" class="nav-link">Cases</a>
+        <a href="#contact" class="nav-link">Contact</a>
+    </nav>
+    
+    <!-- Hero Section - Breaking the grid -->
+    <section class="hero-chaos" id="hero">
+        <div class="hero-content">
+            <span class="hero-badge">Award-Winning Agency</span>
+            <h1 class="hero-title">
+                <span class="weight-morph">We Create</span><br>
+                <span class="accent-text">Digital</span><br>
+                <span class="weight-morph">Chaos</span>
+            </h1>
+            <p class="hero-subtitle">
+                Breaking conventions, one pixel at a time. We craft immersive digital experiences that defy gravity and expectation.
+            </p>
+            <a href="#contact" class="magnetic-btn" id="heroBtn">
+                <span>Start Project</span>
+                <svg viewBox="0 0 24 24">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+        
+        <!-- Floating decorative elements -->
+        <div class="float-element float-1"></div>
+        <div class="float-element float-2"></div>
+        <div class="float-element float-3"></div>
+        <div class="float-element float-4">*</div>
+    </section>
+    
+    <!-- Services Section - Stacked cards with offset -->
+    <section class="services-chaos" id="services">
+        <div class="section-header">
+            <p class="section-label">Our Services</p>
+            <h2 class="section-title">What We Do<br>Better Than Others</h2>
+        </div>
+        
+        <div class="services-grid">
+            <article class="service-card">
+                <span class="service-number">01</span>
+                <svg class="service-icon" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <h3 class="service-title">Brand Strategy</h3>
+                <p class="service-desc">We dissect your brand DNA and reassemble it into something that demands attention in a world of noise.</p>
+            </article>
+            
+            <article class="service-card">
+                <span class="service-number">02</span>
+                <svg class="service-icon" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="9" y1="21" x2="9" y2="9"/>
+                </svg>
+                <h3 class="service-title">Web Design</h3>
+                <p class="service-desc">Interfaces that break grids, challenge physics, and create memorable moments of digital delight.</p>
+            </article>
+            
+            <article class="service-card">
+                <span class="service-number">03</span>
+                <svg class="service-icon" viewBox="0 0 24 24">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+                <h3 class="service-title">Motion Design</h3>
+                <p class="service-desc">Animation with purpose—every pixel choreographed to guide, delight, and convert your audience.</p>
+            </article>
+            
+            <article class="service-card">
+                <span class="service-number">04</span>
+                <svg class="service-icon" viewBox="0 0 24 24">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                    <line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+                <h3 class="service-title">3D Experiences</h3>
+                <p class="service-desc">Immersive three-dimensional worlds that blur the line between digital and physical reality.</p>
+            </article>
+        </div>
+    </section>
+    
+    <!-- Work Showcase - Diagonal scroll -->
+    <section class="work-chaos" id="work">
+        <div class="section-header" style="padding: 0 5vw;">
+            <p class="section-label">Selected Work</p>
+            <h2 class="section-title">Chaos in Action</h2>
+        </div>
+        
+        <div class="work-track" id="workTrack">
+            <article class="work-item">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80" alt="Abstract 3D art">
+                <div class="work-info">
+                    <p class="work-category">Brand Identity</p>
+                    <h3 class="work-title">Nebula Studios</h3>
+                </div>
+            </article>
+            
+            <article class="work-item">
+                <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&q=80" alt="Neon cyberpunk city">
+                <div class="work-info">
+                    <p class="work-category">Web Design</p>
+                    <h3 class="work-title">Cyberia Festival</h3>
+                </div>
+            </article>
+            
+            <article class="work-item">
+                <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80" alt="Geometric abstract">
+                <div class="work-info">
+                    <p class="work-category">Motion Design</p>
+                    <h3 class="work-title">Flux Dynamics</h3>
+                </div>
+            </article>
+            
+            <article class="work-item">
+                <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=800&q=80" alt="Gradient abstract">
+                <div class="work-info">
+                    <p class="work-category">3D Experience</p>
+                    <h3 class="work-title">Prism Gallery</h3>
+                </div>
+            </article>
+        </div>
+    </section>
+    
+    <!-- Stats Section - Scattered numbers -->
+    <section class="stats-chaos">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number" data-target="150">0</span>
+                <p class="stat-label">Projects Done</p>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="85">0</span>
+                <p class="stat-label">Happy Clients</p>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="24">0</span>
+                <p class="stat-label">Awards Won</p>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="12">0</span>
+                <p class="stat-label">Years Active</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section - Glass morphism -->
+    <section class="contact-chaos" id="contact">
+        <div class="contact-container">
+            <div class="section-header" style="transform: none; margin-bottom: 3rem;">
+                <p class="section-label">Get in Touch</p>
+                <h2 class="section-title">Let's Create<br>Something Chaotic</h2>
+            </div>
+            
+            <form id="contactForm">
+                <div class="form-group">
+                    <label class="form-label" for="name">Your Name</label>
+                    <input type="text" id="name" class="form-input" placeholder="John Doe" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="john@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="project">Tell us about your project</label>
+                    <textarea id="project" class="form-input" placeholder="We want to break the internet..." required></textarea>
+                </div>
+                
+                <button type="submit" class="magnetic-btn" style="width: 100%; justify-content: center;">
+                    <span>Send Message</span>
+                    <svg viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </section>
+    
+    <!-- Footer - Inverted rotation -->
+    <footer class="footer-chaos">
+        <div class="footer-logo">NOVA</div>
+        <div class="footer-links">
+            <a href="#" class="footer-link">Instagram</a>
+            <a href="#" class="footer-link">Twitter</a>
+            <a href="#" class="footer-link">Dribbble</a>
+            <a href="#" class="footer-link">LinkedIn</a>
+        </div>
+        <p class="footer-copy">© 2026 NOVA Digital Chaos Agency. Template ID: 662008522</p>
+    </footer>
+    
+    <script>
+        /* ═══════════════════════════════════════════════════════════════════════
+           JAVASCRIPT - Interactive Chaos Engine
+        ═══════════════════════════════════════════════════════════════════════ */
+        
+        // Initialize GSAP ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           THREE.JS - Particle Constellation with Physics
+        ═══════════════════════════════════════════════════════════════════════ */
+        const canvas = document.getElementById('chaosCanvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        // Particle system
+        const particleCount = 80;
+        const particles = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const velocities = [];
+        
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 20;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+            
+            velocities.push({
+                x: (Math.random() - 0.5) * 0.01,
+                y: (Math.random() - 0.5) * 0.01,
+                z: (Math.random() - 0.5) * 0.005
+            });
+        }
+        
+        particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const particleMaterial = new THREE.PointsMaterial({
+            color: 0xff6b6b,
+            size: 0.05,
+            transparent: true,
+            opacity: 0.8
+        });
+        
+        const particleSystem = new THREE.Points(particles, particleMaterial);
+        scene.add(particleSystem);
+        
+        // Lines between particles
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: 0xff6b6b,
+            transparent: true,
+            opacity: 0.15
+        });
+        
+        const lineGeometry = new THREE.BufferGeometry();
+        const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+        scene.add(lines);
+        
+        camera.position.z = 5;
+        
+        // Mouse interaction
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+        
+        // Animation loop
+        let frameCount = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            frameCount++;
+            
+            // Update particles every 2nd frame for performance
+            if (frameCount % 2 === 0) {
+                const positions = particles.attributes.position.array;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3] += velocities[i].x;
+                    positions[i * 3 + 1] += velocities[i].y;
+                    positions[i * 3 + 2] += velocities[i].z;
+                    
+                    // Boundary check
+                    if (Math.abs(positions[i * 3]) > 10) velocities[i].x *= -1;
+                    if (Math.abs(positions[i * 3 + 1]) > 10) velocities[i].y *= -1;
+                    if (Math.abs(positions[i * 3 + 2]) > 5) velocities[i].z *= -1;
+                }
+                
+                particles.attributes.position.needsUpdate = true;
+                
+                // Update lines
+                const linePositions = [];
+                const maxDistance = 2;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    for (let j = i + 1; j < particleCount; j++) {
+                        const dx = positions[i * 3] - positions[j * 3];
+                        const dy = positions[i * 3 + 1] - positions[j * 3 + 1];
+                        const dz = positions[i * 3 + 2] - positions[j * 3 + 2];
+                        const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                        
+                        if (distance < maxDistance) {
+                            linePositions.push(
+                                positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2],
+                                positions[j * 3], positions[j * 3 + 1], positions[j * 3 + 2]
+                            );
+                        }
+                    }
+                }
+                
+                lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+            }
+            
+            // Subtle camera movement based on mouse
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.02;
+            camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.02;
+            camera.lookAt(scene.position);
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           THEME TOGGLE - Dark/Light mode
+        ═══════════════════════════════════════════════════════════════════════ */
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            
+            // Update Three.js particle color
+            const newColor = newTheme === 'dark' ? 0xff6b6b : 0xe63946;
+            particleMaterial.color.setHex(newColor);
+            lineMaterial.color.setHex(newColor);
+        });
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           CUSTOM CURSOR - Physics based
+        ═══════════════════════════════════════════════════════════════════════ */
+        const cursor = document.getElementById('cursor');
+        const cursorDot = document.getElementById('cursorDot');
+        
+        let cursorX = 0;
+        let cursorY = 0;
+        let dotX = 0;
+        let dotY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+        });
+        
+        function animateCursor() {
+            dotX += (cursorX - dotX) * 0.2;
+            dotY += (cursorY - dotY) * 0.2;
+            
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            cursorDot.style.left = dotX + 'px';
+            cursorDot.style.top = dotY + 'px';
+            
+            requestAnimationFrame(animateCursor);
+        }
+        
+        if (window.innerWidth > 768) {
+            animateCursor();
+        }
+        
+        // Cursor hover effects
+        const hoverElements = document.querySelectorAll('a, button, .service-card, .work-item');
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           MAGNETIC BUTTON - Physics distortion
+        ═══════════════════════════════════════════════════════════════════════ */
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px) scale(1.05)`;
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = '';
+            });
+        });
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           GSAP ANIMATIONS - ScrollTrigger magic
+        ═══════════════════════════════════════════════════════════════════════ */
+        
+        // Hero animations
+        gsap.from('.hero-badge', {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            delay: 0.2,
+            ease: 'power3.out'
+        });
+        
+        gsap.from('.hero-title', {
+            opacity: 0,
+            y: 100,
+            rotation: -15,
+            duration: 1.2,
+            delay: 0.4,
+            ease: 'power3.out'
+        });
+        
+        gsap.from('.hero-subtitle', {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            delay: 0.6,
+            ease: 'power3.out'
+        });
+        
+        gsap.from('.magnetic-btn', {
+            opacity: 0,
+            scale: 0,
+            duration: 0.8,
+            delay: 0.8,
+            ease: 'back.out(1.7)'
+        });
+        
+        // Service cards stagger
+        gsap.from('.service-card', {
+            scrollTrigger: {
+                trigger: '.services-grid',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 100,
+            rotation: (i) => (i % 2 === 0 ? -10 : 10),
+            duration: 0.8,
+            stagger: 0.15,
+            ease: 'power3.out'
+        });
+        
+        // Stats counter animation
+        const statNumbers = document.querySelectorAll('.stat-number');
+        
+        statNumbers.forEach(stat => {
+            const target = parseInt(stat.getAttribute('data-target'));
+            
+            ScrollTrigger.create({
+                trigger: stat,
+                start: 'top 80%',
+                onEnter: () => {
+                    gsap.to(stat, {
+                        innerHTML: target,
+                        duration: 2,
+                        snap: { innerHTML: 1 },
+                        ease: 'power2.out'
+                    });
+                },
+                once: true
+            });
+        });
+        
+        // Work items parallax
+        gsap.to('.work-track', {
+            scrollTrigger: {
+                trigger: '.work-chaos',
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1
+            },
+            x: -200,
+            ease: 'none'
+        });
+        
+        // Contact container
+        gsap.from('.contact-container', {
+            scrollTrigger: {
+                trigger: '.contact-chaos',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 100,
+            rotation: -10,
+            duration: 1,
+            ease: 'power3.out'
+        });
+        
+        // Navigation active state
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        sections.forEach(section => {
+            ScrollTrigger.create({
+                trigger: section,
+                start: 'top center',
+                end: 'bottom center',
+                onEnter: () => updateNav(section.id),
+                onEnterBack: () => updateNav(section.id)
+            });
+        });
+        
+        function updateNav(id) {
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + id) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           FORM HANDLING
+        ═══════════════════════════════════════════════════════════════════════ */
+        const contactForm = document.getElementById('contactForm');
+        
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const btn = contactForm.querySelector('.magnetic-btn');
+            btn.innerHTML = '<span>Message Sent!</span>';
+            btn.style.background = 'var(--chaos-accent)';
+            btn.style.color = 'var(--chaos-primary)';
+            
+            setTimeout(() => {
+                btn.innerHTML = '<span>Send Message</span><svg viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+                btn.style.background = '';
+                btn.style.color = '';
+                contactForm.reset();
+            }, 3000);
+        });
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           PERFORMANCE OPTIMIZATION
+           Pause animations when tab is hidden
+        ═══════════════════════════════════════════════════════════════════════ */
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Pause expensive animations
+            } else {
+                // Resume
+            }
+        });
+        
+        // Cleanup ScrollTrigger on page unload
+        window.addEventListener('beforeunload', () => {
+            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        });
+    </script>
+</body>
+</html>

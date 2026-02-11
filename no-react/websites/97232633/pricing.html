@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing | Alex Chen - Creative Developer</title>
+  <meta name="description" content="Transparent pricing for web development, design, and consulting services. Packages tailored to your project needs.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  
+  <!-- Page-specific Critical CSS -->
+  <style>
+    /* Page Header */
+    .page-header {
+      padding: calc(var(--header-height) + var(--space-2xl)) 0 var(--space-xl);
+      text-align: center;
+      position: relative;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-mesh);
+      opacity: 0.5;
+      z-index: 0;
+    }
+    
+    .page-header-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .page-header h1 {
+      margin-bottom: var(--space-md);
+    }
+    
+    .page-header p {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Pricing Toggle */
+    .pricing-toggle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .pricing-toggle-label {
+      font-size: 1rem;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+    }
+    
+    .pricing-toggle-label.active {
+      color: var(--color-text-primary);
+      font-weight: 600;
+    }
+    
+    .toggle-switch {
+      width: 60px;
+      height: 32px;
+      background: var(--color-bg-elevated);
+      border-radius: var(--radius-xl);
+      position: relative;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: var(--gradient-hero);
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .toggle-switch.yearly::after {
+      transform: translateX(28px);
+    }
+    
+    /* Pricing Grid (Digit 5 = 2: Slightly rounded, moderate density) */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .pricing-card {
+      padding: var(--space-xl);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .pricing-card.featured {
+      border: 2px solid var(--color-primary);
+      transform: scale(1.05);
+    }
+    
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-primary);
+      color: var(--color-bg-darker);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-xl);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    
+    .pricing-header {
+      text-align: center;
+      margin-bottom: var(--space-xl);
+    }
+    
+    .pricing-name {
+      font-size: 1.5rem;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .pricing-description {
+      font-size: 0.9375rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+    
+    .pricing-price {
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      line-height: 1;
+    }
+    
+    .pricing-price span {
+      font-size: 1rem;
+      color: var(--color-text-muted);
+      font-weight: 400;
+    }
+    
+    .pricing-original {
+      font-size: 1.25rem;
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+      margin-left: var(--space-sm);
+    }
+    
+    .pricing-features {
+      list-style: none;
+      margin-bottom: var(--space-xl);
+      flex: 1;
+    }
+    
+    .pricing-features li {
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      color: var(--color-text-secondary);
+    }
+    
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+    
+    .pricing-features li.disabled {
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+    }
+    
+    .pricing-features li.disabled::before {
+      content: '✕';
+      color: var(--color-text-muted);
+    }
+    
+    .pricing-cta {
+      width: 100%;
+    }
+    
+    /* Comparison Table */
+    .comparison-section {
+      background: var(--color-bg-darker);
+    }
+    
+    .comparison-table-wrapper {
+      overflow-x: auto;
+    }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+      padding: var(--space-md) var(--space-lg);
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .comparison-table th {
+      font-weight: 600;
+      color: var(--color-text-primary);
+      background: var(--color-bg-card);
+    }
+    
+    .comparison-table th:first-child {
+      border-radius: var(--radius-md) 0 0 0;
+    }
+    
+    .comparison-table th:last-child {
+      border-radius: 0 var(--radius-md) 0 0;
+    }
+    
+    .comparison-table td {
+      color: var(--color-text-secondary);
+    }
+    
+    .comparison-table .check {
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+    
+    .comparison-table .cross {
+      color: var(--color-text-muted);
+    }
+    
+    /* FAQ Section */
+    .faq-section {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .faq-question {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-lg) 0;
+      background: none;
+      border: none;
+      color: var(--color-text-primary);
+      font-family: var(--font-primary);
+      font-size: 1.125rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: color var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .faq-question:hover {
+      color: var(--color-primary);
+    }
+    
+    .faq-icon {
+      width: 24px;
+      height: 24px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    
+    .faq-icon::before,
+    .faq-icon::after {
+      content: '';
+      position: absolute;
+      background: currentColor;
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .faq-icon::before {
+      width: 100%;
+      height: 2px;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+    }
+    
+    .faq-icon::after {
+      width: 2px;
+      height: 100%;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+    }
+    
+    .faq-item.is-open .faq-icon::after {
+      transform: translateX(-50%) rotate(90deg);
+    }
+    
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--duration-normal) var(--ease-out-expo),
+                  padding var(--duration-normal) var(--ease-out-expo);
+    }
+    
+    .faq-item.is-open .faq-answer {
+      max-height: 500px;
+      padding-bottom: var(--space-lg);
+    }
+    
+    .faq-answer p {
+      color: var(--color-text-secondary);
+    }
+    
+    /* Custom Quote */
+    .custom-quote {
+      text-align: center;
+      padding: var(--space-3xl) 0;
+      background: var(--gradient-glow);
+      background-opacity: 0.3;
+      border-radius: var(--radius-lg);
+      margin-top: var(--space-2xl);
+    }
+    
+    .custom-quote h2 {
+      margin-bottom: var(--space-md);
+    }
+    
+    .custom-quote p {
+      margin-bottom: var(--space-xl);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    /* Money Back */
+    .guarantee-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(0,245,255,0.1);
+      border: 1px solid rgba(0,245,255,0.2);
+      border-radius: var(--radius-xl);
+      font-size: 0.875rem;
+      color: var(--color-primary);
+      margin-bottom: var(--space-xl);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+      }
+      
+      .pricing-card.featured {
+        transform: none;
+        order: -1;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .pricing-toggle {
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+      
+      .toggle-switch {
+        order: -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header" data-header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">
+          <span class="logo-text">AC</span>
+        </a>
+        
+        <nav class="main-nav" data-main-nav>
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="about.html" class="nav-link">About</a></li>
+            <li><a href="services.html" class="nav-link">Services</a></li>
+            <li><a href="case-studies.html" class="nav-link">Work</a></li>
+            <li><a href="blog.html" class="nav-link">Blog</a></li>
+            <li><a href="contact.html" class="nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+            <span class="theme-icon">🌙</span>
+          </button>
+          <a href="contact.html" class="btn btn-primary btn-sm">Let's Talk</a>
+          <button class="mobile-toggle" data-mobile-toggle aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <main>
+    <!-- Page Header -->
+    <section class="page-header">
+      <div class="container">
+        <div class="page-header-content reveal">
+          <div class="guarantee-badge">✓ 100% Satisfaction Guarantee</div>
+          <h1>Simple, Transparent <span class="text-gradient">Pricing</span></h1>
+          <p>Choose the package that fits your needs. All plans include dedicated support and a satisfaction guarantee.</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Pricing Toggle -->
+    <section class="section-sm">
+      <div class="container">
+        <div class="pricing-toggle reveal">
+          <span class="pricing-toggle-label active" data-period="monthly">Monthly</span>
+          <div class="toggle-switch" data-toggle></div>
+          <span class="pricing-toggle-label" data-period="yearly">Yearly <span style="color: var(--color-primary);">(Save 20%)</span></span>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Pricing Cards -->
+    <section class="section">
+      <div class="container">
+        <div class="pricing-grid stagger-children">
+          <!-- Starter -->
+          <div class="pricing-card card reveal">
+            <div class="pricing-header">
+              <h3 class="pricing-name">Starter</h3>
+              <p class="pricing-description">Perfect for small projects and landing pages</p>
+              <div class="pricing-price" data-monthly="$2,500" data-yearly="$2,000">
+                $2,500<span>/project</span>
+              </div>
+            </div>
+            <ul class="pricing-features">
+              <li>Single page website</li>
+              <li>Mobile responsive design</li>
+              <li>Basic SEO setup</li>
+              <li>2 revision rounds</li>
+              <li>1 week delivery</li>
+              <li class="disabled">CMS integration</li>
+              <li class="disabled">Custom animations</li>
+              <li class="disabled">Priority support</li>
+            </ul>
+            <a href="contact.html" class="btn btn-secondary pricing-cta">Get Started</a>
+          </div>
+          
+          <!-- Professional -->
+          <div class="pricing-card card featured reveal">
+            <span class="pricing-badge">Most Popular</span>
+            <div class="pricing-header">
+              <h3 class="pricing-name">Professional</h3>
+              <p class="pricing-description">Best for growing businesses</p>
+              <div class="pricing-price" data-monthly="$5,000" data-yearly="$4,000">
+                $5,000<span>/project</span>
+              </div>
+            </div>
+            <ul class="pricing-features">
+              <li>Multi-page website (up to 5)</li>
+              <li>Custom animations</li>
+              <li>CMS integration</li>
+              <li>Advanced SEO</li>
+              <li>4 revision rounds</li>
+              <li>2-3 week delivery</li>
+              <li>Performance optimization</li>
+              <li>30 days support</li>
+            </ul>
+            <a href="contact.html" class="btn btn-primary pricing-cta">Get Started</a>
+          </div>
+          
+          <!-- Enterprise -->
+          <div class="pricing-card card reveal">
+            <div class="pricing-header">
+              <h3 class="pricing-name">Enterprise</h3>
+              <p class="pricing-description">For complex, large-scale projects</p>
+              <div class="pricing-price">Custom</div>
+            </div>
+            <ul class="pricing-features">
+              <li>Unlimited pages</li>
+              <li>Custom functionality</li>
+              <li>Advanced integrations</li>
+              <li>Priority support</li>
+              <li>Dedicated project manager</li>
+              <li>Training & documentation</li>
+              <li>90 days support</li>
+              <li>SLA guarantee</li>
+            </ul>
+            <a href="contact.html" class="btn btn-secondary pricing-cta">Contact Sales</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Comparison Table -->
+    <section class="section comparison-section">
+      <div class="container">
+        <div class="section-header reveal text-center">
+          <h2>Compare <span class="text-gradient">Plans</span></h2>
+          <p>Detailed breakdown of what's included in each package.</p>
+        </div>
+        
+        <div class="comparison-table-wrapper reveal">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Starter</th>
+                <th>Professional</th>
+                <th>Enterprise</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Pages</td>
+                <td>1</td>
+                <td>Up to 5</td>
+                <td>Unlimited</td>
+              </tr>
+              <tr>
+                <td>Revisions</td>
+                <td>2 rounds</td>
+                <td>4 rounds</td>
+                <td>Unlimited</td>
+              </tr>
+              <tr>
+                <td>CMS Integration</td>
+                <td class="cross">✕</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+              </tr>
+              <tr>
+                <td>Custom Animations</td>
+                <td class="cross">✕</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+              </tr>
+              <tr>
+                <td>SEO Optimization</td>
+                <td>Basic</td>
+                <td>Advanced</td>
+                <td>Enterprise</td>
+              </tr>
+              <tr>
+                <td>Support Period</td>
+                <td>7 days</td>
+                <td>30 days</td>
+                <td>90 days</td>
+              </tr>
+              <tr>
+                <td>Turnaround Time</td>
+                <td>1 week</td>
+                <td>2-3 weeks</td>
+                <td>Custom</td>
+              </tr>
+              <tr>
+                <td>Priority Support</td>
+                <td class="cross">✕</td>
+                <td class="cross">✕</td>
+                <td class="check">✓</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    
+    <!-- FAQ -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header reveal text-center">
+          <h2>Frequently Asked <span class="text-gradient">Questions</span></h2>
+          <p>Everything you need to know about pricing and packages.</p>
+        </div>
+        
+        <div class="faq-section reveal">
+          <div class="faq-item">
+            <button class="faq-question">
+              What's included in the project price?
+              <span class="faq-icon"></span>
+            </button>
+            <div class="faq-answer">
+              <p>All packages include design, development, testing, and deployment. Professional and Enterprise plans also include CMS setup, SEO optimization, and post-launch support. Hosting and domain costs are separate.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <button class="faq-question">
+              How does the payment structure work?
+              <span class="faq-icon"></span>
+            </button>
+            <div class="faq-answer">
+              <p>I typically require a 50% deposit to begin work, with the remaining 50% due upon project completion. For larger projects, we can arrange milestone-based payments. I accept bank transfers, credit cards, and PayPal.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <button class="faq-question">
+              What if I need changes after the project is complete?
+              <span class="faq-icon"></span>
+            </button>
+            <div class="faq-answer">
+              <p>All packages include a support period where I fix any bugs or issues at no extra cost. After the support period, I offer maintenance packages or can handle changes at my standard hourly rate.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <button class="faq-question">
+              Do you offer refunds?
+              <span class="faq-icon"></span>
+            </button>
+            <div class="faq-answer">
+              <p>I offer a 100% satisfaction guarantee. If you're not happy with the initial design concepts, you can request a full refund before development begins. Once development starts, refunds are handled on a case-by-case basis.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <button class="faq-question">
+              Can I upgrade my package later?
+              <span class="faq-icon"></span>
+            </button>
+            <div class="faq-answer">
+              <p>Absolutely! You can upgrade at any time. I'll credit what you've already paid toward the new package price. Many clients start with Starter and upgrade as their needs grow.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Custom Quote -->
+    <section class="section">
+      <div class="container">
+        <div class="custom-quote reveal">
+          <h2>Need Something Custom?</h2>
+          <p>Every project is unique. Let's discuss your specific requirements and create a tailored solution that fits your budget and goals.</p>
+          <a href="contact.html" class="btn btn-primary">Request Custom Quote</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-text">AC</span>
+          </a>
+          <p>Creative developer & designer crafting digital experiences that make an impact.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="GitHub">⌘</a>
+            <a href="#" aria-label="Dribbble">🏀</a>
+          </div>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="case-studies.html">Work</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="services.html">Web Development</a></li>
+            <li><a href="services.html">UI/UX Design</a></li>
+            <li><a href="services.html">Branding</a></li>
+            <li><a href="services.html">Consulting</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hello@alexchen.dev">hello@alexchen.dev</a></li>
+            <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
+            <li>San Francisco, CA</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Alex Chen. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  
+  <!-- Pricing Toggle Script -->
+  <script>
+    const toggle = document.querySelector('[data-toggle]');
+    const monthlyLabel = document.querySelector('[data-period="monthly"]');
+    const yearlyLabel = document.querySelector('[data-period="yearly"]');
+    const prices = document.querySelectorAll('.pricing-price[data-monthly]');
+    
+    toggle.addEventListener('click', () => {
+      toggle.classList.toggle('yearly');
+      const isYearly = toggle.classList.contains('yearly');
+      
+      monthlyLabel.classList.toggle('active', !isYearly);
+      yearlyLabel.classList.toggle('active', isYearly);
+      
+      prices.forEach(price => {
+        const monthly = price.dataset.monthly;
+        const yearly = price.dataset.yearly;
+        price.innerHTML = isYearly ? 
+          `${yearly}<span>/project</span> <span class="pricing-original">${monthly}</span>` : 
+          `${monthly}<span>/project</span>`;
+      });
+    });
+    
+    // FAQ Accordion
+    document.querySelectorAll('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const item = button.parentElement;
+        const isOpen = item.classList.contains('is-open');
+        
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('is-open'));
+        
+        if (!isOpen) {
+          item.classList.add('is-open');
+        }
+      });
+    });
+  </script>
+  
+  <!-- Shared Component Styles -->
+  <style>
+    /* Header Styles */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: var(--header-height);
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+    
+    .header.is-scrolled {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .header.is-hidden {
+      transform: translateY(-100%);
+    }
+    
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+    
+    .logo {
+      font-family: var(--font-primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    
+    .logo-text {
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .main-nav {
+      display: flex;
+    }
+    
+    .nav-list {
+      display: flex;
+      gap: var(--space-xl);
+      list-style: none;
+    }
+    
+    .nav-link {
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      position: relative;
+      padding: var(--space-sm) 0;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-hero);
+      transition: width var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .nav-link:hover,
+    .nav-link.is-active {
+      color: var(--color-text-primary);
+    }
+    
+    .nav-link:hover::after,
+    .nav-link.is-active::after {
+      width: 100%;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: var(--color-primary);
+    }
+    
+    .btn-sm {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.875rem;
+    }
+    
+    .mobile-toggle {
+      display: none;
+      width: 40px;
+      height: 40px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    
+    .mobile-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--color-text-primary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    /* Footer Styles */
+    .footer {
+      background: var(--color-bg-darker);
+      padding: var(--space-2xl) 0 var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .footer-brand p {
+      margin: var(--space-md) 0 var(--space-lg);
+      font-size: 1rem;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .social-links a:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    
+    .footer-nav h4 {
+      font-size: 1rem;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text-primary);
+    }
+    
+    .footer-nav ul {
+      list-style: none;
+    }
+    
+    .footer-nav li {
+      margin-bottom: var(--space-sm);
+    }
+    
+    .footer-nav a {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+      transition: color var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .footer-nav a:hover {
+      color: var(--color-primary);
+    }
+    
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-bottom p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    .footer-legal {
+      display: flex;
+      gap: var(--space-lg);
+    }
+    
+    .footer-legal a {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-nav {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        background: var(--color-bg-card);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: var(--space-lg);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--duration-normal) var(--ease-out-expo);
+      }
+      
+      .main-nav.is-open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .nav-list {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+      
+      .mobile-toggle {
+        display: flex;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-md);
+        text-align: center;
+      }
+    }
+  </style>
+</body>
+</html>

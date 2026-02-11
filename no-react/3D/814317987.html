@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mario Raúl Carbonell - AI & Web Development Specialist</title>
+    <!-- 
+    DESIGN CHOICES FOR SEED 814317987:
+    - 3D Scene: Neural Network Visualization (interconnected nodes with data flow)
+    - Color Scheme: Warm Gradient (orange/amber to purple)
+    - Animation Style: Smooth Organic (flowing natural movements)
+    - Layout: Centered Minimal (clean professional focus)
+    - Typography: Ultra-bold Futuristic (strong technical presence)
+    
+    Libraries: Three.js for 3D, GSAP for animations
+    Optimized for mobile, bilingual ES/EN, light/dark modes
+    -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8d1;
+            --accent-warm: #ff6b35;
+            --accent-hot: #f7931e;
+            --accent-cool: #c44569;
+            --accent-purple: #9b59b6;
+            --glow: rgba(255, 107, 53, 0.3);
+            --card-bg: rgba(26, 26, 46, 0.8);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #f5f5f7;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a5e;
+            --accent-warm: #ff6b35;
+            --accent-hot: #f7931e;
+            --accent-cool: #c44569;
+            --accent-purple: #9b59b6;
+            --glow: rgba(255, 107, 53, 0.2);
+            --card-bg: rgba(255, 255, 255, 0.9);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+        
+        .canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+        }
+        
+        .controls {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+        
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--accent-warm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+        }
+        
+        .control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--glow);
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--accent-warm), var(--accent-hot), var(--accent-cool), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: var(--text-secondary);
+            font-weight: 300;
+            max-width: 800px;
+            margin-bottom: 3rem;
+        }
+        
+        .cta-container {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .cta-btn {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .cta-primary {
+            background: linear-gradient(135deg, var(--accent-warm), var(--accent-hot));
+            color: white;
+            box-shadow: 0 10px 30px var(--glow);
+        }
+        
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px var(--glow);
+        }
+        
+        .cta-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--accent-warm);
+        }
+        
+        .cta-secondary:hover {
+            background: var(--accent-warm);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            margin-bottom: 3rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--accent-warm), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px var(--glow);
+            border-color: var(--accent-warm);
+        }
+        
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .card-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent-warm);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .social-link:hover {
+            transform: scale(1.2) rotate(10deg);
+            box-shadow: 0 10px 30px var(--glow);
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                top: 1rem;
+                right: 1rem;
+                gap: 0.5rem;
+            }
+            
+            .control-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .cta-container {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .cta-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Canvas Background -->
+    <div class="canvas-container">
+        <canvas id="neural-canvas"></canvas>
+    </div>
+    
+    <!-- Controls -->
+    <div class="controls">
+        <button class="control-btn" id="theme-toggle" title="Toggle Theme">🌓</button>
+        <button class="control-btn" id="lang-toggle" title="Toggle Language">🌐</button>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 class="hero-title" data-es="Mario Raúl Carbonell" data-en="Mario Raúl Carbonell">Mario Raúl Carbonell</h1>
+            <p class="hero-subtitle" data-es="Especialista en desarrollo web, aplicaciones a medida e inteligencia artificial" data-en="Web Development, Custom Applications & AI Specialist">
+                Especialista en desarrollo web, aplicaciones a medida e inteligencia artificial
+            </p>
+            <div class="cta-container">
+                <a href="https://github.com/mcarbonell" class="cta-btn cta-primary" target="_blank" data-es="Ver GitHub" data-en="View GitHub">Ver GitHub</a>
+                <a href="#contact" class="cta-btn cta-secondary" data-es="Contactar" data-en="Contact">Contactar</a>
+            </div>
+        </section>
+        
+        <!-- Expertise Section -->
+        <section class="section">
+            <h2 class="section-title" data-es="Áreas de Especialización" data-en="Areas of Expertise">Áreas de Especialización</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon">🧠</div>
+                    <h3 class="card-title" data-es="Inteligencia Artificial" data-en="Artificial Intelligence">Inteligencia Artificial</h3>
+                    <p class="card-text" data-es="Consultoría avanzada en IA, machine learning y soluciones inteligentes para problemas complejos" data-en="Advanced AI consulting, machine learning and intelligent solutions for complex problems">
+                        Consultoría avanzada en IA, machine learning y soluciones inteligentes para problemas complejos
+                    </p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">💻</div>
+                    <h3 class="card-title" data-es="Desarrollo Web" data-en="Web Development">Desarrollo Web</h3>
+                    <p class="card-text" data-es="Aplicaciones web modernas, escalables y optimizadas con las últimas tecnologías" data-en="Modern, scalable and optimized web applications with cutting-edge technologies">
+                        Aplicaciones web modernas, escalables y optimizadas con las últimas tecnologías
+                    </p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">⚙️</div>
+                    <h3 class="card-title" data-es="Algoritmos Complejos" data-en="Complex Algorithms">Algoritmos Complejos</h3>
+                    <p class="card-text" data-es="Diseño y análisis de algoritmos eficientes para resolver problemas computacionales difíciles" data-en="Design and analysis of efficient algorithms to solve difficult computational problems">
+                        Diseño y análisis de algoritmos eficientes para resolver problemas computacionales difíciles
+                    </p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">♟️</div>
+                    <h3 class="card-title" data-es="Motores de Ajedrez" data-en="Chess Engines">Motores de Ajedrez</h3>
+                    <p class="card-text" data-es="Desarrollo de motores de ajedrez avanzados con técnicas de IA y optimización" data-en="Development of advanced chess engines with AI techniques and optimization">
+                        Desarrollo de motores de ajedrez avanzados con técnicas de IA y optimización
+                    </p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">🎯</div>
+                    <h3 class="card-title" data-es="Aplicaciones a Medida" data-en="Custom Applications">Aplicaciones a Medida</h3>
+                    <p class="card-text" data-es="Soluciones personalizadas que transforman ideas complejas en código eficiente" data-en="Custom solutions that transform complex ideas into efficient code">
+                        Soluciones personalizadas que transforman ideas complejas en código eficiente
+                    </p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h3 class="card-title" data-es="Eficiencia" data-en="Efficiency">Eficiencia</h3>
+                    <p class="card-text" data-es="Pasión por la optimización y el rendimiento en cada línea de código" data-en="Passion for optimization and performance in every line of code">
+                        Pasión por la optimización y el rendimiento en cada línea de código
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer" id="contact">
+            <h2 class="section-title" data-es="Conecta Conmigo" data-en="Connect With Me">Conecta Conmigo</h2>
+            <div class="social-links">
+                <a href="https://github.com/mcarbonell" class="social-link" target="_blank" title="GitHub">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+            <p style="margin-top: 2rem; color: var(--text-secondary);">© 2026 Mario Raúl Carbonell</p>
+        </footer>
+    </div>
+    
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <script>
+        // Language Toggle
+        let currentLang = 'es';
+        const langToggle = document.getElementById('lang-toggle');
+        
+        function updateLanguage() {
+            document.querySelectorAll('[data-es]').forEach(el => {
+                el.textContent = currentLang === 'es' ? el.getAttribute('data-es') : el.getAttribute('data-en');
+            });
+        }
+        
+        langToggle.addEventListener('click', () => {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            updateLanguage();
+            gsap.from('[data-es]', {
+                opacity: 0,
+                y: 20,
+                duration: 0.5,
+                stagger: 0.05
+            });
+        });
+        
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        let currentTheme = 'dark';
+        
+        themeToggle.addEventListener('click', () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateNeuralNetworkColors();
+        });
+        
+        // Three.js Neural Network Visualization
+        const canvas = document.getElementById('neural-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        camera.position.z = 50;
+        
+        // Neural Network Nodes
+        const nodes = [];
+        const connections = [];
+        const nodeCount = window.innerWidth < 768 ? 30 : 50;
+        
+        // Create nodes with warm gradient colors
+        const nodeGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+        
+        for (let i = 0; i < nodeCount; i++) {
+            const color = new THREE.Color();
+            const hue = 0.05 + Math.random() * 0.15; // Orange to purple range
+            color.setHSL(hue, 0.8, 0.6);
+            
+            const nodeMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const node = new THREE.Mesh(nodeGeometry, nodeMaterial);
+            node.position.x = (Math.random() - 0.5) * 80;
+            node.position.y = (Math.random() - 0.5) * 80;
+            node.position.z = (Math.random() - 0.5) * 40;
+            
+            // Store velocity for organic movement
+            node.velocity = new THREE.Vector3(
+                (Math.random() - 0.5) * 0.02,
+                (Math.random() - 0.5) * 0.02,
+                (Math.random() - 0.5) * 0.01
+            );
+            
+            scene.add(node);
+            nodes.push(node);
+        }
+        
+        // Create connections between nearby nodes
+        function createConnections() {
+            connections.forEach(conn => scene.remove(conn));
+            connections.length = 0;
+            
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const distance = nodes[i].position.distanceTo(nodes[j].position);
+                    
+                    if (distance < 15) {
+                        const points = [nodes[i].position, nodes[j].position];
+                        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                        
+                        const opacity = 1 - (distance / 15);
+                        const material = new THREE.LineBasicMaterial({ 
+                            color: 0xff6b35,
+                            transparent: true,
+                            opacity: opacity * 0.3
+                        });
+                        
+                        const line = new THREE.Line(geometry, material);
+                        scene.add(line);
+                        connections.push(line);
+                    }
+                }
+            }
+        }
+        
+        createConnections();
+        
+        // Update colors based on theme
+        function updateNeuralNetworkColors() {
+            const isDark = currentTheme === 'dark';
+            nodes.forEach(node => {
+                node.material.opacity = isDark ? 0.8 : 0.6;
+            });
+            connections.forEach(conn => {
+                conn.material.opacity = isDark ? conn.material.opacity : conn.material.opacity * 0.5;
+            });
+        }
+        
+        // Mouse interaction
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+        
+        // Animation loop with smooth organic movement
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate scene gently
+            scene.rotation.y += 0.0005;
+            
+            // Organic node movement
+            nodes.forEach((node, index) => {
+                // Update position with velocity
+                node.position.add(node.velocity);
+                
+                // Bounce off boundaries
+                if (Math.abs(node.position.x) > 40) node.velocity.x *= -1;
+                if (Math.abs(node.position.y) > 40) node.velocity.y *= -1;
+                if (Math.abs(node.position.z) > 20) node.velocity.z *= -1;
+                
+                // Subtle pulsing effect
+                const scale = 1 + Math.sin(Date.now() * 0.001 + index) * 0.2;
+                node.scale.set(scale, scale, scale);
+                
+                // Mouse interaction
+                const distX = mouseX * 20 - node.position.x;
+                const distY = mouseY * 20 - node.position.y;
+                node.position.x += distX * 0.001;
+                node.position.y += distY * 0.001;
+            });
+            
+            // Update connections periodically
+            if (Math.random() < 0.02) {
+                createConnections();
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // GSAP Scroll Animations
+        gsap.registerPlugin();
+        
+        // Animate hero on load
+        gsap.from('.hero-title', {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            ease: 'power3.out'
+        });
+        
+        gsap.from('.hero-subtitle', {
+            opacity: 0,
+            y: 30,
+            duration: 1,
+            delay: 0.3,
+            ease: 'power3.out'
+        });
+        
+        gsap.from('.cta-btn', {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 0.6,
+            stagger: 0.2,
+            ease: 'power3.out'
+        });
+        
+        // Animate cards on scroll
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    gsap.from(entry.target, {
+                        opacity: 0,
+                        y: 50,
+                        duration: 0.8,
+                        ease: 'power3.out'
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.card').forEach(card => {
+            observer.observe(card);
+        });
+        
+        document.querySelectorAll('.section-title').forEach(title => {
+            observer.observe(title);
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add parallax effect to hero
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+                hero.style.opacity = 1 - (scrolled / 800);
+            }
+        });
+    </script>
+</body>
+</html>

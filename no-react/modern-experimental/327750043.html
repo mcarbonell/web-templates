@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA | Digital Alchemy</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent-1: #00f5ff;
+            --accent-2: #ff00ff;
+            --accent-3: #ffff00;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(0, 0, 0, 0.02);
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a5a;
+            --accent-1: #0066cc;
+            --accent-2: #cc00cc;
+            --accent-3: #cc9900;
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* WebGL Canvas */
+        #fluid-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        [data-theme="light"] nav {
+            background: rgba(248, 249, 250, 0.8);
+        }
+
+        .logo {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-1);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-1);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .theme-toggle {
+            width: 50px;
+            height: 26px;
+            border-radius: 13px;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-1);
+            top: 2px;
+            left: 3px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 245, 255, 0.4);
+        }
+
+        [data-theme="light"] .theme-toggle::after {
+            transform: translateX(24px);
+            background: var(--accent-2);
+            box-shadow: 0 2px 8px rgba(204, 0, 204, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 4%;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent-1);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.04em;
+        }
+
+        .hero-title .line {
+            display: block;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            font-weight: 400;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Magnetic Buttons */
+        .magnetic-btn {
+            position: relative;
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .magnetic-btn.secondary {
+            background: transparent;
+            border: 2px solid var(--glass-border);
+            color: var(--text-primary);
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .magnetic-btn:hover::before {
+            opacity: 1;
+        }
+
+        /* Bento Grid Section */
+        .bento-section {
+            padding: 8rem 4%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 280px);
+            gap: 1.5rem;
+        }
+
+        .bento-item {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .bento-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.1), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .bento-item:hover::before {
+            opacity: 1;
+        }
+
+        .bento-item:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-1);
+            box-shadow: 0 20px 60px rgba(0, 245, 255, 0.15);
+        }
+
+        .bento-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-item.wide {
+            grid-column: span 2;
+        }
+
+        .bento-item.tall {
+            grid-row: span 2;
+        }
+
+        .bento-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bento-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .bento-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ASCII Canvas Section */
+        .ascii-section {
+            padding: 8rem 4%;
+            position: relative;
+        }
+
+        .ascii-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .ascii-canvas-wrapper {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        #ascii-canvas {
+            width: 100%;
+            height: 500px;
+            display: block;
+            background: var(--bg-secondary);
+        }
+
+        .ascii-controls {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .ascii-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .ascii-btn:hover {
+            background: var(--accent-1);
+            color: white;
+            border-color: var(--accent-1);
+        }
+
+        .ascii-text h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .ascii-text p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Scramble Text Effect */
+        .scramble-text {
+            font-family: 'Courier New', monospace;
+            display: inline-block;
+        }
+
+        /* Features Grid */
+        .features-section {
+            padding: 8rem 4%;
+            background: var(--bg-secondary);
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.1), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .feature-card:hover::after {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(0, 245, 255, 0.3);
+        }
+
+        .feature-number {
+            font-size: 4rem;
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--accent-1);
+            opacity: 0.3;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 10rem 4%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.15), transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-title {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .cta-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 4% 2rem;
+            border-top: 1px solid var(--glass-border);
+            background: var(--bg-secondary);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand .logo {
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .footer-brand p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .footer-links h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-1);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: auto;
+            }
+
+            .bento-item.large,
+            .bento-item.wide {
+                grid-column: span 2;
+            }
+
+            .bento-item.tall {
+                grid-row: span 1;
+            }
+
+            .ascii-container {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero-title {
+                font-size: clamp(2.5rem, 12vw, 4rem);
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bento-item.large,
+            .bento-item.wide {
+                grid-column: span 1;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fluid-canvas"></canvas>
+
+    <nav>
+        <div class="logo">NOVA</div>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+        <button class="mobile-menu-btn">☰</button>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-tag reveal">Digital Alchemy Studio</div>
+            <h1 class="hero-title">
+                <span class="line reveal" style="transition-delay: 0.1s;">We Create</span>
+                <span class="line gradient-text reveal scramble-target" style="transition-delay: 0.2s;" data-text="Digital Magic">Digital Magic</span>
+            </h1>
+            <p class="hero-subtitle reveal" style="transition-delay: 0.3s;">
+                Transforming ideas into immersive digital experiences through cutting-edge design, 
+                WebGL innovation, and kinetic artistry.
+            </p>
+            <div class="hero-cta reveal" style="transition-delay: 0.4s;">
+                <a href="#work" class="magnetic-btn" data-magnetic>Explore Work</a>
+                <a href="#contact" class="magnetic-btn secondary" data-magnetic>Get in Touch</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="bento-section" id="features">
+        <div class="section-header reveal">
+            <h2 class="section-title scramble-target" data-text="Our Expertise">Our Expertise</h2>
+            <p class="section-subtitle">Pushing the boundaries of digital craftsmanship</p>
+        </div>
+        <div class="bento-grid">
+            <div class="bento-item large reveal">
+                <div class="bento-icon">◈</div>
+                <h3 class="bento-title">WebGL Experiences</h3>
+                <p class="bento-desc">Immersive 3D environments and interactive fluid simulations that respond to user interaction in real-time.</p>
+            </div>
+            <div class="bento-item reveal" style="transition-delay: 0.1s;">
+                <div class="bento-icon">◎</div>
+                <h3 class="bento-title">Kinetic Type</h3>
+                <p class="bento-desc">Typography that moves, breathes, and responds.</p>
+            </div>
+            <div class="bento-item reveal" style="transition-delay: 0.2s;">
+                <div class="bento-icon">◉</div>
+                <h3 class="bento-title">Glassmorphism</h3>
+                <p class="bento-desc">Translucent interfaces with depth and elegance.</p>
+            </div>
+            <div class="bento-item wide reveal" style="transition-delay: 0.3s;">
+                <div class="bento-icon">◆</div>
+                <h3 class="bento-title">Motion Design</h3>
+                <p class="bento-desc">Every pixel animated with purpose. We craft scroll-driven narratives and micro-interactions that delight and guide users through your digital story.</p>
+            </div>
+            <div class="bento-item reveal" style="transition-delay: 0.4s;">
+                <div class="bento-icon">◐</div>
+                <h3 class="bento-title">Shaders</h3>
+                <p class="bento-desc">Custom GLSL shaders for unique visual effects.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="ascii-section" id="work">
+        <div class="ascii-container">
+            <div class="ascii-canvas-wrapper reveal">
+                <canvas id="ascii-canvas"></canvas>
+                <div class="ascii-controls">
+                    <button class="ascii-btn" onclick="setAsciiMode('fluid')">Fluid</button>
+                    <button class="ascii-btn" onclick="setAsciiMode('wave')">Wave</button>
+                    <button class="ascii-btn" onclick="setAsciiMode('particles')">Particles</button>
+                </div>
+            </div>
+            <div class="ascii-text reveal" style="transition-delay: 0.2s;">
+                <h2 class="scramble-target" data-text="ASCII Art Rendering">ASCII Art Rendering</h2>
+                <p>Experience the fusion of retro aesthetics and modern technology. Our real-time ASCII renderer transforms visual elements into character-based art, creating a unique nostalgic yet futuristic visual language.</p>
+                <p>Each frame is computed in real-time, converting luminance values into carefully selected characters from our custom ASCII palette.</p>
+                <a href="#" class="magnetic-btn" data-magnetic>View Gallery</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="section-header reveal">
+            <h2 class="section-title scramble-target" data-text="Why Choose Us">Why Choose Us</h2>
+            <p class="section-subtitle">Numbers that speak for themselves</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-number">01</div>
+                <h3 class="feature-title">Performance First</h3>
+                <p class="feature-desc">60fps guaranteed on mid-range devices. We optimize every shader, every animation, every interaction.</p>
+            </div>
+            <div class="feature-card reveal" style="transition-delay: 0.1s;">
+                <div class="feature-number">02</div>
+                <h3 class="feature-title">Modern Browsers</h3>
+                <p class="feature-desc">Built for Chrome, Firefox, Safari. Progressive enhancement ensures everyone gets a great experience.</p>
+            </div>
+            <div class="feature-card reveal" style="transition-delay: 0.2s;">
+                <div class="feature-number">03</div>
+                <h3 class="feature-title">No Dependencies</h3>
+                <p class="feature-desc">Pure HTML, CSS, and vanilla JavaScript. No frameworks, no bloat, just raw performance.</p>
+            </div>
+            <div class="feature-card reveal" style="transition-delay: 0.3s;">
+                <div class="feature-number">04</div>
+                <h3 class="feature-title">Unique Aesthetic</h3>
+                <p class="feature-desc">Every project is a bespoke creation. No templates, no cookie-cutter designs.</p>
+            </div>
+            <div class="feature-card reveal" style="transition-delay: 0.4s;">
+                <div class="feature-number">05</div>
+                <h3 class="feature-title">Accessibility</h3>
+                <p class="feature-desc">Respects prefers-reduced-motion. Semantic HTML structure. Inclusive by design.</p>
+            </div>
+            <div class="feature-card reveal" style="transition-delay: 0.5s;">
+                <div class="feature-number">06</div>
+                <h3 class="feature-title">Future Ready</h3>
+                <p class="feature-desc">WebGL 2.0, CSS Container Queries, and modern APIs. Built to last.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section" id="contact">
+        <div class="cta-bg"></div>
+        <div class="reveal">
+            <h2 class="cta-title scramble-target" data-text="Let's Create Together">Let's Create Together</h2>
+            <p class="cta-subtitle">Ready to transform your digital presence? Let's build something extraordinary.</p>
+            <a href="mailto:hello@nova.studio" class="magnetic-btn" data-magnetic style="font-size: 1.2rem; padding: 1.25rem 3rem;">
+                Start a Project
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">NOVA</div>
+                <p>Digital Alchemy Studio<br>Creating magic through code and design.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Navigation</h4>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#work">Work</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="#">Web Development</a></li>
+                    <li><a href="#">Motion Design</a></li>
+                    <li><a href="#">WebGL Experiences</a></li>
+                    <li><a href="#">Brand Identity</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Connect</h4>
+                <ul>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Instagram</a></li>
+                    <li><a href="#">GitHub</a></li>
+                    <li><a href="#">LinkedIn</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 NOVA Digital Studio. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', savedTheme);
+
+        // WebGL Fluid Simulation
+        const canvas = document.getElementById('fluid-canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+        if (gl) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+
+            const vertexShaderSource = `
+                attribute vec2 position;
+                void main() {
+                    gl_Position = vec4(position, 0.0, 1.0);
+                }
+            `;
+
+            const fragmentShaderSource = `
+                precision mediump float;
+                uniform float time;
+                uniform vec2 resolution;
+                uniform vec2 mouse;
+
+                vec3 palette(float t) {
+                    vec3 a = vec3(0.5, 0.5, 0.5);
+                    vec3 b = vec3(0.5, 0.5, 0.5);
+                    vec3 c = vec3(1.0, 1.0, 1.0);
+                    vec3 d = vec3(0.00, 0.33, 0.67);
+                    return a + b * cos(6.28318 * (c * t + d));
+                }
+
+                void main() {
+                    vec2 uv = gl_FragCoord.xy / resolution.xy;
+                    vec2 uv0 = uv;
+                    vec3 finalColor = vec3(0.0);
+
+                    for (float i = 0.0; i < 3.0; i++) {
+                        uv = fract(uv * 1.5) - 0.5;
+
+                        float d = length(uv) * exp(-length(uv0));
+
+                        vec3 col = palette(length(uv0) + i * 0.4 + time * 0.1);
+
+                        d = sin(d * 8.0 + time * 0.5) / 8.0;
+                        d = abs(d);
+                        d = pow(0.01 / d, 1.2);
+
+                        finalColor += col * d;
+                    }
+
+                    // Add mouse interaction
+                    float mouseInfluence = smoothstep(0.3, 0.0, length(uv0 - mouse));
+                    finalColor += vec3(0.0, 0.8, 1.0) * mouseInfluence * 0.3;
+
+                    gl_FragColor = vec4(finalColor, 1.0);
+                }
+            `;
+
+            function createShader(type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                return shader;
+            }
+
+            const vertexShader = createShader(gl.VERTEX_SHADER, vertexShaderSource);
+            const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+            const program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            gl.useProgram(program);
+
+            const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
+            const buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+            const positionLocation = gl.getAttribLocation(program, 'position');
+            gl.enableVertexAttribArray(positionLocation);
+            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+            const timeLocation = gl.getUniformLocation(program, 'time');
+            const resolutionLocation = gl.getUniformLocation(program, 'resolution');
+            const mouseLocation = gl.getUniformLocation(program, 'mouse');
+
+            let mouseX = 0.5, mouseY = 0.5;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX / window.innerWidth;
+                mouseY = 1.0 - e.clientY / window.innerHeight;
+            }, { passive: true });
+
+            let animationId;
+            let isVisible = true;
+
+            function render(time) {
+                if (!isVisible) {
+                    animationId = requestAnimationFrame(render);
+                    return;
+                }
+
+                time *= 0.001;
+                gl.uniform1f(timeLocation, time);
+                gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+                gl.uniform2f(mouseLocation, mouseX, mouseY);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                animationId = requestAnimationFrame(render);
+            }
+
+            // Visibility check for performance
+            document.addEventListener('visibilitychange', () => {
+                isVisible = !document.hidden;
+            });
+
+            render(0);
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            });
+        }
+
+        // ASCII Canvas Renderer
+        const asciiCanvas = document.getElementById('ascii-canvas');
+        const asciiCtx = asciiCanvas.getContext('2d');
+        let asciiMode = 'fluid';
+
+        function resizeAsciiCanvas() {
+            const rect = asciiCanvas.getBoundingClientRect();
+            asciiCanvas.width = rect.width;
+            asciiCanvas.height = rect.height;
+        }
+        resizeAsciiCanvas();
+        window.addEventListener('resize', resizeAsciiCanvas);
+
+        function setAsciiMode(mode) {
+            asciiMode = mode;
+        }
+
+        const asciiChars = ' .:-=+*#%@';
+        let asciiTime = 0;
+
+        function renderAscii() {
+            const w = Math.floor(asciiCanvas.width / 10);
+            const h = Math.floor(asciiCanvas.height / 16);
+            const charW = asciiCanvas.width / w;
+            const charH = asciiCanvas.height / h;
+
+            asciiCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-secondary');
+            asciiCtx.fillRect(0, 0, asciiCanvas.width, asciiCanvas.height);
+
+            asciiCtx.font = `${charH * 0.9}px 'Courier New', monospace`;
+            asciiCtx.textAlign = 'center';
+            asciiCtx.textBaseline = 'middle';
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    let value = 0;
+
+                    if (asciiMode === 'fluid') {
+                        const nx = x / w;
+                        const ny = y / h;
+                        value = Math.sin(nx * 10 + asciiTime) * Math.cos(ny * 10 + asciiTime * 0.5) * 0.5 + 0.5;
+                        value += Math.sin(nx * 20 + ny * 20 + asciiTime * 2) * 0.2;
+                    } else if (asciiMode === 'wave') {
+                        const dist = Math.sqrt((x - w/2) ** 2 + (y - h/2) ** 2);
+                        value = Math.sin(dist * 0.5 - asciiTime * 3) * 0.5 + 0.5;
+                    } else if (asciiMode === 'particles') {
+                        value = Math.random() * Math.sin(asciiTime + x * 0.1) * Math.cos(asciiTime + y * 0.1);
+                    }
+
+                    value = Math.max(0, Math.min(1, value));
+                    const charIndex = Math.floor(value * (asciiChars.length - 1));
+                    const char = asciiChars[charIndex];
+
+                    const hue = (asciiTime * 50 + x * 2 + y) % 360;
+                    asciiCtx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+                    asciiCtx.fillText(char, x * charW + charW/2, y * charH + charH/2);
+                }
+            }
+
+            asciiTime += 0.02;
+            requestAnimationFrame(renderAscii);
+        }
+        renderAscii();
+
+        // Scramble Text Effect
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                this.originalText = el.getAttribute('data-text') || el.innerText;
+                this.update = this.update.bind(this);
+            }
+
+            scramble() {
+                this.counter = 0;
+                this.update();
+            }
+
+            update() {
+                const output = this.originalText.split('').map((char, index) => {
+                    if (index < this.counter) {
+                        return this.originalText[index];
+                    }
+                    return this.chars[Math.floor(Math.random() * this.chars.length)];
+                }).join('');
+
+                this.el.innerText = output;
+
+                if (this.counter < this.originalText.length) {
+                    this.counter += 1/3;
+                    requestAnimationFrame(this.update);
+                }
+            }
+        }
+
+        // Initialize scramble on scroll
+        const scrambleObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const scrambler = new TextScramble(entry.target);
+                    scrambler.scramble();
+                    scrambleObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.scramble-target').forEach(el => {
+            scrambleObserver.observe(el);
+        });
+
+        // Scroll Reveal Animation
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            revealObserver.observe(el);
+        });
+
+        // Magnetic Buttons
+        const magneticBtns = document.querySelectorAll('[data-magnetic]');
+        
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        // Bento Grid Hover Effect
+        const bentoItems = document.querySelectorAll('.bento-item');
+        
+        bentoItems.forEach(item => {
+            item.addEventListener('mousemove', (e) => {
+                const rect = item.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                
+                item.style.setProperty('--mouse-x', `${x}%`);
+                item.style.setProperty('--mouse-y', `${y}%`);
+            });
+        });
+
+        // Smooth Scroll for Navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Performance: Pause animations when not visible
+        let ticking = false;
+        function updateAnimations() {
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(updateAnimations);
+                ticking = true;
+            }
+        }, { passive: true });
+    </script>
+</body>
+</html>

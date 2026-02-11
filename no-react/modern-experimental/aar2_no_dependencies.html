@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS — ASCII Experience</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Space+Grotesk:wght@300;400;600;700&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --primary: #00ff88;
+    --primary-dim: #00cc6a;
+    --bg: #0a0a0f;
+    --bg-light: #12121a;
+    --text: #e0e0e0;
+    --text-dim: #888;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 1.2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+  }
+
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    letter-spacing: 3px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover {
+    color: var(--primary);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  #ascii-hero {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    line-height: 10px;
+    white-space: pre;
+    color: var(--primary);
+    opacity: 0.35;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-content p {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    max-width: 500px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: var(--primary);
+    color: var(--bg);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(0, 255, 136, 0.3);
+  }
+
+  .btn-outline {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: transparent;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid var(--primary);
+    margin-left: 1rem;
+    transition: all 0.3s;
+  }
+
+  .btn-outline:hover {
+    background: rgba(0, 255, 136, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ─── SECCIONES ─── */
+  section {
+    padding: 8rem 3rem;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--primary);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+  }
+
+  /* ─── ASCII IMAGE SECTION ─── */
+  .ascii-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+  }
+
+  .ascii-showcase-text p {
+    color: var(--text-dim);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    font-size: 1.05rem;
+  }
+
+  #ascii-image-container {
+    background: var(--bg-light);
+    border: 1px solid rgba(0, 255, 136, 0.15);
+    padding: 1.5rem;
+    font-family: 'Courier New', monospace;
+    font-size: 5px;
+    line-height: 5.5px;
+    white-space: pre;
+    color: var(--primary);
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  #ascii-image-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 15, 0.5) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ─── FEATURES ─── */
+  .features {
+    background: var(--bg-light);
+  }
+
+  .features-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 5rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .feature-card {
+    padding: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card:hover {
+    border-color: rgba(0, 255, 136, 0.3);
+    transform: translateY(-5px);
+    background: rgba(0, 255, 136, 0.03);
+  }
+
+  .feature-card .ascii-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    line-height: 0.7rem;
+    color: var(--primary);
+    white-space: pre;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+
+  .feature-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+  }
+
+  .feature-card p {
+    color: var(--text-dim);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+
+  /* ─── WEBCAM SECTION ─── */
+  .webcam-section {
+    text-align: center;
+  }
+
+  .webcam-section .section-title {
+    margin-bottom: 0.5rem;
+  }
+
+  .webcam-section > p {
+    color: var(--text-dim);
+    margin-bottom: 3rem;
+  }
+
+  #ascii-webcam-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--bg-light);
+    border: 1px solid rgba(0, 255, 136, 0.15);
+    padding: 2rem;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  #ascii-webcam {
+    font-family: 'Courier New', monospace;
+    font-size: 5px;
+    line-height: 5.5px;
+    white-space: pre;
+    color: var(--primary);
+  }
+
+  .webcam-placeholder {
+    text-align: center;
+    color: var(--text-dim);
+  }
+
+  .webcam-placeholder .ascii-art {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    line-height: 0.65rem;
+    color: var(--primary);
+    white-space: pre;
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+  }
+
+  #btn-webcam {
+    padding: 0.8rem 2rem;
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+  }
+
+  #btn-webcam:hover {
+    background: var(--primary);
+    color: var(--bg);
+  }
+
+  /* ─── ASCII ANIMATION SECTION ─── */
+  .animation-section {
+    background: var(--bg-light);
+    text-align: center;
+  }
+
+  #ascii-animation {
+    max-width: 700px;
+    margin: 3rem auto 0;
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    line-height: 9px;
+    white-space: pre;
+    color: var(--primary);
+    opacity: 0.9;
+  }
+
+  /* ─── CTA ─── */
+  .cta-section {
+    text-align: center;
+    padding: 10rem 3rem;
+    position: relative;
+  }
+
+  .cta-section h2 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-section p {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    padding: 3rem;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+
+  footer .ascii-footer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.5rem;
+    line-height: 0.6rem;
+    white-space: pre;
+    color: var(--primary);
+    opacity: 0.3;
+    margin-bottom: 2rem;
+  }
+
+  /* ─── HIDDEN ELEMENTS ─── */
+  .hidden-media {
+    display: none;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 5rem 1.5rem; }
+    .ascii-showcase { grid-template-columns: 1fr; gap: 2rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    #ascii-hero { font-size: 7px; line-height: 7px; }
+    .btn-outline { margin-left: 0; margin-top: 1rem; }
+    .hero-content .btn-group { display: flex; flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a href="#" class="logo">&gt;_ NEXUS</a>
+  <ul class="nav-links">
+    <li><a href="#showcase">Tecnología</a></li>
+    <li><a href="#features">Características</a></li>
+    <li><a href="#webcam">Demo en vivo</a></li>
+    <li><a href="#cta">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div id="ascii-hero"></div>
+  <div class="hero-content">
+    <h1>El futuro es<br>texto</h1>
+    <p>Renderizado ASCII en tiempo real. Donde cada píxel se convierte en un carácter y cada frame cobra vida.</p>
+    <div class="btn-group">
+      <a href="#webcam" class="btn-primary">Probar demo</a>
+      <a href="#showcase" class="btn-outline">Explorar</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    SCROLL<br>↓
+  </div>
+</section>
+
+<!-- ─── ASCII IMAGE SHOWCASE ─── -->
+<section id="showcase">
+  <div class="ascii-showcase">
+    <div class="ascii-showcase-text">
+      <span class="section-label">// 001 — Renderizado</span>
+      <h2 class="section-title">Imágenes que se leen</h2>
+      <p>Cada imagen se descompone píxel a píxel. El brillo de cada fragmento se traduce a un carácter ASCII, creando una representación visual hecha enteramente de texto.</p>
+      <p>Los caracteres más densos como <strong style="color:var(--primary)">@ # W</strong> representan zonas oscuras, mientras que los más ligeros como <strong style="color:var(--primary)">. : ·</strong> representan la luz.</p>
+      <a href="#webcam" class="btn-primary">Ver en acción</a>
+    </div>
+    <div id="ascii-image-container">Cargando...</div>
+  </div>
+</section>
+
+<!-- ─── FEATURES ─── -->
+<section class="features" id="features">
+  <div class="features-header">
+    <span class="section-label">// 002 — Capacidades</span>
+    <h2 class="section-title">Potencia bajo cada carácter</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="ascii-icon"> /\_/\
+( o.o )
+ > ^ <</div>
+      <h3>Tiempo real</h3>
+      <p>Renderizado a 60fps usando Canvas API. Cada frame se procesa y convierte al instante sin lag perceptible.</p>
+    </div>
+    <div class="feature-card">
+      <div class="ascii-icon">  ┌──┐
+  │▓▓│
+  │░░│
+  └──┘</div>
+      <h3>Mapeo de densidad</h3>
+      <p>27 niveles de caracteres ordenados por densidad visual para una representación fiel del brillo original.</p>
+    </div>
+    <div class="feature-card">
+      <div class="ascii-icon"> ╔════╗
+ ║ ►► ║
+ ╚════╝</div>
+      <h3>Múltiples fuentes</h3>
+      <p>Compatible con webcam, vídeo, imágenes estáticas y escenas 3D generadas proceduralmente.</p>
+    </div>
+    <div class="feature-card">
+      <div class="ascii-icon">  ◄────►
+  │RGB │
+  ◄────►</div>
+      <h3>Modo color</h3>
+      <p>Cada carácter puede heredar el color del píxel original, creando ASCII art a todo color.</p>
+    </div>
+    <div class="feature-card">
+      <div class="ascii-icon">  ░▒▓█
+  █▓▒░
+  ░▒▓█</div>
+      <h3>Resolución adaptable</h3>
+      <p>Ajusta la densidad de caracteres dinámicamente según el viewport para máximo rendimiento.</p>
+    </div>
+    <div class="feature-card">
+      <div class="ascii-icon">  {&lt;/&gt;}
+  [===]
+  {&lt;/&gt;}</div>
+      <h3>Zero dependencias</h3>
+      <p>Implementado con Canvas API nativo. Sin librerías externas, sin WebGL, puro JavaScript vanilla.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WEBCAM ─── -->
+<section class="webcam-section" id="webcam">
+  <span class="section-label">// 003 — Demo interactiva</span>
+  <h2 class="section-title">Mírate en ASCII</h2>
+  <p>Activa tu cámara y conviértete en arte ASCII en tiempo real.</p>
+  <div id="ascii-webcam-container">
+    <div class="webcam-placeholder" id="webcam-placeholder">
+      <div class="ascii-art">
+    ┌─────────────────┐
+    │                 │
+    │    ┌───────┐    │
+    │    │ ◉   ◉ │    │
+    │    │   ▲   │    │
+    │    │  ───  │    │
+    │    └───────┘    │
+    │                 │
+    └─────────────────┘
+      </div>
+      <button id="btn-webcam">ACTIVAR CÁMARA</button>
+      <p style="margin-top:1rem; font-size:0.8rem">Tu vídeo no se envía a ningún servidor</p>
+    </div>
+    <div id="ascii-webcam" style="display:none;"></div>
+  </div>
+</section>
+
+<!-- ─── PROCEDURAL ANIMATION ─── -->
+<section class="animation-section">
+  <span class="section-label">// 004 — Generativo</span>
+  <h2 class="section-title">Arte procedural</h2>
+  <p style="color:var(--text-dim); max-width:500px; margin:0 auto;">Animaciones generadas matemáticamente y renderizadas como ASCII, sin ninguna imagen de origen.</p>
+  <div id="ascii-animation"></div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="cta-section" id="cta">
+  <span class="section-label">// 005 — Empieza</span>
+  <h2>¿Listo para ver<br>en texto?</h2>
+  <p>Integra el renderizado ASCII en tus proyectos web y sorprende con algo diferente.</p>
+  <a href="#" class="btn-primary">Comenzar ahora</a>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="ascii-footer">
+ ███╗   ██╗███████╗██╗  ██╗██╗   ██╗███████╗
+ ████╗  ██║██╔════╝╚██╗██╔╝██║   ██║██╔════╝
+ ██╔██╗ ██║█████╗   ╚███╔╝ ██║   ██║███████╗
+ ██║╚██╗██║██╔══╝   ██╔██╗ ██║   ██║╚════██║
+ ██║ ╚████║███████╗██╔╝ ██╗╚██████╔╝███████║
+ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+  </div>
+  <p>Hecho con &lt;/&gt; y caracteres ASCII — 2025</p>
+</footer>
+
+<!-- ─── HIDDEN MEDIA ─── -->
+<div class="hidden-media">
+  <canvas id="canvas-hero" width="120" height="40"></canvas>
+  <canvas id="canvas-img" width="140" height="80"></canvas>
+  <canvas id="canvas-webcam"></canvas>
+  <video id="webcam-video" autoplay muted playsinline></video>
+  <canvas id="canvas-gen" width="100" height="100"></canvas>
+  <img id="sample-image" crossorigin="anonymous" alt="">
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// ASCII RENDERING ENGINE
+// ═══════════════════════════════════════════════
+
+const ASCII_CHARS = ' .\'`^",:;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
+
+function brightnessToChar(brightness) {
+  const index = Math.floor(brightness * (ASCII_CHARS.length - 1));
+  return ASCII_CHARS[index];
+}
+
+function getPixelBrightness(data, i) {
+  return (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255;
+}
+
+// ═══════════════════════════════════════════════
+// 1. HERO — Animated procedural ASCII background
+// ═══════════════════════════════════════════════
+
+(function heroASCII() {
+  const el = document.getElementById('ascii-hero');
+  const cols = 150;
+  const rows = 45;
+
+  function render(time) {
+    const t = time * 0.001;
+    let out = '';
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const nx = x / cols;
+        const ny = y / rows;
+
+        // Layered sine waves
+        let val = 0;
+        val += Math.sin(nx * 8 + t * 0.7) * 0.3;
+        val += Math.sin(ny * 6 - t * 0.5) * 0.3;
+        val += Math.sin((nx + ny) * 5 + t) * 0.2;
+        val += Math.sin(Math.sqrt((nx - 0.5) ** 2 + (ny - 0.5) ** 2) * 12 - t * 1.5) * 0.3;
+
+        // Normalize to 0–1
+        const brightness = (val + 1) / 2;
+        out += brightnessToChar(brightness);
+      }
+      out += '\n';
+    }
+
+    el.textContent = out;
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+})();
+
+
+// ═══════════════════════════════════════════════
+// 2. ASCII IMAGE — Render a generated image
+// ═══════════════════════════════════════════════
+
+(function asciiImage() {
+  const container = document.getElementById('ascii-image-container');
+  const canvas = document.getElementById('canvas-img');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+
+  let time = 0;
+
+  function drawScene(t) {
+    // Gradient background
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, '#1a0a2e');
+    grad.addColorStop(1, '#0a0a2e');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Rotating sphere illusion
+    const cx = W / 2;
+    const cy = H / 2;
+    const maxR = Math.min(W, H) * 0.4;
+
+    for (let r = maxR; r > 0; r -= 2) {
+      const ratio = r / maxR;
+      const hue = (ratio * 120 + t * 50) % 360;
+      const brightness = 30 + ratio * 60;
+      ctx.beginPath();
+      ctx.arc(
+        cx + Math.sin(t * 0.8 + ratio * 3) * 10,
+        cy + Math.cos(t * 0.6 + ratio * 2) * 8,
+        r, 0, Math.PI * 2
+      );
+      ctx.fillStyle = `hsl(${hue}, 80%, ${brightness}%)`;
+      ctx.fill();
+    }
+
+    // Floating particles
+    for (let i = 0; i < 30; i++) {
+      const px = (Math.sin(t * 0.3 + i * 1.7) * 0.5 + 0.5) * W;
+      const py = (Math.cos(t * 0.4 + i * 2.1) * 0.5 + 0.5) * H;
+      const pr = 1 + Math.sin(t + i) * 1;
+      ctx.beginPath();
+      ctx.arc(px, py, pr, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.sin(t + i) * 0.3})`;
+      ctx.fill();
+    }
+  }
+
+  function render() {
+    time += 0.02;
+    drawScene(time);
+
+    const imageData = ctx.getImageData(0, 0, W, H);
+    const data = imageData.data;
+
+    let ascii = '';
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const i = (y * W + x) * 4;
+        const brightness = getPixelBrightness(data, i);
+        ascii += brightnessToChar(brightness);
+      }
+      ascii += '\n';
+    }
+
+    container.textContent = ascii;
+    requestAnimationFrame(render);
+  }
+
+  render();
+})();
+
+
+// ═══════════════════════════════════════════════
+// 3. WEBCAM — Live ASCII from camera
+// ═══════════════════════════════════════════════
+
+(function webcamASCII() {
+  const btn = document.getElementById('btn-webcam');
+  const placeholder = document.getElementById('webcam-placeholder');
+  const asciiEl = document.getElementById('ascii-webcam');
+  const video = document.getElementById('webcam-video');
+  const canvas = document.getElementById('canvas-webcam');
+  const ctx = canvas.getContext('2d');
+
+  const COLS = 160;
+  const FONT_RATIO = 0.55;
+
+  btn.addEventListener('click', async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 640, height: 480 }
+      });
+      video.srcObject = stream;
+
+      video.addEventListener('loadeddata', () => {
+        const aspect = video.videoWidth / video.videoHeight;
+        const ROWS = Math.floor(COLS / aspect * FONT_RATIO);
+        canvas.width = COLS;
+        canvas.height = ROWS;
+
+        placeholder.style.display = 'none';
+        asciiEl.style.display = 'block';
+
+        function render() {
+          ctx.drawImage(video, 0, 0, COLS, ROWS);
+          const imageData = ctx.getImageData(0, 0, COLS, ROWS);
+          const data = imageData.data;
+
+          let ascii = '';
+          for (let y = 0; y < ROWS; y++) {
+            for (let x = 0; x < COLS; x++) {
+              const i = (y * COLS + x) * 4;
+              const brightness = getPixelBrightness(data, i);
+              // Invertido para webcam (fondo claro → oscuro)
+              ascii += brightnessToChar(1 - brightness);
+            }
+            ascii += '\n';
+          }
+
+          asciiEl.textContent = ascii;
+          requestAnimationFrame(render);
+        }
+
+        render();
+      });
+    } catch (e) {
+      placeholder.innerHTML = `
+        <p style="color: #ff4444;">No se pudo acceder a la cámara.</p>
+        <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 0.5rem;">
+          Asegúrate de permitir el acceso o prueba en HTTPS.
+        </p>
+      `;
+    }
+  });
+})();
+
+
+// ═══════════════════════════════════════════════
+// 4. PROCEDURAL ANIMATION — Plasma / Tunnel
+// ═══════════════════════════════════════════════
+
+(function proceduralASCII() {
+  const el = document.getElementById('ascii-animation');
+  const cols = 90;
+  const rows = 30;
+
+  function render(time) {
+    const t = time * 0.001;
+    let out = '';
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        // Tunnel effect coordinates
+        const cx = (x / cols - 0.5) * 2;
+        const cy = (y / rows - 0.5) * 2;
+
+        const dist = Math.sqrt(cx * cx + cy * cy) + 0.001;
+        const angle = Math.atan2(cy, cx);
+
+        // Tunnel mapping
+        const tx = 1.0 / dist + t * 0.5;
+        const ty = angle / Math.PI + t * 0.2;
+
+        // Checkerboard in tunnel space
+        const pattern = (Math.sin(tx * 8) * Math.sin(ty * 8));
+
+        // Distance fog
+        const fog = Math.min(1, dist * 0.8);
+
+        const brightness = ((pattern + 1) / 2) * (1 - fog);
+
+        out += brightnessToChar(brightness);
+      }
+      out += '\n';
+    }
+
+    el.textContent = out;
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+})();
+
+</script>
+</body>
+</html>

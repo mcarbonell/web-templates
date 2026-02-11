@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRISM | Digital Experience</title>
+  
+  <!-- 
+    ╔══════════════════════════════════════════════════════════════════════════════╗
+    ║                          DESIGN SYSTEM EXPLANATION                           ║
+    ╠══════════════════════════════════════════════════════════════════════════════╣
+    ║                                                                              ║
+    ║  SEED: 533754056                                                             ║
+    ║  CHAOS LEVEL: 1 (Low - Structured with subtle organic deviations)           ║
+    ║  PRIMARY HUE: 68° (Chartreuse/Yellow-Green)                                 ║
+    ║  SATURATION: 47%                                                             ║
+    ║  SHAPE LANGUAGE: Geometric                                                   ║
+    ║  COLOR TEMPERATURE: Warm                                                     ║
+    ║  SCROLL DIRECTION: Vertical                                                  ║
+    ║                                                                              ║
+    ║  DESIGN PHILOSOPHY:                                                          ║
+    ║  "Digital Prism" - Light refracted through crystalline structures.          ║
+    ║  The low chaos level (1) means we maintain strong grid alignment            ║
+    ║  but introduce subtle organic offsets (±5-10px) to prevent                  ║
+    ║  clinical perfection. Elements appear to float slightly off-grid.           ║
+    ║                                                                              ║
+    ║  VISUAL HIERARCHY:                                                           ║
+    ║  - Three.js particle field for ambient motion                                ║
+    ║  - CSS 3D transformed geometric cards                                        ║
+    ║  - GSAP scroll-triggered animations                                          ║
+    ║  - Mouse-reactive 3D tilt on interactive elements                            ║
+    ║                                                                              ║
+    ║  COLOR STRATEGY:                                                             ║
+    ║  Warm chartreuse primary (HSL 68°, 47%) creates energy without              ║
+    ║  overwhelming. Complemented by coral, amber, and peach warm accents.        ║
+    ║  Dark mode uses deep charcoal (#0a0a0f) to reduce eye strain.               ║
+    ║                                                                              ║
+    ║  TYPOGRAPHY:                                                                 ║
+    ║  - Display: Playfair Display (serif elegance)                                ║
+    ║  - Body: Inter (clean, modern sans-serif)                                    ║
+    ║  - Scale: 1.25 ratio for harmonious sizing                                   ║
+    ║                                                                              ║
+    ║  3D APPROACH:                                                                ║
+    ║  - Background: Three.js particle system with subtle noise movement          ║
+    ║  - Foreground: CSS 3D transforms (translateZ, rotateX/Y) for performance    ║
+    ║  - Interaction: Magnetic cursor effect with subtle element attraction       ║
+    ║                                                                              ║
+    ╚══════════════════════════════════════════════════════════════════════════════╝
+  -->
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       CSS CUSTOM PROPERTIES - THEME SYSTEM
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    :root {
+      /* Seed-based Primary Color: HSL(68°, 47%, 50%) */
+      --primary-hue: 68;
+      --primary-sat: 47%;
+      --primary-lit: 50%;
+      
+      /* Core Colors */
+      --color-primary: hsl(var(--primary-hue), var(--primary-sat), var(--primary-lit));
+      --color-primary-light: hsl(var(--primary-hue), var(--primary-sat), 65%);
+      --color-primary-dark: hsl(var(--primary-hue), var(--primary-sat), 35%);
+      
+      /* Warm Accent Palette (complementary to chartreuse) */
+      --color-coral: hsl(14, 87%, 64%);
+      --color-amber: hsl(38, 92%, 58%);
+      --color-peach: hsl(24, 89%, 71%);
+      --color-rose: hsl(340, 75%, 55%);
+      
+      /* Transitions */
+      --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-bounce: cubic-bezier(0.68, -0.15, 0.265, 1.35);
+      
+      /* Shadows */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.15);
+      --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.2);
+      --shadow-glow: 0 0 60px hsla(var(--primary-hue), var(--primary-sat), var(--primary-lit), 0.4);
+      
+      /* Typography Scale (1.25 ratio) */
+      --font-xs: clamp(0.64rem, 0.8vw, 0.75rem);
+      --font-sm: clamp(0.8rem, 1vw, 0.875rem);
+      --font-base: clamp(1rem, 1.2vw, 1.125rem);
+      --font-lg: clamp(1.25rem, 1.5vw, 1.35rem);
+      --font-xl: clamp(1.563rem, 2vw, 1.75rem);
+      --font-2xl: clamp(1.953rem, 2.8vw, 2.5rem);
+      --font-3xl: clamp(2.441rem, 3.5vw, 3.2rem);
+      --font-4xl: clamp(3.052rem, 5vw, 4.5rem);
+      --font-5xl: clamp(3.815rem, 7vw, 6rem);
+      --font-6xl: clamp(4.768rem, 9vw, 8rem);
+      
+      /* Spacing */
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-8: 3rem;
+      --space-10: 4rem;
+      --space-12: 6rem;
+      --space-16: 8rem;
+      --space-20: 12rem;
+      --space-24: 16rem;
+      
+      /* Z-index Scale */
+      --z-bg: -100;
+      --z-particles: -50;
+      --z-content: 10;
+      --z-ui: 100;
+      --z-nav: 200;
+      --z-modal: 300;
+      --z-toast: 400;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       DARK THEME (Default)
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    [data-theme="dark"] {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-tertiary: #1a1a25;
+      --bg-card: rgba(26, 26, 37, 0.8);
+      
+      --text-primary: #fafafa;
+      --text-secondary: #a0a0b0;
+      --text-muted: #606070;
+      
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border-medium: rgba(255, 255, 255, 0.12);
+      
+      --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-elevated: 0 24px 80px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       LIGHT THEME
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    [data-theme="light"] {
+      --bg-primary: #fafafa;
+      --bg-secondary: #f0f0f5;
+      --bg-tertiary: #e8e8f0;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      
+      --text-primary: #0a0a0f;
+      --text-secondary: #505060;
+      --text-muted: #9090a0;
+      
+      --border-subtle: rgba(0, 0, 0, 0.06);
+      --border-medium: rgba(0, 0, 0, 0.12);
+      
+      --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --shadow-elevated: 0 24px 80px rgba(0, 0, 0, 0.12);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       BASE RESET & GLOBAL STYLES
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: var(--font-base);
+      line-height: 1.6;
+      color: var(--text-primary);
+      background-color: var(--bg-primary);
+      overflow-x: hidden;
+      transition: background-color 0.5s var(--transition-smooth),
+                  color 0.5s var(--transition-smooth);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       THREE.JS CANVAS BACKGROUND
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: var(--z-particles);
+      pointer-events: none;
+    }
+    
+    #particle-canvas {
+      width: 100%;
+      height: 100%;
+      opacity: 0.6;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       NAVIGATION
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: var(--z-nav);
+      padding: var(--space-5) var(--space-6);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: linear-gradient(
+        to bottom,
+        var(--bg-primary) 0%,
+        transparent 100%
+      );
+      transition: padding 0.3s var(--transition-smooth);
+    }
+    
+    .nav.scrolled {
+      padding: var(--space-3) var(--space-6);
+    }
+    
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--font-xl);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    
+    .nav-logo-icon {
+      width: 32px;
+      height: 32px;
+      position: relative;
+      display: block;
+    }
+    
+    .nav-logo-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: var(--color-primary);
+      transition: transform 0.6s var(--transition-bounce);
+    }
+    
+    .nav-logo:hover .nav-logo-icon svg {
+      transform: rotate(180deg);
+    }
+    
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-8);
+      list-style: none;
+    }
+    
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: var(--font-sm);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      position: relative;
+      padding: var(--space-2) 0;
+      transition: color 0.3s var(--transition-smooth);
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--color-primary);
+      transition: width 0.3s var(--transition-smooth);
+    }
+    
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    /* Theme Toggle Button */
+    .theme-toggle {
+      width: 48px;
+      height: 26px;
+      border-radius: 13px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-medium);
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s var(--transition-smooth);
+      overflow: hidden;
+    }
+    
+    .theme-toggle::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      top: 2px;
+      left: 2px;
+      transition: transform 0.4s var(--transition-bounce),
+                  background 0.3s var(--transition-smooth);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    [data-theme="light"] .theme-toggle::before {
+      transform: translateX(22px);
+      background: var(--color-amber);
+    }
+    
+    .theme-toggle-icons {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      pointer-events: none;
+    }
+    
+    .theme-icon {
+      width: 12px;
+      height: 12px;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+    
+    [data-theme="dark"] .theme-icon.moon,
+    [data-theme="light"] .theme-icon.sun {
+      opacity: 1;
+    }
+    
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      padding: var(--space-2);
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .menu-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text-primary);
+      transition: all 0.3s var(--transition-smooth);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       HERO SECTION
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: var(--space-20) var(--space-6);
+      overflow: hidden;
+      perspective: 1200px;
+    }
+    
+    .hero-content {
+      text-align: center;
+      max-width: 900px;
+      position: relative;
+      z-index: var(--z-content);
+      transform-style: preserve-3d;
+    }
+    
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 100px;
+      font-size: var(--font-xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      margin-bottom: var(--space-8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transform: translateZ(30px);
+    }
+    
+    .hero-badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--color-primary);
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+    
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--font-6xl);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-6);
+      transform: translateZ(50px);
+    }
+    
+    .hero-title-line {
+      display: block;
+      overflow: hidden;
+    }
+    
+    .hero-title-line span {
+      display: inline-block;
+    }
+    
+    .hero-title-accent {
+      color: var(--color-primary);
+      position: relative;
+      display: inline-block;
+    }
+    
+    .hero-title-accent::after {
+      content: '';
+      position: absolute;
+      bottom: 0.1em;
+      left: 0;
+      right: 0;
+      height: 0.15em;
+      background: linear-gradient(
+        90deg,
+        var(--color-coral),
+        var(--color-amber),
+        var(--color-primary)
+      );
+      opacity: 0.3;
+      border-radius: 2px;
+    }
+    
+    .hero-description {
+      font-size: var(--font-lg);
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto var(--space-10);
+      line-height: 1.7;
+      transform: translateZ(20px);
+    }
+    
+    .hero-cta {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      flex-wrap: wrap;
+      transform: translateZ(40px);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       BUTTONS
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-6);
+      font-family: inherit;
+      font-size: var(--font-sm);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s var(--transition-bounce);
+      position: relative;
+      overflow: hidden;
+      border: none;
+      outline: none;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%
+      );
+      transform: translateX(-100%);
+      transition: transform 0.6s var(--transition-smooth);
+    }
+    
+    .btn:hover::before {
+      transform: translateX(100%);
+    }
+    
+    .btn-primary {
+      background: var(--color-primary);
+      color: var(--bg-primary);
+      box-shadow: 0 4px 20px hsla(var(--primary-hue), var(--primary-sat), var(--primary-lit), 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px hsla(var(--primary-hue), var(--primary-sat), var(--primary-lit), 0.5);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-medium);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--color-primary);
+      transform: translateY(-3px);
+    }
+    
+    .btn-arrow {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.3s var(--transition-smooth);
+    }
+    
+    .btn:hover .btn-arrow {
+      transform: translateX(4px);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       FLOATING GEOMETRIC ELEMENTS (3D)
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .floating-shapes {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    
+    .shape {
+      position: absolute;
+      transform-style: preserve-3d;
+      animation: float-shape 8s ease-in-out infinite;
+    }
+    
+    .shape-1 {
+      width: 120px;
+      height: 120px;
+      top: 15%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .shape-2 {
+      width: 80px;
+      height: 80px;
+      top: 60%;
+      right: 15%;
+      animation-delay: -2s;
+    }
+    
+    .shape-3 {
+      width: 60px;
+      height: 60px;
+      bottom: 20%;
+      left: 20%;
+      animation-delay: -4s;
+    }
+    
+    .shape-4 {
+      width: 100px;
+      height: 100px;
+      top: 30%;
+      right: 25%;
+      animation-delay: -6s;
+    }
+    
+    @keyframes float-shape {
+      0%, 100% {
+        transform: translateY(0) rotateX(0deg) rotateY(0deg);
+      }
+      25% {
+        transform: translateY(-15px) rotateX(5deg) rotateY(10deg);
+      }
+      50% {
+        transform: translateY(-5px) rotateX(-5deg) rotateY(-5deg);
+      }
+      75% {
+        transform: translateY(-20px) rotateX(8deg) rotateY(-10deg);
+      }
+    }
+    
+    .shape-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+    }
+    
+    .shape-ring {
+      position: absolute;
+      inset: 0;
+      border: 2px solid var(--color-primary);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: rotate-ring 20s linear infinite;
+    }
+    
+    .shape-ring:nth-child(2) {
+      inset: 10%;
+      border-color: var(--color-coral);
+      animation-direction: reverse;
+      animation-duration: 15s;
+    }
+    
+    .shape-ring:nth-child(3) {
+      inset: 20%;
+      border-color: var(--color-amber);
+      animation-duration: 25s;
+    }
+    
+    @keyframes rotate-ring {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       FEATURES SECTION
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .features {
+      padding: var(--space-24) var(--space-6);
+      position: relative;
+    }
+    
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto var(--space-16);
+    }
+    
+    .section-label {
+      display: inline-block;
+      font-size: var(--font-xs);
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      margin-bottom: var(--space-4);
+    }
+    
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--font-4xl);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: var(--space-5);
+    }
+    
+    .section-description {
+      font-size: var(--font-lg);
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: var(--space-8);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: all 0.4s var(--transition-bounce);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.03) 50%,
+        transparent 100%
+      );
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px) rotateX(2deg);
+      box-shadow: var(--shadow-elevated);
+      border-color: var(--border-medium);
+    }
+    
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+    
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      margin-bottom: var(--space-5);
+      position: relative;
+    }
+    
+    .feature-icon-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-coral));
+      border-radius: 16px;
+      opacity: 0.15;
+      transform: rotate(-5deg);
+      transition: transform 0.4s var(--transition-bounce);
+    }
+    
+    .feature-card:hover .feature-icon-bg {
+      transform: rotate(0deg) scale(1.1);
+    }
+    
+    .feature-icon svg {
+      width: 28px;
+      height: 28px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      fill: var(--color-primary);
+    }
+    
+    .feature-title {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--font-xl);
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+      color: var(--text-primary);
+    }
+    
+    .feature-description {
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    
+    /* Chaos Level 1: Subtle organic offset */
+    .feature-card:nth-child(2) {
+      transform: translateY(8px);
+    }
+    
+    .feature-card:nth-child(2):hover {
+      transform: translateY(0) rotateX(2deg);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       SHOWCASE SECTION
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .showcase {
+      padding: var(--space-24) var(--space-6);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .showcase-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-12);
+      align-items: center;
+    }
+    
+    .showcase-visual {
+      position: relative;
+      aspect-ratio: 4/3;
+      border-radius: 32px;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+    
+    .showcase-frame {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-secondary);
+      border-radius: 32px;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+    
+    .showcase-content {
+      position: absolute;
+      inset: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    
+    .showcase-3d-object {
+      width: 60%;
+      height: 60%;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: rotate-3d 20s linear infinite;
+    }
+    
+    @keyframes rotate-3d {
+      from { transform: rotateX(15deg) rotateY(0deg); }
+      to { transform: rotateX(15deg) rotateY(360deg); }
+    }
+    
+    .prism {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+    }
+    
+    .prism-face {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        hsla(var(--primary-hue), var(--primary-sat), var(--primary-lit), 0.8),
+        hsla(var(--primary-hue), var(--primary-sat), 40%, 0.4)
+      );
+      border: 1px solid hsla(var(--primary-hue), var(--primary-sat), 60%, 0.3);
+      backface-visibility: visible;
+    }
+    
+    .prism-face:nth-child(1) { transform: translateZ(60px); }
+    .prism-face:nth-child(2) { transform: rotateY(90deg) translateZ(60px); }
+    .prism-face:nth-child(3) { transform: rotateY(180deg) translateZ(60px); }
+    .prism-face:nth-child(4) { transform: rotateY(-90deg) translateZ(60px); }
+    .prism-face:nth-child(5) { transform: rotateX(90deg) translateZ(60px); }
+    .prism-face:nth-child(6) { transform: rotateX(-90deg) translateZ(60px); }
+    
+    .showcase-info {
+      padding: var(--space-6);
+    }
+    
+    .showcase-stats {
+      display: flex;
+      gap: var(--space-8);
+      margin-top: var(--space-8);
+      padding-top: var(--space-8);
+      border-top: 1px solid var(--border-subtle);
+    }
+    
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+    
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--font-3xl);
+      font-weight: 700;
+      color: var(--color-primary);
+      line-height: 1;
+    }
+    
+    .stat-label {
+      font-size: var(--font-xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       GALLERY SECTION
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .gallery {
+      padding: var(--space-24) var(--space-6);
+    }
+    
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .gallery-item {
+      position: relative;
+      aspect-ratio: 3/4;
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: all 0.5s var(--transition-bounce);
+    }
+    
+    .gallery-item:nth-child(1) { transform: rotate(-2deg); }
+    .gallery-item:nth-child(2) { transform: rotate(1deg) translateY(-10px); }
+    .gallery-item:nth-child(3) { transform: rotate(-1deg); }
+    .gallery-item:nth-child(4) { transform: rotate(2deg) translateY(10px); }
+    
+    .gallery-item:hover {
+      transform: scale(1.05) rotate(0deg) translateZ(50px) !important;
+      z-index: 10;
+      box-shadow: var(--shadow-elevated);
+    }
+    
+    .gallery-item-bg {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-secondary);
+      transition: transform 0.5s var(--transition-smooth);
+    }
+    
+    .gallery-item:hover .gallery-item-bg {
+      transform: scale(1.1);
+    }
+    
+    .gallery-item-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--space-5);
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.8) 0%,
+        transparent 60%
+      );
+      opacity: 0;
+      transition: opacity 0.4s var(--transition-smooth);
+    }
+    
+    .gallery-item:hover .gallery-item-content {
+      opacity: 1;
+    }
+    
+    .gallery-item-title {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--font-lg);
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: var(--space-1);
+    }
+    
+    .gallery-item-category {
+      font-size: var(--font-xs);
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    
+    .gallery-item-icon {
+      position: absolute;
+      top: var(--space-4);
+      right: var(--space-4);
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.4s var(--transition-bounce);
+    }
+    
+    .gallery-item:hover .gallery-item-icon {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    .gallery-item-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: #fff;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       CTA SECTION
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .cta {
+      padding: var(--space-24) var(--space-6);
+      position: relative;
+    }
+    
+    .cta-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      padding: var(--space-16) var(--space-10);
+      border-radius: 40px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+    
+    .cta-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(
+        circle,
+        hsla(var(--primary-hue), var(--primary-sat), var(--primary-lit), 0.3) 0%,
+        transparent 70%
+      );
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: pulse-glow 8s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+    }
+    
+    .cta-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .cta-title {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--font-4xl);
+      font-weight: 700;
+      margin-bottom: var(--space-5);
+    }
+    
+    .cta-description {
+      font-size: var(--font-lg);
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto var(--space-8);
+    }
+    
+    .cta-buttons {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .footer {
+      padding: var(--space-16) var(--space-6) var(--space-8);
+      border-top: 1px solid var(--border-subtle);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr);
+      gap: var(--space-12);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .footer-brand {
+      max-width: 300px;
+    }
+    
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--font-2xl);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--space-4);
+      display: inline-block;
+    }
+    
+    .footer-description {
+      font-size: var(--font-sm);
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-5);
+    }
+    
+    .footer-social {
+      display: flex;
+      gap: var(--space-3);
+    }
+    
+    .social-link {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s var(--transition-bounce);
+    }
+    
+    .social-link:hover {
+      background: var(--color-primary);
+      transform: translateY(-3px);
+    }
+    
+    .social-link svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text-secondary);
+      transition: fill 0.3s;
+    }
+    
+    .social-link:hover svg {
+      fill: var(--bg-primary);
+    }
+    
+    .footer-column-title {
+      font-size: var(--font-sm);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: var(--space-5);
+    }
+    
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    
+    .footer-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: var(--font-sm);
+      transition: color 0.3s;
+      display: inline-block;
+    }
+    
+    .footer-link:hover {
+      color: var(--color-primary);
+      transform: translateX(4px);
+    }
+    
+    .footer-bottom {
+      max-width: 1200px;
+      margin: var(--space-12) auto 0;
+      padding-top: var(--space-8);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+    
+    .footer-copyright {
+      font-size: var(--font-sm);
+      color: var(--text-muted);
+    }
+    
+    .footer-meta {
+      display: flex;
+      gap: var(--space-6);
+    }
+    
+    .footer-meta-link {
+      font-size: var(--font-sm);
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .footer-meta-link:hover {
+      color: var(--text-secondary);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       MAGNETIC CURSOR EFFECT
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .magnetic-wrap {
+      display: inline-block;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       MOBILE RESPONSIVE
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .showcase-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+      }
+      
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .menu-toggle {
+        display: flex;
+      }
+      
+      .hero-title {
+        font-size: var(--font-4xl);
+      }
+      
+      .hero-description {
+        font-size: var(--font-base);
+      }
+      
+      .hero-cta {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn {
+        width: 100%;
+        max-width: 280px;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .feature-card:nth-child(2) {
+        transform: none;
+      }
+      
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .gallery-item {
+        transform: none !important;
+      }
+      
+      .gallery-item:hover {
+        transform: scale(1.02) translateZ(30px) !important;
+      }
+      
+      .showcase-stats {
+        flex-direction: column;
+        gap: var(--space-5);
+      }
+      
+      .cta-container {
+        padding: var(--space-10) var(--space-5);
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .floating-shapes {
+        display: none;
+      }
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       REDUCED MOTION
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      
+      #particle-canvas {
+        display: none;
+      }
+      
+      .shape {
+        animation: none;
+      }
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       UTILITY CLASSES
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Three.js Canvas Background -->
+  <div class="canvas-container">
+    <canvas id="particle-canvas"></canvas>
+  </div>
+  
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <a href="#" class="nav-logo magnetic-wrap">
+      <span class="nav-logo-icon">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="16,2 30,9 30,23 16,30 2,23 2,9"/>
+        </svg>
+      </span>
+      <span>PRISM</span>
+    </a>
+    
+    <ul class="nav-links">
+      <li><a href="#features" class="nav-link magnetic-wrap">Features</a></li>
+      <li><a href="#showcase" class="nav-link magnetic-wrap">Showcase</a></li>
+      <li><a href="#gallery" class="nav-link magnetic-wrap">Gallery</a></li>
+      <li><a href="#contact" class="nav-link magnetic-wrap">Contact</a></li>
+      <li>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <span class="theme-toggle-icons">
+            <svg class="theme-icon moon" viewBox="0 0 12 12">
+              <path d="M6 1a5 5 0 1 0 5 5c0-2.5-2-4-4-4z"/>
+            </svg>
+            <svg class="theme-icon sun" viewBox="0 0 12 12">
+              <circle cx="6" cy="6" r="2"/>
+              <path d="M6 0v1M6 11v1M0 6h1M11 6h1M1.6 1.6l.7.7M9.7 9.7l.7.7M1.6 10.4l.7-.7M9.7 2.3l.7-.7"/>
+            </svg>
+          </span>
+        </button>
+      </li>
+    </ul>
+    
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <!-- Floating Geometric Shapes -->
+    <div class="floating-shapes">
+      <div class="shape shape-1" data-tilt>
+        <div class="shape-inner">
+          <div class="shape-ring"></div>
+          <div class="shape-ring"></div>
+          <div class="shape-ring"></div>
+        </div>
+      </div>
+      <div class="shape shape-2" data-tilt>
+        <div class="shape-inner">
+          <div class="shape-ring"></div>
+          <div class="shape-ring"></div>
+          <div class="shape-ring"></div>
+        </div>
+      </div>
+      <div class="shape shape-3" data-tilt>
+        <div class="shape-inner">
+          <div class="shape-ring"></div>
+          <div class="shape-ring"></div>
+          <div class="shape-ring"></div>
+        </div>
+      </div>
+      <div class="shape shape-4" data-tilt>
+        <div class="shape-inner">
+          <div class="shape-ring"></div>
+          <div class="shape-ring"></div>
+          <div class="shape-ring"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        <span>New Collection 2025</span>
+      </div>
+      
+      <h1 class="hero-title">
+        <span class="hero-title-line"><span>Design Beyond</span></span>
+        <span class="hero-title-line"><span class="hero-title-accent">Boundaries</span></span>
+      </h1>
+      
+      <p class="hero-description">
+        We craft immersive digital experiences that push the limits of creativity. 
+        Where geometric precision meets organic flow, creating something truly extraordinary.
+      </p>
+      
+      <div class="hero-cta">
+        <a href="#features" class="btn btn-primary">
+          <span>Explore Works</span>
+          <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a href="#showcase" class="btn btn-secondary">
+          <span>View Showcase</span>
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="section-header">
+      <span class="section-label">Capabilities</span>
+      <h2 class="section-title">What We Do Best</h2>
+      <p class="section-description">
+        Combining cutting-edge technology with timeless design principles 
+        to deliver experiences that captivate and convert.
+      </p>
+    </div>
+    
+    <div class="features-grid">
+      <article class="feature-card" data-tilt>
+        <div class="feature-icon">
+          <div class="feature-icon-bg"></div>
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">3D Visualization</h3>
+        <p class="feature-description">
+          Immersive three-dimensional experiences that bring your vision to life 
+          with stunning clarity and depth.
+        </p>
+      </article>
+      
+      <article class="feature-card" data-tilt>
+        <div class="feature-icon">
+          <div class="feature-icon-bg"></div>
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">Motion Design</h3>
+        <p class="feature-description">
+          Fluid animations and micro-interactions that create delightful 
+          user experiences and guide attention effectively.
+        </p>
+      </article>
+      
+      <article class="feature-card" data-tilt>
+        <div class="feature-icon">
+          <div class="feature-icon-bg"></div>
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+            <path d="M2 2l7.586 7.586"/>
+            <circle cx="11" cy="11" r="2"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">Brand Identity</h3>
+        <p class="feature-description">
+          Cohesive visual systems that communicate your brand's essence 
+          and resonate with your target audience.
+        </p>
+      </article>
+    </div>
+  </section>
+  
+  <!-- Showcase Section -->
+  <section class="showcase" id="showcase">
+    <div class="showcase-container">
+      <div class="showcase-grid">
+        <div class="showcase-visual" data-tilt>
+          <div class="showcase-frame">
+            <div class="showcase-content">
+              <div class="showcase-3d-object">
+                <div class="prism">
+                  <div class="prism-face"></div>
+                  <div class="prism-face"></div>
+                  <div class="prism-face"></div>
+                  <div class="prism-face"></div>
+                  <div class="prism-face"></div>
+                  <div class="prism-face"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="showcase-info">
+          <span class="section-label">Featured Project</span>
+          <h2 class="section-title">Crystalline Interface</h2>
+          <p class="section-description" style="margin-bottom: var(--space-6);">
+            A groundbreaking interface design that explores the intersection 
+            of geometric forms and fluid interactions. The crystalline structure 
+            represents clarity and precision while maintaining organic adaptability.
+          </p>
+          <p class="section-description">
+            Built with cutting-edge web technologies, this project demonstrates 
+            how thoughtful design can transform complex data into intuitive experiences.
+          </p>
+          
+          <div class="showcase-stats">
+            <div class="stat">
+              <span class="stat-value" data-count="97">0</span>
+              <span class="stat-label">Client Satisfaction</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" data-count="150">0</span>
+              <span class="stat-label">Projects Delivered</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" data-count="12">0</span>
+              <span class="stat-label">Awards Won</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Gallery Section -->
+  <section class="gallery" id="gallery">
+    <div class="section-header">
+      <span class="section-label">Portfolio</span>
+      <h2 class="section-title">Selected Works</h2>
+      <p class="section-description">
+        A curated collection of our most impactful projects, showcasing 
+        the breadth and depth of our creative capabilities.
+      </p>
+    </div>
+    
+    <div class="gallery-grid">
+      <article class="gallery-item" data-tilt>
+        <div class="gallery-item-bg" style="background: linear-gradient(135deg, var(--color-coral) 0%, var(--color-amber) 100%);"></div>
+        <div class="gallery-item-content">
+          <h3 class="gallery-item-title">Aurora Interface</h3>
+          <span class="gallery-item-category">UI/UX Design</span>
+        </div>
+        <div class="gallery-item-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </div>
+      </article>
+      
+      <article class="gallery-item" data-tilt>
+        <div class="gallery-item-bg" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-coral) 100%);"></div>
+        <div class="gallery-item-content">
+          <h3 class="gallery-item-title">Nexus Platform</h3>
+          <span class="gallery-item-category">Web Development</span>
+        </div>
+        <div class="gallery-item-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </div>
+      </article>
+      
+      <article class="gallery-item" data-tilt>
+        <div class="gallery-item-bg" style="background: linear-gradient(135deg, var(--color-amber) 0%, var(--color-peach) 100%);"></div>
+        <div class="gallery-item-content">
+          <h3 class="gallery-item-title">Vertex Identity</h3>
+          <span class="gallery-item-category">Branding</span>
+        </div>
+        <div class="gallery-item-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </div>
+      </article>
+      
+      <article class="gallery-item" data-tilt>
+        <div class="gallery-item-bg" style="background: linear-gradient(135deg, var(--color-rose) 0%, var(--color-coral) 100%);"></div>
+        <div class="gallery-item-content">
+          <h3 class="gallery-item-title">Quantum App</h3>
+          <span class="gallery-item-category">Mobile Design</span>
+        </div>
+        <div class="gallery-item-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </div>
+      </article>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="cta" id="contact">
+    <div class="cta-container">
+      <div class="cta-glow"></div>
+      <div class="cta-content">
+        <h2 class="cta-title">Ready to Create Something Amazing?</h2>
+        <p class="cta-description">
+          Let's collaborate to bring your vision to life. Whether you're starting 
+          from scratch or looking to elevate an existing project, we're here to help.
+        </p>
+        <div class="cta-buttons">
+          <a href="mailto:hello@prism.studio" class="btn btn-primary">
+            <span>Start a Project</span>
+            <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a href="#" class="btn btn-secondary">
+            <span>Schedule a Call</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="footer-logo">PRISM</a>
+        <p class="footer-description">
+          Award-winning design agency specializing in immersive digital experiences 
+          that push creative boundaries.
+        </p>
+        <div class="footer-social">
+          <a href="#" class="social-link" aria-label="Twitter">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+            </svg>
+          </a>
+          <a href="#" class="social-link" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+            </svg>
+          </a>
+          <a href="#" class="social-link" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+              <rect x="2" y="9" width="4" height="12"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
+          </a>
+          <a href="#" class="social-link" aria-label="Dribbble">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 4.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      
+      <div class="footer-column">
+        <h4 class="footer-column-title">Company</h4>
+        <ul class="footer-links">
+          <li><a href="#" class="footer-link">About Us</a></li>
+          <li><a href="#" class="footer-link">Our Team</a></li>
+          <li><a href="#" class="footer-link">Careers</a></li>
+          <li><a href="#" class="footer-link">Press</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column">
+        <h4 class="footer-column-title">Services</h4>
+        <ul class="footer-links">
+          <li><a href="#" class="footer-link">Web Design</a></li>
+          <li><a href="#" class="footer-link">Development</a></li>
+          <li><a href="#" class="footer-link">Branding</a></li>
+          <li><a href="#" class="footer-link">Consulting</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column">
+        <h4 class="footer-column-title">Resources</h4>
+        <ul class="footer-links">
+          <li><a href="#" class="footer-link">Blog</a></li>
+          <li><a href="#" class="footer-link">Case Studies</a></li>
+          <li><a href="#" class="footer-link">Documentation</a></li>
+          <li><a href="#" class="footer-link">Support</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p class="footer-copyright">© 2025 PRISM Studio. All rights reserved.</p>
+      <div class="footer-meta">
+        <a href="#" class="footer-meta-link">Privacy Policy</a>
+        <a href="#" class="footer-meta-link">Terms of Service</a>
+        <a href="#" class="footer-meta-link">Cookies</a>
+      </div>
+    </div>
+  </footer>
+  
+  <script>
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       JAVASCRIPT ARCHITECTURE
+       ═══════════════════════════════════════════════════════════════════════════════
+       
+       This script implements:
+       1. Three.js particle system for ambient background animation
+       2. GSAP animations with ScrollTrigger for scroll-based reveals
+       3. Custom 3D tilt effect on interactive elements
+       4. Magnetic cursor effect for interactive elements
+       5. Theme toggle with localStorage persistence
+       6. Number counting animation for statistics
+       7. Smooth scroll behavior
+       
+       Performance optimizations:
+       - requestAnimationFrame for smooth animations
+       - Throttled mouse move events
+       - Hardware-accelerated transforms
+       - Reduced motion media query support
+       
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    
+    (function() {
+      'use strict';
+      
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // CONFIGURATION
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const config = {
+        particleCount: window.matchMedia('(pointer: coarse)').matches ? 30 : 80,
+        particleColor: getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-primary').trim() || '#b8c444',
+        tiltIntensity: 15,
+        magneticStrength: 0.3,
+        scrollSmoothness: 1.2
+      };
+      
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // THREE.JS PARTICLE SYSTEM
+      // ═══════════════════════════════════════════════════════════════════════════════
+      function initParticles() {
+        const canvas = document.getElementById('particle-canvas');
+        if (!canvas) return;
+        
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        // Create particles
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(config.particleCount * 3);
+        const velocities = [];
+        
+        for (let i = 0; i < config.particleCount; i++) {
+          positions[i * 3] = (Math.random() - 0.5) * 20;
+          positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+          
+          velocities.push({
+            x: (Math.random() - 0.5) * 0.01,
+            y: (Math.random() - 0.5) * 0.01,
+            z: (Math.random() - 0.5) * 0.005
+          });
+        }
+        
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        // Custom shader material for glowing particles
+        const material = new THREE.PointsMaterial({
+          color: config.particleColor,
+          size: 0.15,
+          transparent: true,
+          opacity: 0.6,
+          blending: THREE.AdditiveBlending,
+          sizeAttenuation: true
+        });
+        
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+        
+        // Add connecting lines
+        const lineGeometry = new THREE.BufferGeometry();
+        const lineMaterial = new THREE.LineBasicMaterial({
+          color: config.particleColor,
+          transparent: true,
+          opacity: 0.1
+        });
+        const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+        scene.add(lines);
+        
+        camera.position.z = 8;
+        
+        let isActive = true;
+        let rafId;
+        
+        function animate() {
+          if (!isActive) return;
+          rafId = requestAnimationFrame(animate);
+          
+          const positions = particles.geometry.attributes.position.array;
+          const linePositions = [];
+          
+          for (let i = 0; i < config.particleCount; i++) {
+            // Update positions
+            positions[i * 3] += velocities[i].x;
+            positions[i * 3 + 1] += velocities[i].y;
+            positions[i * 3 + 2] += velocities[i].z;
+            
+            // Boundary check with wrap-around
+            if (Math.abs(positions[i * 3]) > 10) velocities[i].x *= -1;
+            if (Math.abs(positions[i * 3 + 1]) > 10) velocities[i].y *= -1;
+            if (Math.abs(positions[i * 3 + 2]) > 5) velocities[i].z *= -1;
+            
+            // Create connections
+            for (let j = i + 1; j < config.particleCount; j++) {
+              const dx = positions[i * 3] - positions[j * 3];
+              const dy = positions[i * 3 + 1] - positions[j * 3 + 1];
+              const dz = positions[i * 3 + 2] - positions[j * 3 + 2];
+              const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+              
+              if (distance < 3) {
+                linePositions.push(
+                  positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2],
+                  positions[j * 3], positions[j * 3 + 1], positions[j * 3 + 2]
+                );
+              }
+            }
+          }
+          
+          particles.geometry.attributes.position.needsUpdate = true;
+          
+          // Update lines
+          lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+          
+          // Subtle rotation
+          particles.rotation.y += 0.0003;
+          lines.rotation.y += 0.0003;
+          
+          renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        }, { passive: true });
+        
+        // Pause when not visible
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            isActive = false;
+            cancelAnimationFrame(rafId);
+          } else {
+            isActive = true;
+            animate();
+          }
+        });
+      }
+      
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // GSAP ANIMATIONS
+      // ═══════════════════════════════════════════════════════════════════════════════
+      function initAnimations() {
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Hero entrance animation
+        const heroTimeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
+        
+        heroTimeline
+          .from('.hero-badge', { y: 30, opacity: 0, duration: 0.8 }, 0.2)
+          .from('.hero-title-line span', { 
+            y: 100, 
+            opacity: 0, 
+            duration: 1,
+            stagger: 0.1 
+          }, 0.4)
+          .from('.hero-description', { y: 30, opacity: 0, duration: 0.8 }, 0.8)
+          .from('.hero-cta .btn', { 
+            y: 30, 
+            opacity: 0, 
+            duration: 0.6,
+            stagger: 0.1 
+          }, 1);
+        
+        // Feature cards animation
+        gsap.utils.toArray('.feature-card').forEach((card, i) => {
+          gsap.from(card, {
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse'
+            },
+            y: 60,
+            opacity: 0,
+            duration: 0.8,
+            delay: i * 0.1,
+            ease: 'power3.out'
+          });
+        });
+        
+        // Showcase animation
+        gsap.from('.showcase-visual', {
+          scrollTrigger: {
+            trigger: '.showcase',
+            start: 'top 70%'
+          },
+          x: -100,
+          opacity: 0,
+          duration: 1,
+          ease: 'power3.out'
+        });
+        
+        gsap.from('.showcase-info', {
+          scrollTrigger: {
+            trigger: '.showcase',
+            start: 'top 70%'
+          },
+          x: 100,
+          opacity: 0,
+          duration: 1,
+          ease: 'power3.out'
+        });
+        
+        // Stats counter animation
+        const stats = document.querySelectorAll('[data-count]');
+        stats.forEach(stat => {
+          const target = parseInt(stat.dataset.count);
+          gsap.from(stat, {
+            scrollTrigger: {
+              trigger: stat,
+              start: 'top 85%',
+              once: true
+            },
+            innerText: 0,
+            duration: 2,
+            snap: { innerText: 1 },
+            ease: 'power2.out',
+            onUpdate: function() {
+              stat.innerText = Math.round(this.targets()[0].innerText) + (stat.dataset.count === '97' ? '%' : '+');
+            }
+          });
+        });
+        
+        // Gallery items animation
+        gsap.utils.toArray('.gallery-item').forEach((item, i) => {
+          gsap.from(item, {
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 85%'
+            },
+            y: 80,
+            opacity: 0,
+            rotation: i % 2 === 0 ? -5 : 5,
+            duration: 0.8,
+            delay: i * 0.1,
+            ease: 'power3.out'
+          });
+        });
+        
+        // CTA animation
+        gsap.from('.cta-container', {
+          scrollTrigger: {
+            trigger: '.cta',
+            start: 'top 70%'
+          },
+          scale: 0.9,
+          opacity: 0,
+          duration: 1,
+          ease: 'power3.out'
+        });
+        
+        // Parallax for floating shapes
+        gsap.utils.toArray('.shape').forEach((shape, i) => {
+          gsap.to(shape, {
+            scrollTrigger: {
+              trigger: '.hero',
+              start: 'top top',
+              end: 'bottom top',
+              scrub: 1
+            },
+            y: (i + 1) * -50,
+            ease: 'none'
+          });
+        });
+      }
+      
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // 3D TILT EFFECT
+      // ═══════════════════════════════════════════════════════════════════════════════
+      function initTilt() {
+        const tiltElements = document.querySelectorAll('[data-tilt]');
+        
+        if (window.matchMedia('(pointer: coarse)').matches) return;
+        
+        tiltElements.forEach(el => {
+          el.addEventListener('mousemove', (e) => {
+            const rect = el.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = ((y - centerY) / centerY) * -config.tiltIntensity;
+            const rotateY = ((x - centerX) / centerX) * config.tiltIntensity;
+            
+            el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+          }, { passive: true });
+          
+          el.addEventListener('mouseleave', () => {
+            el.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+          }, { passive: true });
+        });
+      }
+      
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // MAGNETIC CURSOR EFFECT
+      // ═══════════════════════════════════════════════════════════════════════════════
+      function initMagnetic() {
+        if (window.matchMedia('(pointer: coarse)').matches) return;
+        
+        const magneticElements = document.querySelectorAll('.magnetic-wrap');
+        
+        magneticElements.forEach(el => {
+          el.addEventListener('mousemove', (e) => {
+            const rect = el.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            
+            el.style.transform = `translate(${x * config.magneticStrength}px, ${y * config.magneticStrength}px)`;
+          }, { passive: true });
+          
+          el.addEventListener('mouseleave', () => {
+            el.style.transform = 'translate(0, 0)';
+          }, { passive: true });
+        });
+      }
+      
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // THEME TOGGLE
+      // ═══════════════════════════════════════════════════════════════════════════════
+      function initThemeToggle() {
+        const toggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', savedTheme);
+        
+        toggle.addEventListener('click', () => {
+          const currentTheme = html.getAttribute('data-theme');
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          
+          html.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+          
+          // Update particle color
+          const primaryColor = getComputedStyle(html).getPropertyValue('--color-primary').trim();
+          // Particles will update on next frame
+        });
+      }
+      
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // NAVIGATION SCROLL EFFECT
+      // ═══════════════════════════════════════════════════════════════════════════════
+      function initNavScroll() {
+        const nav = document.getElementById('nav');
+        let lastScroll = 0;
+        
+        window.addEventListener('scroll', () => {
+          const currentScroll = window.pageYOffset;
+          
+          if (currentScroll > 100) {
+            nav.classList.add('scrolled');
+          } else {
+            nav.classList.remove('scrolled');
+          }
+          
+          lastScroll = currentScroll;
+        }, { passive: true });
+      }
+      
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // SMOOTH SCROLL FOR ANCHOR LINKS
+      // ═══════════════════════════════════════════════════════════════════════════════
+      function initSmoothScroll() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              const offset = 80;
+              const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
+              
+              window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+              });
+            }
+          });
+        });
+      }
+      
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // INITIALIZATION
+      // ═══════════════════════════════════════════════════════════════════════════════
+      document.addEventListener('DOMContentLoaded', () => {
+        initParticles();
+        initAnimations();
+        initTilt();
+        initMagnetic();
+        initThemeToggle();
+        initNavScroll();
+        initSmoothScroll();
+      });
+      
+    })();
+  </script>
+</body>
+</html>

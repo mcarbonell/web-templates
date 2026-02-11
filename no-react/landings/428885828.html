@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaTech - Innovation Redefined</title>
+    <!-- 
+    DESIGN SEED: 428885828
+    
+    DESIGN CHOICES BASED ON SEED:
+    - Layout: Asymmetric grid (digit 4)
+    - Color Scheme: Cool tones - Primary Hue 248 (blue), Accent Hue 338 (pink) (digit 2)
+    - Typography: Modern geometric sans-serif (digit 8)
+    - Animations: Smooth fade & slide, 456ms duration (digit 8)
+    - Hero: Split hero with image/content (digit 8)
+    - Sections: 5 main sections (digit 5)
+    - Border Radius: Medium rounded 16px (digit 8)
+    - Spacing: Compact scale (digit 2)
+    - Buttons: Pill-shaped (digit 8)
+    - Grid: 3 columns for features (random roll)
+    -->
+    <style>
+        /* CSS Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            /* Light Theme Colors - Cool tones based on seed */
+            --primary-hue: 248;
+            --accent-hue: 338;
+            --bg-primary: hsl(0, 0%, 100%);
+            --bg-secondary: hsl(var(--primary-hue), 30%, 97%);
+            --bg-tertiary: hsl(var(--primary-hue), 25%, 94%);
+            --text-primary: hsl(0, 0%, 10%);
+            --text-secondary: hsl(0, 0%, 35%);
+            --text-tertiary: hsl(0, 0%, 55%);
+            --primary-color: hsl(var(--primary-hue), 70%, 55%);
+            --primary-light: hsl(var(--primary-hue), 70%, 65%);
+            --primary-dark: hsl(var(--primary-hue), 70%, 45%);
+            --accent-color: hsl(var(--accent-hue), 75%, 60%);
+            --accent-light: hsl(var(--accent-hue), 75%, 70%);
+            --border-color: hsl(0, 0%, 88%);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            
+            /* Spacing - Compact scale (digit 2) */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2.5rem;
+            --space-xl: 4rem;
+            
+            /* Border Radius - Medium (digit 8) */
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-full: 9999px;
+            
+            /* Animation Duration (random: 456ms) */
+            --transition-speed: 456ms;
+            --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: hsl(var(--primary-hue), 15%, 8%);
+            --bg-secondary: hsl(var(--primary-hue), 15%, 12%);
+            --bg-tertiary: hsl(var(--primary-hue), 15%, 16%);
+            --text-primary: hsl(0, 0%, 95%);
+            --text-secondary: hsl(0, 0%, 75%);
+            --text-tertiary: hsl(0, 0%, 55%);
+            --primary-color: hsl(var(--primary-hue), 65%, 60%);
+            --primary-light: hsl(var(--primary-hue), 65%, 70%);
+            --primary-dark: hsl(var(--primary-hue), 65%, 50%);
+            --accent-color: hsl(var(--accent-hue), 70%, 65%);
+            --accent-light: hsl(var(--accent-hue), 70%, 75%);
+            --border-color: hsl(0, 0%, 25%);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Typography - Modern geometric sans-serif (digit 8) */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            transition: background-color var(--transition-speed) var(--transition-ease),
+                        color var(--transition-speed) var(--transition-ease);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        
+        h1 { font-size: clamp(2.5rem, 5vw, 4rem); }
+        h2 { font-size: clamp(2rem, 4vw, 3rem); }
+        h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
+        h4 { font-size: 1.25rem; }
+        
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+        
+        /* Header & Navigation */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            transition: all var(--transition-speed) var(--transition-ease);
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) 0;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: var(--space-lg);
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition-speed) var(--transition-ease);
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width var(--transition-speed) var(--transition-ease);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Theme Toggle - Pill-shaped button (digit 8) */
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            padding: var(--space-xs) var(--space-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all var(--transition-speed) var(--transition-ease);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .theme-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: var(--space-xs);
+        }
+        
+        .menu-toggle span {
+            width: 24px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: all var(--transition-speed) var(--transition-ease);
+        }
+        
+        /* Hero Section - Split hero (digit 8) */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideInLeft var(--transition-speed) var(--transition-ease) forwards;
+            animation-delay: 200ms;
+        }
+        
+        .hero-title {
+            margin-bottom: var(--space-md);
+            background: linear-gradient(135deg, var(--text-primary), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+            line-height: 1.7;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+        
+        /* Buttons - Pill-shaped (digit 8) */
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all var(--transition-speed) var(--transition-ease);
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .hero-visual {
+            position: relative;
+            opacity: 0;
+            transform: translateX(30px);
+            animation: slideInRight var(--transition-speed) var(--transition-ease) forwards;
+            animation-delay: 400ms;
+        }
+        
+        .hero-image {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: var(--radius-lg);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .hero-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="white" opacity="0.1"/></svg>');
+            background-size: 100px 100px;
+            animation: float 20s linear infinite;
+        }
+        
+        /* Floating shapes decoration */
+        .floating-shape {
+            position: absolute;
+            border-radius: var(--radius-md);
+            opacity: 0.6;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .shape-1 {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-color);
+            top: 10%;
+            right: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape-2 {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-light);
+            bottom: 15%;
+            left: 5%;
+            animation-delay: 2s;
+        }
+        
+        /* Section Base Styles */
+        section {
+            padding: var(--space-xl) 0;
+            position: relative;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .section-header.visible {
+            animation: fadeInUp var(--transition-speed) var(--transition-ease) forwards;
+        }
+        
+        .section-title {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Features Section - Asymmetric grid (digit 4), 3 columns (random) */
+        .features {
+            background: var(--bg-secondary);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+        
+        .feature-card {
+            background: var(--bg-primary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-speed) var(--transition-ease);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .feature-card.visible {
+            animation: fadeInUp var(--transition-speed) var(--transition-ease) forwards;
+        }
+        
+        .feature-card:nth-child(2) {
+            animation-delay: 100ms;
+        }
+        
+        .feature-card:nth-child(3) {
+            animation-delay: 200ms;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-md);
+            font-size: 1.8rem;
+        }
+        
+        .feature-title {
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+        }
+        
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        /* Stats Section - Asymmetric layout */
+        .stats {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-xl);
+            text-align: center;
+        }
+        
+        .stat-item {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
+        .stat-item.visible {
+            animation: scaleIn var(--transition-speed) var(--transition-ease) forwards;
+        }
+        
+        .stat-number {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: var(--space-xs);
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Showcase Section - Asymmetric grid */
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .showcase-grid:nth-child(even) {
+            grid-template-columns: 1fr 2fr;
+        }
+        
+        .showcase-item {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-speed) var(--transition-ease);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .showcase-item.visible {
+            animation: fadeInUp var(--transition-speed) var(--transition-ease) forwards;
+        }
+        
+        .showcase-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .showcase-image {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            position: relative;
+        }
+        
+        .showcase-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml,<svg width="50" height="50" xmlns="http://www.w3.org/2000/svg"><rect width="50" height="50" fill="white" opacity="0.05"/></svg>');
+            background-size: 50px 50px;
+        }
+        
+        .showcase-content {
+            padding: var(--space-lg);
+        }
+        
+        .showcase-title {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .showcase-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+        
+        /* Testimonials Section */
+        .testimonials {
+            background: var(--bg-secondary);
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
+        }
+        
+        .testimonial-card {
+            background: var(--bg-primary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .testimonial-card.visible {
+            animation: fadeInUp var(--transition-speed) var(--transition-ease) forwards;
+        }
+        
+        .testimonial-text {
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: var(--space-md);
+            line-height: 1.8;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        }
+        
+        .author-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .author-role {
+            font-size: 0.9rem;
+            color: var(--text-tertiary);
+        }
+        
+        /* CTA Section */
+        .cta {
+            background: var(--bg-primary);
+            text-align: center;
+        }
+        
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            margin-bottom: var(--space-md);
+        }
+        
+        .cta-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: var(--space-lg);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--bg-tertiary);
+            padding: var(--space-xl) 0 var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .footer-brand {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .footer-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        .footer-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+        
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color var(--transition-speed) var(--transition-ease);
+        }
+        
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+        
+        /* Animations */
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes scaleIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        /* Mobile Responsive - Optimized for mobile */
+        @media (max-width: 968px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: var(--bg-primary);
+                flex-direction: column;
+                padding: var(--space-lg);
+                border-bottom: 1px solid var(--border-color);
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all var(--transition-speed) var(--transition-ease);
+                box-shadow: var(--shadow-lg);
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .hero {
+                grid-template-columns: 1fr;
+                padding-top: 100px;
+                min-height: auto;
+            }
+            
+            .hero-visual {
+                order: -1;
+            }
+            
+            .hero-image {
+                height: 350px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .showcase-grid,
+            .showcase-grid:nth-child(even) {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            :root {
+                --space-xl: 3rem;
+                --space-lg: 2rem;
+            }
+            
+            .hero-cta {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">NovaTech</div>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#features" class="nav-link">Features</a></li>
+                    <li><a href="#showcase" class="nav-link">Showcase</a></li>
+                    <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                    <li>
+                        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                            <span id="themeIcon">🌙</span>
+                            <span id="themeText">Dark</span>
+                        </button>
+                    </li>
+                </ul>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container" style="display: contents;">
+            <div class="hero-content">
+                <h1 class="hero-title">Innovation Meets Excellence</h1>
+                <p class="hero-subtitle">
+                    Transform your digital presence with cutting-edge solutions designed for the modern era. 
+                    We blend creativity with technology to deliver exceptional results.
+                </p>
+                <div class="hero-cta">
+                    <a href="#contact" class="btn btn-primary">Get Started →</a>
+                    <a href="#showcase" class="btn btn-secondary">View Our Work</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-image">
+                    <div class="floating-shape shape-1"></div>
+                    <div class="floating-shape shape-2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Powerful Features</h2>
+                <p class="section-subtitle">Everything you need to succeed in the digital landscape</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Lightning Fast</h3>
+                    <p class="feature-description">
+                        Optimized performance ensures your users get the best experience with blazing fast load times.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="feature-title">Beautiful Design</h3>
+                    <p class="feature-description">
+                        Stunning visuals that captivate your audience and create lasting impressions.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Secure & Reliable</h3>
+                    <p class="feature-description">
+                        Enterprise-grade security measures to protect your data and ensure peace of mind.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Mobile First</h3>
+                    <p class="feature-description">
+                        Responsive design that works flawlessly across all devices and screen sizes.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3 class="feature-title">Scalable</h3>
+                    <p class="feature-description">
+                        Built to grow with your business, from startup to enterprise scale.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💡</div>
+                    <h3 class="feature-title">Smart Solutions</h3>
+                    <p class="feature-description">
+                        Intelligent features powered by modern technology to streamline your workflow.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Happy Clients</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50M+</span>
+                    <span class="stat-label">Projects Delivered</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">99%</span>
+                    <span class="stat-label">Satisfaction Rate</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Support Available</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Showcase Section -->
+    <section class="showcase" id="showcase">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Latest Work</h2>
+                <p class="section-subtitle">Explore our portfolio of successful projects</p>
+            </div>
+            <div class="showcase-grid">
+                <div class="showcase-item">
+                    <div class="showcase-image"></div>
+                    <div class="showcase-content">
+                        <h3 class="showcase-title">E-Commerce Platform</h3>
+                        <p class="showcase-description">
+                            A modern shopping experience with seamless checkout and inventory management.
+                        </p>
+                        <a href="#" class="btn btn-secondary">Learn More →</a>
+                    </div>
+                </div>
+                <div class="showcase-item">
+                    <div class="showcase-image"></div>
+                    <div class="showcase-content">
+                        <h3 class="showcase-title">Mobile App</h3>
+                        <p class="showcase-description">
+                            Cross-platform solution reaching millions of users worldwide.
+                        </p>
+                        <a href="#" class="btn btn-secondary">Learn More →</a>
+                    </div>
+                </div>
+            </div>
+            <div class="showcase-grid">
+                <div class="showcase-item">
+                    <div class="showcase-image"></div>
+                    <div class="showcase-content">
+                        <h3 class="showcase-title">Analytics Dashboard</h3>
+                        <p class="showcase-description">
+                            Real-time insights and data visualization for informed decision making.
+                        </p>
+                        <a href="#" class="btn btn-secondary">Learn More →</a>
+                    </div>
+                </div>
+                <div class="showcase-item">
+                    <div class="showcase-image"></div>
+                    <div class="showcase-content">
+                        <h3 class="showcase-title">Brand Identity</h3>
+                        <p class="showcase-description">
+                            Complete rebranding with modern design language and guidelines.
+                        </p>
+                        <a href="#" class="btn btn-secondary">Learn More →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">What Our Clients Say</h2>
+                <p class="section-subtitle">Don't just take our word for it</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">
+                        "Working with NovaTech transformed our business. Their attention to detail and 
+                        innovative approach exceeded all expectations. Highly recommended!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div>
+                            <div class="author-name">Sarah Johnson</div>
+                            <div class="author-role">CEO, TechStart</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">
+                        "The team delivered beyond what we imagined. Professional, creative, and always 
+                        available to help. Our conversion rates increased by 300%!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div>
+                            <div class="author-name">Michael Chen</div>
+                            <div class="author-role">Founder, GrowthLabs</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">
+                        "Exceptional quality and service. They understood our vision perfectly and 
+                        brought it to life with stunning results. A true partner in success."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div>
+                            <div class="author-name">Emily Rodriguez</div>
+                            <div class="author-role">Director, Creative Co</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="contact">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Get Started?</h2>
+                <p class="cta-description">
+                    Join thousands of satisfied clients and transform your digital presence today. 
+                    Let's create something amazing together.
+                </p>
+                <div class="hero-cta">
+                    <a href="#" class="btn btn-primary">Start Your Project →</a>
+                    <a href="#" class="btn btn-secondary">Schedule a Call</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">NovaTech</div>
+                    <p class="footer-description">
+                        Empowering businesses with innovative digital solutions. 
+                        We turn ideas into reality with cutting-edge technology and creative excellence.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="footer-title">Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">Features</a></li>
+                        <li><a href="#" class="footer-link">Pricing</a></li>
+                        <li><a href="#" class="footer-link">Case Studies</a></li>
+                        <li><a href="#" class="footer-link">Reviews</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title">Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">About</a></li>
+                        <li><a href="#" class="footer-link">Careers</a></li>
+                        <li><a href="#" class="footer-link">Blog</a></li>
+                        <li><a href="#" class="footer-link">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">Privacy</a></li>
+                        <li><a href="#" class="footer-link">Terms</a></li>
+                        <li><a href="#" class="footer-link">Security</a></li>
+                        <li><a href="#" class="footer-link">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 NovaTech. All rights reserved. | Template ID: 428885828</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+        updateThemeButton(currentTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        });
+        
+        function updateThemeButton(theme) {
+            if (theme === 'dark') {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
+            }
+        }
+        
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all animated elements
+        document.querySelectorAll('.section-header, .feature-card, .stat-item, .showcase-item, .testimonial-card').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Header scroll effect
+        let lastScroll = 0;
+        const header = document.querySelector('.header');
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                header.style.boxShadow = 'var(--shadow-md)';
+            } else {
+                header.style.boxShadow = 'none';
+            }
+            
+            lastScroll = currentScroll;
+        });
+        
+        // Counter animation for stats
+        function animateCounter(element, target, duration = 2000) {
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = formatNumber(target);
+                    clearInterval(timer);
+                } else {
+                    element.textContent = formatNumber(Math.floor(current));
+                }
+            }, 16);
+        }
+        
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(0) + 'M+';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(0) + 'K+';
+            }
+            return num.toString();
+        }
+        
+        // Trigger counter animation when stats section is visible
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumbers = entry.target.querySelectorAll('.stat-number');
+                    const values = [10000, 50000000, 99, 24];
+                    
+                    statNumbers.forEach((stat, index) => {
+                        if (index < 3) {
+                            animateCounter(stat, values[index]);
+                        }
+                    });
+                    
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+        
+        // Parallax effect for hero shapes
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const shapes = document.querySelectorAll('.floating-shape');
+            
+            shapes.forEach((shape, index) => {
+                const speed = (index + 1) * 0.5;
+                shape.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+        
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

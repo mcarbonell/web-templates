@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApexHub.co - Professional Photography & Videography</title>
+    <meta name="description" content="Capturing moments that matter. Professional photography and videography services for weddings, events, portraits, and commercial projects.">
+    
+    <!-- Design Choices:
+    Seed: 49692992
+    Business: Photographers & Videographers (#32)
+    Hero: Split-screen diagonal (#3)
+    Color: Deep teal/cyan (120°, 66%, 69%)
+    Layout: Card-based asymmetric (#3)
+    Feature: Parallax scrolling (#1)
+    Animation: Elastic (#3)
+    Typography: Geometric + Humanist sans-serif (#3)
+    Sections: 6 (Hero, Services, Portfolio, Process, Testimonials, Contact)
+    -->
+    
+    <style>
+        /* CSS Reset & Base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            /* Color System - Deep Teal/Cyan Theme */
+            --primary-hue: 120;
+            --primary-sat: 66%;
+            --primary-light: 69%;
+            
+            --color-primary: hsl(var(--primary-hue), var(--primary-sat), var(--primary-light));
+            --color-primary-dark: hsl(var(--primary-hue), var(--primary-sat), 45%);
+            --color-primary-light: hsl(var(--primary-hue), var(--primary-sat), 85%);
+            --color-accent: hsl(180, 70%, 60%);
+            
+            /* Light Theme */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafb;
+            --bg-tertiary: #e8f4f5;
+            --text-primary: #1a2332;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+            
+            /* Typography - Geometric + Humanist */
+            --font-display: 'Outfit', 'Poppins', system-ui, sans-serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* Spacing */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 2rem;
+            --space-lg: 4rem;
+            --space-xl: 6rem;
+            
+            /* Transitions */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-elastic: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        /* Dark Theme */
+        [data-theme="dark"] {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a2332;
+            --bg-tertiary: #243447;
+            --text-primary: #f7fafc;
+            --text-secondary: #cbd5e0;
+            --text-muted: #a0aec0;
+            --border-color: #2d3748;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: var(--space-sm);
+        }
+        
+        h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+        h2 { font-size: clamp(2rem, 5vw, 3.5rem); }
+        h3 { font-size: clamp(1.5rem, 4vw, 2.5rem); }
+        h4 { font-size: clamp(1.25rem, 3vw, 2rem); }
+        
+        p {
+            font-size: clamp(1rem, 2vw, 1.125rem);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+        
+        /* Header & Navigation */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            transition: all var(--transition-base);
+        }
+        
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        [data-theme="dark"] .header.scrolled {
+            background: rgba(15, 20, 25, 0.9);
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) 0;
+        }
+        
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: var(--space-md);
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition-base);
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--color-primary);
+            transition: width var(--transition-elastic);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-elastic);
+            color: var(--text-primary);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .mobile-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: var(--text-primary);
+            margin: 5px 0;
+            transition: all var(--transition-base);
+        }
+        
+        /* Hero Section - Split Diagonal */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            position: relative;
+            overflow: hidden;
+            margin-top: 80px;
+        }
+        
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: var(--space-xl) var(--space-md);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-visual {
+            position: relative;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hero-image-wrapper {
+            width: 80%;
+            height: 70%;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .hero-title {
+            margin-bottom: var(--space-md);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+            max-width: 600px;
+        }
+        
+        .cta-group {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--transition-elastic);
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            background: var(--color-primary-dark);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-3px);
+        }
+        
+        /* Floating Elements for Parallax */
+        .floating-element {
+            position: absolute;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        .float-1 {
+            top: 10%;
+            left: 5%;
+            width: 100px;
+            height: 100px;
+        }
+        
+        .float-2 {
+            bottom: 15%;
+            right: 10%;
+            width: 150px;
+            height: 150px;
+        }
+        
+        /* Services Section */
+        .section {
+            padding: var(--space-xl) 0;
+            position: relative;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .section-subtitle {
+            color: var(--color-primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.875rem;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .section-title {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Card Grid - Asymmetric Layout */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+        
+        .service-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: var(--space-lg);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-elastic);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform var(--transition-elastic);
+        }
+        
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .service-card:nth-child(2) {
+            transform: translateY(30px);
+        }
+        
+        .service-card:nth-child(2):hover {
+            transform: translateY(22px);
+        }
+        
+        .service-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--color-primary-light);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-sm);
+            color: var(--color-primary);
+        }
+        
+        .service-title {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .service-description {
+            color: var(--text-muted);
+        }
+        
+        /* Portfolio Grid */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+        
+        .portfolio-item {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .portfolio-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .portfolio-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        .portfolio-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: var(--space-md);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        
+        .portfolio-item:hover .portfolio-overlay {
+            opacity: 1;
+        }
+        
+        .portfolio-title {
+            color: white;
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .portfolio-category {
+            color: var(--color-accent);
+            font-size: 0.875rem;
+        }
+        
+        /* Process Section */
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            margin-top: var(--space-lg);
+            position: relative;
+        }
+        
+        .process-step {
+            text-align: center;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            margin: 0 auto var(--space-sm);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .step-title {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .step-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Testimonials */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+        
+        .testimonial-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: var(--space-lg);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .quote-icon {
+            width: 48px;
+            height: 48px;
+            color: var(--color-primary);
+            opacity: 0.3;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .testimonial-text {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            margin-bottom: var(--space-md);
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--color-primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+        
+        .author-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.125rem;
+        }
+        
+        .author-role {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        /* Contact Section */
+        .contact-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-top: var(--space-lg);
+            align-items: center;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+        }
+        
+        .contact-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--color-primary-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary);
+            flex-shrink: 0;
+        }
+        
+        .contact-details h4 {
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .contact-details p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+        
+        .contact-form {
+            background: var(--bg-secondary);
+            padding: var(--space-lg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-group {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: all var(--transition-base);
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-light);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all var(--transition-elastic);
+        }
+        
+        .form-submit:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-lg) 0 var(--space-md);
+            margin-top: var(--space-xl);
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .footer-section h3 {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .footer-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color var(--transition-base);
+        }
+        
+        .footer-link:hover {
+            color: var(--color-primary);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-sm);
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-tertiary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all var(--transition-elastic);
+        }
+        
+        .social-link:hover {
+            background: var(--color-primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        .animate-in {
+            animation: fadeInUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            opacity: 0;
+        }
+        
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        .animate-delay-4 { animation-delay: 0.4s; }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-visual {
+                clip-path: none;
+                min-height: 400px;
+            }
+            
+            .contact-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: var(--bg-primary);
+                flex-direction: column;
+                padding: var(--space-md);
+                box-shadow: var(--shadow-lg);
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all var(--transition-base);
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .services-grid,
+            .portfolio-grid,
+            .process-steps,
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .service-card:nth-child(2) {
+                transform: translateY(0);
+            }
+            
+            .cta-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            :root {
+                --space-lg: 3rem;
+                --space-xl: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="#" class="logo" aria-label="ApexHub.co Home">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 4L28 28H4L16 4Z" fill="currentColor"/>
+                    <circle cx="16" cy="20" r="3" fill="white"/>
+                </svg>
+                ApexHub.co
+            </a>
+            
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
+                <li><a href="#process" class="nav-link">Process</a></li>
+                <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                    </button>
+                </li>
+            </ul>
+            
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="container">
+                <h1 class="hero-title animate-in">Capturing Moments That Matter</h1>
+                <p class="hero-subtitle animate-in animate-delay-1">
+                    Professional photography and videography services that tell your story with creativity, 
+                    passion, and technical excellence. From weddings to corporate events, we bring your vision to life.
+                </p>
+                <div class="cta-group animate-in animate-delay-2">
+                    <a href="#contact" class="btn btn-primary">
+                        Get Started
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </a>
+                    <a href="#portfolio" class="btn btn-secondary">
+                        View Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-visual parallax-layer" data-speed="0.5">
+            <div class="hero-image-wrapper">
+                <svg class="hero-image" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:hsl(120, 66%, 69%);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:hsl(180, 70%, 60%);stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="800" height="600" fill="url(#heroGrad)" opacity="0.1"/>
+                    <circle cx="400" cy="300" r="150" fill="url(#heroGrad)" opacity="0.3"/>
+                    <path d="M300 200 L500 200 L450 400 L350 400 Z" fill="white" opacity="0.2"/>
+                    <text x="400" y="320" font-size="48" fill="white" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold">📸</text>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Floating parallax elements -->
+        <svg class="floating-element float-1 parallax-layer" data-speed="0.3" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="currentColor" style="color: var(--color-primary)"/>
+        </svg>
+        <svg class="floating-element float-2 parallax-layer" data-speed="0.7" viewBox="0 0 150 150">
+            <rect x="25" y="25" width="100" height="100" fill="currentColor" style="color: var(--color-accent)" rx="20"/>
+        </svg>
+    </section>
+
+    <!-- Services Section -->
+    <section class="section" id="services">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-subtitle">What We Offer</p>
+                <h2 class="section-title">Professional Services</h2>
+            </div>
+            
+            <div class="services-grid">
+                <article class="service-card">
+                    <div class="service-icon" aria-hidden="true">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Wedding Photography</h3>
+                    <p class="service-description">
+                        Capture every precious moment of your special day with our comprehensive wedding photography packages. 
+                        From intimate ceremonies to grand celebrations.
+                    </p>
+                </article>
+                
+                <article class="service-card">
+                    <div class="service-icon" aria-hidden="true">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="23 7 16 12 23 17 23 7"/>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Event Videography</h3>
+                    <p class="service-description">
+                        Professional video production for corporate events, conferences, and special occasions. 
+                        Cinematic storytelling that engages your audience.
+                    </p>
+                </article>
+
+                <article class="service-card">
+                    <div class="service-icon" aria-hidden="true">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Portrait Sessions</h3>
+                    <p class="service-description">
+                        Professional headshots, family portraits, and personal branding photography. 
+                        Studio or on-location sessions tailored to your needs.
+                    </p>
+                </article>
+                
+                <article class="service-card">
+                    <div class="service-icon" aria-hidden="true">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Commercial Photography</h3>
+                    <p class="service-description">
+                        Product photography, real estate, and commercial shoots that showcase your business 
+                        in the best light. High-quality images for marketing.
+                    </p>
+                </article>
+                
+                <article class="service-card">
+                    <div class="service-icon" aria-hidden="true">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Photo Editing</h3>
+                    <p class="service-description">
+                        Professional retouching and color grading services. Transform your images with 
+                        expert editing that enhances without losing authenticity.
+                    </p>
+                </article>
+
+                <article class="service-card">
+                    <div class="service-icon" aria-hidden="true">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polygon points="10 8 16 12 10 16 10 8"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Drone Photography</h3>
+                    <p class="service-description">
+                        Aerial photography and videography for unique perspectives. Perfect for real estate, 
+                        events, and landscape photography with stunning bird's-eye views.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Portfolio Section -->
+    <section class="section" id="portfolio" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-subtitle">Our Work</p>
+                <h2 class="section-title">Recent Projects</h2>
+            </div>
+            
+            <div class="portfolio-grid">
+                <article class="portfolio-item">
+                    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="800" height="600" fill="hsl(120, 66%, 69%)"/>
+                        <circle cx="400" cy="300" r="100" fill="white" opacity="0.3"/>
+                        <text x="400" y="320" font-size="64" fill="white" text-anchor="middle" font-weight="bold">💑</text>
+                    </svg>
+                    <div class="portfolio-overlay">
+                        <h3 class="portfolio-title">Sarah & Michael's Wedding</h3>
+                        <p class="portfolio-category">Wedding Photography</p>
+                    </div>
+                </article>
+
+                <article class="portfolio-item">
+                    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="800" height="600" fill="hsl(180, 70%, 60%)"/>
+                        <rect x="200" y="150" width="400" height="300" fill="white" opacity="0.3" rx="20"/>
+                        <text x="400" y="320" font-size="64" fill="white" text-anchor="middle" font-weight="bold">🏢</text>
+                    </svg>
+                    <div class="portfolio-overlay">
+                        <h3 class="portfolio-title">Tech Summit 2026</h3>
+                        <p class="portfolio-category">Event Coverage</p>
+                    </div>
+                </article>
+                
+                <article class="portfolio-item">
+                    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="800" height="600" fill="hsl(140, 60%, 65%)"/>
+                        <circle cx="400" cy="300" r="120" fill="white" opacity="0.4"/>
+                        <text x="400" y="330" font-size="72" fill="white" text-anchor="middle" font-weight="bold">👨‍💼</text>
+                    </svg>
+                    <div class="portfolio-overlay">
+                        <h3 class="portfolio-title">Executive Portraits</h3>
+                        <p class="portfolio-category">Corporate Photography</p>
+                    </div>
+                </article>
+                
+                <article class="portfolio-item">
+                    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="800" height="600" fill="hsl(160, 65%, 68%)"/>
+                        <path d="M200 500 L400 200 L600 500 Z" fill="white" opacity="0.3"/>
+                        <text x="400" y="380" font-size="64" fill="white" text-anchor="middle" font-weight="bold">🏔️</text>
+                    </svg>
+                    <div class="portfolio-overlay">
+                        <h3 class="portfolio-title">Mountain Adventures</h3>
+                        <p class="portfolio-category">Landscape Photography</p>
+                    </div>
+                </article>
+
+                <article class="portfolio-item">
+                    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="800" height="600" fill="hsl(100, 60%, 70%)"/>
+                        <rect x="250" y="200" width="300" height="200" fill="white" opacity="0.3" rx="15"/>
+                        <text x="400" y="330" font-size="64" fill="white" text-anchor="middle" font-weight="bold">📦</text>
+                    </svg>
+                    <div class="portfolio-overlay">
+                        <h3 class="portfolio-title">Product Showcase</h3>
+                        <p class="portfolio-category">Commercial Photography</p>
+                    </div>
+                </article>
+                
+                <article class="portfolio-item">
+                    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="800" height="600" fill="hsl(190, 68%, 62%)"/>
+                        <circle cx="300" cy="250" r="80" fill="white" opacity="0.3"/>
+                        <circle cx="500" cy="350" r="100" fill="white" opacity="0.3"/>
+                        <text x="400" y="320" font-size="64" fill="white" text-anchor="middle" font-weight="bold">👨‍👩‍👧‍👦</text>
+                    </svg>
+                    <div class="portfolio-overlay">
+                        <h3 class="portfolio-title">Johnson Family</h3>
+                        <p class="portfolio-category">Family Portraits</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Process Section -->
+    <section class="section" id="process">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-subtitle">How We Work</p>
+                <h2 class="section-title">Our Creative Process</h2>
+            </div>
+            
+            <div class="process-steps">
+                <article class="process-step">
+                    <div class="step-number" aria-label="Step 1">1</div>
+                    <h3 class="step-title">Consultation</h3>
+                    <p class="step-description">
+                        We start with understanding your vision, requirements, and goals for the project.
+                    </p>
+                </article>
+
+                <article class="process-step">
+                    <div class="step-number" aria-label="Step 2">2</div>
+                    <h3 class="step-title">Planning</h3>
+                    <p class="step-description">
+                        Detailed planning including location scouting, shot lists, and timeline creation.
+                    </p>
+                </article>
+                
+                <article class="process-step">
+                    <div class="step-number" aria-label="Step 3">3</div>
+                    <h3 class="step-title">Production</h3>
+                    <p class="step-description">
+                        Professional shooting with state-of-the-art equipment and creative direction.
+                    </p>
+                </article>
+                
+                <article class="process-step">
+                    <div class="step-number" aria-label="Step 4">4</div>
+                    <h3 class="step-title">Delivery</h3>
+                    <p class="step-description">
+                        Expertly edited final products delivered in your preferred format and resolution.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section class="section" id="testimonials" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-subtitle">Client Reviews</p>
+                <h2 class="section-title">What Our Clients Say</h2>
+            </div>
+            
+            <div class="testimonials-grid">
+                <article class="testimonial-card">
+                    <svg class="quote-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+                    </svg>
+                    <p class="testimonial-text">
+                        "ApexHub captured our wedding day perfectly! Every moment was beautifully documented, 
+                        and the photos exceeded our expectations. Highly professional and creative."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar" aria-hidden="true">SM</div>
+                        <div class="author-info">
+                            <h4>Sarah Martinez</h4>
+                            <p class="author-role">Bride, June 2025</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="testimonial-card">
+                    <svg class="quote-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+                    </svg>
+                    <p class="testimonial-text">
+                        "Outstanding corporate event coverage! The team was professional, unobtrusive, 
+                        and delivered stunning photos that we've used across all our marketing materials."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar" aria-hidden="true">JC</div>
+                        <div class="author-info">
+                            <h4>James Chen</h4>
+                            <p class="author-role">Marketing Director, TechCorp</p>
+                        </div>
+                    </div>
+                </article>
+                
+                <article class="testimonial-card">
+                    <svg class="quote-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+                    </svg>
+                    <p class="testimonial-text">
+                        "The family portraits turned out amazing! They made everyone feel comfortable and 
+                        captured genuine moments. We'll treasure these photos forever."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar" aria-hidden="true">EP</div>
+                        <div class="author-info">
+                            <h4>Emily Parker</h4>
+                            <p class="author-role">Family Portrait Client</p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-subtitle">Get In Touch</p>
+                <h2 class="section-title">Let's Create Something Amazing</h2>
+            </div>
+            
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <article class="contact-item">
+                        <div class="contact-icon" aria-hidden="true">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Visit Us</h4>
+                            <p>123 Creative Street<br>Photography District, PH 12345</p>
+                        </div>
+                    </article>
+
+                    <article class="contact-item">
+                        <div class="contact-icon" aria-hidden="true">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                            </svg>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Call Us</h4>
+                            <p>(555) 123-4567<br>Mon-Fri: 9AM - 6PM</p>
+                        </div>
+                    </article>
+                    
+                    <article class="contact-item">
+                        <div class="contact-icon" aria-hidden="true">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Email Us</h4>
+                            <p>hello@apexhub.co<br>info@apexhub.co</p>
+                        </div>
+                    </article>
+                </div>
+                
+                <form class="contact-form" aria-label="Contact form">
+                    <div class="form-group">
+                        <label for="name" class="form-label">Your Name</label>
+                        <input type="text" id="name" name="name" class="form-input" required aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-input" required aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="service" class="form-label">Service Interested In</label>
+                        <input type="text" id="service" name="service" class="form-input" placeholder="e.g., Wedding Photography">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea id="message" name="message" class="form-textarea" required aria-required="true"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="form-submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>ApexHub.co</h3>
+                    <p style="color: var(--text-muted); margin-bottom: var(--space-sm);">
+                        Professional photography and videography services capturing moments that matter.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                                <rect x="2" y="9" width="4" height="12"/>
+                                <circle cx="4" cy="4" r="2"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#services" class="footer-link">Wedding Photography</a></li>
+                        <li><a href="#services" class="footer-link">Event Videography</a></li>
+                        <li><a href="#services" class="footer-link">Portrait Sessions</a></li>
+                        <li><a href="#services" class="footer-link">Commercial Work</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">About Us</a></li>
+                        <li><a href="#portfolio" class="footer-link">Portfolio</a></li>
+                        <li><a href="#testimonials" class="footer-link">Testimonials</a></li>
+                        <li><a href="#contact" class="footer-link">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">Blog</a></li>
+                        <li><a href="#" class="footer-link">Pricing Guide</a></li>
+                        <li><a href="#" class="footer-link">FAQ</a></li>
+                        <li><a href="#" class="footer-link">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 ApexHub.co. All rights reserved. | Crafted with passion for visual storytelling.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- External Libraries -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const theme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        });
+
+        // Mobile Menu Toggle
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        mobileToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+        
+        // Header Scroll Effect
+        const header = document.getElementById('header');
+        let lastScroll = 0;
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            
+            lastScroll = currentScroll;
+        });
+        
+        // Parallax Effect
+        const parallaxElements = document.querySelectorAll('.parallax-layer');
+        
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            
+            parallaxElements.forEach(element => {
+                const speed = element.dataset.speed || 0.5;
+                const yPos = -(scrolled * speed);
+                element.style.transform = `translateY(${yPos}px)`;
+            });
+        });
+
+        // Intersection Observer for Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all cards and sections
+        document.querySelectorAll('.service-card, .portfolio-item, .process-step, .testimonial-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            observer.observe(el);
+        });
+        
+        // Form Submission Handler
+        const contactForm = document.querySelector('.contact-form');
+        
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(contactForm);
+            const data = Object.fromEntries(formData);
+            
+            // Simulate form submission
+            console.log('Form submitted:', data);
+            
+            // Show success message
+            alert('Thank you for your message! We will get back to you soon.');
+            
+            // Reset form
+            contactForm.reset();
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const headerOffset = 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

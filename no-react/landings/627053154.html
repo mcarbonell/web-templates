@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse Trim | Modern Barber Studio</title>
+    <meta name="description" content="Experience the future of grooming at Pulse Trim. Precision cuts, modern style, timeless results.">
+    
+    <!-- Accessibility: Preload fonts for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <style>
+        /* 
+        DESIGN CHOICES (Seed: 627053154):
+        - Business Type: Beauty & Personal Services (Hair salons and barbershops)
+        - Hero Layout: Asymmetric geometric layout (seed % 5 = 4)
+        - Color Palette: Monochrome with accent color (seed % 7 = 0)
+        - Typography: Handwritten/script elements (seed % 4 = 2)
+        - Animation: Smooth GSAP scroll animations (seed % 6 = 0)
+        - Content Density: Minimalist (seed % 3 = 0)
+        - Special Feature: Animated gradient backgrounds (seed % 8 = 2)
+        - Accent Color: 150° (Cyan/Teal)
+        - Animation Duration: 0.75s
+        */
+        
+        :root {
+            /* Light Theme Variables */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-muted: #666666;
+            --accent-hue: 150;
+            --accent-sat: 60%;
+            --accent-light: 45%;
+            --accent-color: hsl(var(--accent-hue), var(--accent-sat), var(--accent-light));
+            --accent-contrast: hsl(var(--accent-hue), 60%, 95%);
+            --border-color: #e0e0e0;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-hard: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --transition-speed: 0.4s;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme Variables */
+            --bg-primary: #0f0f11;
+            --bg-secondary: #1a1a1d;
+            --text-primary: #ffffff;
+            --text-secondary: #d1d1d6;
+            --text-muted: #a1a1aa;
+            --accent-light: 55%;
+            --accent-color: hsl(var(--accent-hue), var(--accent-sat), var(--accent-light));
+            --accent-contrast: hsl(var(--accent-hue), 60%, 15%);
+            --border-color: #2d2d33;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-hard: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+        }
+
+        /* CSS-in-JS for dynamic gradients */
+        :root {
+            --gradient-1: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            --gradient-2: linear-gradient(45deg, var(--accent-color), transparent);
+            --gradient-3: radial-gradient(circle at 50% 50%, var(--accent-color), transparent 70%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Accessibility: Skip to content link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--accent-color);
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            z-index: 1000;
+            transition: top 0.3s ease;
+        }
+
+        .skip-link:focus {
+            top: 6px;
+        }
+
+        /* Typography Classes */
+        .heading-xl {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 0.9;
+        }
+
+        .heading-lg {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .heading-md {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 600;
+        }
+
+        .heading-sm {
+            font-size: clamp(1.125rem, 3vw, 1.5rem);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .text-lg {
+            font-size: clamp(1.125rem, 2.5vw, 1.25rem);
+            line-height: 1.6;
+        }
+
+        .text-md {
+            font-size: clamp(1rem, 2vw, 1.125rem);
+            line-height: 1.6;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.4;
+            color: var(--text-muted);
+        }
+
+        /* Handwritten/script font for accents */
+        .script-text {
+            font-family: 'Dancing Script', 'Brush Script MT', cursive;
+            font-weight: 600;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+        }
+
+        /* Layout Classes */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .flex {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        /* Spacing Classes */
+        .py-2 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-4 { padding-top: 2rem; padding-bottom: 2rem; }
+        .py-8 { padding-top: 4rem; padding-bottom: 4rem; }
+        .py-12 { padding-top: 6rem; padding-bottom: 6rem; }
+        .px-2 { padding-left: 1rem; padding-right: 1rem; }
+        .px-4 { padding-left: 2rem; padding-right: 2rem; }
+        .px-8 { padding-left: 4rem; padding-right: 4rem; }
+        .my-2 { margin-top: 1rem; margin-bottom: 1rem; }
+        .my-4 { margin-top: 2rem; margin-bottom: 2rem; }
+        .my-8 { margin-top: 4rem; margin-bottom: 4rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+
+        /* Button Classes */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hard);
+            background: hsl(var(--accent-hue), 70%, 50%);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Card Classes */
+        .card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hard);
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-up {
+            animation: slideUp 0.75s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Geometric Shapes for Asymmetric Layout */
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--accent-color);
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .shape-1 {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            right: -200px;
+        }
+
+        .shape-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            left: -150px;
+        }
+
+        .shape-3 {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            right: 10%;
+            opacity: 0.05;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .shape-1, .shape-2 {
+                display: none;
+            }
+            
+            .shape-3 {
+                display: none;
+            }
+        }
+
+        /* Focus States for Accessibility */
+        :focus {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        /* Remove focus from non-interactive elements */
+        button, a, input, select, textarea {
+            outline: none;
+        }
+
+        /* High Contrast Mode Support */
+        @media (prefers-contrast: high) {
+            :root {
+                --bg-primary: #000000;
+                --bg-secondary: #111111;
+                --text-primary: #ffffff;
+                --text-secondary: #ffffff;
+                --border-color: #ffffff;
+            }
+        }
+
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--bg-secondary);
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        .loader::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            animation: loading 2s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Accessibility: Skip to content link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Loading indicator -->
+    <div class="loader" aria-hidden="true"></div>
+
+    <!-- Header with ARIA roles -->
+    <header role="banner" class="py-4" style="position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);">
+        <div class="container">
+            <nav role="navigation" aria-label="Main navigation" class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <!-- Logo with SVG icon -->
+                    <div style="width: 40px; height: 40px; background: var(--accent-color); border-radius: 50%; position: relative; margin-right: 1rem;">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="white"/>
+                            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="heading-sm" style="margin: 0;">Pulse Trim</h1>
+                        <span class="text-sm" style="color: var(--text-muted);">Modern Barber Studio</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false" class="btn-secondary" style="padding: 0.5rem 1rem; margin-right: 1rem;">
+                        <span id="theme-icon">🌙</span>
+                        <span class="sr-only">Toggle theme</span>
+                    </button>
+                    
+                    <!-- Mobile Menu Toggle -->
+                    <button id="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false" class="btn-secondary" style="padding: 0.5rem 1rem; display: none;">
+                        ☰ Menu
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        
+        <!-- Hero Section with Asymmetric Geometric Layout -->
+        <section id="hero" class="py-12" style="position: relative; overflow: hidden;">
+            <!-- Animated Background Shapes -->
+            <div class="shape shape-1" aria-hidden="true"></div>
+            <div class="shape shape-2" aria-hidden="true"></div>
+            <div class="shape shape-3" aria-hidden="true"></div>
+            
+            <div class="container">
+                <div class="grid grid-2" style="align-items: center; min-height: 80vh;">
+                    <div class="fade-in">
+                        <h2 class="heading-xl" style="background: linear-gradient(135deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                            Precision Cuts.<br>
+                            <span class="script-text" style="color: var(--accent-color);">Timeless Style.</span>
+                        </h2>
+                        <p class="text-lg my-4" style="color: var(--text-secondary);">
+                            Where modern technique meets classic craftsmanship. Experience the future of grooming in our award-winning studio.
+                        </p>
+                        <div class="flex" style="gap: 1rem; flex-wrap: wrap;">
+                            <a href="#services" class="btn slide-up" style="animation-delay: 0.1s;">Explore Services</a>
+                            <a href="#book" class="btn btn-secondary slide-up" style="animation-delay: 0.2s;">Book Now</a>
+                        </div>
+                    </div>
+                    
+                    <div class="fade-in" style="text-align: right;">
+                        <!-- Placeholder for hero image -->
+                        <div style="background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary)); border-radius: var(--radius-lg); padding: 2rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft);">
+                            <div style="width: 100%; height: 400px; background: radial-gradient(circle at 30% 30%, var(--accent-color), transparent 60%), radial-gradient(circle at 70% 70%, var(--accent-contrast), transparent 60%); border-radius: var(--radius-lg); position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 20px; right: 20px; width: 60px; height: 60px; background: var(--accent-color); border-radius: 50%; opacity: 0.3;"></div>
+                                <div style="position: absolute; bottom: 20px; left: 20px; width: 80px; height: 80px; background: var(--accent-color); border-radius: 50%; opacity: 0.2;"></div>
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-primary);">
+                                    <div style="font-size: 4rem; margin-bottom: 1rem;">✂️</div>
+                                    <div class="script-text">Modern Barbering</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-12" role="region" aria-label="Our Services">
+            <div class="container">
+                <div class="text-center fade-in">
+                    <h2 class="heading-lg">Our Craft</h2>
+                    <p class="text-md my-4" style="color: var(--text-secondary);">Master barbers with decades of experience</p>
+                </div>
+                
+                <div class="grid grid-3 my-8" style="gap: 2rem;">
+                    <div class="card fade-in" style="animation-delay: 0.1s;">
+                        <div style="width: 60px; height: 60px; background: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                            <span style="font-size: 1.5rem;">💈</span>
+                        </div>
+                        <h3 class="heading-md">Classic Cuts</h3>
+                        <p class="text-md my-2" style="color: var(--text-secondary);">
+                            Timeless styles that never go out of fashion. From fades to pompadours, we've mastered the classics.
+                        </p>
+                        <ul class="text-sm" style="color: var(--text-muted); margin-top: 1rem;">
+                            <li>• Precision fades</li>
+                            <li>• Classic pompadour</li>
+                            <li>• Side part styles</li>
+                            <li>• Crew cuts</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card fade-in" style="animation-delay: 0.2s;">
+                        <div style="width: 60px; height: 60px; background: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                            <span style="font-size: 1.5rem;">🧖</span>
+                        </div>
+                        <h3 class="heading-md">Beard Care</h3>
+                        <p class="text-md my-2" style="color: var(--text-secondary);">
+                            Shape, style, and maintain your facial hair with our expert beard services.
+                        </p>
+                        <ul class="text-sm" style="color: var(--text-muted); margin-top: 1rem;">
+                            <li>• Beard shaping</li>
+                            <li>• Hot towel treatment</li>
+                            <li>• Beard oil application</li>
+                            <li>• Mustache styling</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card fade-in" style="animation-delay: 0.3s;">
+                        <div style="width: 60px; height: 60px; background: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                            <span style="font-size: 1.5rem;">✨</span>
+                        </div>
+                        <h3 class="heading-md">Premium Experience</h3>
+                        <p class="text-md my-2" style="color: var(--text-secondary);">
+                            Luxury treatments that elevate your grooming routine to an art form.
+                        </p>
+                        <ul class="text-sm" style="color: var(--text-muted); margin-top: 1rem;">
+                            <li>• Hot lather shave</li>
+                            <li>• Scalp massage</li>
+                            <li>• Product consultation</li>
+                            <li>• Style advice</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-12" role="region" aria-label="About Us" style="background: var(--bg-secondary);">
+            <div class="container">
+                <div class="grid grid-2" style="align-items: center; gap: 4rem;">
+                    <div class="fade-in">
+                        <h2 class="heading-lg">Our Story</h2>
+                        <p class="text-lg my-4" style="color: var(--text-secondary);">
+                            Founded in 2020, Pulse Trim was born from a passion for precision and a dedication to the art of barbering. We combine traditional techniques with modern innovation to create a truly unique experience.
+                        </p>
+                        <div class="grid grid-2" style="gap: 1rem; margin-top: 2rem;">
+                            <div style="padding: 1rem; background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                <h4 class="heading-sm" style="color: var(--accent-color);">1000+</h4>
+                                <p class="text-sm" style="color: var(--text-muted);">Happy Clients</p>
+                            </div>
+                            <div style="padding: 1rem; background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                <h4 class="heading-sm" style="color: var(--accent-color);">15+</h4>
+                                <p class="text-sm" style="color: var(--text-muted);">Years Experience</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fade-in">
+                        <!-- Placeholder for team image -->
+                        <div style="background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary)); border-radius: var(--radius-lg); padding: 2rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft);">
+                            <div style="width: 100%; height: 300px; background: linear-gradient(45deg, var(--accent-color), var(--accent-contrast)); border-radius: var(--radius-lg); position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 20px; left: 20px; width: 100px; height: 100px; background: white; border-radius: 50%; opacity: 0.2;"></div>
+                                <div style="position: absolute; bottom: 20px; right: 20px; width: 120px; height: 120px; background: white; border-radius: 50%; opacity: 0.1;"></div>
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+                                    <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                                    <div class="script-text" style="color: white;">Expert Team</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Booking Section -->
+        <section id="book" class="py-12">
+            <div class="container">
+                <div class="text-center fade-in">
+                    <h2 class="heading-lg">Ready for Your Transformation?</h2>
+                    <p class="text-md my-4" style="color: var(--text-secondary);">
+                        Book your appointment today and experience the Pulse Trim difference.
+                    </p>
+                </div>
+                
+                <div class="card mx-auto" style="max-width: 600px; margin-top: 3rem; text-align: center;">
+                    <div style="margin-bottom: 2rem;">
+                        <div style="width: 80px; height: 80px; background: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <span style="font-size: 2rem;">📅</span>
+                        </div>
+                        <h3 class="heading-md">Easy Booking</h3>
+                    </div>
+                    
+                    <div class="grid grid-2" style="gap: 1rem; margin-bottom: 2rem;">
+                        <div style="padding: 1rem; background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                            <h4 class="heading-sm" style="color: var(--accent-color);">Online</h4>
+                            <p class="text-sm" style="color: var(--text-muted);">Book anytime</p>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                            <h4 class="heading-sm" style="color: var(--accent-color);">Phone</h4>
+                            <p class="text-sm" style="color: var(--text-muted);">Call us directly</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                        <a href="tel:+1234567890" class="btn">Call Now</a>
+                        <a href="mailto:info@pulse.trim" class="btn btn-secondary">Email Us</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-12" role="region" aria-label="Contact Information" style="background: var(--bg-secondary);">
+            <div class="container">
+                <div class="grid grid-2" style="align-items: center; gap: 4rem;">
+                    <div class="fade-in">
+                        <h2 class="heading-lg">Visit Us</h2>
+                        <div class="my-4">
+                            <p class="text-md" style="color: var(--text-secondary); margin-bottom: 0.5rem;">📍 123 Style Avenue, Fashion District</p>
+                            <p class="text-md" style="color: var(--text-secondary); margin-bottom: 0.5rem;">📞 (555) 123-4567</p>
+                            <p class="text-md" style="color: var(--text-secondary);">✉️ info@pulse.trim</p>
+                        </div>
+                        <div class="my-4">
+                            <h4 class="heading-sm" style="margin-bottom: 1rem;">Hours</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                <span style="color: var(--text-muted);">Mon - Fri</span>
+                                <span style="color: var(--text-secondary);">9AM - 7PM</span>
+                                <span style="color: var(--text-muted);">Saturday</span>
+                                <span style="color: var(--text-secondary);">10AM - 6PM</span>
+                                <span style="color: var(--text-muted);">Sunday</span>
+                                <span style="color: var(--text-secondary);">Closed</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fade-in">
+                        <!-- Placeholder for map -->
+                        <div style="background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary)); border-radius: var(--radius-lg); padding: 2rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft);">
+                            <div style="width: 100%; height: 300px; background: linear-gradient(45deg, var(--accent-contrast), var(--accent-color)); border-radius: var(--radius-lg); position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 20px; left: 20px; width: 150px; height: 150px; background: white; border-radius: 50%; opacity: 0.1;"></div>
+                                <div style="position: absolute; bottom: 20px; right: 20px; width: 100px; height: 100px; background: white; border-radius: 50%; opacity: 0.2;"></div>
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+                                    <div style="font-size: 3rem; margin-bottom: 1rem;">🗺️</div>
+                                    <div class="script-text" style="color: white;">Find Us</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer role="contentinfo" class="py-8" style="background: var(--bg-primary); border-top: 1px solid var(--border-color);">
+        <div class="container">
+            <div class="grid grid-3" style="gap: 2rem;">
+                <div>
+                    <h3 class="heading-md">Pulse Trim</h3>
+                    <p class="text-sm my-2" style="color: var(--text-muted);">
+                        Modern barbering with a pulse. Where precision meets style.
+                    </p>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <a href="#" aria-label="Instagram" class="btn-secondary" style="padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">📸</a>
+                        <a href="#" aria-label="Facebook" class="btn-secondary" style="padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">📘</a>
+                        <a href="#" aria-label="Twitter" class="btn-secondary" style="padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">🐦</a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="heading-sm">Quick Links</h4>
+                    <ul class="text-sm my-2" style="color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem;">
+                        <li><a href="#services" class="text-secondary">Services</a></li>
+                        <li><a href="#about" class="text-secondary">About</a></li>
+                        <li><a href="#book" class="text-secondary">Book Now</a></li>
+                        <li><a href="#contact" class="text-secondary">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="heading-sm">Newsletter</h4>
+                    <p class="text-sm my-2" style="color: var(--text-muted);">
+                        Stay updated with our latest styles and offers.
+                    </p>
+                    <form style="display: flex; gap: 0.5rem;">
+                        <input type="email" placeholder="Your email" aria-label="Email address" style="flex: 1; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-secondary); color: var(--text-primary);">
+                        <button type="submit" class="btn" style="padding: 0.5rem 1rem;">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center my-4" style="color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 2rem; margin-top: 2rem;">
+                <p class="text-sm">© 2024 Pulse Trim. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        // Accessibility: Announce theme changes
+        function announceThemeChange(theme) {
+            const liveRegion = document.createElement('div');
+            liveRegion.setAttribute('aria-live', 'polite');
+            liveRegion.setAttribute('aria-atomic', 'true');
+            liveRegion.style.position = 'absolute';
+            liveRegion.style.left = '-10000px';
+            liveRegion.textContent = `Theme changed to ${theme}`;
+            document.body.appendChild(liveRegion);
+            
+            // Remove after announcement
+            setTimeout(() => {
+                document.body.removeChild(liveRegion);
+            }, 1000);
+        }
+
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+        
+        // Check for saved theme preference or default to light
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.setAttribute('data-theme', savedTheme);
+        
+        // Update toggle button state
+        function updateThemeToggle() {
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            themeIcon.textContent = isDark ? '☀️' : '🌙';
+            themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+            announceThemeChange(isDark ? 'dark' : 'light');
+        }
+        
+        updateThemeToggle();
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeToggle();
+        });
+
+        // Scroll Animation with GSAP
+        document.addEventListener('DOMContentLoaded', () => {
+            // Remove loader
+            const loader = document.querySelector('.loader');
+            if (loader) {
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.remove(), 300);
+                }, 1000);
+            }
+
+            // Initialize GSAP animations
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            fadeElements.forEach((element, index) => {
+                gsap.fromTo(element, 
+                    { opacity: 0, y: 50 },
+                    { 
+                        opacity: 1, 
+                        y: 0, 
+                        duration: 0.75, 
+                        delay: index * 0.1,
+                        scrollTrigger: {
+                            trigger: element,
+                            start: 'top 80%',
+                            toggleActions: 'play none none reverse'
+                        }
+                    }
+                );
+            });
+
+            // Animate shapes on scroll
+            const shapes = document.querySelectorAll('.shape');
+            shapes.forEach((shape, index) => {
+                gsap.to(shape, {
+                    x: index % 2 === 0 ? 50 : -50,
+                    y: index % 2 === 0 ? -50 : 50,
+                    rotation: 360,
+                    duration: 20,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: 'power1.inOut'
+                });
+            });
+
+            // Header scroll effect
+            const header = document.querySelector('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.style.background = 'rgba(255,255,255,0.95)';
+                } else {
+                    header.style.background = 'rgba(255,255,255,0.8)';
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        if (window.innerWidth <= 768) {
+            mobileMenuToggle.style.display = 'block';
+            
+            mobileMenuToggle.addEventListener('click', () => {
+                const isExpanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
+                mobileMenuToggle.setAttribute('aria-expanded', !isExpanded);
+                // In a real implementation, this would toggle a mobile menu
+            });
+        }
+    </script>
+</body>
+</html>

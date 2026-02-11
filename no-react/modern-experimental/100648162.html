@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VEXEL — Digital Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#0A0A0A;--accent:#CCFF00;--white:#FFFFFF;--muted:#666;--card:#111;--border:#1e1e1e}
+        html{scroll-behavior:smooth}
+        body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+        body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:256px 256px}
+        ::selection{background:var(--accent);color:var(--bg)}
+        a{color:inherit;text-decoration:none}
+        .mono{font-family:'Space Mono',monospace}
+
+        /* NAV */
+        nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.5rem 2rem;display:flex;justify-content:space-between;align-items:center;mix-blend-mode:difference}
+        .nav-logo{font-family:'Space Mono',monospace;font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
+        .nav-links{display:flex;gap:2rem;list-style:none;font-size:.8rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+        .nav-links a{position:relative;padding:.25rem 0}
+        .nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--accent);transition:width .3s}
+        .nav-links a:hover::after{width:100%}
+        .nav-menu-btn{display:none;background:0;border:0;color:var(--white);cursor:pointer;font-family:'Space Mono',monospace;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em}
+
+        /* HERO */
+        .hero{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:2rem;padding-bottom:4rem;position:relative}
+        .hero-eyebrow{font-family:'Space Mono',monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:.25em;color:var(--accent);margin-bottom:2rem;display:flex;align-items:center;gap:1rem}
+        .hero-eyebrow::before{content:'';width:40px;height:1px;background:var(--accent)}
+        .hero-title{font-size:clamp(3.2rem,11.5vw,12rem);font-weight:900;line-height:.88;letter-spacing:-.045em;text-transform:uppercase}
+        .hero-title .outline{-webkit-text-stroke:2px var(--white);color:transparent}
+        .hero-title .accent{color:var(--accent)}
+        .hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:3rem}
+        .hero-desc{max-width:360px;font-size:.95rem;line-height:1.75;color:var(--muted);font-weight:300}
+        .hero-scroll{font-family:'Space Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.25em;color:var(--muted);writing-mode:vertical-rl;animation:bdwn 2s ease-in-out infinite}
+        @keyframes bdwn{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+
+        .hero-geo{position:absolute;top:18%;right:6%;width:180px;height:180px;border:2px solid var(--accent);transform:rotate(45deg);animation:gspin 25s linear infinite;pointer-events:none}
+        .hero-geo::before{content:'';position:absolute;inset:22%;border:1px solid var(--border);transform:rotate(15deg)}
+        .hero-geo::after{content:'';position:absolute;inset:40%;border:1px solid var(--border);transform:rotate(-10deg)}
+        @keyframes gspin{to{transform:rotate(405deg)}}
+
+        .hero-circle{position:absolute;top:30%;right:18%;width:60px;height:60px;border-radius:50%;background:var(--accent);opacity:.12;animation:pulse 4s ease-in-out infinite;pointer-events:none}
+        @keyframes pulse{0%,100%{transform:scale(1);opacity:.12}50%{transform:scale(1.5);opacity:.06}}
+
+        /* MARQUEE */
+        .marquee-section{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.25rem 0;overflow:hidden}
+        .marquee-track{display:flex;animation:mq 18s linear infinite;width:max-content}
+        .marquee-track:hover{animation-play-state:paused}
+        .marquee-item{font-size:clamp(1.25rem,3.5vw,2.5rem);font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;padding:0 1.5rem;display:flex;align-items:center;gap:1.5rem}
+        .marquee-item .dot{width:10px;height:10px;background:var(--accent);flex-shrink:0}
+        @keyframes mq{to{transform:translateX(-50%)}}
+
+        /* ABOUT */
+        .about{padding:8rem 2rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+        .section-num{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--accent);letter-spacing:.2em;margin-bottom:1.5rem}
+        .about-title{font-size:clamp(2rem,5vw,4rem);font-weight:700;line-height:1.08;letter-spacing:-.03em}
+        .about-right{padding-top:3rem}
+        .about-text{font-size:1.05rem;line-height:1.8;color:var(--muted);font-weight:300;margin-bottom:1.5rem}
+        .about-stats{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem;padding-top:3rem;border-top:1px solid var(--border)}
+        .stat-num{font-family:'Space Mono',monospace;font-size:2.25rem;font-weight:700;color:var(--accent)}
+        .stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-top:.4rem}
+
+        /* SERVICES */
+        .services{padding:4rem 2rem 8rem}
+        .services-header{margin-bottom:4rem}
+        .services-title{font-size:clamp(2rem,5vw,4rem);font-weight:700;letter-spacing:-.03em}
+        .svc{border-top:1px solid var(--border);padding:2.25rem 0;display:grid;grid-template-columns:60px 1fr auto;gap:2rem;align-items:center;cursor:pointer;transition:all .3s}
+        .svc:last-child{border-bottom:1px solid var(--border)}
+        .svc:hover{padding-left:1.5rem}
+        .svc:hover .svc-n{color:var(--accent)}
+        .svc:hover .svc-arrow{transform:rotate(-45deg);color:var(--accent)}
+        .svc-n{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--muted);transition:color .3s}
+        .svc-name{font-size:clamp(1.3rem,3vw,2.25rem);font-weight:600;letter-spacing:-.02em}
+        .svc-arrow{font-size:1.5rem;transition:all .3s;color:var(--muted)}
+
+        /* WORK */
+        .work{padding:4rem 2rem 8rem}
+        .work-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+        .work-card{position:relative;overflow:hidden;background:var(--card);aspect-ratio:4/3;cursor:pointer;border:1px solid var(--border);transition:border-color .4s}
+        .work-card:nth-child(2){margin-top:5rem}
+        .work-card:nth-child(3){margin-top:-3rem}
+        .work-card:hover{border-color:var(--accent)}
+        .work-card-inner{width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:2rem;position:relative;transition:background .4s}
+        .work-card:hover .work-card-inner{background:rgba(204,255,0,.04)}
+        .work-card:hover .work-tag{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+        .work-card-n{position:absolute;top:1.5rem;right:2rem;font-family:'Space Mono',monospace;font-size:4.5rem;font-weight:700;color:var(--border);line-height:1}
+        .work-tag{font-family:'Space Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;border:1px solid var(--border);padding:.35rem .7rem;display:inline-block;width:fit-content;margin-bottom:.8rem;transition:all .3s}
+        .work-card-title{font-size:1.4rem;font-weight:600;letter-spacing:-.015em}
+        .work-card-desc{font-size:.8rem;color:var(--muted);margin-top:.35rem}
+
+        /* TESTIMONIAL */
+        .testimonial{padding:8rem 2rem;text-align:center;position:relative}
+        .testimonial-quote{font-size:clamp(1.4rem,3.5vw,3rem);font-weight:300;line-height:1.35;max-width:860px;margin:0 auto;letter-spacing:-.015em}
+        .testimonial-quote em{font-style:italic;color:var(--accent)}
+        .testimonial-author{margin-top:2.5rem;font-family:'Space Mono',monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.2em;color:var(--muted)}
+        .tq-big{font-size:clamp(8rem,18vw,16rem);position:absolute;top:0;left:50%;transform:translateX(-50%);color:var(--border);font-family:Georgia,serif;line-height:1;pointer-events:none;opacity:.45}
+
+        /* CTA */
+        .cta{padding:8rem 2rem;text-align:center;border-top:1px solid var(--border)}
+        .cta-title{font-size:clamp(2.8rem,10vw,10rem);font-weight:900;text-transform:uppercase;letter-spacing:-.045em;line-height:.88}
+        .cta-title .accent{color:var(--accent)}
+        .cta-btn{display:inline-flex;align-items:center;gap:1rem;margin-top:3rem;padding:1.2rem 2.8rem;background:var(--accent);color:var(--bg);font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;border:none;cursor:pointer;transition:all .3s;text-decoration:none}
+        .cta-btn:hover{background:var(--white);transform:translateY(-3px)}
+        .cta-btn .arr{transition:transform .3s}
+        .cta-btn:hover .arr{transform:translateX(6px)}
+
+        /* FOOTER */
+        footer{padding:4rem 2rem;border-top:1px solid var(--border);display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:2rem}
+        .f-brand{font-family:'Space Mono',monospace;font-weight:700;font-size:1.2rem;margin-bottom:.8rem}
+        .f-text{color:var(--muted);font-size:.85rem;line-height:1.7;max-width:280px}
+        .f-heading{font-family:'Space Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);margin-bottom:1.3rem}
+        .f-links{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+        .f-links a{color:var(--muted);font-size:.85rem;transition:color .3s}
+        .f-links a:hover{color:var(--white)}
+        .f-bottom{padding:2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+
+        /* REVEAL */
+        .reveal{opacity:0;transform:translateY(50px);transition:all .9s cubic-bezier(.16,1,.3,1)}
+        .reveal.active{opacity:1;transform:translateY(0)}
+        .reveal-d1{transition-delay:.1s}
+        .reveal-d2{transition-delay:.2s}
+        .reveal-d3{transition-delay:.3s}
+        .reveal-d4{transition-delay:.4s}
+
+        /* CURSOR */
+        .cursor{width:18px;height:18px;border:1.5px solid var(--accent);border-radius:50%;position:fixed;pointer-events:none;z-index:10000;transition:width .2s,height .2s,opacity .2s,background .2s;mix-blend-mode:difference;margin-left:-9px;margin-top:-9px}
+        .cursor.hov{width:50px;height:50px;margin-left:-25px;margin-top:-25px;background:var(--accent);opacity:.25}
+
+        /* MOBILE MENU */
+        .mob-menu{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;justify-content:center;padding:2rem;transform:translateX(100%);transition:transform .5s cubic-bezier(.16,1,.3,1)}
+        .mob-menu.open{transform:translateX(0)}
+        .mob-menu-links{list-style:none;display:flex;flex-direction:column;gap:1.25rem}
+        .mob-menu-links a{font-size:2.2rem;font-weight:700;text-transform:uppercase;letter-spacing:-.02em;transition:color .3s}
+        .mob-menu-links a:hover{color:var(--accent)}
+        .mob-close{position:absolute;top:1.5rem;right:1.5rem;background:0;border:0;color:var(--white);font-family:'Space Mono',monospace;font-size:.8rem;cursor:pointer;text-transform:uppercase;letter-spacing:.1em}
+
+        /* RESPONSIVE */
+        @media(max-width:768px){
+            nav{padding:1rem 1.25rem}
+            .nav-links{display:none}
+            .nav-menu-btn{display:block}
+            .hero{padding:1.25rem;padding-bottom:3rem}
+            .hero-geo{width:100px;height:100px;top:14%;right:-15px;opacity:.6}
+            .hero-circle{width:40px;height:40px;right:10%}
+            .hero-bottom{flex-direction:column;gap:1.5rem;align-items:flex-start}
+            .hero-scroll{display:none}
+            .about{grid-template-columns:1fr;padding:4rem 1.25rem;gap:1.5rem}
+            .about-right{padding-top:0}
+            .services{padding:4rem 1.25rem}
+            .svc{grid-template-columns:40px 1fr auto;gap:1rem;padding:1.5rem 0}
+            .svc:hover{padding-left:.5rem}
+            .work{padding:4rem 1.25rem}
+            .work-grid{grid-template-columns:1fr;gap:1.25rem}
+            .work-card:nth-child(2),.work-card:nth-child(3){margin-top:0}
+            .testimonial{padding:4rem 1.25rem}
+            .tq-big{font-size:7rem}
+            .cta{padding:4rem 1.25rem}
+            footer{grid-template-columns:1fr;padding:3rem 1.25rem;gap:2rem}
+            .f-bottom{flex-direction:column;gap:.5rem;padding:1.25rem}
+            .cursor{display:none}
+        }
+    </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<nav>
+    <a href="#" class="nav-logo">VEXEL®</a>
+    <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav-menu-btn" id="menuOpen">Menu</button>
+</nav>
+
+<div class="mob-menu" id="mobMenu">
+    <button class="mob-close" id="menuClose">Close</button>
+    <ul class="mob-menu-links">
+        <li><a href="#about" onclick="closeMenu()">About</a></li>
+        <li><a href="#services" onclick="closeMenu()">Services</a></li>
+        <li><a href="#work" onclick="closeMenu()">Work</a></li>
+        <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
+    </ul>
+</div>
+
+<section class="hero">
+    <div class="hero-geo"></div>
+    <div class="hero-circle"></div>
+    <div class="hero-eyebrow mono">Digital Design Studio — Est. 2019</div>
+    <h1 class="hero-title">
+        <span>We build</span><br>
+        <span class="outline">digital</span> <span class="accent">&</span><br>
+        <span>bold.</span>
+    </h1>
+    <div class="hero-bottom">
+        <p class="hero-desc">We craft distinctive digital experiences that push boundaries and defy conventions. Strategy, design, and code — unified.</p>
+        <span class="hero-scroll mono">Scroll ↓</span>
+    </div>
+</section>
+
+<section class="marquee-section">
+    <div class="marquee-track">
+        <span class="marquee-item">Branding <span class="dot"></span></span>
+        <span class="marquee-item">Development <span class="dot"></span></span>
+        <span class="marquee-item">Strategy <span class="dot"></span></span>
+        <span class="marquee-item">Motion <span class="dot"></span></span>
+        <span class="marquee-item">Identity <span class="dot"></span></span>
+        <span class="marquee-item">Experience <span class="dot"></span></span>
+        <span class="marquee-item">Branding <span class="dot"></span></span>
+        <span class="marquee-item">Development <span class="dot"></span></span>
+        <span class="marquee-item">Strategy <span class="dot"></span></span>
+        <span class="marquee-item">Motion <span class="dot"></span></span>
+        <span class="marquee-item">Identity <span class="dot"></span></span>
+        <span class="marquee-item">Experience <span class="dot"></span></span>
+    </div>
+</section>
+
+<section class="about" id="about">
+    <div class="reveal">
+        <div class="section-num mono">(01)</div>
+        <h2 class="about-title">Designed to<br>stand apart.</h2>
+    </div>
+    <div class="about-right reveal reveal-d1">
+        <p class="about-text">We are a collective of designers, developers, and strategists obsessed with creating work that matters. Every pixel is intentional. Every interaction is deliberate.</p>
+        <p class="about-text">From ambitious startups to established brands, we partner with those who refuse to blend in. Our process is rigorous, our output is uncompromising.</p>
+        <div class="about-stats">
+            <div><div class="stat-num mono" data-target="147" data-suffix="+">0+</div><div class="stat-label">Projects Delivered</div></div>
+            <div><div class="stat-num mono" data-target="98" data-suffix="%">0%</div><div class="stat-label">Client Retention</div></div>
+            <div><div class="stat-num mono" data-target="12" data-suffix="">0</div><div class="stat-label">Design Awards</div></div>
+            <div><div class="stat-num mono" data-target="5" data-suffix="yr">0yr</div><div class="stat-label">In The Game</div></div>
+        </div>
+    </div>
+</section>
+
+<section class="services" id="services">
+    <div class="services-header reveal">
+        <div class="section-num mono">(02)</div>
+        <h2 class="services-title">What we do</h2>
+    </div>
+    <div class="svc reveal reveal-d1"><span class="svc-n mono">01</span><span class="svc-name">Brand Identity</span><span class="svc-arrow">→</span></div>
+    <div class="svc reveal reveal-d2"><span class="svc-n mono">02</span><span class="svc-name">Web Development</span><span class="svc-arrow">→</span></div>
+    <div class="svc reveal reveal-d3"><span class="svc-n mono">03</span><span class="svc-name">Digital Strategy</span><span class="svc-arrow">→</span></div>
+    <div class="svc reveal reveal-d4"><span class="svc-n mono">04</span><span class="svc-name">Motion Design</span><span class="svc-arrow">→</span></div>
+    <div class="svc reveal"><span class="svc-n mono">05</span><span class="svc-name">Product Design</span><span class="svc-arrow">→</span></div>
+</section>
+
+<section class="work" id="work">
+    <div class="services-header reveal">
+        <div class="section-num mono">(03)</div>
+        <h2 class="services-title">Selected Work</h2>
+    </div>
+    <div class="work-grid">
+        <div class="work-card reveal">
+            <div class="work-card-inner">
+                <div class="work-card-n">01</div>
+                <span class="work-tag mono">E-Commerce</span>
+                <h3 class="work-card-title">Aether Apparel</h3>
+                <p class="work-card-desc">Brand identity &amp; web platform</p>
+            </div>
+        </div>
+        <div class="work-card reveal reveal-d2">
+            <div class="work-card-inner">
+                <div class="work-card-n">02</div>
+                <span class="work-tag mono">Fintech</span>
+                <h3 class="work-card-title">Nova Banking</h3>
+                <p class="work-card-desc">Digital product &amp; mobile app</p>
+            </div>
+        </div>
+        <div class="work-card reveal">
+            <div class="work-card-inner">
+                <div class="work-card-n">03</div>
+                <span class="work-tag mono">Architecture</span>
+                <h3 class="work-card-title">Monolith Studio</h3>
+                <p class="work-card-desc">Website &amp; visual identity</p>
+            </div>
+        </div>
+        <div class="work-card reveal reveal-d2">
+            <div class="work-card-inner">
+                <div class="work-card-n">04</div>
+                <span class="work-tag mono">Healthcare</span>
+                <h3 class="work-card-title">Vitalis Health</h3>
+                <p class="work-card-desc">Platform design &amp; strategy</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="testimonial reveal">
+    <div class="tq-big">"</div>
+    <blockquote class="testimonial-quote">"VEXEL didn't just redesign our brand — they <em>redefined</em> how we think about our entire digital presence."</blockquote>
+    <div class="testimonial-author">— Sarah Chen, CEO at Monolith Studio</div>
+</section>
+
+<section class="marquee-section">
+    <div class="marquee-track" style="animation-direction:reverse">
+        <span class="marquee-item">Let's Work Together <span class="dot"></span></span>
+        <span class="marquee-item">Let's Work Together <span class="dot"></span></span>
+        <span class="marquee-item">Let's Work Together <span class="dot"></span></span>
+        <span class="marquee-item">Let's Work Together <span class="dot"></span></span>
+        <span class="marquee-item">Let's Work Together <span class="dot"></span></span>
+        <span class="marquee-item">Let's Work Together <span class="dot"></span></span>
+        <span class="marquee-item">Let's Work Together <span class="dot"></span></span>
+        <span class="marquee-item">Let's Work Together <span class="dot"></span></span>
+    </div>
+</section>
+
+<section class="cta" id="contact">
+    <div class="section-num mono">(04)</div>
+    <h2 class="cta-title reveal">Start a<br><span class="accent">project</span></h2>
+    <a href="mailto:hello@vexel.studio" class="cta-btn reveal reveal-d2">Get in touch <span class="arr">→</span></a>
+</section>
+
+<footer>
+    <div>
+        <div class="f-brand mono">VEXEL®</div>
+        <p class="f-text">Digital design studio crafting bold experiences for ambitious brands worldwide.</p>
+    </div>
+    <div>
+        <div class="f-heading">Navigation</div>
+        <ul class="f-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </div>
+    <div>
+        <div class="f-heading">Connect</div>
+        <ul class="f-links">
+            <li><a href="#">Twitter / X</a></li>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">Dribbble</a></li>
+            <li><a href="#">LinkedIn</a></li>
+        </ul>
+    </div>
+</footer>
+<div class="f-bottom">
+    <span>© 2024 Vexel Studio. All rights reserved.</span>
+    <span>Made with precision</span>
+</div>
+
+<script>
+// Cursor
+const cur=document.getElementById('cursor');
+document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'});
+document.querySelectorAll('a,button,.svc,.work-card,.cta-btn').forEach(el=>{el.addEventListener('mouseenter',()=>cur.classList.add('hov'));el.addEventListener('mouseleave',()=>cur.classList.remove('hov'))});
+
+// Reveal
+const revealEls=document.querySelectorAll('.reveal');
+const check=()=>{revealEls.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight-60)el.classList.add('active')})};
+window.addEventListener('scroll',check);check();
+
+// Counter animation
+let counted=false;
+const counters=document.querySelectorAll('.stat-num');
+const animateCounters=()=>{if(counted)return;const first=counters[0];if(!first)return;if(first.getBoundingClientRect().top<window.innerHeight-40){counted=true;counters.forEach(c=>{const target=+c.dataset.target;const suffix=c.dataset.suffix;let current=0;const step=Math.max(1,Math.ceil(target/35));const iv=setInterval(()=>{current+=step;if(current>=target){current=target;clearInterval(iv)}c.textContent=current+suffix},30)})}};
+window.addEventListener('scroll',animateCounters);
+
+// Mobile menu
+const mob=document.getElementById('mobMenu');
+document.getElementById('menuOpen').onclick=()=>mob.classList.add('open');
+document.getElementById('menuClose').onclick=()=>mob.classList.remove('open');
+function closeMenu(){mob.classList.remove('open')}
+</script>
+</body>
+</html>

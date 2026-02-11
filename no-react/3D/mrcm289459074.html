@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mario Raúl Carbonell | Full-Stack Developer & AI Specialist</title>
+    <meta name="description"
+        content="Especialista en desarrollo web, aplicaciones a medida e inteligencia artificial. Mario Raúl Carbonell, transformando ideas complejas en código eficiente.">
+
+    <!-- 
+    TEMPLATE ID: 289459074
+    DESIGN DECISIONS:
+    - Color Palette: Crimson Red (#DC2626) & Deep Onyx (#111827). High contrast for a bold, technical look.
+    - 3D Hero Visual: "The Algorithmic Chessboard" - A dynamic 3D grid with floating geometric data nodes representing chess engine logic.
+    - Typography: Geometric Sans-Serif (Outfit) for a modern, clean, and professional high-tech feel.
+    - Animation: Calm, floating 3D movement to emphasize stability and depth without being distracting.
+    - Navigation: Top glassmorphism header for a premium, integrated look.
+    - Bilingual Support: Spanish and English integrated toggle.
+    -->
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            /* Theme: Crimson & Onyx (Seed #1) */
+            --primary: #DC2626;
+            --primary-rgb: 220, 38, 38;
+            --bg-dark: #0A0F1A;
+            --text-dark: #F3F4F6;
+            --bg-light: #F9FAFB;
+            --text-light: #111827;
+            --accent: #E11D48;
+
+            --transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            --header-height: 80px;
+        }
+
+        [data-theme="light"] {
+            --bg: var(--bg-light);
+            --text: var(--text-light);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --border: rgba(0, 0, 0, 0.1);
+            --overlay: rgba(255, 255, 255, 0.8);
+        }
+
+        [data-theme="dark"] {
+            --bg: var(--bg-dark);
+            --text: var(--text-dark);
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --overlay: rgba(10, 15, 26, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1,
+        h2,
+        h3,
+        .font-display {
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        /* --- Layout --- */
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* --- Header --- */
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 1.5rem;
+            }
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .btn-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            transition: var(--transition);
+        }
+
+        .btn-toggle:hover {
+            border-color: var(--primary);
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .lang-switch {
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--text);
+            opacity: 0.6;
+            transition: var(--transition);
+        }
+
+        .lang-switch.active {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        /* --- 3D Canvas --- */
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- Hero Section --- */
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            font-size: 0.75rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            line-height: 0.9;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.8;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 0;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* --- Sections --- */
+
+        section {
+            padding: 10rem 0;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 4rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* --- Grid Features --- */
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 3rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px);
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        /* --- Algorithms / Experience Section --- */
+
+        .split-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .split-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-item {
+            margin-bottom: 2rem;
+        }
+
+        .stat-value {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-label {
+            text-transform: uppercase;
+            font-weight: 600;
+            opacity: 0.6;
+            font-size: 0.875rem;
+        }
+
+        /* --- Footer --- */
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            font-size: 1.2rem;
+        }
+
+        .social-links a:hover {
+            color: var(--primary);
+        }
+
+        /* --- Language Elements --- */
+
+        [lang="en"] {
+            display: none;
+        }
+
+        html[data-lang="en"] [lang="es"] {
+            display: none;
+        }
+
+        html[data-lang="en"] [lang="en"] {
+            display: block;
+        }
+    </style>
+</head>
+
+<body data-theme="dark">
+
+    <div id="canvas-container"></div>
+
+    <header class="header">
+        <a href="#" class="logo">
+            <i data-lucide="cpu"></i>
+            CARBON<span style="color:var(--text)">ELL</span>
+        </a>
+        <div class="nav-actions">
+            <div class="lang-controls">
+                <button class="lang-switch active" onclick="setLang('es')">ES</button>
+                <span style="opacity: 0.3">/</span>
+                <button class="lang-switch" onclick="setLang('en')">EN</button>
+            </div>
+            <button class="btn-toggle" onclick="toggleTheme()" id="theme-toggle">
+                <i data-lucide="sun"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <span class="badge" lang="es">Seed ID: #289459074</span>
+                <span class="badge" lang="en">Seed ID: #289459074</span>
+
+                <h1 lang="es">INGENIERÍA<br><span style="color:var(--primary)">DE ALGORITMOS</span></h1>
+                <h1 lang="en">ALGORITHM<br><span style="color:var(--primary)">ENGINEERING</span></h1>
+
+                <p lang="es">
+                    Especialista en desarrollo web, aplicaciones a medida e inteligencia artificial.
+                    Desde motores de ajedrez hasta consultoría de IA avanzada, transformo ideas complejas en código
+                    eficiente.
+                </p>
+                <p lang="en">
+                    Specialist in web development, custom applications, and artificial intelligence.
+                    From chess engines to advanced AI consulting, I transform complex ideas into efficient code.
+                </p>
+
+                <div class="cta-group">
+                    <a href="https://github.com/mcarbonell" target="_blank" class="btn btn-primary" lang="es">VER
+                        GITHUB</a>
+                    <a href="https://github.com/mcarbonell" target="_blank" class="btn btn-primary" lang="en">VIEW
+                        GITHUB</a>
+                    <a href="#contact" class="btn btn-outline" lang="es">CONTACTO</a>
+                    <a href="#contact" class="btn btn-outline" lang="en">CONTACT</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="specialization">
+            <h2 class="section-title">
+                <span lang="es">ESPECIALIDADES</span>
+                <span lang="en">SPECIALTIES</span>
+            </h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i data-lucide="code-2"></i>
+                    <h3 lang="es">Desarrollo Web</h3>
+                    <h3 lang="en">Web Development</h3>
+                    <p lang="es">Arquitecturas robustas y escalables utilizando las últimas tecnologías para crear
+                        experiencias digitales fluidas.</p>
+                    <p lang="en">Robust and scalable architectures using the latest technologies to create seamless
+                        digital experiences.</p>
+                </div>
+                <div class="feature-card">
+                    <i data-lucide="brain-circuit"></i>
+                    <h3 lang="es">Consultoría IA</h3>
+                    <h3 lang="en">AI Consulting</h3>
+                    <p lang="es">Implementación de modelos avanzados y análisis de datos para optimizar procesos y
+                        resolver problemas complejos.</p>
+                    <p lang="en">Implementation of advanced models and data analysis to optimize processes and solve
+                        complex problems.</p>
+                </div>
+                <div class="feature-card">
+                    <i data-lucide="layers"></i>
+                    <h3 lang="es">Software a Medida</h3>
+                    <h3 lang="en">Custom Software</h3>
+                    <p lang="es">Soluciones específicas diseñadas desde cero para necesidades computacionales exigentes
+                        y únicas.</p>
+                    <p lang="en">Specific solutions designed from scratch for demanding and unique computational needs.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="passion">
+            <div class="split-content">
+                <div>
+                    <h2 class="section-title">
+                        <span lang="es">PASIÓN POR LA EFICIENCIA</span>
+                        <span lang="en">PASSION FOR EFFICIENCY</span>
+                    </h2>
+                    <p style="margin-bottom: 2rem; opacity: 0.8; font-size: 1.1rem;" lang="es">
+                        Más allá del desarrollo convencional, me especializo en el diseño y análisis de algoritmos
+                        complejos para resolver problemas computacionales difíciles.
+                    </p>
+                    <p style="margin-bottom: 2rem; opacity: 0.8; font-size: 1.1rem;" lang="en">
+                        Beyond conventional development, I specialize in the design and analysis of complex algorithms
+                        to solve difficult computational problems.
+                    </p>
+                    <div class="cta-group">
+                        <a href="#" class="btn btn-primary" lang="es">MÁS SOBRE MI</a>
+                        <a href="#" class="btn btn-primary" lang="en">MORE ABOUT ME</a>
+                    </div>
+                </div>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <span class="stat-value">64</span>
+                        <span class="stat-label" lang="es">CASILLAS DE LÓGICA</span>
+                        <span class="stat-label" lang="en">CHESS SQUARES OF LOGIC</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">100%</span>
+                        <span class="stat-label" lang="es">FOCADO EN RENDIMIENTO</span>
+                        <span class="stat-label" lang="en">PERFORMANCE FOCUSED</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">O(n log n)</span>
+                        <span class="stat-label" lang="es">OBSESIÓN POR LA COMPLEJIDAD</span>
+                        <span class="stat-label" lang="en">COMPLEXITY OBSESSION</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer id="contact">
+            <div class="social-links">
+                <a href="https://github.com/mcarbonell" target="_blank">GITHUB</a>
+                <a href="#">LINKEDIN</a>
+                <a href="#">TWITTER</a>
+            </div>
+            <p>&copy; 2026 Mario Raúl Carbonell. <span lang="es">Todos los derechos reservados.</span><span
+                    lang="en">All rights reserved.</span></p>
+            <p style="font-size: 0.75rem; opacity: 0.5; margin-top: 1rem;">ID: 289459074</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- Core ---
+        lucide.createIcons();
+
+        // --- Theme Management ---
+        function toggleTheme() {
+            const body = document.body;
+            const current = body.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', next);
+
+            const icon = document.querySelector('#theme-toggle i');
+            icon.setAttribute('data-lucide', next === 'dark' ? 'sun' : 'moon');
+            lucide.createIcons();
+
+            // Notify three.js if needed (for color updates)
+            if (window.updateSceneColors) window.updateSceneColors(next);
+        }
+
+        // --- Language Management ---
+        function setLang(lang) {
+            document.documentElement.setAttribute('data-lang', lang);
+            document.querySelectorAll('.lang-switch').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText.toLowerCase() === lang);
+            });
+        }
+
+        // --- Three.js: The Algorithmic Chessboard ---
+        const initThree = () => {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Group for all elements
+            const mainGroup = new THREE.Group();
+            scene.add(mainGroup);
+
+            // Create Grid (The Board)
+            const gridSize = 40;
+            const gridDivisions = 20;
+            const gridHelper = new THREE.GridHelper(gridSize, gridDivisions, 0xDC2626, 0x334155);
+            gridHelper.position.y = -5;
+            gridHelper.rotation.x = Math.PI * 0.05;
+            mainGroup.add(gridHelper);
+
+            // Create Floating Data Nodes (Chess-like pieces)
+            const nodes = [];
+            const geometries = [
+                new THREE.BoxGeometry(0.5, 0.5, 0.5),
+                new THREE.OctahedronGeometry(0.4),
+                new THREE.IcosahedronGeometry(0.3)
+            ];
+
+            const nodeMaterial = new THREE.MeshPhongMaterial({
+                color: 0xDC2626,
+                emissive: 0x7F1D1D,
+                transparent: true,
+                opacity: 0.8,
+                shininess: 100
+            });
+
+            for (let i = 0; i < 40; i++) {
+                const geo = geometries[Math.floor(Math.random() * geometries.length)];
+                const mesh = new THREE.Mesh(geo, nodeMaterial.clone());
+
+                mesh.position.set(
+                    (Math.random() - 0.5) * 30,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 30
+                );
+
+                mesh.userData.speedX = (Math.random() - 0.5) * 0.01;
+                mesh.userData.speedY = (Math.random() - 0.5) * 0.01;
+                mesh.userData.rotationSpeed = (Math.random() - 0.5) * 0.02;
+
+                mainGroup.add(mesh);
+                nodes.push(mesh);
+            }
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xDC2626, 2);
+            pointLight.position.set(10, 10, 10);
+            scene.add(pointLight);
+
+            camera.position.z = 15;
+            camera.position.y = 2;
+
+            // Handle Theme Colors
+            window.updateSceneColors = (theme) => {
+                const isDark = theme === 'dark';
+                nodeMaterial.color.set(isDark ? 0xDC2626 : 0xDC2626);
+                gridHelper.material.color.set(isDark ? 0xDC2626 : 0x991B1B);
+            };
+
+            // Animation Loop
+            const animate = () => {
+                requestAnimationFrame(animate);
+
+                nodes.forEach(node => {
+                    node.position.x += node.userData.speedX;
+                    node.position.y += node.userData.speedY;
+                    node.rotation.x += node.userData.rotationSpeed;
+                    node.rotation.y += node.userData.rotationSpeed;
+
+                    // Bounds check
+                    if (Math.abs(node.position.x) > 20) node.userData.speedX *= -1;
+                    if (Math.abs(node.position.y) > 15) node.userData.speedY *= -1;
+                });
+
+                // Subtle group rotation
+                mainGroup.rotation.y += 0.001;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // Resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            // Mouse Interaction
+            document.addEventListener('mousemove', (e) => {
+                const x = (e.clientX / window.innerWidth) - 0.5;
+                const y = (e.clientY / window.innerHeight) - 0.5;
+                gsap.to(mainGroup.rotation, {
+                    x: y * 0.2,
+                    y: x * 0.2,
+                    duration: 1.5,
+                    ease: "power2.out"
+                });
+            });
+        };
+
+        // --- Scroll Animations (GSAP) ---
+        const initAnimations = () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Hero Entrance
+            gsap.from(".hero h1", {
+                y: 100,
+                opacity: 0,
+                duration: 1.5,
+                ease: "expo.out",
+                delay: 0.5
+            });
+
+            gsap.from(".hero p", {
+                y: 50,
+                opacity: 0,
+                duration: 1.5,
+                ease: "expo.out",
+                delay: 0.8
+            });
+
+            // Feature Cards
+            gsap.from(".feature-card", {
+                scrollTrigger: {
+                    trigger: "#specialization",
+                    start: "top 80%",
+                },
+                y: 100,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.2,
+                ease: "power4.out"
+            });
+
+            // Split Content
+            gsap.from(".split-content > div", {
+                scrollTrigger: {
+                    trigger: "#passion",
+                    start: "top 80%",
+                },
+                x: -50,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.5,
+                ease: "power2.out"
+            });
+        };
+
+        // Start
+        window.addEventListener('DOMContentLoaded', () => {
+            initThree();
+            initAnimations();
+
+            // Default lang
+            setLang('es');
+        });
+    </script>
+</body>
+
+</html>

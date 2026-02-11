@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura | Future of Intelligence</title>
+    <!-- 
+        DESIGN DECOMPOSITION FOR SEED: 640205124
+        
+        1. [64] Base Hue: 230° (Deep Electric Blue/Indigo). This drives the primary brand identity.
+        2. [02] Corner Strategy: 2px minimal rounding for elements, creating a sharp, precise, and tech-forward "Precision UI" look.
+        3. [05] Layout Rhythm: 5-column underlying sub-grid for asymmetrical content placement.
+        4. [12] Spacing Constant: 1.2rem base unit for a dense but readable information architecture.
+        5. [4]  Motion Profile: "Staggered Fluidity" – using CSS transitions with custom cubic-bezier(.19,1,.22,1) for snappy response.
+        
+        Design Style: "Neo-Glass Digitalism" - High contrast, sharp edges, heavy use of backdrop filters, and typography-driven hierarchy.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            /* Light Mode */
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --primary: #4f46e5;
+            --accent: #06b6d4;
+            --border: rgba(0, 0, 0, 0.08);
+            --glass: rgba(255, 255, 255, 0.7);
+            --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --nav-bg: rgba(248, 250, 252, 0.8);
+
+            --hue: 230;
+            --radius: 2px;
+            --transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #020617;
+            --surface: #0f172a;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #818cf8;
+            --accent: #22d3ee;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: rgba(15, 23, 42, 0.7);
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --nav-bg: rgba(2, 6, 23, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .font-display {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section {
+            padding: 8rem 0;
+            position: relative;
+        }
+
+        /* Nav */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(12px);
+            background: var(--nav-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 1.25rem 0;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--border);
+            border: none;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(15deg) scale(1.1);
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 10rem;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            margin-bottom: 2rem;
+            letter-spacing: -3px;
+        }
+
+        .hero h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1px var(--text);
+            opacity: 0.3;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 3rem;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-family: 'Outfit', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-outline {
+            border-color: var(--text);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .hero-visual {
+            position: absolute;
+            right: -10%;
+            top: 20%;
+            width: 60%;
+            height: 70%;
+            z-index: 1;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            filter: blur(100px);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: move 20s infinite alternate;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            to {
+                transform: translate(100px, 100px) rotate(360deg);
+            }
+        }
+
+        /* Features */
+        .section-title {
+            margin-bottom: 5rem;
+        }
+
+        .section-title h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .grid-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: 3.5rem;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .feature-card:hover .icon-box {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .feature-card:hover p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            border-radius: var(--radius);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+        }
+
+        /* Stats */
+        .stats {
+            background: var(--text);
+            color: var(--bg);
+            padding: 6rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 4rem;
+        }
+
+        .stat-item h3 {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .stat-item p {
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
+
+        /* Asymmetric Split */
+        .split-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 6rem;
+        }
+
+        .split-img {
+            width: 100%;
+            height: 500px;
+            background: var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .split-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1) contrast(1.2);
+            mix-blend-mode: luminosity;
+        }
+
+        .split-content h2 {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Portfolio */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 250px;
+            gap: 1.5rem;
+        }
+
+        .gallery-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .gallery-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .pricing-card {
+            padding: 4rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .pricing-card.popular {
+            border-color: var(--primary);
+            border-width: 2px;
+        }
+
+        .price-tag {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 2rem 0;
+        }
+
+        .price-tag span {
+            font-size: 1rem;
+            opacity: 0.5;
+        }
+
+        .pricing-list {
+            list-style: none;
+            margin-bottom: 3rem;
+        }
+
+        .pricing-list li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 8rem 0 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 6rem;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links h4 {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+            }
+
+            .split-section {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .hero h1 {
+                font-size: 4rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .section {
+                padding: 4rem 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-btns {
+                flex-direction: column;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-item h3 {
+                font-size: 3rem;
+            }
+
+            footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation utilities */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="container nav-content">
+            <a href="#" class="logo">
+                <div class="dot"></div>
+                AURA
+            </a>
+            <div class="nav-links">
+                <a href="#features">Solutions</a>
+                <a href="#about">Philosophy</a>
+                <a href="#gallery">Exploration</a>
+                <a href="#pricing">Access</a>
+                <button class="theme-toggle" id="theme-btn">
+                    <i data-lucide="moon" id="theme-icon"></i>
+                </button>
+                <a href="#" class="btn btn-primary" style="padding: 0.6rem 1.5rem; font-size: 0.8rem;">START NOW</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-visual">
+            <div class="blob"></div>
+        </div>
+        <div class="container hero-content">
+            <span class="hero-tag">System.Init(640205124)</span>
+            <h1>THE <span>FRAMEWORK</span> OF INTELLIGENCE.</h1>
+            <p>Aura provides a high-dimensional architecture for cognitive infrastructure. Scale your neural operations
+                with absolute precision and unmatched aesthetic clarity.</p>
+            <div class="hero-btns">
+                <a href="#features" class="btn btn-primary">EXPLORE CORE <i data-lucide="arrow-right"></i></a>
+                <a href="#about" class="btn btn-outline">READ MANIFESTO</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="container">
+            <div class="section-title reveal">
+                <h2>CORE SYSTEMS</h2>
+                <p>Engineered for the 0.1% who demand existential performance.</p>
+            </div>
+            <div class="grid-features">
+                <div class="feature-card reveal">
+                    <div class="icon-box"><i data-lucide="layers"></i></div>
+                    <h3>Multi-Layered Stack</h3>
+                    <p>Proprietary synthesis of asynchronous data flows integrated into a single unified dashboard.</p>
+                </div>
+                <div class="feature-card reveal" style="transition-delay: 0.1s;">
+                    <div class="icon-box"><i data-lucide="shield-check"></i></div>
+                    <h3>Immutable Core</h3>
+                    <p>Security protocols that adapt in real-time to emerging threats. Your data is effectively
+                        invisible.</p>
+                </div>
+                <div class="feature-card reveal" style="transition-delay: 0.2s;">
+                    <div class="icon-box"><i data-lucide="zap"></i></div>
+                    <h3>Instant Execution</h3>
+                    <p>Sub-millisecond latency across 48 global nodes. Speed isn't a feature; it's our foundation.</p>
+                </div>
+                <div class="feature-card reveal" style="transition-delay: 0.3s;">
+                    <div class="icon-box"><i data-lucide="activity"></i></div>
+                    <h3>Neural Monitoring</h3>
+                    <p>Visualize system health with biomechanical accuracy using our advanced telemetry suite.</p>
+                </div>
+                <div class="feature-card reveal" style="transition-delay: 0.4s;">
+                    <div class="icon-box"><i data-lucide="cpu"></i></div>
+                    <h3>Edge Allocation</h3>
+                    <p>Compute resources dynamically routed to where they provide the highest impact value.</p>
+                </div>
+                <div class="feature-card reveal" style="transition-delay: 0.5s;">
+                    <div class="icon-box"><i data-lucide="code-2"></i></div>
+                    <h3>Developer First</h3>
+                    <p>An API so intuitive it feels like an extension of your own cognitive process.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item reveal">
+                    <h3>99.9<span>%</span></h3>
+                    <p>Cognitive Uptime</p>
+                </div>
+                <div class="stat-item reveal" style="transition-delay: 0.1s;">
+                    <h3>2.4<span>M</span></h3>
+                    <p>Neural Nodes</p>
+                </div>
+                <div class="stat-item reveal" style="transition-delay: 0.2s;">
+                    <h3>12<span>ms</span></h3>
+                    <p>Global Latency</p>
+                </div>
+                <div class="stat-item reveal" style="transition-delay: 0.3s;">
+                    <h3>∞</h3>
+                    <p>Scalability</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container split-section">
+            <div class="split-img reveal">
+                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2070"
+                    alt="Tech Abstract">
+            </div>
+            <div class="split-content reveal">
+                <span class="hero-tag">Philosophy</span>
+                <h2>REDESIGNING THE HUMAN INTERFACE.</h2>
+                <p>We believe that technology should not just assist, but augment the very structure of human thought.
+                    Aura is the bridge between raw silicon and conscious intent.</p>
+                <p>By stripping away the unnecessary, we expose the raw power of logic in its most beautiful form.</p>
+                <div class="hero-btns" style="margin-top: 2rem;">
+                    <a href="#" class="btn btn-primary">LEARN MORE</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery">
+        <div class="container">
+            <div class="section-title reveal">
+                <h2>VISUAL ARCHIVES</h2>
+                <p>Snapshots of the Aura ecosystem in deployment.</p>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-item large reveal">
+                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2072"
+                        alt="Aura System 1">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=2070"
+                        alt="Aura System 2">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?auto=format&fit=crop&q=80&w=2069"
+                        alt="Aura System 3">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80&w=2020"
+                        alt="Aura System 4">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=2032"
+                        alt="Aura System 5">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing">
+        <div class="container">
+            <div class="section-title reveal" style="text-align: center;">
+                <h2>SECURE ACCESS</h2>
+                <p>Choose your tier of integration.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card reveal">
+                    <h3>ENTROPY</h3>
+                    <p>For independent researchers.</p>
+                    <div class="price-tag">$0<span>/lifetime</span></div>
+                    <ul class="pricing-list">
+                        <li><i data-lucide="check" size="16"></i> Basic Neural Access</li>
+                        <li><i data-lucide="check" size="16"></i> 5 Sync Terminals</li>
+                        <li><i data-lucide="check" size="16"></i> Community Intelligence</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline" style="width: 100%; justify-content: center;">INITIATE</a>
+                </div>
+                <div class="pricing-card popular reveal" style="transition-delay: 0.1s;">
+                    <div
+                        style="position: absolute; top: 0; right: 0; background: var(--primary); color: white; padding: 0.5rem 1rem; font-size: 0.7rem; font-weight: 800;">
+                        RECOMMENDED</div>
+                    <h3>SYNAPSE</h3>
+                    <p>For high-intensity operations.</p>
+                    <div class="price-tag">$49<span>/mo</span></div>
+                    <ul class="pricing-list">
+                        <li><i data-lucide="check" size="16"></i> Full Aura Suite</li>
+                        <li><i data-lucide="check" size="16"></i> Priority Neural Routing</li>
+                        <li><i data-lucide="check" size="16"></i> 24/7 Tech Augmentation</li>
+                        <li><i data-lucide="check" size="16"></i> Private Repository Tier</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center;">AUGMENT</a>
+                </div>
+                <div class="pricing-card reveal" style="transition-delay: 0.2s;">
+                    <h3>QUANTUM</h3>
+                    <p>For global organizations.</p>
+                    <div class="price-tag">$999<span>/mo</span></div>
+                    <ul class="pricing-list">
+                        <li><i data-lucide="check" size="16"></i> Infinite Node Scaling</li>
+                        <li><i data-lucide="check" size="16"></i> Custom Protocol Design</li>
+                        <li><i data-lucide="check" size="16"></i> Dedicated Success Oracle</li>
+                        <li><i data-lucide="check" size="16"></i> On-Site Deployment</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline" style="width: 100%; justify-content: center;">COMMAND</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <div class="logo footer-logo">
+                        <div class="dot"></div>
+                        AURA
+                    </div>
+                    <p style="color: var(--text-muted); max-width: 300px;">The definitive standard for cognitive
+                        infrastructure and future-state design.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#">Engine</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">Neural Link</a></li>
+                        <li><a href="#">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">Manifesto</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Social</h4>
+                    <ul>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="#">Discord</a></li>
+                        <li><a href="#">LinkedIn</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Aura Neuro-Systems. All rights reserved.</p>
+                <p>Designed by DeepMind Factory // Seed 640205124</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Lucide Icons
+        lucide.createIcons();
+
+        // Theme Toggle
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = document.getElementById('theme-icon');
+        const html = document.documentElement;
+
+        // Check for saved theme
+        const savedTheme = localStorage.getItem('aura-theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('aura-theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            themeIcon.setAttribute('data-lucide', theme === 'light' ? 'moon' : 'sun');
+            lucide.createIcons();
+        }
+
+        // Reveal on Scroll
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealOnScroll = () => {
+            revealElements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                if (rect.top < windowHeight * 0.85) {
+                    el.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('load', revealOnScroll);
+
+        // Header Background on Scroll
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.style.padding = '0.75rem 0';
+            } else {
+                nav.style.padding = '1.25rem 0';
+            }
+        });
+    </script>
+</body>
+
+</html>

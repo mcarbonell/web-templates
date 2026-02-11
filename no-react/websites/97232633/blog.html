@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog | Alex Chen - Creative Developer</title>
+  <meta name="description" content="Insights on web development, design, and digital creativity. Articles, tutorials, and thoughts from Alex Chen.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  
+  <!-- Page-specific Critical CSS -->
+  <style>
+    /* Page Header */
+    .page-header {
+      padding: calc(var(--header-height) + var(--space-2xl)) 0 var(--space-xl);
+      text-align: center;
+      position: relative;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-mesh);
+      opacity: 0.5;
+      z-index: 0;
+    }
+    
+    .page-header-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .page-header h1 {
+      margin-bottom: var(--space-md);
+    }
+    
+    .page-header p {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Search & Filter */
+    .blog-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+    }
+    
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 400px;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: var(--space-md) var(--space-md) var(--space-md) calc(var(--space-md) + 40px);
+      background: var(--color-bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-xl);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary);
+      font-size: 1rem;
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    
+    .search-box::before {
+      content: '🔍';
+      position: absolute;
+      left: var(--space-md);
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.5;
+    }
+    
+    .category-filter {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: var(--space-sm) var(--space-md);
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-xl);
+      color: var(--color-text-secondary);
+      font-family: var(--font-primary);
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .filter-btn:hover,
+    .filter-btn.is-active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-bg-darker);
+    }
+    
+    /* Blog Grid (Digit 7 = 3: Moderate-airy density) */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-xl);
+    }
+    
+    .blog-card {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .blog-card.featured {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+    }
+    
+    .blog-card-image {
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+    }
+    
+    .blog-card.featured .blog-card-image {
+      aspect-ratio: auto;
+      height: 100%;
+    }
+    
+    .blog-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--duration-slow) var(--ease-out-expo);
+    }
+    
+    .blog-card:hover .blog-card-image img {
+      transform: scale(1.05);
+    }
+    
+    .blog-card-content {
+      padding: var(--space-lg) 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .blog-card.featured .blog-card-content {
+      justify-content: center;
+    }
+    
+    .blog-meta {
+      display: flex;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    .blog-category {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+    
+    .blog-card h2 {
+      font-size: 1.25rem;
+      margin-bottom: var(--space-sm);
+      line-height: 1.3;
+    }
+    
+    .blog-card.featured h2 {
+      font-size: 2rem;
+    }
+    
+    .blog-excerpt {
+      color: var(--color-text-secondary);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: var(--space-md);
+      flex: 1;
+    }
+    
+    .blog-read-more {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      color: var(--color-primary);
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+    
+    .blog-read-more::after {
+      content: '→';
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .blog-card:hover .blog-read-more::after {
+      transform: translateX(4px);
+    }
+    
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-top: var(--space-2xl);
+    }
+    
+    .page-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: var(--color-text-secondary);
+      font-family: var(--font-primary);
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .page-btn:hover,
+    .page-btn.is-active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-bg-darker);
+    }
+    
+    .page-btn.prev,
+    .page-btn.next {
+      width: auto;
+      padding: 0 var(--space-md);
+    }
+    
+    /* Newsletter CTA */
+    .blog-newsletter {
+      background: var(--color-bg-darker);
+      padding: var(--space-2xl);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      margin-top: var(--space-2xl);
+    }
+    
+    .blog-newsletter h3 {
+      margin-bottom: var(--space-md);
+    }
+    
+    .blog-newsletter p {
+      margin-bottom: var(--space-lg);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .newsletter-form-inline {
+      display: flex;
+      gap: var(--space-sm);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .newsletter-form-inline input {
+      flex: 1;
+      padding: var(--space-md);
+      background: var(--color-bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-md);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary);
+    }
+    
+    .newsletter-form-inline input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .blog-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .blog-card.featured {
+        grid-column: 1 / -1;
+        grid-template-columns: 1fr;
+      }
+      
+      .blog-card.featured .blog-card-image {
+        aspect-ratio: 16/9;
+        height: auto;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .blog-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .blog-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .search-box {
+        max-width: none;
+      }
+      
+      .category-filter {
+        justify-content: center;
+      }
+      
+      .newsletter-form-inline {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header" data-header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">
+          <span class="logo-text">AC</span>
+        </a>
+        
+        <nav class="main-nav" data-main-nav>
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="about.html" class="nav-link">About</a></li>
+            <li><a href="services.html" class="nav-link">Services</a></li>
+            <li><a href="case-studies.html" class="nav-link">Work</a></li>
+            <li><a href="blog.html" class="nav-link">Blog</a></li>
+            <li><a href="contact.html" class="nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+            <span class="theme-icon">🌙</span>
+          </button>
+          <a href="contact.html" class="btn btn-primary btn-sm">Let's Talk</a>
+          <button class="mobile-toggle" data-mobile-toggle aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <main>
+    <!-- Page Header -->
+    <section class="page-header">
+      <div class="container">
+        <div class="page-header-content reveal">
+          <h1>The <span class="text-gradient">Blog</span></h1>
+          <p>Thoughts on design, development, and the creative process. Weekly insights for digital creators.</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Controls -->
+    <section class="section-sm">
+      <div class="container">
+        <div class="blog-controls reveal">
+          <div class="search-box">
+            <input type="text" placeholder="Search articles...">
+          </div>
+          <div class="category-filter">
+            <button class="filter-btn is-active">All</button>
+            <button class="filter-btn">Development</button>
+            <button class="filter-btn">Design</button>
+            <button class="filter-btn">Career</button>
+            <button class="filter-btn">Tutorials</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Blog Grid -->
+    <section class="section">
+      <div class="container">
+        <div class="blog-grid stagger-children">
+          <!-- Featured Post -->
+          <article class="blog-card card featured reveal">
+            <div class="blog-card-image">
+              <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=500&fit=crop" alt="Web Performance">
+            </div>
+            <div class="blog-card-content">
+              <div class="blog-meta">
+                <span class="blog-category">Development</span>
+                <span>Jan 15, 2024</span>
+                <span>8 min read</span>
+              </div>
+              <h2>The Ultimate Guide to Web Performance Optimization in 2024</h2>
+              <p class="blog-excerpt">Learn the latest techniques for achieving sub-second load times, from Core Web Vitals optimization to advanced caching strategies that actually work.</p>
+              <a href="blog-post.html" class="blog-read-more">Read Article</a>
+            </div>
+          </article>
+          
+          <!-- Post 2 -->
+          <article class="blog-card card reveal">
+            <div class="blog-card-image">
+              <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=375&fit=crop" alt="Design Systems">
+            </div>
+            <div class="blog-card-content">
+              <div class="blog-meta">
+                <span class="blog-category">Design</span>
+                <span>Jan 10, 2024</span>
+                <span>5 min read</span>
+              </div>
+              <h2>Building Scalable Design Systems</h2>
+              <p class="blog-excerpt">A practical approach to creating design systems that grow with your organization and maintain consistency across products.</p>
+              <a href="blog-post.html" class="blog-read-more">Read Article</a>
+            </div>
+          </article>
+          
+          <!-- Post 3 -->
+          <article class="blog-card card reveal">
+            <div class="blog-card-image">
+              <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=600&h=375&fit=crop" alt="Freelancing">
+            </div>
+            <div class="blog-card-content">
+              <div class="blog-meta">
+                <span class="blog-category">Career</span>
+                <span>Jan 5, 2024</span>
+                <span>6 min read</span>
+              </div>
+              <h2>From Employee to Freelancer: A Complete Guide</h2>
+              <p class="blog-excerpt">Everything you need to know about making the transition to freelance, from finding clients to managing your business.</p>
+              <a href="blog-post.html" class="blog-read-more">Read Article</a>
+            </div>
+          </article>
+          
+          <!-- Post 4 -->
+          <article class="blog-card card reveal">
+            <div class="blog-card-image">
+              <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=600&h=375&fit=crop" alt="React Patterns">
+            </div>
+            <div class="blog-card-content">
+              <div class="blog-meta">
+                <span class="blog-category">Tutorials</span>
+                <span>Dec 28, 2023</span>
+                <span>12 min read</span>
+              </div>
+              <h2>Advanced React Patterns You Should Know</h2>
+              <p class="blog-excerpt">Deep dive into compound components, render props, and custom hooks that will level up your React applications.</p>
+              <a href="blog-post.html" class="blog-read-more">Read Article</a>
+            </div>
+          </article>
+          
+          <!-- Post 5 -->
+          <article class="blog-card card reveal">
+            <div class="blog-card-image">
+              <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&h=375&fit=crop" alt="CSS Grid">
+            </div>
+            <div class="blog-card-content">
+              <div class="blog-meta">
+                <span class="blog-category">Tutorials</span>
+                <span>Dec 20, 2023</span>
+                <span>8 min read</span>
+              </div>
+              <h2>Mastering CSS Grid Layout</h2>
+              <p class="blog-excerpt">From basic concepts to advanced techniques, learn how to create complex layouts with ease using CSS Grid.</p>
+              <a href="blog-post.html" class="blog-read-more">Read Article</a>
+            </div>
+          </article>
+          
+          <!-- Post 6 -->
+          <article class="blog-card card reveal">
+            <div class="blog-card-image">
+              <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&h=375&fit=crop" alt="Accessibility">
+            </div>
+            <div class="blog-card-content">
+              <div class="blog-meta">
+                <span class="blog-category">Development</span>
+                <span>Dec 15, 2023</span>
+                <span>7 min read</span>
+              </div>
+              <h2>Web Accessibility: Beyond the Basics</h2>
+              <p class="blog-excerpt">Practical techniques for creating truly inclusive web experiences that work for everyone, regardless of ability.</p>
+              <a href="blog-post.html" class="blog-read-more">Read Article</a>
+            </div>
+          </article>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination reveal">
+          <button class="page-btn prev">← Previous</button>
+          <button class="page-btn is-active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <span style="color: var(--color-text-muted);">...</span>
+          <button class="page-btn">12</button>
+          <button class="page-btn next">Next →</button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Newsletter -->
+    <section class="section">
+      <div class="container">
+        <div class="blog-newsletter reveal">
+          <h3>Subscribe to the Newsletter</h3>
+          <p>Get weekly insights on design, development, and digital creativity delivered straight to your inbox.</p>
+          <form class="newsletter-form-inline" data-validate>
+            <input type="email" placeholder="Enter your email" data-validate-field="email" required>
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-text">AC</span>
+          </a>
+          <p>Creative developer & designer crafting digital experiences that make an impact.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="GitHub">⌘</a>
+            <a href="#" aria-label="Dribbble">🏀</a>
+          </div>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="case-studies.html">Work</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="services.html">Web Development</a></li>
+            <li><a href="services.html">UI/UX Design</a></li>
+            <li><a href="services.html">Branding</a></li>
+            <li><a href="services.html">Consulting</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hello@alexchen.dev">hello@alexchen.dev</a></li>
+            <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
+            <li>San Francisco, CA</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Alex Chen. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  
+  <!-- Shared Component Styles -->
+  <style>
+    /* Header Styles */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: var(--header-height);
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+    
+    .header.is-scrolled {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .header.is-hidden {
+      transform: translateY(-100%);
+    }
+    
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+    
+    .logo {
+      font-family: var(--font-primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    
+    .logo-text {
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .main-nav {
+      display: flex;
+    }
+    
+    .nav-list {
+      display: flex;
+      gap: var(--space-xl);
+      list-style: none;
+    }
+    
+    .nav-link {
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      position: relative;
+      padding: var(--space-sm) 0;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-hero);
+      transition: width var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .nav-link:hover,
+    .nav-link.is-active {
+      color: var(--color-text-primary);
+    }
+    
+    .nav-link:hover::after,
+    .nav-link.is-active::after {
+      width: 100%;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: var(--color-primary);
+    }
+    
+    .btn-sm {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.875rem;
+    }
+    
+    .mobile-toggle {
+      display: none;
+      width: 40px;
+      height: 40px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    
+    .mobile-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--color-text-primary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    /* Footer Styles */
+    .footer {
+      background: var(--color-bg-darker);
+      padding: var(--space-2xl) 0 var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .footer-brand p {
+      margin: var(--space-md) 0 var(--space-lg);
+      font-size: 1rem;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .social-links a:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    
+    .footer-nav h4 {
+      font-size: 1rem;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text-primary);
+    }
+    
+    .footer-nav ul {
+      list-style: none;
+    }
+    
+    .footer-nav li {
+      margin-bottom: var(--space-sm);
+    }
+    
+    .footer-nav a {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+      transition: color var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .footer-nav a:hover {
+      color: var(--color-primary);
+    }
+    
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-bottom p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    .footer-legal {
+      display: flex;
+      gap: var(--space-lg);
+    }
+    
+    .footer-legal a {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-nav {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        background: var(--color-bg-card);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: var(--space-lg);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--duration-normal) var(--ease-out-expo);
+      }
+      
+      .main-nav.is-open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .nav-list {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+      
+      .mobile-toggle {
+        display: flex;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-md);
+        text-align: center;
+      }
+    }
+  </style>
+</body>
+</html>

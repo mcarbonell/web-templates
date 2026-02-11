@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bliss Studio — Vestidos de novia y ropa de gala</title>
+  <!--
+    Template ID: 521998648
+    Business: Bridal & formal wear (Beauty & Personal Services)
+    Design choices (seed 521998648):
+    - Hero: split layout, image left (index 1)
+    - Special feature: 3D card tilt on service cards (index 2)
+    - Palette: warm earth — primary #3D2318, accent #C9A227, light #FDF8F5, dark #1A1210
+    - Typography: all sans — Outfit (index 1)
+    - Animation: bounce for section reveals (index 2)
+    - Brand: Bliss Studio .com (random words + .com)
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS custom properties: light (default) and dark ===== */
+    :root {
+      --bg: #FDF8F5;
+      --bg-elevated: #FFFBF8;
+      --text: #2C1810;
+      --text-muted: #5C4A3D;
+      --primary: #3D2318;
+      --accent: #C9A227;
+      --accent-soft: rgba(201, 162, 39, 0.15);
+      --border: #E8DDD4;
+      --focus-ring: 2px solid var(--accent);
+      --shadow: 0 4px 24px rgba(45, 24, 16, 0.08);
+      --radius: 12px;
+      --radius-lg: 20px;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1A1210;
+      --bg-elevated: #251A16;
+      --text: #F5EDE8;
+      --text-muted: #B8A99A;
+      --primary: #E8DDD4;
+      --accent: #D4AF37;
+      --accent-soft: rgba(212, 175, 55, 0.2);
+      --border: #3D3028;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    /* ===== Reset + base ===== */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .animate-in { animation: none !important; transform: none !important; }
+      .card-tilt { transform: none !important; }
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Outfit', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    /* ===== Skip to content (first focusable) ===== */
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 1rem;
+      z-index: 9999;
+      padding: 0.75rem 1.25rem;
+      background: var(--accent);
+      color: var(--primary);
+      font-weight: 600;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: top 0.2s ease;
+    }
+    .skip-link:focus {
+      top: 1rem;
+      outline: var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* ===== Focus visible (WCAG) ===== */
+    :focus-visible {
+      outline: var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* ===== Aria-live for theme ===== */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ===== Layout ===== */
+    .container { width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: 1.25rem; }
+    .container--narrow { max-width: 720px; }
+
+    /* ===== Header ===== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .site-header .inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 72px;
+      gap: 1rem;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .logo span { color: var(--accent); }
+
+    .nav { }
+    .nav__list {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 0.5rem;
+    }
+    .nav__item { }
+    .nav__link {
+      display: block;
+      padding: 0.5rem 0.85rem;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: var(--radius);
+    }
+    .nav__link:hover { background: var(--accent-soft); color: var(--accent); }
+
+    /* Mobile menu */
+    .menu-toggle {
+      display: none;
+      padding: 0.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      border-radius: var(--radius);
+    }
+    .menu-toggle:hover { background: var(--accent-soft); }
+
+    .theme-toggle {
+      padding: 0.5rem 0.75rem;
+      background: var(--accent-soft);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .theme-toggle:hover { background: var(--accent); color: var(--primary); }
+
+    @media (max-width: 768px) {
+      .menu-toggle { display: block; }
+      .nav__list {
+        position: fixed;
+        top: 72px;
+        left: 0;
+        right: 0;
+        background: var(--bg-elevated);
+        border-bottom: 1px solid var(--border);
+        flex-direction: column;
+        padding: 1rem;
+        gap: 0;
+        transform: translateY(-100%);
+        visibility: hidden;
+        transition: transform 0.25s ease, visibility 0.25s;
+      }
+      .nav__list.is-open {
+        transform: translateY(0);
+        visibility: visible;
+      }
+      .nav__link { padding: 0.85rem; }
+    }
+
+    /* ===== Main ===== */
+    main { }
+
+    /* ===== Hero: split, image LEFT ===== */
+    .hero {
+      min-height: 85vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 2rem;
+      padding-block: 3rem;
+      overflow: hidden;
+    }
+    .hero__media {
+      order: -1;
+      position: relative;
+      aspect-ratio: 4/5;
+      max-height: 85vh;
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+      overflow: hidden;
+      background: var(--border);
+    }
+    .hero__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Placeholder SVG if no image */
+    .hero__media svg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      fill: var(--accent-soft);
+    }
+    .hero__content { padding-inline: 0 1rem; }
+    .hero__overline {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+    .hero__title {
+      font-size: clamp(2.25rem, 5vw, 3.5rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin: 0 0 1rem;
+      color: var(--text);
+    }
+    .hero__title span { color: var(--accent); }
+    .hero__text {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      margin: 0 0 1.5rem;
+      max-width: 28ch;
+    }
+    .hero__cta {
+      display: inline-flex;
+      gap: 0.5rem;
+      padding: 0.9rem 1.75rem;
+      background: var(--accent);
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hero__cta:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .hero__cta:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+
+    @media (max-width: 768px) {
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding-block: 2rem;
+      }
+      .hero__media { order: 0; max-height: 50vh; border-radius: var(--radius-lg); aspect-ratio: 16/10; }
+      .hero__content { padding-inline: 0; }
+    }
+
+    /* ===== Section common ===== */
+    .section {
+      padding-block: 4rem;
+      role: region;
+    }
+    .section__title {
+      font-size: clamp(1.75rem, 3vw, 2.25rem);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      color: var(--text);
+    }
+    .section__subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin: 0 0 2rem;
+      max-width: 40ch;
+    }
+
+    /* ===== Services (cards with 3D tilt) ===== */
+    .services { }
+    .services .section__title { margin-bottom: 0.5rem; }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .services-grid li { }
+    .card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+      will-change: transform;
+    }
+    .card:hover { box-shadow: 0 12px 40px rgba(45, 24, 16, 0.12); }
+    [data-theme="dark"] .card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    .card__icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+    .card__title { font-size: 1.2rem; font-weight: 600; margin: 0 0 0.5rem; }
+    .card__text { font-size: 0.95rem; color: var(--text-muted); margin: 0; }
+
+    /* ===== About ===== */
+    .about {
+      background: var(--bg-elevated);
+    }
+    .about .inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .about__media {
+      aspect-ratio: 3/4;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--border);
+    }
+    .about__media img { width: 100%; height: 100%; object-fit: cover; }
+    .about__media svg { width: 100%; height: 100%; fill: var(--accent-soft); }
+    .about__text { margin: 0 0 1rem; color: var(--text-muted); }
+    @media (max-width: 768px) {
+      .about .inner { grid-template-columns: 1fr; }
+    }
+
+    /* ===== Testimonials ===== */
+    .testimonials { }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .testimonials-grid li { }
+    .quote-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+    }
+    .quote-card__quote { font-size: 1rem; font-style: italic; margin: 0 0 1rem; color: var(--text); }
+    .quote-card__author { font-weight: 600; color: var(--accent); }
+    .quote-card__role { font-size: 0.9rem; color: var(--text-muted); }
+
+    /* ===== Pricing / Plans ===== */
+    .pricing {
+      background: var(--bg-elevated);
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .pricing-grid li { }
+    .plan-card {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s ease;
+    }
+    .plan-card--featured { border-color: var(--accent); box-shadow: var(--shadow); }
+    .plan-card__name { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem; }
+    .plan-card__price { font-size: 2rem; font-weight: 700; color: var(--accent); margin: 0 0 1rem; }
+    .plan-card__desc { font-size: 0.95rem; color: var(--text-muted); margin: 0 0 1.5rem; }
+    .plan-card__list {
+      list-style: none;
+      margin: 0 0 1.5rem;
+      padding: 0;
+      text-align: left;
+    }
+    .plan-card__list li {
+      padding: 0.35rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+    .plan-card__list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.6em;
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+    .plan-card .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+    }
+    .plan-card .btn:hover { opacity: 0.95; }
+    .plan-card--featured .btn { background: var(--primary); color: var(--accent); }
+
+    /* ===== Gallery ===== */
+    .gallery { }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .gallery-grid li { }
+    .gallery-grid a {
+      display: block;
+      aspect-ratio: 1;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--border);
+    }
+    .gallery-grid img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-grid svg { width: 100%; height: 100%; fill: var(--accent-soft); }
+
+    /* ===== Contact ===== */
+    .contact {
+      background: var(--bg-elevated);
+    }
+    .contact .inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    .contact__text { margin: 0 0 1.5rem; color: var(--text-muted); }
+    .contact-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .contact-list li { margin-bottom: 0.75rem; }
+    .contact-list a { color: var(--accent); font-weight: 500; text-decoration: none; }
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .contact-form label { font-weight: 500; display: block; margin-bottom: 0.25rem; }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+    }
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      outline: var(--focus-ring);
+      outline-offset: 0;
+    }
+    .contact-form textarea { min-height: 120px; resize: vertical; }
+    .contact-form button {
+      padding: 0.9rem 1.5rem;
+      background: var(--accent);
+      color: var(--primary);
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+    .contact-form button:hover { opacity: 0.95; }
+    @media (max-width: 768px) { .contact .inner { grid-template-columns: 1fr; } }
+
+    /* ===== Footer ===== */
+    .site-footer {
+      padding: 2rem 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .site-footer p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+
+    /* ===== Animations: bounce (seed animation index 2) ===== */
+    @media (prefers-reduced-motion: no-preference) {
+      .animate-in {
+        animation: bounce-in 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+      .animate-in.delay-1 { animation-delay: 0.1s; }
+      .animate-in.delay-2 { animation-delay: 0.2s; }
+      .animate-in.delay-3 { animation-delay: 0.3s; }
+      @keyframes bounce-in {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Ir al contenido</a>
+
+  <header class="site-header" role="banner">
+    <div class="container inner">
+      <a href="#" class="logo" aria-label="Bliss Studio inicio">Bliss <span>Studio</span></a>
+      <nav class="nav" role="navigation" aria-label="Principal">
+        <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="nav-list" id="menu-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <ul class="nav__list" id="nav-list" role="list">
+          <li class="nav__item" role="listitem"><a class="nav__link" href="#services">Servicios</a></li>
+          <li class="nav__item" role="listitem"><a class="nav__link" href="#about">Nosotros</a></li>
+          <li class="nav__item" role="listitem"><a class="nav__link" href="#pricing">Precios</a></li>
+          <li class="nav__item" role="listitem"><a class="nav__link" href="#contact">Contacto</a></li>
+        </ul>
+      </nav>
+      <button type="button" class="theme-toggle" aria-label="Cambiar a tema oscuro" id="theme-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3a6 6 0 0 0 6 6c0 2.2-1.2 4.1-3 5.2V19a1 1 0 0 1-2 0v-4.8C7.2 13.1 6 11.2 6 9a6 6 0 0 0 6-6Z"/></svg>
+        <span>Claro</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main-content" role="main">
+    <!-- Hero: split, image left (layout index 1) -->
+    <section class="hero" role="region" aria-labelledby="hero-heading">
+      <div class="hero__media">
+        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80" alt="Vestido de novia elegante en atelier" width="800" height="1000" loading="eager">
+      </div>
+      <div class="hero__content container">
+        <p class="hero__overline animate-in">Vestidos de novia y ropa de gala</p>
+        <h1 id="hero-heading" class="hero__title animate-in delay-1">Tu día perfecto empieza <span>aquí</span></h1>
+        <p class="hero__text animate-in delay-2">Asesoramiento personalizado, vestidos de diseñador y una experiencia única para tu boda o evento especial.</p>
+        <a href="#contact" class="hero__cta animate-in delay-3">Reservar cita</a>
+      </div>
+    </section>
+
+    <!-- Services: cards with 3D tilt (special feature) -->
+    <section id="services" class="section services" role="region" aria-labelledby="services-heading" aria-label="Nuestros servicios">
+      <div class="container">
+        <h2 id="services-heading" class="section__title">Nuestros servicios</h2>
+        <p class="section__subtitle">Desde el primer boceto hasta el día D, te acompañamos en cada paso.</p>
+        <ul class="services-grid" role="list">
+          <li class="card card-tilt" role="listitem" data-tilt>
+            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <h3 class="card__title">Vestidos de novia</h3>
+            <p class="card__text">Selección de vestidos de diseñador y a medida para tu boda.</p>
+          </li>
+          <li class="card card-tilt" role="listitem" data-tilt>
+            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <h3 class="card__title">Ropa de gala</h3>
+            <p class="card__text">Trajes y vestidos para eventos, comuniones y fiestas.</p>
+          </li>
+          <li class="card card-tilt" role="listitem" data-tilt>
+            <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <h3 class="card__title">Asesoría de imagen</h3>
+            <p class="card__text">Consultoría personalizada para elegir la silueta y el estilo ideal.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section about" role="region" aria-labelledby="about-heading" aria-label="Sobre nosotros">
+      <div class="container inner">
+        <div class="about__media">
+          <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80" alt="Interior del atelier Bliss Studio" width="600" height="800" loading="lazy">
+        </div>
+        <div>
+          <h2 id="about-heading" class="section__title">Sobre Bliss Studio</h2>
+          <p class="about__text">Llevamos más de una década ayudando a novias y clientes a encontrar la prenda perfecta para su día especial. Combinamos diseño, calidad y un trato cercano.</p>
+          <p class="about__text">Nuestro atelier en el centro de la ciudad es un espacio tranquilo donde puedes probar con calma y recibir asesoramiento sin prisas.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="section testimonials" role="region" aria-labelledby="testimonials-heading" aria-label="Opiniones de clientes">
+      <div class="container">
+        <h2 id="testimonials-heading" class="section__title">Lo que dicen nuestras clientes</h2>
+        <p class="section__subtitle">Experiencias reales de novias y invitadas que confiaron en nosotros.</p>
+        <ul class="testimonials-grid" role="list">
+          <li role="listitem">
+            <article class="quote-card">
+              <blockquote class="quote-card__quote">Encontré el vestido de mis sueños y el trato fue exquisito. Recomiendo Bliss Studio al 100%.</blockquote>
+              <p class="quote-card__author">Laura M.</p>
+              <p class="quote-card__role">Novia</p>
+            </article>
+          </li>
+          <li role="listitem">
+            <article class="quote-card">
+              <blockquote class="quote-card__quote">Necesitaba un vestido de gala con urgencia. Me asesoraron perfecto y quedé encantada.</blockquote>
+              <p class="quote-card__author">Carmen R.</p>
+              <p class="quote-card__role">Cliente evento</p>
+            </article>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="section pricing" role="region" aria-labelledby="pricing-heading" aria-label="Precios y paquetes">
+      <div class="container">
+        <h2 id="pricing-heading" class="section__title">Paquetes</h2>
+        <p class="section__subtitle">Elige la opción que mejor se adapte a tu día.</p>
+        <ul class="pricing-grid" role="list">
+          <li role="listitem">
+            <article class="plan-card">
+              <h3 class="plan-card__name">Consulta</h3>
+              <p class="plan-card__price">Gratis</p>
+              <p class="plan-card__desc">Primera visita y asesoramiento inicial.</p>
+              <ul class="plan-card__list" role="list">
+                <li role="listitem">Prueba de vestidos</li>
+                <li role="listitem">Recomendaciones de estilo</li>
+              </ul>
+              <a href="#contact" class="btn">Pedir cita</a>
+            </article>
+          </li>
+          <li role="listitem">
+            <article class="plan-card plan-card--featured">
+              <h3 class="plan-card__name">Novia completa</h3>
+              <p class="plan-card__price">Desde 1.200 €</p>
+              <p class="plan-card__desc">Vestido + arreglos + accesorios básicos.</p>
+              <ul class="plan-card__list" role="list">
+                <li role="listitem">Vestido de novia</li>
+                <li role="listitem">Ajustes y arreglos</li>
+                <li role="listitem">Asesoría de complementos</li>
+              </ul>
+              <a href="#contact" class="btn">Reservar</a>
+            </article>
+          </li>
+          <li role="listitem">
+            <article class="plan-card">
+              <h3 class="plan-card__name">Gala y eventos</h3>
+              <p class="plan-card__price">Desde 350 €</p>
+              <p class="plan-card__desc">Alquiler o compra para eventos.</p>
+              <ul class="plan-card__list" role="list">
+                <li role="listitem">Vestido o traje</li>
+                <li role="listitem">Alquiler o compra</li>
+              </ul>
+              <a href="#contact" class="btn">Consultar</a>
+            </article>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section id="gallery" class="section gallery" role="region" aria-labelledby="gallery-heading" aria-label="Galería">
+      <div class="container">
+        <h2 id="gallery-heading" class="section__title">Galería</h2>
+        <p class="section__subtitle">Algunos de nuestros vestidos y momentos.</p>
+        <ul class="gallery-grid" role="list">
+          <li role="listitem"><a href="#"><img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80" alt="Vestido 1" width="400" height="400" loading="lazy"></a></li>
+          <li role="listitem"><a href="#"><img src="https://images.unsplash.com/photo-1519657337289-077653f724ed?w=400&q=80" alt="Vestido 2" width="400" height="400" loading="lazy"></a></li>
+          <li role="listitem"><a href="#"><img src="https://images.unsplash.com/photo-1578932750294-f5075e85f44a?w=400&q=80" alt="Vestido 3" width="400" height="400" loading="lazy"></a></li>
+          <li role="listitem"><a href="#"><img src="https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=400&q=80" alt="Vestido 4" width="400" height="400" loading="lazy"></a></li>
+          <li role="listitem"><a href="#"><img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&q=80" alt="Vestido 5" width="400" height="400" loading="lazy"></a></li>
+          <li role="listitem"><a href="#"><img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400&q=80" alt="Vestido 6" width="400" height="400" loading="lazy"></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section contact" role="region" aria-labelledby="contact-heading" aria-label="Contacto">
+      <div class="container inner">
+        <div>
+          <h2 id="contact-heading" class="section__title">Contacto</h2>
+          <p class="contact__text">Reserva tu cita o escríbenos para cualquier consulta. Estamos en el centro y te atendemos con cita previa.</p>
+          <ul class="contact-list" role="list">
+            <li role="listitem"><a href="mailto:hola@blissstudio.com">hola@blissstudio.com</a></li>
+            <li role="listitem"><a href="tel:+34912345678">+34 912 345 678</a></li>
+            <li role="listitem">Calle Ejemplo 12, 28001 Madrid</li>
+          </ul>
+        </div>
+        <form class="contact-form" action="#" method="post" aria-label="Formulario de contacto">
+          <div>
+            <label for="name">Nombre</label>
+            <input type="text" id="name" name="name" required autocomplete="name">
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required autocomplete="email">
+          </div>
+          <div>
+            <label for="msg">Mensaje</label>
+            <textarea id="msg" name="message" required></textarea>
+          </div>
+          <button type="submit">Enviar mensaje</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>© 2025 Bliss Studio. Vestidos de novia y ropa de gala.</p>
+    </div>
+  </footer>
+
+  <!-- Theme toggle + aria-live announcement -->
+  <div id="theme-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var THEME_KEY = 'bliss-theme';
+      var themeBtn = document.getElementById('theme-btn');
+      var themeLabel = themeBtn && themeBtn.querySelector('span');
+      var announce = document.getElementById('theme-announce');
+
+      function getTheme() {
+        try {
+          return localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        } catch (e) { return 'light'; }
+      }
+
+      function setTheme(val) {
+        document.documentElement.setAttribute('data-theme', val === 'dark' ? 'dark' : '');
+        try { localStorage.setItem(THEME_KEY, val); } catch (e) {}
+        if (themeLabel) themeLabel.textContent = val === 'dark' ? 'Claro' : 'Oscuro';
+        if (themeBtn) themeBtn.setAttribute('aria-label', val === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+        if (announce) announce.textContent = val === 'dark' ? 'Tema oscuro activado.' : 'Tema claro activado.';
+      }
+
+      if (themeBtn) {
+        setTheme(getTheme());
+        themeBtn.addEventListener('click', function () {
+          var next = getTheme() === 'dark' ? 'light' : 'dark';
+          setTheme(next);
+        });
+      }
+
+      // Mobile menu
+      var menuBtn = document.getElementById('menu-btn');
+      var navList = document.getElementById('nav-list');
+      if (menuBtn && navList) {
+        menuBtn.addEventListener('click', function () {
+          var open = navList.classList.toggle('is-open');
+          menuBtn.setAttribute('aria-expanded', open);
+        });
+        navList.querySelectorAll('.nav__link').forEach(function (link) {
+          link.addEventListener('click', function () {
+            navList.classList.remove('is-open');
+            menuBtn.setAttribute('aria-expanded', 'false');
+          });
+        });
+      }
+
+      // 3D card tilt (special feature) — lightweight, no lib
+      var cards = document.querySelectorAll('.card-tilt[data-tilt]');
+      var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!reducedMotion && cards.length) {
+        cards.forEach(function (card) {
+          card.addEventListener('mouseenter', function () { card.classList.add('is-tilt'); });
+          card.addEventListener('mouseleave', function () {
+            card.classList.remove('is-tilt');
+            card.style.transform = '';
+          });
+          card.addEventListener('mousemove', function (e) {
+            if (!card.classList.contains('is-tilt')) return;
+            var rect = card.getBoundingClientRect();
+            var x = (e.clientX - rect.left) / rect.width;
+            var y = (e.clientY - rect.top) / rect.height;
+            var tiltX = (y - 0.5) * 12;
+            var tiltY = (x - 0.5) * -12;
+            card.style.transform = 'perspective(800px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) scale3d(1.02, 1.02, 1.02)';
+          });
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

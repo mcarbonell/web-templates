@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURAL GRID // Experimental Landing Page</title>
+    <!--
+    DESIGN LOGIC // SEED: 697728813
+    - Core Technique: WebGL Custom Shaders (Fragment shader for liquid noise background)
+    - Layout Architecture: Bento Grid (Systemic, modular blocks)
+    - Interaction Focus: Kinetic Typography & Scramble Text
+    - Visual Accents: Parallax movement on grid elements & Magnetic buttons
+    - Color Palette: Cyberpunk Monotone (Neon Teal/Violet accents)
+    - Typography: Technical Monospace (Space Mono & JetBrains Mono)
+    - Dark/Light Mode: Dynamic CSS variables with transition effects
+    - Mobile: Fluid grid layouts via CSS clamp and media queries
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --fg: #f0f0f0;
+            --accent: #00ffcc;
+            --accent-secondary: #cc00ff;
+            --grid-line: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        [data-theme="light"] {
+            --bg: #f5f5f5;
+            --fg: #1a1a1a;
+            --accent: #008877;
+            --accent-secondary: #770088;
+            --grid-line: rgba(0, 0, 0, 0.1);
+            --card-bg: rgba(0, 0, 0, 0.03);
+            --card-border: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            transition: background-color 0.8s ease;
+        }
+
+        /* CUSTOM CURSOR */
+        #cursor {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        #cursor-follower {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.3s ease, width 0.3s, height 0.3s;
+        }
+
+        /* WEBGL CANVAS */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* LAYOUT */
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--grid-line);
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--fg);
+            text-decoration: none;
+            font-size: 0.9rem;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-bottom: 1px solid var(--grid-line);
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 10vw, 8rem);
+            line-height: 0.9;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            letter-spacing: -4px;
+        }
+
+        .hero .accent-text {
+            color: var(--accent);
+            display: block;
+            font-style: italic;
+        }
+
+        /* BENTO GRID */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 300px;
+            gap: 1.5rem;
+            margin: 4rem 0;
+        }
+
+        .bento-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bento-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 204, 0.05);
+        }
+
+        .item-1 {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .item-2 {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+
+        .item-3 {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+
+        .item-4 {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+
+        .item-5 {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+
+        .bento-item h3 {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bento-item p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            opacity: 0.7;
+        }
+
+        .bento-item .tag {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 1rem;
+            width: fit-content;
+        }
+
+        /* KINETIC TYPOGRAPHY SECTION */
+        .kinetic-banner {
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            white-space: nowrap;
+            overflow: hidden;
+            background: var(--accent);
+            color: var(--bg);
+            padding: 1.5rem 0;
+            transform: rotate(-2deg);
+            margin-bottom: 4rem;
+        }
+
+        .marquee {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        .marquee span {
+            font-size: 3rem;
+            font-weight: 700;
+            padding: 0 2rem;
+            text-transform: uppercase;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* MAGNETIC BUTTON */
+        .button-container {
+            padding: 4rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .cta-button {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.3s, color 0.3s;
+            position: relative;
+        }
+
+        .cta-button:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 4rem 0;
+            border-top: 1px solid var(--grid-line);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        /* MOBILE OPTIMIZATION */
+        @media (max-width: 900px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+                grid-auto-rows: min-content;
+            }
+
+            .item-1,
+            .item-2,
+            .item-3,
+            .item-4,
+            .item-5 {
+                grid-column: span 1;
+                grid-row: auto;
+                min-height: 250px;
+            }
+
+            .hero h1 {
+                font-size: 4rem;
+                letter-spacing: -2px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* UTILS */
+        .scramble {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .parallax-target {
+            will-change: transform;
+        }
+    </style>
+</head>
+
+<body data-theme="dark">
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+
+    <div id="canvas-container"></div>
+
+    <div class="page-container">
+        <nav>
+            <div class="logo">Neural_Grid</div>
+            <div class="nav-links">
+                <a href="#about" class="scramble-hover">Approach</a>
+                <a href="#systems" class="scramble-hover">Systems</a>
+                <a href="#lab" class="scramble-hover">The Lab</a>
+            </div>
+            <button class="theme-toggle" id="theme-toggle">MODE_SWITCH</button>
+        </nav>
+
+        <section class="hero">
+            <h1 id="hero-title">
+                Systemic <br />
+                <span class="accent-text">Intelligence</span> <br />
+                Arch. 01
+            </h1>
+            <p style="max-width: 400px; opacity: 0.6; margin-top: 1rem;">
+                A fusion of aesthetic brutality and high-efficiency computation.
+                Designing frameworks for the next epoch of digital interaction.
+            </p>
+        </section>
+
+        <div class="bento-grid">
+            <div class="bento-item item-1 parallax-target" data-speed="0.05">
+                <div>
+                    <span class="tag">INTELLIGENCE</span>
+                    <h3>Core Engine</h3>
+                </div>
+                <p>Developing low-latency neural architectures that optimize for real-time human interaction. Our engine
+                    processes multi-modal data streams with unprecedented precision.</p>
+            </div>
+            <div class="bento-item item-2 parallax-target" data-speed="-0.03">
+                <div>
+                    <span class="tag">AESTHETICS</span>
+                    <h3>Visual Systems</h3>
+                </div>
+                <p>Generating adaptive interfaces that react to user behavior through procedural shaders and fluid
+                    mechanics.</p>
+            </div>
+            <div class="bento-item item-3 parallax-target" data-speed="0.02">
+                <h3>0xFF</h3>
+                <p>Protocol established. 2026. Neural Grid v4.0</p>
+            </div>
+            <div class="bento-item item-4 parallax-target" data-speed="-0.05">
+                <h3>404 MS</h3>
+                <p>Average response time across distributed nodes.</p>
+            </div>
+            <div class="bento-item item-5 parallax-target" data-speed="0.04">
+                <div>
+                    <span class="tag">FUTURE</span>
+                    <h3>Next-Gen UI</h3>
+                </div>
+                <p>Moving beyond flat design into kinetic typography and volumetric interaction spaces.</p>
+            </div>
+        </div>
+
+        <div class="kinetic-banner">
+            <div class="marquee">
+                <span>NEURAL INTERFACE // PROCEDURAL GENERATION // QUANTUM LOGIC // KINETIC SYSTEMS // NEURAL INTERFACE
+                    // PROCEDURAL GENERATION // QUANTUM LOGIC // KINETIC SYSTEMS //</span>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a href="#" class="cta-button magnetic" id="magnetic-cta">Connect</a>
+        </div>
+
+        <footer>
+            <div>© 2026 NEURAL GRID CORE</div>
+            <div>ST_697728813 // BUILT_ON_SUBSTRATE</div>
+            <div id="clock">00:00:00</div>
+        </footer>
+    </div>
+
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        uniform float time;
+        uniform vec2 resolution;
+        uniform vec2 mouse;
+        uniform float theme; // 0 for dark, 1 for light
+
+        float hash(vec2 p) {
+            return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+        }
+
+        float noise(vec2 p) {
+            vec2 i = floor(p);
+            vec2 f = fract(p);
+            vec2 u = f*f*(3.0-2.0*f);
+            return mix(mix(hash(i + vec2(0.0,0.0)), hash(i + vec2(1.0,0.0)), u.x),
+                       mix(hash(i + vec2(0.0,1.0)), hash(i + vec2(1.0,1.0)), u.x), u.y);
+        }
+
+        void main() {
+            vec2 uv = gl_FragCoord.xy / resolution.xy;
+            uv.x *= resolution.x / resolution.y;
+            
+            vec2 p = uv * 3.0;
+            float n = noise(p + time * 0.1);
+            n += 0.5 * noise(p * 2.1 + time * 0.15);
+            n += 0.25 * noise(p * 4.2 + time * 0.2);
+            
+            vec3 color1 = theme > 0.5 ? vec3(0.95, 0.95, 0.95) : vec3(0.04, 0.04, 0.04);
+            vec3 color2 = theme > 0.5 ? vec3(0.85, 0.9, 0.95) : vec3(0.08, 0.1, 0.12);
+            vec3 accent = theme > 0.5 ? vec3(0.0, 0.5, 0.4) : vec3(0.0, 1.0, 0.8);
+            
+            vec3 finalColor = mix(color1, color2, n);
+            finalColor += accent * pow(n, 5.0) * 0.3;
+            
+            // Distant grid
+            vec2 grid = fract(uv * 10.0 + n * 0.2);
+            float g = smoothstep(0.0, 0.02, grid.x) * smoothstep(1.0, 0.98, grid.x) *
+                      smoothstep(0.0, 0.02, grid.y) * smoothstep(1.0, 0.98, grid.y);
+            
+            finalColor = mix(finalColor, finalColor * 1.1, 1.0 - g);
+
+            gl_FragColor = vec4(finalColor, 1.0);
+        }
+    </script>
+
+    <script id="vertexShader" type="x-shader/x-vertex">
+        void main() {
+            gl_Position = vec4(position, 1.0);
+        }
+    </script>
+
+    <script>
+        // --- WEBGL BACKGROUND ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        const uniforms = {
+            time: { value: 1.0 },
+            resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            mouse: { value: new THREE.Vector2(0, 0) },
+            theme: { value: 0.0 }
+        };
+
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const material = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: document.getElementById('vertexShader').textContent,
+            fragmentShader: document.getElementById('fragmentShader').textContent
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        function animate(t) {
+            uniforms.time.value = t / 1000;
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+        });
+
+        // --- CUSTOM CURSOR ---
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
+        let cursorX = 0, cursorY = 0;
+        let followerX = 0, followerY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+
+            uniforms.mouse.value.set(e.clientX / window.innerWidth, 1.0 - e.clientY / window.innerHeight);
+        });
+
+        function updateFollower() {
+            followerX += (cursorX - followerX) * 0.1;
+            followerY += (cursorY - followerY) * 0.1;
+            follower.style.left = (followerX - 20) + 'px';
+            follower.style.top = (followerY - 20) + 'px';
+            requestAnimationFrame(updateFollower);
+        }
+        updateFollower();
+
+        // --- THEME TOGGLE ---
+        const themeBtn = document.getElementById('theme-toggle');
+        const body = document.body;
+        themeBtn.addEventListener('click', () => {
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            themeBtn.innerText = isDark ? 'MODE_GLARE' : 'MODE_VOID';
+            gsap.to(uniforms.theme, { value: isDark ? 1.0 : 0.0, duration: 1.2, ease: "power2.inOut" });
+        });
+
+        // --- SCRAMBLE TEXT EFFECT ---
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                this.update = this.update.bind(this);
+            }
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise((resolve) => (this.resolve = resolve));
+                this.queue = [];
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end });
+                }
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+            update() {
+                let output = '';
+                let complete = 0;
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.randomChar();
+                            this.queue[i].char = char;
+                        }
+                        output += `<span style="color:var(--accent)">${char}</span>`;
+                    } else {
+                        output += from;
+                    }
+                }
+                this.el.innerHTML = output;
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+        }
+
+        document.querySelectorAll('.scramble-hover').forEach(el => {
+            const fx = new TextScramble(el);
+            const originalText = el.innerText;
+            el.addEventListener('mouseenter', () => fx.setText(originalText));
+        });
+
+        // --- PARALLAX EFFECT ---
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelectorAll('.parallax-target').forEach(el => {
+                const speed = parseFloat(el.getAttribute('data-speed'));
+                gsap.to(el, { y: scrolled * speed, duration: 0.5, ease: "power1.out" });
+            });
+        });
+
+        // --- MAGNETIC BUTTON ---
+        const magneticBtn = document.getElementById('magnetic-cta');
+        magneticBtn.addEventListener('mousemove', (e) => {
+            const rect = magneticBtn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            gsap.to(magneticBtn, { x: x * 0.5, y: y * 0.5, duration: 0.3 });
+            follower.style.transform = 'scale(2)';
+        });
+        magneticBtn.addEventListener('mouseleave', () => {
+            gsap.to(magneticBtn, { x: 0, y: 0, duration: 0.3 });
+            follower.style.transform = 'scale(1)';
+        });
+
+        // --- CLOCK ---
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' +
+                now.getMinutes().toString().padStart(2, '0') + ':' +
+                now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('clock').innerText = timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // GSAP INTRO
+        gsap.from(".hero h1", {
+            opacity: 0,
+            y: 100,
+            duration: 1.5,
+            ease: "expo.out",
+            stagger: 0.2
+        });
+        gsap.from(".bento-item", {
+            opacity: 0,
+            y: 50,
+            stagger: 0.1,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: ".bento-grid",
+                start: "top 80%"
+            }
+        });
+    </script>
+</body>
+
+</html>

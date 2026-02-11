@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLUX - Digital Innovation Studio</title>
+    <!--
+    ═══════════════════════════════════════════════════════════════════════════
+    DESIGN CONCEPT - SEED: 894820757
+    ═══════════════════════════════════════════════════════════════════════════
+    
+    SEED DECOMPOSITION:
+    - 894 → Color Palette: Deep magenta (#8B2C8A) + Electric cyan (#00D9FF)
+    - 820 → Layout: Asymmetric bento grid with kinetic typography hero
+    - 757 → Effects: WebGL fluid simulation background + ASCII art overlay
+    
+    TECHNIQUES IMPLEMENTED:
+    1. Custom WebGL Shaders - Fluid simulation with interactive mouse tracking
+    2. ASCII Art Rendering - Real-time canvas-to-ASCII conversion overlay
+    3. Kinetic Typography - Animated split-text hero with stagger effects
+    4. Bento Grid - Asymmetric card layout with varied sizes
+    5. Gradient Animated Text - Flowing color gradients on headings
+    6. Aurora Gradient Blobs - Animated background orbs
+    7. Glassmorphism - Frosted glass cards with backdrop blur
+    8. Scroll-Driven Animations - Elements animate on scroll
+    9. Magnetic Buttons - Buttons follow cursor with smooth easing
+    10. Scramble Text - Text scrambles on hover
+    
+    DESIGN PHILOSOPHY:
+    Bold, experimental, and unapologetically modern. Combines organic fluid
+    motion with rigid ASCII aesthetics. Dark/light modes shift the entire
+    visual language. Mobile-first with touch-optimized interactions.
+    ═══════════════════════════════════════════════════════════════════════════
+    -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #8B2C8A;
+            --secondary: #00D9FF;
+            --accent: #FF006E;
+            --bg: #0A0A0F;
+            --surface: #1A1A2E;
+            --text: #FFFFFF;
+            --text-dim: #A0A0B0;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="light"] {
+            --primary: #6B1C6A;
+            --secondary: #0099CC;
+            --accent: #CC0055;
+            --bg: #F5F5FA;
+            --surface: #FFFFFF;
+            --text: #0A0A0F;
+            --text-dim: #505060;
+            --glass: rgba(0, 0, 0, 0.03);
+            --glass-border: rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.6;
+        }
+
+        #ascii-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            font-family: 'Courier New', monospace;
+            font-size: 8px;
+            line-height: 8px;
+            white-space: pre;
+            color: var(--secondary);
+            opacity: 0.15;
+            overflow: hidden;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 3;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .theme-toggle {
+            width: 50px;
+            height: 26px;
+            background: var(--surface);
+            border: 2px solid var(--glass-border);
+            border-radius: 13px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        [data-theme="light"] .theme-toggle::before {
+            transform: translateX(24px);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 12vw, 8rem);
+            font-weight: 900;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            letter-spacing: -0.05em;
+        }
+
+        .hero-title .word {
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .hero-title .char {
+            display: inline-block;
+            transform: translateY(100%);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientFlow 8s ease infinite;
+        }
+
+        @keyframes gradientFlow {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: var(--text-dim);
+            max-width: 600px;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.8s forwards;
+        }
+
+        .magnetic-btn {
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .magnetic-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .magnetic-btn.secondary {
+            background: var(--glass);
+            color: var(--text);
+            border: 2px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .magnetic-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .magnetic-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .bento-grid {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            grid-auto-rows: 250px;
+        }
+
+        .bento-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .bento-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .bento-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .bento-card.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-card.tall {
+            grid-row: span 2;
+        }
+
+        .bento-card.wide {
+            grid-column: span 2;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-description {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            top: -200px;
+            right: -200px;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--secondary);
+            bottom: -250px;
+            left: -250px;
+            animation-delay: -10s;
+        }
+
+        .blob-3 {
+            width: 350px;
+            height: 350px;
+            background: var(--accent);
+            top: 50%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(100px, -100px) scale(1.1);
+            }
+            66% {
+                transform: translate(-100px, 100px) scale(0.9);
+            }
+        }
+
+        .scramble-text {
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        footer p {
+            color: var(--text-dim);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            .hero {
+                padding: 6rem 1rem 2rem;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+                grid-auto-rows: 200px;
+                padding: 2rem 1rem;
+            }
+
+            .bento-card.large,
+            .bento-card.tall,
+            .bento-card.wide {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+
+            .cta-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .magnetic-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="webgl-canvas"></canvas>
+    <div id="ascii-overlay"></div>
+
+    <div class="aurora-blob blob-1"></div>
+    <div class="aurora-blob blob-2"></div>
+    <div class="aurora-blob blob-3"></div>
+
+    <div class="content-wrapper">
+        <header>
+            <div class="logo">FLUX</div>
+            <div class="theme-toggle" id="themeToggle"></div>
+        </header>
+
+        <section class="hero">
+            <h1 class="hero-title gradient-text" id="heroTitle">
+                <span class="word">DIGITAL</span>
+                <span class="word">INNOVATION</span>
+            </h1>
+            <p class="hero-subtitle">
+                We craft immersive digital experiences that push the boundaries of web technology. 
+                Where creativity meets cutting-edge engineering.
+            </p>
+            <div class="cta-group">
+                <button class="magnetic-btn primary" data-magnetic>
+                    <span>Start Your Project</span>
+                </button>
+                <button class="magnetic-btn secondary" data-magnetic>
+                    <span>View Our Work</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="bento-grid" id="bentoGrid">
+            <article class="bento-card large">
+                <span class="card-icon">🚀</span>
+                <h3 class="card-title scramble-text" data-text="WebGL Mastery">WebGL Mastery</h3>
+                <p class="card-description">
+                    Custom shaders and GPU-accelerated graphics that bring your vision to life with 
+                    stunning visual fidelity and performance.
+                </p>
+            </article>
+
+            <article class="bento-card tall">
+                <span class="card-icon">⚡</span>
+                <h3 class="card-title scramble-text" data-text="Lightning Fast">Lightning Fast</h3>
+                <p class="card-description">
+                    Optimized for performance across all devices. 60fps animations and instant load times.
+                </p>
+            </article>
+
+            <article class="bento-card">
+                <span class="card-icon">🎨</span>
+                <h3 class="card-title scramble-text" data-text="Bold Design">Bold Design</h3>
+                <p class="card-description">
+                    Daring aesthetics that stand out in a sea of sameness.
+                </p>
+            </article>
+
+            <article class="bento-card wide">
+                <span class="card-icon">🌊</span>
+                <h3 class="card-title scramble-text" data-text="Fluid Interactions">Fluid Interactions</h3>
+                <p class="card-description">
+                    Smooth, organic animations that respond to user input. Every interaction feels natural and delightful.
+                </p>
+            </article>
+
+            <article class="bento-card">
+                <span class="card-icon">🔮</span>
+                <h3 class="card-title scramble-text" data-text="Future Ready">Future Ready</h3>
+                <p class="card-description">
+                    Built with tomorrow's web standards today.
+                </p>
+            </article>
+
+            <article class="bento-card tall">
+                <span class="card-icon">🎯</span>
+                <h3 class="card-title scramble-text" data-text="Pixel Perfect">Pixel Perfect</h3>
+                <p class="card-description">
+                    Obsessive attention to detail in every element, every animation, every interaction.
+                </p>
+            </article>
+
+            <article class="bento-card wide">
+                <span class="card-icon">🌐</span>
+                <h3 class="card-title scramble-text" data-text="Cross Platform">Cross Platform</h3>
+                <p class="card-description">
+                    Seamless experience across desktop, tablet, and mobile. Responsive design that adapts intelligently.
+                </p>
+            </article>
+
+            <article class="bento-card">
+                <span class="card-icon">✨</span>
+                <h3 class="card-title scramble-text" data-text="Magic Touch">Magic Touch</h3>
+                <p class="card-description">
+                    That special something that makes users say "wow".
+                </p>
+            </article>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 FLUX Digital Innovation Studio. Crafted with passion and WebGL.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', savedTheme);
+
+        // Kinetic Typography - Split text into characters
+        const heroTitle = document.getElementById('heroTitle');
+        const words = heroTitle.querySelectorAll('.word');
+        
+        words.forEach((word, wordIndex) => {
+            const text = word.textContent;
+            word.textContent = '';
+            
+            text.split('').forEach((char, charIndex) => {
+                const span = document.createElement('span');
+                span.className = 'char';
+                span.textContent = char;
+                span.style.animationDelay = `${(wordIndex * 0.1) + (charIndex * 0.03)}s`;
+                word.appendChild(span);
+            });
+        });
+
+        // Magnetic Buttons
+        const magneticBtns = document.querySelectorAll('[data-magnetic]');
+        
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        // Scramble Text Effect
+        const scrambleTexts = document.querySelectorAll('.scramble-text');
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*';
+        
+        scrambleTexts.forEach(element => {
+            const originalText = element.getAttribute('data-text');
+            
+            element.addEventListener('mouseenter', () => {
+                let iteration = 0;
+                const interval = setInterval(() => {
+                    element.textContent = originalText
+                        .split('')
+                        .map((char, index) => {
+                            if (index < iteration) {
+                                return originalText[index];
+                            }
+                            return chars[Math.floor(Math.random() * chars.length)];
+                        })
+                        .join('');
+                    
+                    if (iteration >= originalText.length) {
+                        clearInterval(interval);
+                    }
+                    
+                    iteration += 1 / 3;
+                }, 30);
+            });
+        });
+
+        // Scroll-Driven Animations for Bento Cards
+        const bentoCards = document.querySelectorAll('.bento-card');
+        
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 100);
+                }
+            });
+        }, observerOptions);
+        
+        bentoCards.forEach(card => observer.observe(card));
+
+        // WebGL Fluid Simulation
+        const canvas = document.getElementById('webgl-canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        
+        if (!gl) {
+            console.warn('WebGL not supported');
+        } else {
+            let width, height;
+            let mouseX = 0, mouseY = 0;
+            let targetX = 0, targetY = 0;
+            
+            function resizeCanvas() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                gl.viewport(0, 0, width, height);
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Vertex Shader
+            const vertexShaderSource = `
+                attribute vec2 position;
+                void main() {
+                    gl_Position = vec4(position, 0.0, 1.0);
+                }
+            `;
+            
+            // Fragment Shader - Fluid Simulation
+            const fragmentShaderSource = `
+                precision mediump float;
+                uniform vec2 resolution;
+                uniform float time;
+                uniform vec2 mouse;
+                
+                vec3 palette(float t) {
+                    vec3 a = vec3(0.5, 0.5, 0.5);
+                    vec3 b = vec3(0.5, 0.5, 0.5);
+                    vec3 c = vec3(1.0, 1.0, 1.0);
+                    vec3 d = vec3(0.54, 0.17, 0.89);
+                    return a + b * cos(6.28318 * (c * t + d));
+                }
+                
+                void main() {
+                    vec2 uv = (gl_FragCoord.xy * 2.0 - resolution) / resolution.y;
+                    vec2 uv0 = uv;
+                    vec3 finalColor = vec3(0.0);
+                    
+                    for (float i = 0.0; i < 3.0; i++) {
+                        uv = fract(uv * 1.5) - 0.5;
+                        
+                        float d = length(uv) * exp(-length(uv0));
+                        vec3 col = palette(length(uv0) + i * 0.4 + time * 0.4);
+                        
+                        d = sin(d * 8.0 + time + mouse.x * 0.01) / 8.0;
+                        d = abs(d);
+                        d = pow(0.01 / d, 1.2);
+                        
+                        finalColor += col * d;
+                    }
+                    
+                    gl_FragColor = vec4(finalColor, 1.0);
+                }
+            `;
+
+            function createShader(type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                
+                return shader;
+            }
+            
+            const vertexShader = createShader(gl.VERTEX_SHADER, vertexShaderSource);
+            const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
+            
+            const program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                console.error('Program link error:', gl.getProgramInfoLog(program));
+            }
+            
+            gl.useProgram(program);
+            
+            // Create full-screen quad
+            const vertices = new Float32Array([
+                -1, -1,
+                1, -1,
+                -1, 1,
+                1, 1
+            ]);
+            
+            const buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+            
+            const positionLocation = gl.getAttribLocation(program, 'position');
+            gl.enableVertexAttribArray(positionLocation);
+            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+            
+            const resolutionLocation = gl.getUniformLocation(program, 'resolution');
+            const timeLocation = gl.getUniformLocation(program, 'time');
+            const mouseLocation = gl.getUniformLocation(program, 'mouse');
+            
+            // Mouse tracking
+            document.addEventListener('mousemove', (e) => {
+                targetX = e.clientX;
+                targetY = e.clientY;
+            });
+            
+            // Animation loop
+            let startTime = Date.now();
+            
+            function render() {
+                const currentTime = (Date.now() - startTime) * 0.001;
+                
+                // Smooth mouse movement
+                mouseX += (targetX - mouseX) * 0.05;
+                mouseY += (targetY - mouseY) * 0.05;
+                
+                gl.uniform2f(resolutionLocation, width, height);
+                gl.uniform1f(timeLocation, currentTime);
+                gl.uniform2f(mouseLocation, mouseX, mouseY);
+                
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                
+                requestAnimationFrame(render);
+            }
+            
+            render();
+        }
+
+        // ASCII Art Overlay
+        const asciiOverlay = document.getElementById('ascii-overlay');
+        const asciiChars = ' .:-=+*#%@';
+        
+        function createASCIIArt() {
+            const cols = Math.floor(window.innerWidth / 8);
+            const rows = Math.floor(window.innerHeight / 8);
+            let ascii = '';
+            
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const noise = Math.sin(x * 0.1 + Date.now() * 0.001) * 
+                                  Math.cos(y * 0.1 + Date.now() * 0.001);
+                    const index = Math.floor((noise + 1) * 0.5 * (asciiChars.length - 1));
+                    ascii += asciiChars[index];
+                }
+                ascii += '\n';
+            }
+            
+            asciiOverlay.textContent = ascii;
+        }
+        
+        // Update ASCII art periodically
+        setInterval(createASCIIArt, 100);
+        createASCIIArt();
+        
+        // Adjust ASCII on resize
+        window.addEventListener('resize', createASCIIArt);
+    </script>
+</body>
+</html>

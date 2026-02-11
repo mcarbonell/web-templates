@@ -1,0 +1,1552 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  DESIGN SYSTEM: EXPERIMENTAL LANDING PAGE                                    ║
+║  Random Seed: 544056486                                                      ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  Seed Decomposition & Design Choices:                                        ║
+║  ─────────────────────────────────────────────────────────────────────────── ║
+║  SEED: 544 | 056 | 486                                                       ║
+║  ─────────────────────────────────────────────────────────────────────────── ║
+║  • [544] → COLOR PALETTE: Deep Twilight (Navy to Cyan to Hot Pink)           ║
+║    HSL: Primary(220, 80%, 60%), Accent(180, 90%, 55%), Pop(330, 100%, 65%)   ║
+║                                                                              ║
+║  • [056] → LAYOUT: Asymmetric Bento Grid with 12-column CSS Grid            ║
+║    Broken grid aesthetic, overlapping elements, dynamic whitespace           ║
+║                                                                              ║
+║  • [486] → EFFECTS STACK:                                                    ║
+║    1. WebGL Liquid Aurora Shader (background)                                ║
+║    2. ASCII-to-Canvas Dithering (hero text)                                  ║
+║    3. Kinetic Typography with Scramble Effect                                ║
+║    4. Magnetic Buttons (hover physics)                                       ║
+║    5. Glassmorphism with animated borders                                    ║
+║    6. Scroll-driven parallax snap points                                     ║
+║                                                                              ║
+║  TECHNIQUE MIX:                                                              ║
+║  ✓ WebGL Fragment Shader (60fps optimized)                                   ║
+║  ✓ Canvas 2D ASCII Rendering                                                 ║
+║  ✓ CSS Scroll Snap + Scroll-Driven Animations                                ║
+║  ✓ GSAP-like text scramble (vanilla JS)                                      ║
+║  ✓ CSS 3D Transforms for magnetic effects                                    ║
+║  ✓ CSS Custom Properties for theme switching                                 ║
+║                                                                              ║
+║  AESTHETIC: "Digital Aurora" - An ethereal blend of fluid light and         ║
+║  brutalist typography. The design evokes a sense of controlled chaos,        ║
+║  where organic WebGL flows meet rigid ASCII structure.                       ║
+║                                                                              ║
+║  MOBILE OPTIMIZATION:                                                        ║
+║  • Shader quality reduction on mobile (lower pixel ratio)                    ║
+║  • Touch-friendly magnetic button zones                                      ║
+║  • Reduced particle counts for 60fps                                         ║
+║  • Simplified scroll animations for battery efficiency                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="Experimental design studio pushing the boundaries of web experiences">
+  <meta name="theme-color" content="#0a0a1a">
+  <title>AURORA | Experimental Design Studio</title>
+  
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════
+       CSS CUSTOM PROPERTIES & THEME SYSTEM
+       ═══════════════════════════════════════════════════════════════════════ */
+    :root {
+      /* Seed-Generated Color Palette (544) */
+      --primary-hue: 220;
+      --accent-hue: 180;
+      --pop-hue: 330;
+      
+      /* Dark Mode (Default) */
+      --bg-primary: #0a0a1a;
+      --bg-secondary: #12122a;
+      --bg-tertiary: #1a1a3a;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0c0;
+      --text-muted: #606080;
+      --accent: hsl(var(--accent-hue), 90%, 55%);
+      --accent-dim: hsl(var(--accent-hue), 70%, 40%);
+      --pop: hsl(var(--pop-hue), 100%, 65%);
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --shadow-color: rgba(0, 0, 0, 0.5);
+      --shader-brightness: 1.0;
+      
+      /* Spacing Scale */
+      --space-xs: clamp(0.5rem, 1vw, 0.75rem);
+      --space-sm: clamp(0.75rem, 2vw, 1rem);
+      --space-md: clamp(1rem, 3vw, 1.5rem);
+      --space-lg: clamp(1.5rem, 5vw, 2.5rem);
+      --space-xl: clamp(2rem, 8vw, 4rem);
+      --space-xxl: clamp(3rem, 12vw, 6rem);
+      
+      /* Typography */
+      --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-display: var(--font-mono);
+      
+      /* Animation Timing */
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+      --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      
+      /* Z-Index Scale */
+      --z-background: -10;
+      --z-content: 10;
+      --z-nav: 100;
+      --z-modal: 1000;
+      
+      /* Grid */
+      --grid-columns: 12;
+      --grid-gap: clamp(1rem, 2vw, 2rem);
+    }
+    
+    /* Light Mode */
+    [data-theme="light"] {
+      --bg-primary: #f8f9fc;
+      --bg-secondary: #eef0f5;
+      --bg-tertiary: #e4e7ee;
+      --text-primary: #0a0a1a;
+      --text-secondary: #4a4a6a;
+      --text-muted: #8a8aa0;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(0, 0, 0, 0.08);
+      --shadow-color: rgba(0, 0, 0, 0.1);
+      --shader-brightness: 0.3;
+      --accent: hsl(220, 80%, 50%);
+      --pop: hsl(280, 80%, 55%);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       RESET & BASE STYLES
+       ═══════════════════════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      transition: background-color 0.5s var(--ease-out-expo),
+                  color 0.5s var(--ease-out-expo);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       WEBGL CANVAS BACKGROUND
+       ═══════════════════════════════════════════════════════════════════════ */
+    #aurora-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: var(--z-background);
+      opacity: var(--shader-brightness);
+      pointer-events: none;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       SCROLL SNAP CONTAINER
+       ═══════════════════════════════════════════════════════════════════════ */
+    .scroll-container {
+      scroll-snap-type: y proximity;
+      overflow-y: scroll;
+      height: 100vh;
+      scroll-behavior: smooth;
+    }
+    
+    section {
+      scroll-snap-align: start;
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: var(--space-xl) var(--space-lg);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       NAVIGATION
+       ═══════════════════════════════════════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: var(--z-nav);
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: linear-gradient(180deg, var(--bg-primary) 0%, transparent 100%);
+    }
+    
+    .logo {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--text-primary);
+      text-decoration: none;
+      position: relative;
+    }
+    
+    .logo::after {
+      content: '_';
+      color: var(--accent);
+      animation: blink 1s step-end infinite;
+    }
+    
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+    
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.3s var(--ease-out-expo);
+      position: relative;
+    }
+    
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.3s var(--ease-out-expo);
+    }
+    
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+    
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    
+    /* Theme Toggle Button */
+    .theme-toggle {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-elastic);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      border-color: var(--accent);
+    }
+    
+    .theme-toggle svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--text-primary);
+      transition: transform 0.5s var(--ease-out-expo);
+    }
+    
+    .theme-toggle .sun { display: none; }
+    [data-theme="light"] .theme-toggle .moon { display: none; }
+    [data-theme="light"] .theme-toggle .sun { display: block; }
+    
+    /* Mobile Menu */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-xs);
+    }
+    
+    .mobile-menu-btn span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text-primary);
+      margin: 5px 0;
+      transition: all 0.3s var(--ease-out-expo);
+    }
+    
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: block; }
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       HERO SECTION - ASCII CANVAS & KINETIC TYPOGRAPHY
+       ═══════════════════════════════════════════════════════════════════════ */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-xl);
+      align-items: center;
+      position: relative;
+    }
+    
+    @media (min-width: 1024px) {
+      .hero {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: var(--z-content);
+    }
+    
+    .hero-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .hero-label::before {
+      content: '';
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+    }
+    
+    /* ASCII Canvas Container */
+    .ascii-container {
+      position: relative;
+      margin: var(--space-lg) 0;
+    }
+    
+    #ascii-canvas {
+      display: block;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      image-rendering: pixelated;
+    }
+    
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 12vw, 8rem);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      margin: 0;
+      background: linear-gradient(
+        135deg,
+        var(--text-primary) 0%,
+        var(--accent) 50%,
+        var(--pop) 100%
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+    
+    /* Stroke text effect */
+    .hero-title::before {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      -webkit-text-stroke: 1px var(--glass-border);
+      -webkit-text-fill-color: transparent;
+      z-index: -1;
+    }
+    
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin-top: var(--space-lg);
+      line-height: 1.7;
+    }
+    
+    /* Scramble text effect container */
+    .scramble-text {
+      display: inline-block;
+      min-height: 1.2em;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       MAGNETIC BUTTONS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .magnetic-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-xl);
+      margin-top: var(--space-xl);
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--bg-primary);
+      background: linear-gradient(135deg, var(--accent), var(--pop));
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.3s var(--ease-out-expo);
+      transform-style: preserve-3d;
+    }
+    
+    .magnetic-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--pop), var(--accent));
+      opacity: 0;
+      transition: opacity 0.3s var(--ease-out-expo);
+    }
+    
+    .magnetic-btn:hover::before {
+      opacity: 1;
+    }
+    
+    .magnetic-btn span {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .magnetic-btn .arrow {
+      transition: transform 0.3s var(--ease-elastic);
+    }
+    
+    .magnetic-btn:hover .arrow {
+      transform: translateX(4px);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       BENTO GRID SECTION
+       ═══════════════════════════════════════════════════════════════════════ */
+    .bento-section {
+      padding: var(--space-xxl) var(--space-lg);
+    }
+    
+    .section-header {
+      text-align: center;
+      margin-bottom: var(--space-xxl);
+    }
+    
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 800;
+      margin-bottom: var(--space-md);
+    }
+    
+    .section-desc {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Bento Grid Layout (12-column based, asymmetric) */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-columns), 1fr);
+      gap: var(--grid-gap);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .bento-card {
+      position: relative;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: var(--space-xl);
+      overflow: hidden;
+      transition: all 0.5s var(--ease-out-expo);
+      transform-style: preserve-3d;
+    }
+    
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(255, 255, 255, 0.06),
+        transparent 40%
+      );
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    
+    .bento-card:hover::before {
+      opacity: 1;
+    }
+    
+    .bento-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px var(--shadow-color);
+    }
+    
+    /* Grid spans based on 056 seed layout */
+    .bento-card-1 { grid-column: span 7; grid-row: span 2; }
+    .bento-card-2 { grid-column: span 5; }
+    .bento-card-3 { grid-column: span 5; }
+    .bento-card-4 { grid-column: span 4; }
+    .bento-card-5 { grid-column: span 4; }
+    .bento-card-6 { grid-column: span 4; }
+    
+    @media (max-width: 1024px) {
+      .bento-card-1 { grid-column: span 12; grid-row: span 1; }
+      .bento-card-2 { grid-column: span 6; }
+      .bento-card-3 { grid-column: span 6; }
+      .bento-card-4 { grid-column: span 4; }
+      .bento-card-5 { grid-column: span 4; }
+      .bento-card-6 { grid-column: span 4; }
+    }
+    
+    @media (max-width: 768px) {
+      .bento-card { grid-column: span 12 !important; }
+    }
+    
+    .bento-card h3 {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      margin-bottom: var(--space-sm);
+      color: var(--text-primary);
+    }
+    
+    .bento-card p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    
+    .bento-card .card-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: var(--space-md);
+      background: linear-gradient(135deg, var(--accent), var(--pop));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       GLASSMORPHISM FEATURE CARDS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .features-section {
+      background: linear-gradient(180deg, transparent 0%, var(--bg-secondary) 50%, transparent 100%);
+    }
+    
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 32px;
+      padding: var(--space-xxl);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .glass-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(
+        circle,
+        var(--accent) 0%,
+        transparent 70%
+      );
+      opacity: 0.1;
+      animation: pulse 4s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.1; }
+      50% { transform: scale(1.2); opacity: 0.2; }
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       PARALLAX SECTION
+       ═══════════════════════════════════════════════════════════════════════ */
+    .parallax-section {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .parallax-layer {
+      position: absolute;
+      inset: -20%;
+      will-change: transform;
+    }
+    
+    .parallax-bg {
+      background: radial-gradient(
+        ellipse at 30% 50%,
+        hsla(var(--accent-hue), 70%, 50%, 0.15) 0%,
+        transparent 50%
+      );
+    }
+    
+    .parallax-bg-2 {
+      background: radial-gradient(
+        ellipse at 70% 80%,
+        hsla(var(--pop-hue), 70%, 50%, 0.1) 0%,
+        transparent 50%
+      );
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       STATS WITH ANIMATED COUNTERS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-xl);
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: var(--space-xl);
+    }
+    
+    .stat-number {
+      font-family: var(--font-mono);
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--accent), var(--pop));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-top: var(--space-sm);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════════════════════ */
+    footer {
+      padding: var(--space-xxl) var(--space-lg);
+      border-top: 1px solid var(--glass-border);
+      text-align: center;
+    }
+    
+    .footer-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .footer-logo {
+      font-family: var(--font-mono);
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: var(--space-md);
+    }
+    
+    .footer-text {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       SCROLL REVEAL ANIMATIONS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s var(--ease-out-expo),
+                  transform 0.8s var(--ease-out-expo);
+    }
+    
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       LOADING SCREEN
+       ═══════════════════════════════════════════════════════════════════════ */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: var(--space-lg);
+      transition: opacity 0.5s var(--ease-out-expo),
+                  visibility 0.5s;
+    }
+    
+    #loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .loader-text {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+    }
+    
+    .loader-bar {
+      width: 200px;
+      height: 2px;
+      background: var(--glass-border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .loader-progress {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent), var(--pop));
+      transition: width 0.3s var(--ease-out-expo);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════
+       CUSTOM CURSOR (Desktop only)
+       ═══════════════════════════════════════════════════════════════════════ */
+    @media (pointer: fine) {
+      .custom-cursor {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--accent);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 99999;
+        transition: transform 0.15s var(--ease-out-expo),
+                    width 0.15s,
+                    height 0.15s;
+        transform: translate(-50%, -50%);
+      }
+      
+      .custom-cursor.hover {
+        width: 50px;
+        height: 50px;
+        background: rgba(100, 200, 255, 0.1);
+      }
+      
+      body {
+        cursor: none;
+      }
+      
+      a, button, .bento-card {
+        cursor: none;
+      }
+    }
+    
+    @media (pointer: coarse) {
+      .custom-cursor {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loader">
+    <div class="loader-text" data-scramble>AURORA</div>
+    <div class="loader-bar">
+      <div class="loader-progress"></div>
+    </div>
+  </div>
+  
+  <!-- Custom Cursor -->
+  <div class="custom-cursor"></div>
+  
+  <!-- WebGL Aurora Canvas -->
+  <canvas id="aurora-canvas"></canvas>
+  
+  <!-- Navigation -->
+  <nav>
+    <a href="#" class="logo">AURORA</a>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button class="mobile-menu-btn" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <div class="hero-label reveal">Design Studio</div>
+      <h1 class="hero-title" data-text="CREATE">CREATE</h1>
+      <h1 class="hero-title" data-text="BEYOND">BEYOND</h1>
+      <h1 class="hero-title" data-text="REALITY">REALITY</h1>
+      
+      <div class="ascii-container reveal reveal-delay-2">
+        <canvas id="ascii-canvas"></canvas>
+      </div>
+      
+      <p class="hero-subtitle reveal reveal-delay-3">
+        We craft immersive digital experiences that blur the line between 
+        <span class="scramble-text" data-text="imagination">imagination</span> and 
+        <span class="scramble-text" data-text="reality">reality</span>.
+      </p>
+      
+      <a href="#work" class="magnetic-btn reveal reveal-delay-4">
+        <span>Explore Work</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+  
+  <!-- Bento Grid Section -->
+  <section class="bento-section" id="services">
+    <div class="section-header reveal">
+      <h2 class="section-title">What We Do</h2>
+      <p class="section-desc">Pushing boundaries with cutting-edge design and technology</p>
+    </div>
+    
+    <div class="bento-grid">
+      <article class="bento-card bento-card-1 reveal">
+        <div class="card-icon">✦</div>
+        <h3>WebGL Experiences</h3>
+        <p>Immersive 3D environments that respond to user interaction in real-time. From fluid simulations to particle systems, we create living digital spaces that captivate and engage.</p>
+      </article>
+      
+      <article class="bento-card bento-card-2 reveal reveal-delay-1">
+        <div class="card-icon">◈</div>
+        <h3>Brand Identity</h3>
+        <p>Comprehensive visual systems that tell your story across every touchpoint.</p>
+      </article>
+      
+      <article class="bento-card bento-card-3 reveal reveal-delay-2">
+        <div class="card-icon">◉</div>
+        <h3>Motion Design</h3>
+        <p>Kinetic typography and fluid animations that bring interfaces to life.</p>
+      </article>
+      
+      <article class="bento-card bento-card-4 reveal reveal-delay-1">
+        <div class="card-icon">◇</div>
+        <h3>Creative Code</h3>
+        <p>Custom shaders and generative art installations.</p>
+      </article>
+      
+      <article class="bento-card bento-card-5 reveal reveal-delay-2">
+        <div class="card-icon">✧</div>
+        <h3>UI/UX Design</h3>
+        <p>Intuitive interfaces with delightful micro-interactions.</p>
+      </article>
+      
+      <article class="bento-card bento-card-6 reveal reveal-delay-3">
+        <div class="card-icon">◆</div>
+        <h3>Strategy</h3>
+        <p>Data-driven creative solutions for digital growth.</p>
+      </article>
+    </div>
+  </section>
+  
+  <!-- Stats Section -->
+  <section class="parallax-section" id="about">
+    <div class="parallax-layer parallax-bg" data-speed="0.3"></div>
+    <div class="parallax-layer parallax-bg-2" data-speed="0.5"></div>
+    
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-number" data-count="150">0</div>
+        <div class="stat-label">Projects Delivered</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-number" data-count="50">0</div>
+        <div class="stat-label">Happy Clients</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-number" data-count="12">0</div>
+        <div class="stat-label">Awards Won</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <div class="stat-number" data-count="8">0</div>
+        <div class="stat-label">Years Active</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="features-section" id="contact">
+    <div class="glass-card reveal">
+      <h2 class="section-title" style="text-align: center; margin-bottom: var(--space-lg);">
+        Ready to Create?
+      </h2>
+      <p class="section-desc" style="text-align: center; margin-bottom: var(--space-xl);">
+        Let's build something extraordinary together. Your vision, our expertise.
+      </p>
+      <div style="text-align: center;">
+        <a href="mailto:hello@aurora.studio" class="magnetic-btn">
+          <span>Start a Project</span>
+          <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-logo">AURORA_</div>
+      <p class="footer-text">
+        © 2026 Aurora Design Studio. Crafted with code and creativity.<br>
+        Seed: 544056486
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    /* ═════════════════════════════════════════════════════════════════════════
+       SEED-BASED RANDOMNESS & UTILITIES
+       Seed: 544056486
+       ═════════════════════════════════════════════════════════════════════════ */
+    const SEED = 544056486;
+    const SEED_PARTS = {
+      color: Math.floor(SEED / 1000000),      // 544
+      layout: Math.floor((SEED % 1000000) / 1000), // 056
+      effects: SEED % 1000                     // 486
+    };
+    
+    // Pseudo-random number generator based on seed
+    function seededRandom(seed) {
+      let s = seed;
+      return function() {
+        s = Math.sin(s * 12.9898) * 43758.5453;
+        return s - Math.floor(s);
+      };
+    }
+    
+    const rng = seededRandom(SEED);
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       THEME TOGGLE
+       ═════════════════════════════════════════════════════════════════════════ */
+    const themeToggle = document.querySelector('.theme-toggle');
+    const html = document.documentElement;
+    
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       CUSTOM CURSOR (Desktop only)
+       ═════════════════════════════════════════════════════════════════════════ */
+    const cursor = document.querySelector('.custom-cursor');
+    
+    if (window.matchMedia('(pointer: fine)').matches) {
+      let cursorX = 0, cursorY = 0;
+      let currentX = 0, currentY = 0;
+      
+      document.addEventListener('mousemove', (e) => {
+        cursorX = e.clientX;
+        cursorY = e.clientY;
+      });
+      
+      function animateCursor() {
+        currentX += (cursorX - currentX) * 0.15;
+        currentY += (cursorY - currentY) * 0.15;
+        cursor.style.left = currentX + 'px';
+        cursor.style.top = currentY + 'px';
+        requestAnimationFrame(animateCursor);
+      }
+      animateCursor();
+      
+      // Hover effects
+      const hoverElements = document.querySelectorAll('a, button, .bento-card');
+      hoverElements.forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+      });
+    }
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       MAGNETIC BUTTONS
+       ═════════════════════════════════════════════════════════════════════════ */
+    const magneticBtns = document.querySelectorAll('.magnetic-btn');
+    
+    magneticBtns.forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        
+        btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+      });
+      
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translate(0, 0)';
+      });
+    });
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       TEXT SCRAMBLE EFFECT
+       Based on seed value: 486 → scramble intensity
+       ═════════════════════════════════════════════════════════════════════════ */
+    class TextScramble {
+      constructor(el) {
+        this.el = el;
+        this.chars = '!<>-_\\/[]{}—=+*^?#________';
+        this.update = this.update.bind(this);
+      }
+      
+      setText(newText) {
+        const oldText = this.el.innerText;
+        const length = Math.max(oldText.length, newText.length);
+        const promise = new Promise(resolve => this.resolve = resolve);
+        this.queue = [];
+        
+        for (let i = 0; i < length; i++) {
+          const from = oldText[i] || '';
+          const to = newText[i] || '';
+          const start = Math.floor(Math.random() * 40);
+          const end = start + Math.floor(Math.random() * 40);
+          this.queue.push({ from, to, start, end });
+        }
+        
+        cancelAnimationFrame(this.frameRequest);
+        this.frame = 0;
+        this.update();
+        return promise;
+      }
+      
+      update() {
+        let output = '';
+        let complete = 0;
+        
+        for (let i = 0, n = this.queue.length; i < n; i++) {
+          let { from, to, start, end, char } = this.queue[i];
+          
+          if (this.frame >= end) {
+            complete++;
+            output += to;
+          } else if (this.frame >= start) {
+            if (!char || Math.random() < 0.28) {
+              char = this.randomChar();
+              this.queue[i].char = char;
+            }
+            output += `<span style="color: var(--accent)">${char}</span>`;
+          } else {
+            output += from;
+          }
+        }
+        
+        this.el.innerHTML = output;
+        
+        if (complete === this.queue.length) {
+          this.resolve();
+        } else {
+          this.frameRequest = requestAnimationFrame(this.update);
+          this.frame++;
+        }
+      }
+      
+      randomChar() {
+        return this.chars[Math.floor(Math.random() * this.chars.length)];
+      }
+    }
+    
+    // Apply scramble to elements
+    document.querySelectorAll('.scramble-text').forEach(el => {
+      const fx = new TextScramble(el);
+      const text = el.getAttribute('data-text');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            fx.setText(text);
+            observer.unobserve(el);
+          }
+        });
+      });
+      observer.observe(el);
+    });
+    
+    // Loader scramble
+    const loaderText = document.querySelector('.loader-text');
+    const loaderFx = new TextScramble(loaderText);
+    loaderFx.setText('AURORA');
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       ASCII TO CANVAS RENDERER
+       Creates ASCII art from text with dithering effect
+       ═════════════════════════════════════════════════════════════════════════ */
+    function initASCIICanvas() {
+      const canvas = document.getElementById('ascii-canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Set canvas size
+      const width = 400;
+      const height = 150;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.scale(dpr, dpr);
+      
+      // ASCII characters for dithering (dark to light)
+      const asciiChars = '@%#*+=-:. ';
+      
+      // Text to render
+      const text = 'EXPERIMENTAL';
+      
+      // Create offscreen canvas for text
+      const textCanvas = document.createElement('canvas');
+      const textCtx = textCanvas.getContext('2d');
+      textCanvas.width = width;
+      textCanvas.height = height;
+      
+      // Draw text
+      textCtx.fillStyle = '#000';
+      textCtx.fillRect(0, 0, width, height);
+      textCtx.fillStyle = '#fff';
+      textCtx.font = 'bold 40px monospace';
+      textCtx.textAlign = 'center';
+      textCtx.textBaseline = 'middle';
+      textCtx.fillText(text, width / 2, height / 2);
+      
+      // Get pixel data
+      const imageData = textCtx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+      
+      // Clear main canvas
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg-primary');
+      ctx.fillRect(0, 0, width, height);
+      
+      // Render ASCII
+      const charSize = 6;
+      ctx.font = `${charSize}px monospace`;
+      ctx.textBaseline = 'top';
+      
+      for (let y = 0; y < height; y += charSize) {
+        for (let x = 0; x < width; x += charSize) {
+          const i = (y * width + x) * 4;
+          const brightness = data[i]; // Red channel is enough
+          const charIndex = Math.floor((brightness / 255) * (asciiChars.length - 1));
+          
+          // Get theme colors
+          const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+          const textColor = getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
+          
+          ctx.fillStyle = brightness > 128 ? accent : textColor;
+          ctx.fillText(asciiChars[charIndex], x, y);
+        }
+      }
+    }
+    
+    // Initialize ASCII canvas after load
+    window.addEventListener('load', initASCIICanvas);
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       WEBGL AURORA SHADER
+       Optimized liquid aurora effect with 60fps target
+       ═════════════════════════════════════════════════════════════════════════ */
+    function initWebGL() {
+      const canvas = document.getElementById('aurora-canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      
+      if (!gl) {
+        console.warn('WebGL not supported, falling back to CSS');
+        canvas.style.background = 'linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%)';
+        return;
+      }
+      
+      // Check if mobile for quality reduction
+      const isMobile = window.matchMedia('(pointer: coarse)').matches;
+      const pixelRatio = isMobile ? 0.5 : Math.min(window.devicePixelRatio, 1.5);
+      
+      // Vertex shader
+      const vertexShaderSource = `
+        attribute vec2 a_position;
+        void main() {
+          gl_Position = vec4(a_position, 0.0, 1.0);
+        }
+      `;
+      
+      // Fragment shader - Liquid Aurora
+      const fragmentShaderSource = `
+        precision mediump float;
+        uniform vec2 u_resolution;
+        uniform float u_time;
+        uniform vec2 u_mouse;
+        
+        // Simplex noise function
+        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+        
+        float snoise(vec2 v) {
+          const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                             -0.577350269189626, 0.024390243902439);
+          vec2 i  = floor(v + dot(v, C.yy));
+          vec2 x0 = v -   i + dot(i, C.xx);
+          vec2 i1;
+          i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+          vec4 x12 = x0.xyxy + C.xxzz;
+          x12.xy -= i1;
+          i = mod289(i);
+          vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
+            + i.x + vec3(0.0, i1.x, 1.0));
+          vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+            dot(x12.zw,x12.zw)), 0.0);
+          m = m*m;
+          m = m*m;
+          vec3 x = 2.0 * fract(p * C.www) - 1.0;
+          vec3 h = abs(x) - 0.5;
+          vec3 ox = floor(x + 0.5);
+          vec3 a0 = x - ox;
+          m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+          vec3 g;
+          g.x  = a0.x  * x0.x  + h.x  * x0.y;
+          g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+          return 130.0 * dot(m, g);
+        }
+        
+        void main() {
+          vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+          vec2 p = uv * 2.0 - 1.0;
+          p.x *= u_resolution.x / u_resolution.y;
+          
+          // Time-based animation
+          float time = u_time * 0.15;
+          
+          // Mouse influence
+          vec2 mouse = u_mouse * 2.0 - 1.0;
+          float mouseDist = length(p - mouse);
+          float mouseInfluence = smoothstep(0.5, 0.0, mouseDist) * 0.3;
+          
+          // Layered noise for aurora effect
+          float n1 = snoise(p * 1.5 + time);
+          float n2 = snoise(p * 3.0 - time * 0.5);
+          float n3 = snoise(p * 0.5 + time * 0.3);
+          
+          float noise = n1 * 0.5 + n2 * 0.3 + n3 * 0.2;
+          noise += mouseInfluence;
+          
+          // Color palette (based on seed 544)
+          vec3 color1 = vec3(0.04, 0.04, 0.1);  // Navy
+          vec3 color2 = vec3(0.0, 0.8, 1.0);    // Cyan
+          vec3 color3 = vec3(1.0, 0.2, 0.6);    // Hot pink
+          vec3 color4 = vec3(0.1, 0.1, 0.3);    // Deep blue
+          
+          // Mix colors based on noise
+          vec3 color = mix(color1, color4, smoothstep(-0.5, 0.5, noise));
+          color = mix(color, color2, smoothstep(0.2, 0.8, noise + sin(time) * 0.2));
+          color = mix(color, color3, smoothstep(0.4, 1.0, noise + cos(time * 0.7) * 0.2) * 0.5);
+          
+          // Add subtle vertical gradient
+          color = mix(color, color1, uv.y * 0.3);
+          
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `;
+      
+      // Compile shader
+      function compileShader(gl, source, type) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+          gl.deleteShader(shader);
+          return null;
+        }
+        return shader;
+      }
+      
+      const vertexShader = compileShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
+      const fragmentShader = compileShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
+      
+      // Create program
+      const program = gl.createProgram();
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+      
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error('Program link error:', gl.getProgramInfoLog(program));
+        return;
+      }
+      
+      gl.useProgram(program);
+      
+      // Create buffer
+      const positionBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1, -1, 1, -1, -1, 1,
+        -1, 1, 1, -1, 1, 1
+      ]), gl.STATIC_DRAW);
+      
+      const positionLocation = gl.getAttribLocation(program, 'a_position');
+      gl.enableVertexAttribArray(positionLocation);
+      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+      
+      // Uniforms
+      const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+      const timeLocation = gl.getUniformLocation(program, 'u_time');
+      const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
+      
+      let mouseX = 0.5, mouseY = 0.5;
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX / window.innerWidth;
+        mouseY = 1.0 - e.clientY / window.innerHeight;
+      });
+      
+      let startTime = Date.now();
+      let animationId;
+      let isVisible = true;
+      
+      function resize() {
+        const displayWidth = Math.floor(window.innerWidth * pixelRatio);
+        const displayHeight = Math.floor(window.innerHeight * pixelRatio);
+        
+        if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+          canvas.width = displayWidth;
+          canvas.height = displayHeight;
+          gl.viewport(0, 0, canvas.width, canvas.height);
+        }
+      }
+      
+      function render() {
+        if (!isVisible) {
+          animationId = requestAnimationFrame(render);
+          return;
+        }
+        
+        const time = (Date.now() - startTime) / 1000;
+        
+        gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+        gl.uniform1f(timeLocation, time);
+        gl.uniform2f(mouseLocation, mouseX, mouseY);
+        
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        
+        animationId = requestAnimationFrame(render);
+      }
+      
+      // Visibility check
+      document.addEventListener('visibilitychange', () => {
+        isVisible = !document.hidden;
+      });
+      
+      resize();
+      window.addEventListener('resize', resize);
+      render();
+    }
+    
+    // Initialize WebGL
+    initWebGL();
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       SCROLL REVEAL ANIMATION
+       ═════════════════════════════════════════════════════════════════════════ */
+    const revealElements = document.querySelectorAll('.reveal');
+    
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+    
+    revealElements.forEach(el => revealObserver.observe(el));
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       PARALLAX SCROLL EFFECT
+       ═════════════════════════════════════════════════════════════════════════ */
+    const parallaxLayers = document.querySelectorAll('.parallax-layer');
+    
+    let ticking = false;
+    function updateParallax() {
+      const scrolled = window.pageYOffset;
+      
+      parallaxLayers.forEach(layer => {
+        const speed = parseFloat(layer.dataset.speed) || 0.5;
+        const yPos = -(scrolled * speed);
+        layer.style.transform = `translateY(${yPos}px)`;
+      });
+      
+      ticking = false;
+    }
+    
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    });
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       COUNTER ANIMATION
+       ═════════════════════════════════════════════════════════════════════════ */
+    const counters = document.querySelectorAll('.stat-number');
+    
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const counter = entry.target;
+          const target = parseInt(counter.dataset.count);
+          const duration = 2000;
+          const step = target / (duration / 16);
+          let current = 0;
+          
+          function updateCounter() {
+            current += step;
+            if (current < target) {
+              counter.textContent = Math.floor(current) + '+';
+              requestAnimationFrame(updateCounter);
+            } else {
+              counter.textContent = target + '+';
+            }
+          }
+          
+          updateCounter();
+          counterObserver.unobserve(counter);
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    counters.forEach(counter => counterObserver.observe(counter));
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       BENTO CARD SPOTLIGHT EFFECT
+       ═════════════════════════════════════════════════════════════════════════ */
+    document.querySelectorAll('.bento-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.setProperty('--mouse-x', x + '%');
+        card.style.setProperty('--mouse-y', y + '%');
+      });
+    });
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       LOADING SCREEN
+       ═════════════════════════════════════════════════════════════════════════ */
+    const loader = document.getElementById('loader');
+    const loaderProgress = document.querySelector('.loader-progress');
+    
+    let progress = 0;
+    function updateLoader() {
+      progress += Math.random() * 15;
+      if (progress > 100) progress = 100;
+      loaderProgress.style.width = progress + '%';
+      
+      if (progress < 100) {
+        setTimeout(updateLoader, 100);
+      } else {
+        setTimeout(() => {
+          loader.classList.add('hidden');
+        }, 300);
+      }
+    }
+    
+    // Start loading animation
+    setTimeout(updateLoader, 500);
+    
+    /* ═════════════════════════════════════════════════════════════════════════
+       SMOOTH SCROLL FOR ANCHOR LINKS
+       ═════════════════════════════════════════════════════════════════════════ */
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

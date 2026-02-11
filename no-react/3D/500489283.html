@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mario Raúl Carbonell | Desarrollador & Especialista en IA</title>
+    <meta name="description" content="Especialista en desarrollo web, aplicaciones a medida e inteligencia artificial. Desde motores de ajedrez hasta consultoría de IA avanzada.">
+    
+    <!-- DESIGN CHOICE: Cyberpunk Neon Palette with glassmorphism -->
+    <!-- Primary: Electric Cyan (#00f0ff), Magenta (#ff00ff), Deep Purple (#6b21ff) -->
+    <!-- Background: Near-black with gradient mesh animation -->
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        /* DESIGN CHOICE: CSS Custom Properties for theming */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent-cyan: #00f0ff;
+            --accent-magenta: #ff00ff;
+            --accent-purple: #6b21ff;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: 20px;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #f5f5fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8e8f0;
+            --text-primary: #0a0a0f;
+            --text-secondary: #4a4a5a;
+            --accent-cyan: #0088cc;
+            --accent-magenta: #cc00aa;
+            --accent-purple: #6b21ff;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+        
+        /* DESIGN CHOICE: Animated gradient mesh background */
+        .gradient-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: 
+                radial-gradient(ellipse at 20% 30%, var(--accent-purple) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, var(--accent-magenta) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 50%, var(--accent-cyan) 0%, transparent 60%);
+            opacity: 0.15;
+            animation: meshMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes meshMove {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(5%, 5%) scale(1.1); }
+            50% { transform: translate(-5%, 10%) scale(1); }
+            75% { transform: translate(10%, -5%) scale(1.05); }
+        }
+        
+        /* Three.js canvas container */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* DESIGN CHOICE: Glassmorphism card style */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to bottom, var(--bg-primary) 0%, transparent 100%);
+        }
+        
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        /* DESIGN CHOICE: Toggle switches with spring physics */
+        .toggle-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 0.5rem 1.25rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toggle-btn:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+        
+        .toggle-btn.active {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-color: transparent;
+        }
+        
+        /* Hero Section - Asymmetric Grid Layout */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            padding: 8rem 4rem 4rem;
+            position: relative;
+        }
+        
+        /* DESIGN CHOICE: Left-heavy composition */
+        .hero-content {
+            z-index: 10;
+            position: relative;
+        }
+        
+        .hero-greeting {
+            font-size: 1rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeSlideUp 0.8s ease forwards 0.2s;
+        }
+        
+        .hero-name {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeSlideUp 0.8s ease forwards 0.4s;
+        }
+        
+        .hero-name .highlight {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-description {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeSlideUp 0.8s ease forwards 0.6s;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeSlideUp 0.8s ease forwards 0.8s;
+        }
+        
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 240, 255, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 240, 255, 0.6);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--glass-border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--accent-magenta);
+            background: rgba(255, 0, 255, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        /* Floating code elements */
+        .hero-visual {
+            position: relative;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .floating-code {
+            position: absolute;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 0.85rem;
+            padding: 1.5rem;
+            border-radius: 16px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            color: var(--accent-cyan);
+            max-width: 280px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-code:nth-child(1) {
+            top: 10%;
+            right: 10%;
+            animation-delay: 0s;
+            border-color: var(--accent-cyan);
+        }
+        
+        .floating-code:nth-child(2) {
+            bottom: 20%;
+            left: 5%;
+            animation-delay: -2s;
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+        }
+        
+        .floating-code:nth-child(3) {
+            top: 50%;
+            right: 0;
+            animation-delay: -4s;
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Sections */
+        .section {
+            padding: 6rem 4rem;
+            position: relative;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+            border-radius: 2px;
+        }
+        
+        /* Services Grid - Asymmetric */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+        
+        .service-card {
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(0, 240, 255, 0.1) 0%, 
+                rgba(255, 0, 255, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .service-card:hover::before {
+            opacity: 1;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 240, 255, 0.2);
+        }
+        
+        .service-card:nth-child(1) {
+            grid-column: span 7;
+        }
+        
+        .service-card:nth-child(2) {
+            grid-column: span 5;
+        }
+        
+        .service-card:nth-child(3) {
+            grid-column: span 5;
+        }
+        
+        .service-card:nth-child(4) {
+            grid-column: span 7;
+        }
+        
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .service-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .service-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        /* About Section */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        .about-image {
+            position: relative;
+        }
+        
+        .about-image-frame {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+            animation: morphBorder 8s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .about-image-frame::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            background: var(--bg-secondary);
+            border-radius: inherit;
+        }
+        
+        .about-image-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes morphBorder {
+            0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
+        }
+        
+        .about-text p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            line-height: 1.9;
+            margin-bottom: 1.5rem;
+        }
+        
+        .about-text strong {
+            color: var(--accent-cyan);
+            font-weight: 500;
+        }
+        
+        /* Skills Marquee */
+        .skills-marquee {
+            overflow: hidden;
+            padding: 3rem 0;
+            margin: 4rem 0;
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .marquee-track {
+            display: flex;
+            gap: 3rem;
+            animation: marquee 30s linear infinite;
+        }
+        
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+        
+        .skill-item {
+            flex-shrink: 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            padding: 1rem 2rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .skill-item:hover {
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            transform: scale(1.1);
+        }
+        
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+        }
+        
+        .project-card {
+            position: relative;
+            padding: 2rem;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        
+        .project-card:hover {
+            transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) translateZ(20px);
+        }
+        
+        .project-card:nth-child(2) {
+            transform: translateY(40px);
+        }
+        
+        .project-card:nth-child(2):hover {
+            transform: perspective(1000px) rotateX(5deg) rotateY(5deg) translateZ(20px) translateY(40px);
+        }
+        
+        .project-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-cyan);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+        
+        .project-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .project-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+        
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-magenta);
+            text-decoration: none;
+            font-weight: 500;
+            transition: gap 0.3s ease;
+        }
+        
+        .project-link:hover {
+            gap: 1rem;
+        }
+        
+        /* Contact Section */
+        .contact-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        .contact-info h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .contact-link:hover {
+            transform: translateX(10px);
+            border-color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.1);
+        }
+        
+        .contact-link-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .contact-form {
+            padding: 3rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+        }
+        
+        textarea.form-input {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 3rem 4rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .footer p {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-cyan);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 6rem 2rem 4rem;
+            }
+            
+            .hero-visual {
+                height: 400px;
+                order: -1;
+            }
+            
+            .about-grid,
+            .contact-wrapper {
+                grid-template-columns: 1fr;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-card:nth-child(2) {
+                transform: none;
+            }
+            
+            .service-card:nth-child(1),
+            .service-card:nth-child(2),
+            .service-card:nth-child(3),
+            .service-card:nth-child(4) {
+                grid-column: span 12;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .nav {
+                padding: 1rem;
+            }
+            
+            .section {
+                padding: 4rem 1.5rem;
+            }
+            
+            .floating-code {
+                display: none;
+            }
+            
+            .hero-cta {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Parallax layers */
+        .parallax-layer {
+            will-change: transform;
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .gradient-mesh {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated gradient mesh background -->
+    <div class="gradient-mesh"></div>
+    
+    <!-- Three.js particles canvas -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-logo">MRC</div>
+        <div class="nav-controls">
+            <button class="toggle-btn" id="lang-toggle" aria-label="Cambiar idioma">
+                <span id="lang-text">ES</span>
+            </button>
+            <button class="toggle-btn" id="theme-toggle" aria-label="Cambiar tema">
+                <span id="theme-icon">🌙</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <p class="hero-greeting" data-es="Hola, soy" data-en="Hello, I'm">Hola, soy</p>
+            <h1 class="hero-name">
+                Mario Raúl<br>
+                <span class="highlight">Carbonell</span>
+            </h1>
+            <p class="hero-description" data-es="Especialista en desarrollo web, aplicaciones a medida e inteligencia artificial. Desde motores de ajedrez hasta consultoría de IA avanzada, transformo ideas complejas en código eficiente." data-en="Specialist in web development, custom applications, and artificial intelligence. From chess engines to advanced AI consulting, I transform complex ideas into efficient code.">
+                Especialista en desarrollo web, aplicaciones a medida e inteligencia artificial. Desde motores de ajedrez hasta consultoría de IA avanzada, transformo ideas complejas en código eficiente.
+            </p>
+            <div class="hero-cta">
+                <a href="#contact" class="btn btn-primary" data-es="Trabajemos juntos" data-en="Let's work together">Trabajemos juntos</a>
+                <a href="https://github.com/mcarbonell" target="_blank" class="btn btn-secondary">
+                    <span data-es="Ver GitHub" data-en="View GitHub">Ver GitHub</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="floating-code parallax-layer" data-speed="0.5">
+                <code>
+                    function optimizeAI(model) {<br>
+                    &nbsp;&nbsp;return model<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;.train()<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;.evaluate();<br>
+                    }
+                </code>
+            </div>
+            <div class="floating-code parallax-layer" data-speed="0.8">
+                <code>
+                    // Chess Engine<br>
+                    class AlphaBeta {<br>
+                    &nbsp;&nbsp;search(depth) {...}<br>
+                    }
+                </code>
+            </div>
+            <div class="floating-code parallax-layer" data-speed="0.3">
+                <code>
+                    const efficiency =<br>
+                    &nbsp;&nbsp;complexity / time;<br>
+                    // Always optimize
+                </code>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Services Section -->
+    <section class="section" id="services">
+        <h2 class="section-title" data-es="Servicios" data-en="Services">Servicios</h2>
+        
+        <div class="services-grid">
+            <article class="service-card glass-card parallax-layer" data-speed="0.1">
+                <div class="service-icon">🌐</div>
+                <h3 class="service-title" data-es="Desarrollo Web" data-en="Web Development">Desarrollo Web</h3>
+                <p class="service-description" data-es="Aplicaciones web modernas, rápidas y escalables. Especializado en arquitecturas complejas y experiencias de usuario excepcionales." data-en="Modern, fast, and scalable web applications. Specialized in complex architectures and exceptional user experiences.">
+                    Aplicaciones web modernas, rápidas y escalables. Especializado en arquitecturas complejas y experiencias de usuario excepcionales.
+                </p>
+            </article>
+            
+            <article class="service-card glass-card parallax-layer" data-speed="0.15">
+                <div class="service-icon">🤖</div>
+                <h3 class="service-title" data-es="Inteligencia Artificial" data-en="Artificial Intelligence">Inteligencia Artificial</h3>
+                <p class="service-description" data-es="Consultoría e implementación de soluciones IA. Machine learning, NLP y optimización de modelos." data-en="Consulting and implementation of AI solutions. Machine learning, NLP, and model optimization.">
+                    Consultoría e implementación de soluciones IA. Machine learning, NLP y optimización de modelos.
+                </p>
+            </article>
+            
+            <article class="service-card glass-card parallax-layer" data-speed="0.12">
+                <div class="service-icon">⚡</div>
+                <h3 class="service-title" data-es="Algoritmos" data-en="Algorithms">Algoritmos</h3>
+                <p class="service-description" data-es="Diseño y análisis de algoritmos complejos. Optimización de rendimiento y resolución de problemas computacionales difíciles." data-en="Design and analysis of complex algorithms. Performance optimization and solving difficult computational problems.">
+                    Diseño y análisis de algoritmos complejos. Optimización de rendimiento y resolución de problemas computacionales difíciles.
+                </p>
+            </article>
+            
+            <article class="service-card glass-card parallax-layer" data-speed="0.18">
+                <div class="service-icon">♟️</div>
+                <h3 class="service-title" data-es="Motores de Juego" data-en="Game Engines">Motores de Juego</h3>
+                <p class="service-description" data-es="Desarrollo de motores de ajedrez y otros juegos. IA para juegos, árboles de decisión y algoritmos de búsqueda." data-en="Development of chess engines and other games. Game AI, decision trees, and search algorithms.">
+                    Desarrollo de motores de ajedrez y otros juegos. IA para juegos, árboles de decisión y algoritmos de búsqueda.
+                </p>
+            </article>
+        </div>
+    </section>
+    
+    <!-- Skills Marquee -->
+    <div class="skills-marquee">
+        <div class="marquee-track">
+            <span class="skill-item">JavaScript</span>
+            <span class="skill-item">TypeScript</span>
+            <span class="skill-item">Python</span>
+            <span class="skill-item">React</span>
+            <span class="skill-item">Node.js</span>
+            <span class="skill-item">TensorFlow</span>
+            <span class="skill-item">PyTorch</span>
+            <span class="skill-item">GraphQL</span>
+            <span class="skill-item">PostgreSQL</span>
+            <span class="skill-item">MongoDB</span>
+            <span class="skill-item">Docker</span>
+            <span class="skill-item">AWS</span>
+            <span class="skill-item">Algorithm Design</span>
+            <span class="skill-item">Machine Learning</span>
+            <span class="skill-item">Chess AI</span>
+            <!-- Duplicate for seamless loop -->
+            <span class="skill-item">JavaScript</span>
+            <span class="skill-item">TypeScript</span>
+            <span class="skill-item">Python</span>
+            <span class="skill-item">React</span>
+            <span class="skill-item">Node.js</span>
+            <span class="skill-item">TensorFlow</span>
+            <span class="skill-item">PyTorch</span>
+            <span class="skill-item">GraphQL</span>
+            <span class="skill-item">PostgreSQL</span>
+            <span class="skill-item">MongoDB</span>
+            <span class="skill-item">Docker</span>
+            <span class="skill-item">AWS</span>
+            <span class="skill-item">Algorithm Design</span>
+            <span class="skill-item">Machine Learning</span>
+            <span class="skill-item">Chess AI</span>
+        </div>
+    </div>
+    
+    <!-- About Section -->
+    <section class="section" id="about">
+        <h2 class="section-title" data-es="Sobre Mí" data-en="About Me">Sobre Mí</h2>
+        
+        <div class="about-grid">
+            <div class="about-image parallax-layer" data-speed="0.2">
+                <div class="about-image-frame">
+                    <span class="about-image-content">👨‍💻</span>
+                </div>
+            </div>
+            
+            <div class="about-text">
+                <p data-es="Más allá del desarrollo convencional, me especializo en el diseño y análisis de algoritmos complejos para resolver problemas computacionales difíciles." data-en="Beyond conventional development, I specialize in designing and analyzing complex algorithms to solve difficult computational problems.">
+                    Más allá del desarrollo convencional, me especializo en el <strong>diseño y análisis de algoritmos complejos</strong> para resolver problemas computacionales difíciles.
+                </p>
+                <p data-es="Mi pasión por la eficiencia me lleva a optimizar cada línea de código, cada consulta a base de datos, cada modelo de IA. No solo construyo soluciones; construyo soluciones que escalan, que resisten el paso del tiempo, que superan expectativas." data-en="My passion for efficiency drives me to optimize every line of code, every database query, every AI model. I don't just build solutions; I build solutions that scale, that withstand the test of time, that exceed expectations.">
+                    Mi pasión por la <strong>eficiencia</strong> me lleva a optimizar cada línea de código, cada consulta a base de datos, cada modelo de IA. No solo construyo soluciones; construyo soluciones que escalan, que resisten el paso del tiempo, que superan expectativas.
+                </p>
+                <p data-es="Desde motores de ajedrez que evalúan millones de posiciones por segundo, hasta sistemas de IA que procesan datos en tiempo real, mi experiencia abarca lo más complejo de la computación moderna." data-en="From chess engines evaluating millions of positions per second, to AI systems processing data in real-time, my experience spans the most complex aspects of modern computing.">
+                    Desde <strong>motores de ajedrez</strong> que evalúan millones de posiciones por segundo, hasta sistemas de <strong>IA</strong> que procesan datos en tiempo real, mi experiencia abarca lo más complejo de la computación moderna.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Projects Section -->
+    <section class="section" id="projects">
+        <h2 class="section-title" data-es="Proyectos Destacados" data-en="Featured Projects">Proyectos Destacados</h2>
+        
+        <div class="projects-grid">
+            <article class="project-card glass-card parallax-layer" data-speed="0.1">
+                <div>
+                    <span class="project-tag">AI</span>
+                    <h3 class="project-title" data-es="Motor de Ajedrez" data-en="Chess Engine">Motor de Ajedrez</h3>
+                    <p class="project-description" data-es="Motor de ajedrez de alto rendimiento con algoritmo alpha-beta pruning, tablas de transposición y evaluación posicional avanzada." data-en="High-performance chess engine with alpha-beta pruning algorithm, transposition tables, and advanced positional evaluation.">
+                        Motor de ajedrez de alto rendimiento con algoritmo alpha-beta pruning, tablas de transposición y evaluación posicional avanzada.
+                    </p>
+                </div>
+                <a href="https://github.com/mcarbonell" class="project-link" target="_blank">
+                    <span data-es="Ver en GitHub" data-en="View on GitHub">Ver en GitHub</span> →
+                </a>
+            </article>
+            
+            <article class="project-card glass-card parallax-layer" data-speed="0.15">
+                <div>
+                    <span class="project-tag">Web</span>
+                    <h3 class="project-title" data-es="Consultoría IA" data-en="AI Consulting">Consultoría IA</h3>
+                    <p class="project-description" data-es="Plataforma de consultoría empresarial con modelos de machine learning para predicción de mercados y análisis de datos." data-en="Business consulting platform with machine learning models for market prediction and data analysis.">
+                        Plataforma de consultoría empresarial con modelos de machine learning para predicción de mercados y análisis de datos.
+                    </p>
+                </div>
+                <a href="https://github.com/mcarbonell" class="project-link" target="_blank">
+                    <span data-es="Ver en GitHub" data-en="View on GitHub">Ver en GitHub</span> →
+                </a>
+            </article>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+        <h2 class="section-title" data-es="Contacto" data-en="Contact">Contacto</h2>
+        
+        <div class="contact-wrapper">
+            <div class="contact-info">
+                <h3 data-es="¿Tienes un proyecto en mente?" data-en="Have a project in mind?">¿Tienes un proyecto en mente?</h3>
+                <p data-es="Hablemos sobre cómo puedo ayudarte a transformar tus ideas en código eficiente y escalable." data-en="Let's talk about how I can help you transform your ideas into efficient, scalable code.">
+                    Hablemos sobre cómo puedo ayudarte a transformar tus ideas en código eficiente y escalable.
+                </p>
+                
+                <div class="contact-links">
+                    <a href="https://github.com/mcarbonell" class="contact-link" target="_blank">
+                        <span class="contact-link-icon">💻</span>
+                        <div>
+                            <div style="font-weight: 600;">GitHub</div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">@mcarbonell</div>
+                        </div>
+                    </a>
+                    
+                    <a href="mailto:contacto@mariorcarbonell.com" class="contact-link">
+                        <span class="contact-link-icon">✉️</span>
+                        <div>
+                            <div style="font-weight: 600;" data-es="Email" data-en="Email">Email</div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">contacto@mariorcarbonell.com</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <form class="contact-form glass-card" id="contact-form">
+                <div class="form-group">
+                    <label class="form-label" data-es="Nombre" data-en="Name">Nombre</label>
+                    <input type="text" class="form-input" required data-placeholder-es="Tu nombre" data-placeholder-en="Your name" placeholder="Tu nombre">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" required data-placeholder-es="tu@email.com" data-placeholder-en="your@email.com" placeholder="tu@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" data-es="Mensaje" data-en="Message">Mensaje</label>
+                    <textarea class="form-input" required data-placeholder-es="Cuéntame sobre tu proyecto..." data-placeholder-en="Tell me about your project..." placeholder="Cuéntame sobre tu proyecto..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;" data-es="Enviar Mensaje" data-en="Send Message">
+                    Enviar Mensaje
+                </button>
+            </form>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2025 Mario Raúl Carbonell. <span data-es="Todos los derechos reservados." data-en="All rights reserved.">Todos los derechos reservados.</span></p>
+        <div class="footer-links">
+            <a href="https://github.com/mcarbonell" target="_blank">GitHub</a>
+            <a href="#contact" data-es="Contacto" data-en="Contact">Contacto</a>
+        </div>
+    </footer>
+    
+    <script>
+        // ============================================
+        // DESIGN CHOICE: Three.js Particle System
+        // Animated floating particles with connection lines
+        // Optimized for performance with requestAnimationFrame
+        // ============================================
+        
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let particles = [];
+        let animationId;
+        let mouseX = 0;
+        let mouseY = 0;
+        let isTouch = window.matchMedia('(pointer: coarse)').matches;
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas, { passive: true });
+        
+        // Particle class
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+                this.color = Math.random() > 0.5 ? 'rgba(0, 240, 255,' : 'rgba(255, 0, 255,';
+                this.alpha = Math.random() * 0.5 + 0.2;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // Wrap around edges
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+                
+                // Mouse interaction (only on desktop)
+                if (!isTouch) {
+                    const dx = mouseX - this.x;
+                    const dy = mouseY - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 150) {
+                        const force = (150 - distance) / 150;
+                        this.vx -= (dx / distance) * force * 0.02;
+                        this.vy -= (dy / distance) * force * 0.02;
+                    }
+                }
+                
+                // Damping
+                this.vx *= 0.99;
+                this.vy *= 0.99;
+                
+                // Minimum velocity
+                if (Math.abs(this.vx) < 0.1) this.vx += (Math.random() - 0.5) * 0.1;
+                if (Math.abs(this.vy) < 0.1) this.vy += (Math.random() - 0.5) * 0.1;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color + this.alpha + ')';
+                ctx.fill();
+            }
+        }
+        
+        // Initialize particles
+        const particleCount = isTouch ? 25 : 50;
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+        
+        // Draw connections
+        function drawConnections() {
+            const maxDistance = 100;
+            const maxConnections = 3;
+            
+            for (let i = 0; i < particles.length; i++) {
+                let connections = 0;
+                
+                for (let j = i + 1; j < particles.length; j++) {
+                    if (connections >= maxConnections) break;
+                    
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < maxDistance) {
+                        const alpha = (1 - distance / maxDistance) * 0.2;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                        connections++;
+                    }
+                }
+            }
+        }
+        
+        // Animation loop
+        let frameCount = 0;
+        function animate() {
+            frameCount++;
+            
+            // Render every 2nd frame on mobile for performance
+            if (isTouch && frameCount % 2 !== 0) {
+                animationId = requestAnimationFrame(animate);
+                return;
+            }
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            drawConnections();
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // Start animation
+        animate();
+        
+        // Mouse tracking
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        }, { passive: true });
+        
+        // Pause when tab hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                cancelAnimationFrame(animationId);
+            } else {
+                animate();
+            }
+        });
+        
+        // ============================================
+        // GSAP ScrollTrigger for parallax layers
+        // ============================================
+        
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Parallax effect for layers
+        document.querySelectorAll('.parallax-layer').forEach(layer => {
+            const speed = layer.dataset.speed || 0.1;
+            
+            gsap.to(layer, {
+                y: () => window.innerHeight * speed * 0.5,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: layer,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+        });
+        
+        // Reveal animations
+        gsap.utils.toArray('.service-card, .project-card').forEach((card, i) => {
+            gsap.from(card, {
+                y: 60,
+                opacity: 0,
+                duration: 0.8,
+                delay: i * 0.1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        });
+        
+        // ============================================
+        // Theme Toggle (Light/Dark)
+        // ============================================
+        
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const html = document.documentElement;
+        
+        // Check saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', savedTheme);
+        themeIcon.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeIcon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+            
+            // Update particle colors based on theme
+            if (newTheme === 'light') {
+                particles.forEach(p => {
+                    p.color = Math.random() > 0.5 ? 'rgba(0, 136, 204,' : 'rgba(204, 0, 170,';
+                });
+            } else {
+                particles.forEach(p => {
+                    p.color = Math.random() > 0.5 ? 'rgba(0, 240, 255,' : 'rgba(255, 0, 255,';
+                });
+            }
+        });
+        
+        // ============================================
+        // Language Toggle (ES/EN)
+        // ============================================
+        
+        const langToggle = document.getElementById('lang-toggle');
+        const langText = document.getElementById('lang-text');
+        
+        let currentLang = localStorage.getItem('language') || 'es';
+        langText.textContent = currentLang.toUpperCase();
+        
+        function updateLanguage(lang) {
+            document.querySelectorAll('[data-es][data-en]').forEach(el => {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = el.getAttribute(`data-placeholder-${lang}`);
+                } else {
+                    el.textContent = el.getAttribute(`data-${lang}`);
+                }
+            });
+        }
+        
+        updateLanguage(currentLang);
+        
+        langToggle.addEventListener('click', () => {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            localStorage.setItem('language', currentLang);
+            langText.textContent = currentLang.toUpperCase();
+            updateLanguage(currentLang);
+        });
+        
+        // ============================================
+        // Contact Form Handler
+        // ============================================
+        
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            
+            btn.textContent = currentLang === 'es' ? '¡Mensaje enviado!' : 'Message sent!';
+            btn.style.background = 'linear-gradient(135deg, #00cc66, #00aa44)';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+                e.target.reset();
+            }, 3000);
+        });
+        
+        // ============================================
+        // Smooth scroll for anchor links
+        // ============================================
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

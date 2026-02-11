@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - SaaSFlow</title>
+    <meta name="description" content="Read the latest insights, tips, and trends from the SaaSFlow team on business automation and technology">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <style>
+        /* Seed 672710564 - Blog Page Styles */
+        /* Position 7 (5): List density - Medium density with clear hierarchy */
+        
+        .blog-hero {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: white;
+            padding: var(--space-3xl) 0;
+            text-align: center;
+        }
+        
+        .blog-section {
+            padding: var(--space-3xl) 0;
+        }
+        
+        .blog-container {
+            max-width: var(--content-max-width);
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+        
+        .blog-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-3xl);
+        }
+        
+        .blog-main {
+            min-width: 0;
+        }
+        
+        .blog-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        
+        .blog-filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .category-filters {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        .category-filter {
+            padding: var(--space-xs) var(--space-md);
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+        
+        .category-filter:hover,
+        .category-filter.active {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+        
+        .search-box {
+            position: relative;
+            width: 250px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: var(--space-xs) var(--space-md) var(--space-xs) var(--space-2xl);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: var(--space-sm);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-light);
+        }
+        
+        .blog-grid {
+            display: grid;
+            gap: var(--space-xl);
+        }
+        
+        .blog-post {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: all var(--transition-normal);
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: var(--space-lg);
+        }
+        
+        .blog-post:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .blog-image {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        }
+        
+        .blog-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-normal);
+        }
+        
+        .blog-post:hover .blog-image img {
+            transform: scale(1.05);
+        }
+        
+        .blog-content {
+            padding: var(--space-lg);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .blog-meta {
+            display: flex;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+            font-size: var(--text-sm);
+            color: var(--color-text-light);
+        }
+        
+        .blog-category {
+            color: var(--color-primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .blog-title {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            line-height: var(--line-height-compact);
+        }
+        
+        .blog-excerpt {
+            color: var(--color-text-light);
+            line-height: var(--line-height-relaxed);
+            margin-bottom: var(--space-md);
+            flex-grow: 1;
+        }
+        
+        .blog-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+        
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+        
+        .sidebar-section {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .sidebar-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+        }
+        
+        .trending-list {
+            list-style: none;
+        }
+        
+        .trending-item {
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .trending-item:last-child {
+            border-bottom: none;
+        }
+        
+        .trending-title {
+            color: var(--color-text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: var(--text-sm);
+            line-height: var(--line-height-normal);
+            display: block;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .trending-title:hover {
+            color: var(--color-primary);
+        }
+        
+        .trending-meta {
+            font-size: var(--text-xs);
+            color: var(--color-text-light);
+        }
+        
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+        
+        .tag {
+            padding: var(--space-xs) var(--space-sm);
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-light);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+        
+        .tag:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+        
+        .newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        .newsletter-input {
+            padding: var(--space-sm);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-sm);
+            margin-top: var(--space-2xl);
+        }
+        
+        .page-link {
+            padding: var(--space-sm) var(--space-md);
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text);
+            text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+        
+        .page-link:hover,
+        .page-link.active {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .blog-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .blog-sidebar {
+                position: static;
+            }
+            
+            .blog-post {
+                grid-template-columns: 1fr;
+            }
+            
+            .blog-filters {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--space-md);
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .category-filters {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">SaaSFlow</a>
+            <button class="navbar-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="navbar-menu">
+                <li><a href="index.html" class="navbar-link">Home</a></li>
+                <li><a href="about.html" class="navbar-link">About</a></li>
+                <li><a href="services.html" class="navbar-link">Services</a></li>
+                <li><a href="pricing.html" class="navbar-link">Pricing</a></li>
+                <li><a href="blog.html" class="navbar-link active">Blog</a></li>
+                <li><a href="contact.html" class="navbar-link">Contact</a></li>
+                <li><button class="theme-toggle" aria-label="Toggle theme">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Hero -->
+    <header class="blog-hero">
+        <div class="container">
+            <h1 class="section-title">SaaSFlow Blog</h1>
+            <p class="section-subtitle">Insights, trends, and best practices for modern business operations</p>
+        </div>
+    </header>
+
+    <!-- Blog Section -->
+    <section class="blog-section">
+        <div class="blog-container">
+            <div class="blog-layout">
+                <!-- Main Content -->
+                <div class="blog-main">
+                    <!-- Filters -->
+                    <div class="blog-filters">
+                        <div class="category-filters">
+                            <a href="#" class="category-filter active">All</a>
+                            <a href="#" class="category-filter">Analytics</a>
+                            <a href="#" class="category-filter">Automation</a>
+                            <a href="#" class="category-filter">Productivity</a>
+                            <a href="#" class="category-filter">Security</a>
+                            <a href="#" class="category-filter">Tips</a>
+                        </div>
+                        
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" class="search-input" placeholder="Search articles...">
+                        </div>
+                    </div>
+
+                    <!-- Blog Posts Grid -->
+                    <div class="blog-grid">
+                        <!-- Blog Post 1 -->
+                        <article class="blog-post reveal">
+                            <div class="blog-image">
+                                <img src="https://picsum.photos/seed/analytics2024/300/200.jpg" alt="Analytics trends">
+                            </div>
+                            <div class="blog-content">
+                                <div class="blog-meta">
+                                    <a href="#" class="blog-category">Analytics</a>
+                                    <span>•</span>
+                                    <time>5 min read</time>
+                                </div>
+                                
+                                <h2 class="blog-title">
+                                    <a href="blog-post.html" style="color: inherit; text-decoration: none;">
+                                        The Future of Business Analytics: 5 Trends to Watch in 2024
+                                    </a>
+                                </h2>
+                                
+                                <p class="blog-excerpt">
+                                    Explore the cutting-edge trends shaping business analytics this year, from AI-powered insights to real-time data streaming and predictive modeling breakthroughs.
+                                </p>
+                                
+                                <div class="blog-author">
+                                    <div class="author-avatar">SC</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Sarah Chen</div>
+                                        <div style="font-size: var(--text-xs); color: var(--color-text-light);">Jan 15, 2024</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Blog Post 2 -->
+                        <article class="blog-post reveal" style="animation-delay: 0.1s">
+                            <div class="blog-image">
+                                <img src="https://picsum.photos/seed/automation/300/200.jpg" alt="Workflow automation">
+                            </div>
+                            <div class="blog-content">
+                                <div class="blog-meta">
+                                    <a href="#" class="blog-category">Automation</a>
+                                    <span>•</span>
+                                    <time>8 min read</time>
+                                </div>
+                                
+                                <h2 class="blog-title">
+                                    <a href="blog-post.html" style="color: inherit; text-decoration: none;">
+                                        How to Automate Your Business Workflows: A Complete Guide
+                                    </a>
+                                </h2>
+                                
+                                <p class="blog-excerpt">
+                                    Learn step-by-step how to identify automation opportunities, design efficient workflows, and implement automation tools that save time and reduce errors.
+                                </p>
+                                
+                                <div class="blog-author">
+                                    <div class="author-avatar">MR</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Michael Rodriguez</div>
+                                        <div style="font-size: var(--text-xs); color: var(--color-text-light);">Jan 12, 2024</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Blog Post 3 -->
+                        <article class="blog-post reveal" style="animation-delay: 0.2s">
+                            <div class="blog-image">
+                                <img src="https://picsum.photos/seed/productivity/300/200.jpg" alt="Team productivity">
+                            </div>
+                            <div class="blog-content">
+                                <div class="blog-meta">
+                                    <a href="#" class="blog-category">Productivity</a>
+                                    <span>•</span>
+                                    <time>6 min read</time>
+                                </div>
+                                
+                                <h2 class="blog-title">
+                                    <a href="blog-post.html" style="color: inherit; text-decoration: none;">
+                                        10 Productivity Hacks That Actually Work for Remote Teams
+                                    </a>
+                                </h2>
+                                
+                                <p class="blog-excerpt">
+                                    Discover proven strategies to boost productivity, maintain work-life balance, and foster collaboration in distributed work environments.
+                                </p>
+                                
+                                <div class="blog-author">
+                                    <div class="author-avatar">EJ</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Emily Johnson</div>
+                                        <div style="font-size: var(--text-xs); color: var(--color-text-light);">Jan 10, 2024</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Blog Post 4 -->
+                        <article class="blog-post reveal" style="animation-delay: 0.3s">
+                            <div class="blog-image">
+                                <img src="https://picsum.photos/seed/security/300/200.jpg" alt="Data security">
+                            </div>
+                            <div class="blog-content">
+                                <div class="blog-meta">
+                                    <a href="#" class="blog-category">Security</a>
+                                    <span>•</span>
+                                    <time>10 min read</time>
+                                </div>
+                                
+                                <h2 class="blog-title">
+                                    <a href="blog-post.html" style="color: inherit; text-decoration: none;">
+                                        Essential Security Measures for Your SaaS Applications
+                                    </a>
+                                </h2>
+                                
+                                <p class="blog-excerpt">
+                                    Understand the critical security measures every business should implement to protect their SaaS applications and sensitive customer data.
+                                </p>
+                                
+                                <div class="blog-author">
+                                    <div class="author-avatar">AK</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Alex Kumar</div>
+                                        <div style="font-size: var(--text-xs); color: var(--color-text-light);">Jan 8, 2024</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <a href="#" class="page-link">← Previous</a>
+                        <a href="#" class="page-link active">1</a>
+                        <a href="#" class="page-link">2</a>
+                        <a href="#" class="page-link">3</a>
+                        <a href="#" class="page-link">Next →</a>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="blog-sidebar">
+                    <!-- Trending Posts -->
+                    <div class="sidebar-section reveal">
+                        <h3 class="sidebar-title">Trending Posts</h3>
+                        <ol class="trending-list">
+                            <li class="trending-item">
+                                <a href="blog-post.html" class="trending-title">AI in Business: Transforming Decision Making</a>
+                                <div class="trending-meta">2.5k views • 3 days ago</div>
+                            </li>
+                            <li class="trending-item">
+                                <a href="blog-post.html" class="trending-title">The Ultimate Guide to Cloud Migration</a>
+                                <div class="trending-meta">1.8k views • 5 days ago</div>
+                            </li>
+                            <li class="trending-item">
+                                <a href="blog-post.html" class="trending-title">Building a Data-Driven Culture</a>
+                                <div class="trending-meta">1.2k views • 1 week ago</div>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <!-- Popular Tags -->
+                    <div class="sidebar-section reveal" style="animation-delay: 0.1s">
+                        <h3 class="sidebar-title">Popular Tags</h3>
+                        <div class="tag-cloud">
+                            <a href="#" class="tag">Analytics</a>
+                            <a href="#" class="tag">Automation</a>
+                            <a href="#" class="tag">Cloud</a>
+                            <a href="#" class="tag">Data</a>
+                            <a href="#" class="tag">Productivity</a>
+                            <a href="#" class="tag">Security</a>
+                            <a href="#" class="tag">AI</a>
+                            <a href="#" class="tag">Remote Work</a>
+                            <a href="#" class="tag">Integration</a>
+                            <a href="#" class="tag">Workflow</a>
+                        </div>
+                    </div>
+
+                    <!-- Newsletter -->
+                    <div class="sidebar-section reveal" style="animation-delay: 0.2s">
+                        <h3 class="sidebar-title">Subscribe to Newsletter</h3>
+                        <p style="font-size: var(--text-sm); color: var(--color-text-light); margin-bottom: var(--space-md);">
+                            Get the latest insights delivered to your inbox weekly.
+                        </p>
+                        <form class="newsletter-form">
+                            <input type="email" class="newsletter-input" placeholder="Your email address">
+                            <button type="submit" class="btn btn-sm">Subscribe</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="services.html">Features</a></li>
+                        <li><a href="pricing.html">Pricing</a></li>
+                        <li><a href="case-studies.html">Case Studies</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="help.html">Help Center</a></li>
+                        <li><a href="docs.html">Documentation</a></li>
+                        <li><a href="api.html">API</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="security.html">Security</a></li>
+                        <li><a href="compliance.html">Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SaaSFlow. All rights reserved.</p>
+                <div class="flex gap-md">
+                    <a href="#" aria-label="Twitter">𝕏</a>
+                    <a href="#" aria-label="LinkedIn">in</a>
+                    <a href="#" aria-label="GitHub">⚡</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    
+    <script>
+        // Category filtering
+        document.addEventListener('DOMContentLoaded', () => {
+            const categoryFilters = document.querySelectorAll('.category-filter');
+            const blogPosts = document.querySelectorAll('.blog-post');
+            
+            categoryFilters.forEach(filter => {
+                filter.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Update active filter
+                    categoryFilters.forEach(f => f.classList.remove('active'));
+                    filter.classList.add('active');
+                    
+                    const category = filter.textContent;
+                    
+                    // Filter posts (simplified for demo)
+                    if (category === 'All') {
+                        blogPosts.forEach(post => post.style.display = 'grid');
+                    } else {
+                        // In a real app, this would filter based on actual categories
+                        blogPosts.forEach((post, index) => {
+                            const shouldShow = 
+                                (category === 'Analytics' && index === 0) ||
+                                (category === 'Automation' && index === 1) ||
+                                (category === 'Productivity' && index === 2) ||
+                                (category === 'Security' && index === 3);
+                            post.style.display = shouldShow ? 'grid' : 'none';
+                        });
+                    }
+                });
+            });
+            
+            // Newsletter subscription
+            const newsletterForm = document.querySelector('.newsletter-form');
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Demo: You would be subscribed to the newsletter!');
+                newsletterForm.reset();
+            });
+        });
+    </script>
+</body>
+</html>

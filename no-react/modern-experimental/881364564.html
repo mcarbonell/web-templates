@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEO-ARCHIVE // SEED 881364564</title>
+    <!--
+    DESIGN LOG // SEED: 881364564
+    --------------------------------------------------
+    - THEME: Digital Brutalism / The Dithered Archive
+    - LAYOUT: Bento Grid System (Recursive)
+    - PRIMARY TECHNIQUES: 
+        1. Custom WebGL Shader: Dithered Grain Flow
+        2. ASCII Art Rendering: Dynamic Hero Visuals
+        3. Scramble Text: Interactive Typography
+        4. Bento Grids: Information hierarchy
+        5. Scroll-Driven Animations: Contextual reveals
+    - COLOR PALETTE: 
+        Dark: #0A0A0A (Bg), #F0F0F0 (Text), #00FF41 (Accent - Matrix Green)
+        Light: #F5F5F5 (Bg), #1A1A1A (Text), #0044FF (Accent - Electric Blue)
+    - DECISIONS:
+        * Daring choice to use ASCII as a primary visual element rather than images.
+        * Custom Bayer Dithering applied via WebGL for a nostalgic yet modern "technical" aesthetic.
+        * Magnetic interactions on all primary CTA elements.
+        * Scroll-snapping layout for precise presentation.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0A0A0A;
+            --txt: #F0F0F0;
+            --accent: #00FF41;
+            --accent-rgb: 0, 255, 65;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        [data-theme="light"] {
+            --bg: #F5F5F5;
+            --txt: #1A1A1A;
+            --accent: #0044FF;
+            --accent-rgb: 0, 68, 255;
+            --card-bg: rgba(0, 0, 0, 0.03);
+            --border: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--txt);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            transition: background-color var(--transition), color var(--transition);
+            line-height: 1.5;
+        }
+
+        /* Custom Cursor */
+        #cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        /* Shader Canvas */
+        #gl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        /* UI Elements */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            letter-spacing: -1px;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--txt);
+            color: var(--txt);
+            padding: 0.5rem 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: var(--txt);
+            color: var(--bg);
+        }
+
+        /* Layout */
+        main {
+            padding: 8rem 2rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        section {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 8rem;
+        }
+
+        /* Hero */
+        .hero {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 900;
+            line-height: 0.9;
+            letter-spacing: -0.05em;
+            text-transform: uppercase;
+        }
+
+        .hero-ascii {
+            font-family: var(--font-mono);
+            font-size: 8px;
+            line-height: 1;
+            white-space: pre;
+            color: var(--accent);
+            opacity: 0.8;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Bento Grid */
+        .bento {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 300px);
+            gap: 1.5rem;
+        }
+
+        .bento-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: border-color var(--transition);
+        }
+
+        .bento-item:hover {
+            border-color: var(--accent);
+        }
+
+        .item-1 {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .item-2 {
+            grid-column: span 2;
+        }
+
+        .item-3 {
+            grid-column: span 1;
+        }
+
+        .item-4 {
+            grid-column: span 1;
+        }
+
+        .bento-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            opacity: 0.5;
+        }
+
+        .bento-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 1rem;
+        }
+
+        /* Magnetic Button */
+        .magnetic-wrap {
+            display: inline-block;
+            padding: 20px;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #000;
+            padding: 1.5rem 3rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s linear;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-ascii {
+                display: none;
+            }
+
+            .bento {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+
+            .item-1,
+            .item-2,
+            .item-3,
+            .item-4 {
+                grid-column: span 1;
+                height: 300px;
+            }
+
+            h1 {
+                font-size: 4rem;
+            }
+        }
+
+        /* Scramble Text Effect */
+        .scramble {
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cursor"></div>
+    <canvas id="gl-canvas"></canvas>
+
+    <nav>
+        <div class="logo">NEO_ARCHIVE // 881364564</div>
+        <button class="theme-toggle" id="mode-toggle">Switch Mode</button>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div>
+                <h1 class="reveal" data-scramble>System<br>Overload</h1>
+                <p class="reveal" style="margin-top: 2rem; max-width: 400px; opacity: 0.7;">
+                    Experience the synergy of raw data and elegant design. A dithered exploration of the digital
+                    frontier.
+                </p>
+                <div class="magnetic-wrap reveal">
+                    <a href="#" class="btn">Initialize</a>
+                </div>
+            </div>
+            <div class="hero-ascii" id="hero-ascii">
+                <!-- ASCII Generates Here -->
+            </div>
+        </section>
+
+        <section id="services">
+            <div class="bento">
+                <div class="bento-item item-1 reveal">
+                    <div>
+                        <span class="bento-label">01 // VISUALS</span>
+                        <div class="bento-title">Dithered WebGL Shaders</div>
+                    </div>
+                    <p style="opacity: 0.6;">Pushing pixels beyond their limits with custom bayer-matrix dithering
+                        algorithms.</p>
+                </div>
+                <div class="bento-item item-2 reveal">
+                    <div>
+                        <span class="bento-label">02 // DATA</span>
+                        <div class="bento-title">Bento Grid Architecture</div>
+                    </div>
+                </div>
+                <div class="bento-item item-3 reveal">
+                    <div>
+                        <span class="bento-label">03 // FLOW</span>
+                        <div class="bento-title">Liquid UX</div>
+                    </div>
+                </div>
+                <div class="bento-item item-4 reveal">
+                    <div>
+                        <span class="bento-label">04 // CORE</span>
+                        <div class="bento-title">Vanilla JS</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section style="text-align: center;">
+            <h2 class="reveal" style="font-size: 5vw; line-height: 1;">READY FOR<br><span
+                    style="-webkit-text-stroke: 1px var(--txt); color: transparent;" data-scramble>DECOMPRESSION?</span>
+            </h2>
+        </section>
+    </main>
+
+    <script id="v-shader" type="x-shader/x-vertex">
+        attribute vec2 position;
+        void main() {
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    </script>
+
+    <script id="f-shader" type="x-shader/x-fragment">
+        precision highp float;
+        uniform float time;
+        uniform vec2 resolution;
+        uniform vec3 color1;
+        uniform vec3 color2;
+        uniform float theme;
+
+        float random(vec2 st) {
+            return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+        }
+
+        // 4x4 Bayer Matrix
+        float bayer(vec2 uv) {
+            vec2 p = floor(mod(uv, 4.0));
+            int x = int(p.x);
+            int y = int(p.y);
+            if (x == 0) {
+                if (y == 0) return 0.0;
+                if (y == 1) return 8.0;
+                if (y == 2) return 2.0;
+                if (y == 3) return 10.0;
+            } else if (x == 1) {
+                if (y == 0) return 12.0;
+                if (y == 1) return 4.0;
+                if (y == 2) return 14.0;
+                if (y == 3) return 6.0;
+            } else if (x == 2) {
+                if (y == 0) return 3.0;
+                if (y == 1) return 11.0;
+                if (y == 2) return 1.0;
+                if (y == 3) return 9.0;
+            } else if (x == 3) {
+                if (y == 0) return 15.0;
+                if (y == 1) return 7.0;
+                if (y == 2) return 13.0;
+                if (y == 3) return 5.0;
+            }
+            return 0.0;
+        }
+
+        void main() {
+            vec2 uv = gl_FragCoord.xy / resolution.xy;
+            
+            // Animated background noise/flow
+            float n = random(uv + time * 0.1);
+            float mask = sin(uv.x * 10.0 + time) * cos(uv.y * 5.0 - time);
+            
+            vec3 color = mix(color1, color2, uv.y + mask * 0.2);
+            
+            // Apply Dithering
+            float threshold = bayer(gl_FragCoord.xy) / 16.0;
+            float lum = dot(color, vec3(0.299, 0.587, 0.114));
+            
+            vec3 finalColor = lum > threshold ? color : vec3(0.0);
+            
+            // Add subtle noise
+            finalColor += n * 0.05;
+
+            gl_FragColor = vec4(finalColor, 1.0);
+        }
+    </script>
+
+    <script>
+        // --- LOGIC ---
+
+        // Dark/Light Theme
+        const toggle = document.getElementById('mode-toggle');
+        const themeState = { dark: true };
+
+        toggle.addEventListener('click', () => {
+            themeState.dark = !themeState.dark;
+            document.documentElement.setAttribute('data-theme', themeState.dark ? 'dark' : 'light');
+            updateShaderColors();
+        });
+
+        // Custom Cursor
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Scramble Text
+        const scramble = (el) => {
+            if (el.dataset.scrambling === "true") return;
+
+            // Store original text if not already stored
+            if (!el.dataset.original) {
+                el.dataset.original = el.innerText;
+            }
+
+            const original = el.dataset.original;
+            const chars = '!<>-_\\/[]{}—=+*^?#________';
+            let iteration = 0;
+            el.dataset.scrambling = "true";
+
+            const interval = setInterval(() => {
+                el.innerText = original.split('').map((char, index) => {
+                    // Handle line breaks and spaces specifically to maintain layout
+                    if (char === " " || char === "\n") return char;
+                    if (index < iteration) return original[index];
+                    return chars[Math.floor(Math.random() * chars.length)];
+                }).join('');
+
+                if (iteration >= original.length) {
+                    clearInterval(interval);
+                    el.dataset.scrambling = "false";
+                }
+                iteration += 1 / 2; // Slightly faster for responsiveness
+            }, 30);
+        };
+
+        document.querySelectorAll('[data-scramble]').forEach(el => {
+            // Pre-store original text on load
+            el.dataset.original = el.innerText;
+            el.addEventListener('mouseenter', () => scramble(el));
+        });
+
+        // Reveal animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    if (entry.target.hasAttribute('data-scramble')) scramble(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Magnetic Buttons
+        document.querySelectorAll('.magnetic-wrap').forEach(wrap => {
+            wrap.addEventListener('mousemove', (e) => {
+                const btn = wrap.querySelector('.btn');
+                const rect = wrap.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.5}px)`;
+            });
+            wrap.addEventListener('mouseleave', () => {
+                wrap.querySelector('.btn').style.transform = `translate(0, 0)`;
+            });
+        });
+
+        // ASCII Generator
+        const asciiContainer = document.getElementById('hero-ascii');
+        const frames = [
+            `
+    RRRRR   AAAAA   DDDDD   IIIII   OOOOO
+    R   R   A   A   D   D     I     O   O
+    RRRRR   AAAAA   D   D     I     O   O
+    R R     A   A   D   D     I     O   O
+    R  R    A   A   DDDDD   IIIII   OOOOO
+            `,
+            `
+     ####   #####   ####    ###    #### 
+    #    #  #    #  #   #    #    #    #
+    #    #  #####   #   #    #    #    #
+    #    #  #   #   #   #    #    #    #
+     ####   #    #  ####    ###    #### 
+            `
+        ];
+        let frameIdx = 0;
+        setInterval(() => {
+            asciiContainer.innerText = frames[frameIdx];
+            frameIdx = (frameIdx + 1) % frames.length;
+        }, 500);
+
+        // WebGL Shader Boot
+        const canvas = document.getElementById('gl-canvas');
+        const gl = canvas.getContext('webgl');
+
+        function createShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            return shader;
+        }
+
+        const vSource = document.getElementById('v-shader').text;
+        const fSource = document.getElementById('f-shader').text;
+        const vs = createShader(gl, gl.VERTEX_SHADER, vSource);
+        const fs = createShader(gl, gl.FRAGMENT_SHADER, fSource);
+
+        const program = gl.createProgram();
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        gl.useProgram(program);
+
+        const posBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+
+        const posAttrib = gl.getAttribLocation(program, 'position');
+        gl.enableVertexAttribArray(posAttrib);
+        gl.vertexAttribPointer(posAttrib, 2, gl.FLOAT, false, 0, 0);
+
+        const timeLoc = gl.getUniformLocation(program, 'time');
+        const resLoc = gl.getUniformLocation(program, 'resolution');
+        const col1Loc = gl.getUniformLocation(program, 'color1');
+        const col2Loc = gl.getUniformLocation(program, 'color2');
+
+        function updateShaderColors() {
+            const colors = themeState.dark
+                ? { c1: [0.03, 0.03, 0.03], c2: [0.0, 1.0, 0.25] }
+                : { c1: [0.96, 0.96, 0.96], c2: [0.0, 0.27, 1.0] };
+            gl.uniform3fv(col1Loc, colors.c1);
+            gl.uniform3fv(col2Loc, colors.c2);
+        }
+
+        function render(now) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+
+            gl.uniform1f(timeLoc, now * 0.001);
+            gl.uniform2f(resLoc, canvas.width, canvas.height);
+
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            requestAnimationFrame(render);
+        }
+
+        updateShaderColors();
+        requestAnimationFrame(render);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+
+</html>

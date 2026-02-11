@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VANTA — Digital Studio</title>
+
+  <!--
+    ============================================================
+    DESIGN DOCUMENT — Seed: 806339775
+    ============================================================
+
+    DESIGN DECOMPOSITION:
+    - 806 → Color palette index 2: Coral/Salmon (#FF6B5A) + Deep Black (#0A0A0A)
+      with accent Electric Lime (#CDFF50) for contrast pops
+    - 339 → Hero layout 4: Oversized rotated typography hero
+    - 775 → Typography 7: Space Grotesk (body) + Syne (display/headings)
+    - 80  → Decorative shape 2: Cut circles / semicircles as section dividers
+    - 63  → Navigation style 3: Vertical side nav on desktop, hamburger on mobile
+    - 39  → Animation 4: Infinite horizontal marquee text bands
+    - 77  → Card style 2: Thick bordered cards with hard offset shadows (brutalist)
+    - 5   → Footer style 2: Maximal footer with enormous typography
+
+    DESIGN PHILOSOPHY:
+    A brutalist-meets-editorial aesthetic. No gradients anywhere.
+    Flat bold colors, oversized type, hard geometric shapes.
+    The layout breaks conventional grid expectations with rotated
+    elements and asymmetric compositions. The marquee bands add
+    kinetic energy. Semicircle dividers create visual rhythm.
+
+    Dark mode inverts the palette: black bg with coral accents
+    and lime highlights preserved.
+
+    BROWSER SUPPORT: Chrome, Firefox, Safari (modern)
+    MOBILE: Fully responsive, mobile-first approach
+    ============================================================
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==================== CUSTOM PROPERTIES ==================== */
+    :root {
+      --color-bg: #F5F0EB;
+      --color-bg-alt: #FFFFFF;
+      --color-text: #0A0A0A;
+      --color-text-muted: #5A5A5A;
+      --color-primary: #FF6B5A;
+      --color-accent: #CDFF50;
+      --color-border: #0A0A0A;
+      --color-card-shadow: #0A0A0A;
+      --color-marquee-bg: #0A0A0A;
+      --color-marquee-text: #F5F0EB;
+      --color-nav-bg: rgba(245, 240, 235, 0.95);
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'Space Grotesk', sans-serif;
+      --shadow-offset: 6px;
+      --border-thick: 3px;
+      --radius: 0px;
+      --transition-speed: 0.3s;
+    }
+
+    [data-theme="dark"] {
+      --color-bg: #0A0A0A;
+      --color-bg-alt: #161616;
+      --color-text: #F5F0EB;
+      --color-text-muted: #A0A0A0;
+      --color-primary: #FF6B5A;
+      --color-accent: #CDFF50;
+      --color-border: #F5F0EB;
+      --color-card-shadow: #FF6B5A;
+      --color-marquee-bg: #FF6B5A;
+      --color-marquee-text: #0A0A0A;
+      --color-nav-bg: rgba(10, 10, 10, 0.95);
+    }
+
+    /* ==================== RESET & BASE ==================== */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    /* ==================== THEME TOGGLE ==================== */
+    .theme-toggle {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1000;
+      width: 56px;
+      height: 56px;
+      border: var(--border-thick) solid var(--color-border);
+      background-color: var(--color-bg-alt);
+      color: var(--color-text);
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-speed);
+      border-radius: 50%;
+    }
+
+    .theme-toggle:hover {
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+      transform: rotate(180deg);
+    }
+
+    .theme-toggle .icon-dark,
+    .theme-toggle .icon-light {
+      position: absolute;
+      transition: opacity var(--transition-speed);
+    }
+
+    [data-theme="light"] .theme-toggle .icon-light { opacity: 0; }
+    [data-theme="light"] .theme-toggle .icon-dark { opacity: 1; }
+    [data-theme="dark"] .theme-toggle .icon-light { opacity: 1; }
+    [data-theme="dark"] .theme-toggle .icon-dark { opacity: 0; }
+
+    /* ==================== VERTICAL SIDE NAV (Desktop) ==================== */
+    .side-nav {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 60px;
+      height: 100vh;
+      background-color: var(--color-nav-bg);
+      border-right: var(--border-thick) solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      z-index: 999;
+      transition: background-color var(--transition-speed);
+    }
+
+    .side-nav__link {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-text-muted);
+      transition: color var(--transition-speed);
+      transform: rotate(180deg);
+    }
+
+    .side-nav__link:hover {
+      color: var(--color-primary);
+    }
+
+    .side-nav__brand {
+      writing-mode: vertical-rl;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      color: var(--color-text);
+      transform: rotate(180deg);
+      margin-bottom: auto;
+      padding-top: 1.5rem;
+    }
+
+    /* ==================== MOBILE NAV ==================== */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      background-color: var(--color-nav-bg);
+      border-bottom: var(--border-thick) solid var(--color-border);
+      z-index: 999;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      transition: background-color var(--transition-speed);
+    }
+
+    .mobile-nav__brand {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: 0.05em;
+    }
+
+    .hamburger {
+      width: 40px;
+      height: 40px;
+      border: var(--border-thick) solid var(--color-border);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .hamburger__line {
+      width: 20px;
+      height: 2px;
+      background-color: var(--color-text);
+      transition: all var(--transition-speed);
+    }
+
+    .hamburger.active .hamburger__line:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger.active .hamburger__line:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active .hamburger__line:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 60px);
+      background-color: var(--color-bg);
+      z-index: 998;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .mobile-menu.active {
+      display: flex;
+    }
+
+    .mobile-menu__link {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--color-text);
+      transition: color var(--transition-speed);
+    }
+
+    .mobile-menu__link:hover {
+      color: var(--color-primary);
+    }
+
+    /* ==================== MAIN CONTENT OFFSET ==================== */
+    .main-content {
+      margin-left: 60px;
+    }
+
+    /* ==================== HERO SECTION ==================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero__eyebrow {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--color-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero__title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(3.5rem, 10vw, 9rem);
+      line-height: 0.9;
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+    }
+
+    .hero__title-rotated {
+      display: inline-block;
+      transform: rotate(-3deg);
+      color: var(--color-primary);
+      position: relative;
+    }
+
+    .hero__title-rotated::after {
+      content: '';
+      position: absolute;
+      bottom: 0.1em;
+      left: -0.05em;
+      right: -0.05em;
+      height: 0.15em;
+      background-color: var(--color-accent);
+      z-index: -1;
+    }
+
+    .hero__subtitle {
+      font-family: var(--font-body);
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      max-width: 500px;
+      color: var(--color-text-muted);
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+
+    .hero__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 1rem 2.5rem;
+      border: var(--border-thick) solid var(--color-border);
+      background-color: var(--color-accent);
+      color: #0A0A0A;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      position: relative;
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-card-shadow);
+    }
+
+    .hero__cta:hover {
+      box-shadow: none;
+      transform: translate(var(--shadow-offset), var(--shadow-offset));
+    }
+
+    .hero__cta-arrow {
+      font-size: 1.3rem;
+      transition: transform var(--transition-speed);
+    }
+
+    .hero__cta:hover .hero__cta-arrow {
+      transform: translateX(4px);
+    }
+
+    /* Semicircle decoration */
+    .hero__semicircle {
+      position: absolute;
+      right: -80px;
+      top: 15%;
+      width: 350px;
+      height: 350px;
+      border: var(--border-thick) solid var(--color-border);
+      border-radius: 50%;
+      background-color: var(--color-primary);
+      clip-path: circle(50% at 50% 50%);
+      opacity: 0.15;
+    }
+
+    .hero__semicircle--small {
+      width: 150px;
+      height: 150px;
+      right: auto;
+      left: 10%;
+      top: auto;
+      bottom: 10%;
+      background-color: var(--color-accent);
+      opacity: 0.2;
+    }
+
+    /* ==================== MARQUEE BAND ==================== */
+    .marquee-band {
+      background-color: var(--color-marquee-bg);
+      color: var(--color-marquee-text);
+      border-top: var(--border-thick) solid var(--color-border);
+      border-bottom: var(--border-thick) solid var(--color-border);
+      padding: 0.8rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .marquee-band__track {
+      display: inline-flex;
+      animation: marquee 20s linear infinite;
+    }
+
+    .marquee-band__item {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      padding: 0 2rem;
+      flex-shrink: 0;
+    }
+
+    .marquee-band__separator {
+      color: var(--color-primary);
+      padding: 0 0.5rem;
+    }
+
+    [data-theme="dark"] .marquee-band__separator {
+      color: var(--color-accent);
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ==================== ABOUT SECTION ==================== */
+    .about {
+      padding: 6rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .about__label {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+    }
+
+    .about__heading {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1.05;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .about__text {
+      color: var(--color-text-muted);
+      font-size: 1rem;
+      line-height: 1.8;
+      max-width: 480px;
+    }
+
+    .about__visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .about__shape {
+      width: 300px;
+      height: 300px;
+      border: var(--border-thick) solid var(--color-border);
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      background-color: var(--color-primary);
+    }
+
+    .about__shape::before {
+      content: 'V';
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 15rem;
+      color: var(--color-bg);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.3;
+    }
+
+    .about__shape-accent {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background-color: var(--color-accent);
+      border: var(--border-thick) solid var(--color-border);
+      bottom: -20px;
+      right: 20%;
+    }
+
+    /* ==================== SEMICIRCLE DIVIDER ==================== */
+    .divider-semicircle {
+      width: 100%;
+      height: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .divider-semicircle::before {
+      content: '';
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background-color: var(--color-primary);
+      left: 50%;
+      transform: translateX(-50%);
+      top: 0;
+      opacity: 0.12;
+    }
+
+    /* ==================== SERVICES / CARDS ==================== */
+    .services {
+      padding: 6rem 3rem;
+    }
+
+    .services__header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .services__label {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+    }
+
+    .services__heading {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3rem);
+      text-transform: uppercase;
+    }
+
+    .services__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .card {
+      border: var(--border-thick) solid var(--color-border);
+      background-color: var(--color-bg-alt);
+      padding: 2.5rem 2rem;
+      position: relative;
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-card-shadow);
+      transition: all var(--transition-speed);
+    }
+
+    .card:hover {
+      box-shadow: none;
+      transform: translate(var(--shadow-offset), var(--shadow-offset));
+    }
+
+    .card__number {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 3.5rem;
+      color: var(--color-primary);
+      line-height: 1;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+
+    .card__title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .card__text {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .card__tag {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.3rem 0.8rem;
+      border: 2px solid var(--color-border);
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ==================== STATS BAND ==================== */
+    .stats {
+      padding: 4rem 3rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      border-top: var(--border-thick) solid var(--color-border);
+      border-bottom: var(--border-thick) solid var(--color-border);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat__number {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      color: var(--color-primary);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat__label {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-text-muted);
+    }
+
+    /* ==================== TESTIMONIAL ==================== */
+    .testimonial {
+      padding: 6rem 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .testimonial__quote-mark {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 8rem;
+      color: var(--color-primary);
+      line-height: 0.5;
+      opacity: 0.2;
+      margin-bottom: 1rem;
+    }
+
+    .testimonial__text {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      max-width: 700px;
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .testimonial__author {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-text-muted);
+    }
+
+    .testimonial__author-name {
+      color: var(--color-primary);
+    }
+
+    /* ==================== CTA SECTION ==================== */
+    .cta-section {
+      padding: 6rem 3rem;
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    [data-theme="dark"] .cta-section {
+      color: #0A0A0A;
+    }
+
+    .cta-section__heading {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      text-transform: uppercase;
+      line-height: 0.95;
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-section__text {
+      font-size: 1.1rem;
+      max-width: 500px;
+      margin: 0 auto 2.5rem;
+      opacity: 0.85;
+      line-height: 1.7;
+    }
+
+    .cta-section__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 1rem 2.5rem;
+      border: var(--border-thick) solid #0A0A0A;
+      background-color: var(--color-accent);
+      color: #0A0A0A;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0 #0A0A0A;
+    }
+
+    .cta-section__btn:hover {
+      box-shadow: none;
+      transform: translate(var(--shadow-offset), var(--shadow-offset));
+    }
+
+    .cta-section__semicircle {
+      position: absolute;
+      width: 250px;
+      height: 125px;
+      background-color: rgba(0, 0, 0, 0.08);
+      border-radius: 250px 250px 0 0;
+      bottom: 0;
+      left: 10%;
+    }
+
+    .cta-section__semicircle--right {
+      left: auto;
+      right: 5%;
+      bottom: auto;
+      top: 0;
+      border-radius: 0 0 250px 250px;
+    }
+
+    /* ==================== FOOTER ==================== */
+    .footer {
+      padding: 4rem 3rem 2rem;
+      border-top: var(--border-thick) solid var(--color-border);
+    }
+
+    .footer__big-text {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(4rem, 12vw, 10rem);
+      text-transform: uppercase;
+      line-height: 0.85;
+      letter-spacing: -0.04em;
+      margin-bottom: 3rem;
+      color: var(--color-text);
+      opacity: 0.08;
+      user-select: none;
+    }
+
+    .footer__content {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .footer__brand-text {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      max-width: 280px;
+      line-height: 1.7;
+    }
+
+    .footer__col-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .footer__link {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.6rem;
+      transition: color var(--transition-speed);
+    }
+
+    .footer__link:hover {
+      color: var(--color-primary);
+    }
+
+    .footer__bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 1024px) {
+      .services__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .footer__content {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .about {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .about__visual {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .side-nav {
+        display: none;
+      }
+
+      .mobile-nav {
+        display: flex;
+      }
+
+      .main-content {
+        margin-left: 0;
+        margin-top: 60px;
+      }
+
+      .hero {
+        padding: 3rem 1.5rem;
+        min-height: calc(100vh - 60px);
+      }
+
+      .hero__semicircle {
+        width: 200px;
+        height: 200px;
+        right: -60px;
+      }
+
+      .about {
+        padding: 4rem 1.5rem;
+      }
+
+      .services {
+        padding: 4rem 1.5rem;
+      }
+
+      .services__grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        padding: 3rem 1.5rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+
+      .testimonial {
+        padding: 4rem 1.5rem;
+      }
+
+      .cta-section {
+        padding: 4rem 1.5rem;
+      }
+
+      .footer {
+        padding: 3rem 1.5rem 1.5rem;
+      }
+
+      .footer__content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .footer__bottom {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+
+      .theme-toggle {
+        top: auto;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+      }
+
+      .about__shape {
+        width: 220px;
+        height: 220px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero__title {
+        font-size: clamp(2.8rem, 14vw, 4.5rem);
+      }
+
+      .card {
+        padding: 2rem 1.5rem;
+      }
+
+      .stat__number {
+        font-size: 2.2rem;
+      }
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @media (prefers-reduced-motion: no-preference) {
+      .fade-in {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+      }
+
+      .fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .marquee-band__track {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== THEME TOGGLE ==================== -->
+  <button class="theme-toggle" aria-label="Toggle dark mode">
+    <span class="icon-dark" aria-hidden="true">☾</span>
+    <span class="icon-light" aria-hidden="true">☀</span>
+  </button>
+
+  <!-- ==================== SIDE NAV (Desktop) ==================== -->
+  <nav class="side-nav" aria-label="Main navigation">
+    <span class="side-nav__brand">VANTA</span>
+    <a href="#about" class="side-nav__link">About</a>
+    <a href="#services" class="side-nav__link">Services</a>
+    <a href="#testimonial" class="side-nav__link">Voices</a>
+    <a href="#contact" class="side-nav__link">Contact</a>
+  </nav>
+
+  <!-- ==================== MOBILE NAV ==================== -->
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <span class="mobile-nav__brand">VANTA</span>
+    <button class="hamburger" aria-label="Open menu" aria-expanded="false">
+      <span class="hamburger__line"></span>
+      <span class="hamburger__line"></span>
+      <span class="hamburger__line"></span>
+    </button>
+  </nav>
+
+  <div class="mobile-menu" role="dialog" aria-label="Navigation menu">
+    <a href="#about" class="mobile-menu__link">About</a>
+    <a href="#services" class="mobile-menu__link">Services</a>
+    <a href="#testimonial" class="mobile-menu__link">Voices</a>
+    <a href="#contact" class="mobile-menu__link">Contact</a>
+  </div>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="main-content">
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero__semicircle" aria-hidden="true"></div>
+      <div class="hero__semicircle hero__semicircle--small" aria-hidden="true"></div>
+      <p class="hero__eyebrow fade-in">Digital Studio — Est. 2024</p>
+      <h1 class="hero__title fade-in">
+        We Build<br>
+        <span class="hero__title-rotated">Bold</span><br>
+        Digital
+      </h1>
+      <p class="hero__subtitle fade-in">
+        Crafting unforgettable digital experiences through daring design and relentless innovation. We don't follow trends — we ignite them.
+      </p>
+      <a href="#contact" class="hero__cta fade-in">
+        Start a Project
+        <span class="hero__cta-arrow" aria-hidden="true">→</span>
+      </a>
+    </section>
+
+    <!-- MARQUEE BAND -->
+    <div class="marquee-band" aria-hidden="true">
+      <div class="marquee-band__track">
+        <span class="marquee-band__item">Strategy</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Branding</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Development</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Design</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Motion</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Identity</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Strategy</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Branding</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Development</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Design</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Motion</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Identity</span>
+        <span class="marquee-band__separator">◆</span>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <section class="about" id="about">
+      <div class="about__copy">
+        <p class="about__label fade-in">Who We Are</p>
+        <h2 class="about__heading fade-in">
+          Not Your<br>Average<br>Studio
+        </h2>
+        <p class="about__text fade-in">
+          We're a collective of designers, developers, and strategists who believe the digital world deserves more personality. Every pixel has purpose. Every interaction tells a story. We reject the ordinary and embrace the unexpected.
+        </p>
+      </div>
+      <div class="about__visual fade-in">
+        <div class="about__shape" aria-hidden="true"></div>
+        <div class="about__shape-accent" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- DIVIDER -->
+    <div class="divider-semicircle" aria-hidden="true"></div>
+
+    <!-- SERVICES -->
+    <section class="services" id="services">
+      <header class="services__header">
+        <p class="services__label fade-in">What We Do</p>
+        <h2 class="services__heading fade-in">Our Craft</h2>
+      </header>
+      <div class="services__grid">
+        <article class="card fade-in">
+          <span class="card__number" aria-hidden="true">01</span>
+          <h3 class="card__title">Brand Identity</h3>
+          <p class="card__text">
+            We distill your essence into a visual language that commands attention and builds lasting recognition.
+          </p>
+          <span class="card__tag">Identity</span>
+        </article>
+        <article class="card fade-in">
+          <span class="card__number" aria-hidden="true">02</span>
+          <h3 class="card__title">Web Design</h3>
+          <p class="card__text">
+            Interfaces that break conventions while maintaining intuitive usability. Beautiful and functional, always.
+          </p>
+          <span class="card__tag">Design</span>
+        </article>
+        <article class="card fade-in">
+          <span class="card__number" aria-hidden="true">03</span>
+          <h3 class="card__title">Development</h3>
+          <p class="card__text">
+            Clean, performant code that brings ambitious designs to life. We build for speed, scale, and the future.
+          </p>
+          <span class="card__tag">Engineering</span>
+        </article>
+        <article class="card fade-in">
+          <span class="card__number" aria-hidden="true">04</span>
+          <h3 class="card__title">Motion Design</h3>
+          <p class="card__text">
+            Kinetic storytelling that captivates. From micro-interactions to full cinematic experiences.
+          </p>
+          <span class="card__tag">Animation</span>
+        </article>
+        <article class="card fade-in">
+          <span class="card__number" aria-hidden="true">05</span>
+          <h3 class="card__title">Strategy</h3>
+          <p class="card__text">
+            Data-informed creative direction. We align your vision with market reality to maximize impact.
+          </p>
+          <span class="card__tag">Consulting</span>
+        </article>
+        <article class="card fade-in">
+          <span class="card__number" aria-hidden="true">06</span>
+          <h3 class="card__title">Content</h3>
+          <p class="card__text">
+            Words that resonate, visuals that stop scrolling. We craft content ecosystems that drive engagement.
+          </p>
+          <span class="card__tag">Creative</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- MARQUEE BAND 2 -->
+    <div class="marquee-band" aria-hidden="true">
+      <div class="marquee-band__track" style="animation-direction: reverse;">
+        <span class="marquee-band__item">Think Different</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Be Bold</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Stay Curious</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Break Rules</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Create Impact</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Own It</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Think Different</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Be Bold</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Stay Curious</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Break Rules</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Create Impact</span>
+        <span class="marquee-band__separator">◆</span>
+        <span class="marquee-band__item">Own It</span>
+        <span class="marquee-band__separator">◆</span>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <section class="stats" aria-label="Company statistics">
+      <div class="stat fade-in">
+        <p class="stat__number">150+</p>
+        <p class="stat__label">Projects Shipped</p>
+      </div>
+      <div class="stat fade-in">
+        <p class="stat__number">40+</p>
+        <p class="stat__label">Global Clients</p>
+      </div>
+      <div class="stat fade-in">
+        <p class="stat__number">12</p>
+        <p class="stat__label">Awards Won</p>
+      </div>
+      <div class="stat fade-in">
+        <p class="stat__number">98%</p>
+        <p class="stat__label">Client Retention</p>
+      </div>
+    </section>
+
+    <!-- TESTIMONIAL -->
+    <section class="testimonial" id="testimonial">
+      <p class="testimonial__quote-mark fade-in" aria-hidden="true">"</p>
+      <blockquote class="testimonial__text fade-in">
+        Working with Vanta was a revelation. They didn't just redesign our brand — they reimagined what our brand could become. Fearless, precise, unforgettable.
+      </blockquote>
+      <p class="testimonial__author fade-in">
+        <span class="testimonial__author-name">Elena Voss</span> — CEO, Meridian Labs
+      </p>
+    </section>
+
+    <!-- DIVIDER -->
+    <div class="divider-semicircle" aria-hidden="true"></div>
+
+    <!-- CTA SECTION -->
+    <section class="cta-section" id="contact">
+      <div class="cta-section__semicircle" aria-hidden="true"></div>
+      <div class="cta-section__semicircle cta-section__semicircle--right" aria-hidden="true"></div>
+      <h2 class="cta-section__heading fade-in">
+        Let's Make<br>Something<br>Extraordinary
+      </h2>
+      <p class="cta-section__text fade-in">
+        Ready to break the mold? We're always looking for ambitious partners who dare to stand out.
+      </p>
+      <a href="mailto:hello@vanta.studio" class="cta-section__btn fade-in">
+        Get In Touch
+        <span aria-hidden="true">→</span>
+      </a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p class="footer__big-text" aria-hidden="true">VANTA STUDIO</p>
+      <div class="footer__content">
+        <div>
+          <p class="footer__brand-text">
+            Vanta is a digital design studio crafting bold, memorable experiences for brands that refuse to blend in.
+          </p>
+        </div>
+        <div>
+          <p class="footer__col-title">Navigate</p>
+          <a href="#hero" class="footer__link">Home</a>
+          <a href="#about" class="footer__link">About</a>
+          <a href="#services" class="footer__link">Services</a>
+          <a href="#contact" class="footer__link">Contact</a>
+        </div>
+        <div>
+          <p class="footer__col-title">Social</p>
+          <a href="#" class="footer__link">Instagram</a>
+          <a href="#" class="footer__link">Dribbble</a>
+          <a href="#" class="footer__link">LinkedIn</a>
+          <a href="#" class="footer__link">Twitter / X</a>
+        </div>
+        <div>
+          <p class="footer__col-title">Legal</p>
+          <a href="#" class="footer__link">Privacy Policy</a>
+          <a href="#" class="footer__link">Terms of Service</a>
+          <a href="#" class="footer__link">Cookie Policy</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© 2026 Vanta Studio. All rights reserved.</p>
+        <p>Designed with conviction.</p>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script>
+    // Theme Toggle
+    const themeToggle = document.querySelector('.theme-toggle');
+    const html = document.documentElement;
+
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('vanta-theme', theme);
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      setTheme(current === 'light' ? 'dark' : 'light');
+    });
+
+    // Restore saved theme
+    const savedTheme = localStorage.getItem('vanta-theme');
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
+    }
+
+    // Mobile Menu
+    const hamburger = document.querySelector('.hamburger');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const mobileLinks = document.querySelectorAll('.mobile-menu__link');
+
+    hamburger.addEventListener('click', () => {
+      const isOpen = hamburger.classList.toggle('active');
+      mobileMenu.classList.toggle('active');
+      hamburger.setAttribute('aria-expanded', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+
+    mobileLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // Intersection Observer for fade-in animations
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      });
+
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    } else {
+      document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+    }
+  </script>
+
+</body>
+</html>

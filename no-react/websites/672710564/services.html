@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services - SaaSFlow</title>
+    <meta name="description" content="Explore SaaSFlow's comprehensive suite of business automation and analytics services">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <style>
+        /* Seed 672710564 - Services Page Styles */
+        /* Position 6 (0): Visual texture - Flat design with Position 6 (6): Card grid columns */
+        
+        .services-hero {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: white;
+            padding: var(--space-3xl) 0;
+            text-align: center;
+        }
+        
+        .services-section {
+            padding: var(--space-3xl) 0;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-xl);
+            margin-top: var(--space-2xl);
+        }
+        
+        .service-card {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+            transform: scaleX(0);
+            transition: transform var(--transition-normal);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .service-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-2xl);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .service-title {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--color-text);
+        }
+        
+        .service-description {
+            color: var(--color-text-light);
+            line-height: var(--line-height-relaxed);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .service-features {
+            list-style: none;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .service-features li {
+            padding: var(--space-xs) 0;
+            color: var(--color-text-light);
+            position: relative;
+            padding-left: var(--space-lg);
+        }
+        
+        .service-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--color-success);
+            font-weight: 600;
+        }
+        
+        .categories-section {
+            background-color: var(--color-surface);
+            padding: var(--space-3xl) 0;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-2xl);
+            flex-wrap: wrap;
+        }
+        
+        .category-tab {
+            padding: var(--space-sm) var(--space-lg);
+            background-color: var(--color-surface);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+        
+        .category-tab:hover,
+        .category-tab.active {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background-color: var(--color-primary);
+            color: white;
+        }
+        
+        .comparison-section {
+            padding: var(--space-3xl) 0;
+        }
+        
+        .comparison-table {
+            max-width: var(--content-max-width);
+            margin: 0 auto;
+            background-color: var(--color-surface);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: var(--space-md);
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .comparison-table th {
+            background-color: var(--color-primary);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: var(--color-surface);
+        }
+        
+        .check-icon {
+            color: var(--color-success);
+            font-weight: 600;
+        }
+        
+        .cross-icon {
+            color: var(--color-error);
+        }
+        
+        @media (max-width: 768px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-table {
+                overflow-x: auto;
+            }
+            
+            .category-tabs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">SaaSFlow</a>
+            <button class="navbar-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="navbar-menu">
+                <li><a href="index.html" class="navbar-link">Home</a></li>
+                <li><a href="about.html" class="navbar-link">About</a></li>
+                <li><a href="services.html" class="navbar-link active">Services</a></li>
+                <li><a href="pricing.html" class="navbar-link">Pricing</a></li>
+                <li><a href="blog.html" class="navbar-link">Blog</a></li>
+                <li><a href="contact.html" class="navbar-link">Contact</a></li>
+                <li><button class="theme-toggle" aria-label="Toggle theme">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Services Hero -->
+    <header class="services-hero">
+        <div class="container">
+            <h1 class="section-title">Our Services</h1>
+            <p class="section-subtitle">Comprehensive solutions designed to transform your business operations</p>
+        </div>
+    </header>
+
+    <!-- Services Grid -->
+    <section class="services-section">
+        <div class="container">
+            <div class="services-grid">
+                <div class="service-card reveal">
+                    <div class="service-icon">📊</div>
+                    <h3 class="service-title">Business Analytics</h3>
+                    <p class="service-description">
+                        Transform raw data into actionable insights with our powerful analytics engine.
+                    </p>
+                    <ul class="service-features">
+                        <li>Real-time dashboards</li>
+                        <li>Custom report builder</li>
+                        <li>Advanced forecasting</li>
+                        <li>Data visualization tools</li>
+                    </ul>
+                    <a href="service-detail.html?service=analytics" class="btn">Learn More</a>
+                </div>
+                
+                <div class="service-card reveal" style="animation-delay: 0.1s">
+                    <div class="service-icon">🔄</div>
+                    <h3 class="service-title">Workflow Automation</h3>
+                    <p class="service-description">
+                        Automate repetitive tasks and streamline your business processes.
+                    </p>
+                    <ul class="service-features">
+                        <li>Drag-and-drop builder</li>
+                        <li>1000+ app integrations</li>
+                        <li>Conditional logic</li>
+                        <li>Scheduled workflows</li>
+                    </ul>
+                    <a href="service-detail.html?service=automation" class="btn">Learn More</a>
+                </div>
+                
+                <div class="service-card reveal" style="animation-delay: 0.2s">
+                    <div class="service-icon">👥</div>
+                    <h3 class="service-title">Team Collaboration</h3>
+                    <p class="service-description">
+                        Foster teamwork and communication across your organization.
+                    </p>
+                    <ul class="service-features">
+                        <li>Real-time messaging</li>
+                        <li>Shared workspaces</li>
+                        <li>Video conferencing</li>
+                        <li>File sharing</li>
+                    </ul>
+                    <a href="service-detail.html?service=collaboration" class="btn">Learn More</a>
+                </div>
+                
+                <div class="service-card reveal" style="animation-delay: 0.3s">
+                    <div class="service-icon">🔒</div>
+                    <h3 class="service-title">Security & Compliance</h3>
+                    <p class="service-description">
+                        Enterprise-grade security to protect your valuable data.
+                    </p>
+                    <ul class="service-features">
+                        <li>End-to-end encryption</li>
+                        <li>SOC 2 Type II certified</li>
+                        <li>GDPR compliant</li>
+                        <li>Access controls</li>
+                    </ul>
+                    <a href="service-detail.html?service=security" class="btn">Learn More</a>
+                </div>
+                
+                <div class="service-card reveal" style="animation-delay: 0.4s">
+                    <div class="service-icon">📱</div>
+                    <h3 class="service-title">Mobile Solutions</h3>
+                    <p class="service-description">
+                        Access your business tools anywhere, anytime on any device.
+                    </p>
+                    <ul class="service-features">
+                        <li>iOS and Android apps</li>
+                        <li>Offline mode</li>
+                        <li>Push notifications</li>
+                        <li>Mobile-optimized UI</li>
+                    </ul>
+                    <a href="service-detail.html?service=mobile" class="btn">Learn More</a>
+                </div>
+                
+                <div class="service-card reveal" style="animation-delay: 0.5s">
+                    <div class="service-icon">⚙️</div>
+                    <h3 class="service-title">API & Integrations</h3>
+                    <p class="service-description">
+                        Connect with your existing tools and build custom solutions.
+                    </p>
+                    <ul class="service-features">
+                        <li>RESTful API</li>
+                        <li>Webhook support</li>
+                        <li>SDK for major languages</li>
+                        <li>Developer documentation</li>
+                    </ul>
+                    <a href="service-detail.html?service=api" class="btn">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories-section">
+        <div class="container">
+            <h2 class="section-title">Browse by Category</h2>
+            <p class="section-subtitle">Find services that match your specific needs</p>
+            
+            <div class="category-tabs">
+                <a href="#" class="category-tab active" data-category="all">All Services</a>
+                <a href="#" class="category-tab" data-category="analytics">Analytics</a>
+                <a href="#" class="category-tab" data-category="automation">Automation</a>
+                <a href="#" class="category-tab" data-category="collaboration">Collaboration</a>
+                <a href="#" class="category-tab" data-category="security">Security</a>
+            </div>
+            
+            <div class="services-grid" id="filteredServices">
+                <!-- Services will be dynamically filtered here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="comparison-section">
+        <div class="container">
+            <h2 class="section-title">Compare Plans</h2>
+            <p class="section-subtitle">See what's included in each service tier</p>
+            
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Starter</th>
+                            <th>Professional</th>
+                            <th>Enterprise</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Basic Analytics</td>
+                            <td class="check-icon">✓</td>
+                            <td class="check-icon">✓</td>
+                            <td class="check-icon">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Advanced Analytics</td>
+                            <td class="cross-icon">✗</td>
+                            <td class="check-icon">✓</td>
+                            <td class="check-icon">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Workflow Automation</td>
+                            <td class="cross-icon">✗</td>
+                            <td class="check-icon">✓</td>
+                            <td class="check-icon">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Team Collaboration</td>
+                            <td class="check-icon">✓</td>
+                            <td class="check-icon">✓</td>
+                            <td class="check-icon">✓</td>
+                        </tr>
+                        <tr>
+                            <td>API Access</td>
+                            <td class="cross-icon">✗</td>
+                            <td class="cross-icon">✗</td>
+                            <td class="check-icon">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Priority Support</td>
+                            <td class="cross-icon">✗</td>
+                            <td class="cross-icon">✗</td>
+                            <td class="check-icon">✓</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="services.html">Features</a></li>
+                        <li><a href="pricing.html">Pricing</a></li>
+                        <li><a href="case-studies.html">Case Studies</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="help.html">Help Center</a></li>
+                        <li><a href="docs.html">Documentation</a></li>
+                        <li><a href="api.html">API</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="security.html">Security</a></li>
+                        <li><a href="compliance.html">Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SaaSFlow. All rights reserved.</p>
+                <div class="flex gap-md">
+                    <a href="#" aria-label="Twitter">𝕏</a>
+                    <a href="#" aria-label="LinkedIn">in</a>
+                    <a href="#" aria-label="GitHub">⚡</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    
+    <script>
+        // Category filtering
+        document.addEventListener('DOMContentLoaded', () => {
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const servicesGrid = document.querySelector('.services-grid');
+            const services = Array.from(servicesGrid.children);
+            
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Update active tab
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    const category = tab.dataset.category;
+                    
+                    // Filter services (simplified for demo)
+                    if (category === 'all') {
+                        services.forEach(service => {
+                            service.style.display = 'block';
+                        });
+                    } else {
+                        services.forEach((service, index) => {
+                            // Simple demo filtering
+                            const shouldShow = category === 'analytics' && index === 0 ||
+                                             category === 'automation' && index === 1 ||
+                                             category === 'collaboration' && index === 2 ||
+                                             category === 'security' && index === 3;
+                            service.style.display = shouldShow ? 'block' : 'none';
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

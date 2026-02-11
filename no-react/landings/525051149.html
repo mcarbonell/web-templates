@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloom Beauty | High-Performance Aesthetic Studio</title>
+    <meta name="description"
+        content="Bloom Beauty offers premium aesthetic treatments combining clinical precision with holistic wellness. Experience the future of skin health.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+        rel="stylesheet">
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- 
+    DESIGN CHOICES (Seed: 525051149):
+    - Business: Beauty salons and aestheticians
+    - Brand: Bloom Beauty
+    - Layout: Swiss/International with Interactive Canvas Hero
+    - Color (Light): #F8FAFC (Bg), #1E293B (Text), #90C7A9 (Primary), #0ACAE9 (Accent)
+    - Color (Dark): #0F172A (Bg), #F8FAFC (Text), #76B090 (Primary), #08A9C3 (Accent)
+    - Density: Information-Dense (Rich details about services and methodology)
+    - Special Feature: Interactive Particle Canvas Hero (responding to mouse)
+    - Animation Style: Bounce (Elastic transitions and playful reveals)
+    - Visual Treatment: Glassmorphism / Frosted Panels
+    -->
+
+    <style>
+        :root {
+            /* Accessibility: WCAG AA colors */
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --text-muted: #475569;
+            --primary: #90c7a9;
+            --primary-dark: #76b090;
+            --accent: #059db6;
+            /* Adjusted for better contrast on light */
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --transition-speed: 0.4s;
+            --font-main: 'Outfit', sans-serif;
+            --font-heading: 'Playfair Display', serif;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --text: #f8fafc;
+            --text-muted: #cbd5e1;
+            --primary: #76b090;
+            --accent: #0acae9;
+            --glass-bg: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline-offset: 4px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* Accessibility: Skip to Content */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--accent);
+            color: white;
+            padding: 1rem;
+            z-index: 10000;
+            transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Visual Focus State */
+        :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 4px;
+        }
+
+        /* Utility */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.5rem 0;
+            transition: background 0.3s, backdrop-filter 0.3s;
+        }
+
+        header.scrolled {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--glass-border);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 5rem;
+        }
+
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .hero-content {
+            max-width: 700px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            line-height: 1.1;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 span {
+            color: var(--accent);
+            font-style: italic;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 500px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--text);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        /* Section styles */
+        section {
+            padding: 10rem 0;
+        }
+
+        .section-header {
+            margin-bottom: 5rem;
+        }
+
+        .subtitle {
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 700;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            max-width: 600px;
+        }
+
+        /* Services Grid - Information Dense */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(5px);
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .service-card:hover {
+            transform: translateY(-15px) scale(1.02);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .service-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+
+        .service-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .service-features {
+            list-style: none;
+        }
+
+        .service-features li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .service-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Philosophy Section */
+        .philosophy {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+
+        .philosophy-image {
+            flex: 1;
+            position: relative;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            aspect-ratio: 4/5;
+            background: var(--primary);
+            border-radius: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(0.5);
+            transition: filter 0.5s;
+        }
+
+        .image-placeholder:hover .image-item {
+            filter: grayscale(0);
+        }
+
+        .glass-badge {
+            position: absolute;
+            bottom: 2rem;
+            right: -2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            max-width: 250px;
+        }
+
+        .philosophy-content {
+            flex: 1;
+        }
+
+        .philosophy-content h2 {
+            font-family: var(--font-heading);
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Stats - Information Dense Feature */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat-item h4 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Contact Section */
+        .contact-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            background: var(--text);
+            color: var(--bg);
+            padding: 4rem;
+            border-radius: 2rem;
+        }
+
+        .contact-info h2 {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        /* Footer */
+        footer {
+            padding: 5rem 0;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 4rem;
+        }
+
+        .footer-logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .footer-links h5 {
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links ul li a {
+            text-decoration: none;
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+
+        .footer-links ul li a:hover {
+            color: var(--accent);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            transition: background 0.3s;
+        }
+
+        .social-link:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 992px) {
+            .hero {
+                text-align: center;
+                justify-content: center;
+            }
+
+            .hero-content {
+                max-width: 100%;
+            }
+
+            .cta-group {
+                justify-content: center;
+            }
+
+            .philosophy {
+                flex-direction: column;
+            }
+
+            .contact-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Custom UI Elements */
+        .cursor-blob {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.15;
+            filter: blur(50px);
+            transform: translate(-50%, -50%);
+        }
+
+        /* A11Y Announcement */
+        #theme-announcer {
+            position: absolute;
+            left: -10000px;
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+    <!-- Accessibility: Skip Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Accessibility: Live Region for Theme -->
+    <div id="theme-announcer" aria-live="polite"></div>
+
+    <div class="cursor-blob" id="blob"></div>
+
+    <header role="banner" id="site-header">
+        <div class="container">
+            <nav role="navigation" aria-label="Main Navigation">
+                <a href="#" class="logo" aria-label="Bloom Beauty Home">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2" />
+                        <path d="M50 20 C60 40 80 50 80 50 C80 50 60 60 50 80 C40 60 20 50 20 50 C20 50 40 40 50 20" />
+                    </svg>
+                    <span>BLOOM</span>
+                </a>
+                <div class="nav-links" role="list">
+                    <div role="listitem"><a href="#services">Services</a></div>
+                    <div role="listitem"><a href="#methodology">Methodology</a></div>
+                    <div role="listitem"><a href="#pricing">Studio</a></div>
+                    <div role="listitem"><a href="#contact">Book Now</a></div>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"
+                        title="Toggle current theme">
+                        <svg class="sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5" />
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                            <line x1="1" y1="12" x2="3" y2="12" />
+                            <line x1="21" y1="12" x2="23" y2="12" />
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" role="main">
+        <!-- Hero Section -->
+        <section class="hero" role="region" aria-label="Welcome section">
+            <canvas id="hero-canvas"></canvas>
+            <div class="container">
+                <div class="hero-content">
+                    <span class="hero-tag">Aesthetic Excellence</span>
+                    <h1>Sculpting <span>Radiance</span> Through Science.</h1>
+                    <p>Where advanced clinical technology meets high-fashion wellness. We don't just treat skin; we
+                        curate cellular health.</p>
+                    <div class="cta-group">
+                        <a href="#services" class="btn btn-primary" aria-label="Explore our services">View
+                            Treatments</a>
+                        <a href="#contact" class="btn btn-outline" aria-label="Book your consultation">Consultation</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" role="region" aria-labelledby="services-heading">
+            <div class="container">
+                <div class="section-header">
+                    <span class="subtitle">The Collection</span>
+                    <h2 class="section-title" id="services-heading">Bespoke Treatments for Universal Beauty</h2>
+                </div>
+
+                <div class="services-grid" role="list">
+                    <!-- Service 1 -->
+                    <article class="service-card" role="listitem" aria-labelledby="s1-title">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
+                            </svg>
+                        </div>
+                        <h3 id="s1-title">Luminous Hydra-Facial</h3>
+                        <p>A multi-step treatment that cleanses, exfoliates, and extracts to remove impurities while
+                            replenishing vital nutrients.</p>
+                        <ul class="service-features" role="list">
+                            <li role="listitem">Vortex-Fusion Technology</li>
+                            <li role="listitem">Antioxidant Infusion</li>
+                            <li role="listitem">Immediate Glow Result</li>
+                        </ul>
+                    </article>
+
+                    <!-- Service 2 -->
+                    <article class="service-card" role="listitem" aria-labelledby="s2-title">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5Z" />
+                            </svg>
+                        </div>
+                        <h3 id="s2-title">Sculpt & Lift RF</h3>
+                        <p>Non-invasive radiofrequency treatment to tighten skin and redefine contours through
+                            deep-tissue heating.</p>
+                        <ul class="service-features" role="list">
+                            <li role="listitem">Collagen Stimulation</li>
+                            <li role="listitem">Zero Downtime</li>
+                            <li role="listitem">Pain-Free Procedure</li>
+                        </ul>
+                    </article>
+
+                    <!-- Service 3 -->
+                    <article class="service-card" role="listitem" aria-labelledby="s3-title">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.59,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" />
+                            </svg>
+                        </div>
+                        <h3 id="s3-title">Biocell Regenerative</h3>
+                        <p>Leveraging stem cell technology to stimulate natural repair mechanisms for aging or damaged
+                            skin.</p>
+                        <ul class="service-features" role="list">
+                            <li role="listitem">Exosome Therapy</li>
+                            <li role="listitem">Cellular Renewal</li>
+                            <li role="listitem">Deep Hydration</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Methodology Section -->
+        <section id="methodology" role="region" aria-labelledby="method-heading"
+            style="background: var(--glass-border);">
+            <div class="container">
+                <div class="philosophy">
+                    <div class="philosophy-image">
+                        <div class="image-placeholder">
+                            <svg class="image-item" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice"
+                                aria-label="Conceptual aesthetic placeholder">
+                                <rect width="100%" height="100%" fill="#90c7a9" />
+                                <circle cx="200" cy="200" r="100" fill="rgba(255,255,255,0.2)" />
+                                <path d="M0 400 Q200 300 400 400 V500 H0 Z" fill="rgba(255,255,255,0.1)" />
+                            </svg>
+                        </div>
+                        <div class="glass-badge">
+                            <p><strong>98%</strong> Ritual Satisfaction</p>
+                            <small>Based on our annual patient feedback report.</small>
+                        </div>
+                    </div>
+                    <div class="philosophy-content">
+                        <span class="subtitle">Our Ethos</span>
+                        <h2 id="method-heading">Clinical Precision. Holistic Feel.</h2>
+                        <p>The Bloom Methodology is built on the intersection of data-driven dermatology and the sensory
+                            experience of a sanctuary. We believe that true beauty is a byproduct of efficient
+                            biological function.</p>
+
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <h4>12+</h4>
+                                <p>Specialist Therapists</p>
+                            </div>
+                            <div class="stat-item">
+                                <h4>5k+</h4>
+                                <p>Skin Transformed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" role="region" aria-labelledby="contact-heading">
+            <div class="container">
+                <div class="contact-wrapper">
+                    <div class="contact-info">
+                        <h2 id="contact-heading">Begin Your Skin Journey.</h2>
+                        <p>Visit our flagship studio or schedule a virtual mapping session.</p>
+                        <div style="margin-top: 3rem;">
+                            <p><strong>Address:</strong> 122 Aesthetic Ave, Bloom District</p>
+                            <p><strong>Phone:</strong> +1 (555) 012-3456</p>
+                            <p><strong>Email:</strong> atelier@bloombeauty.com</p>
+                        </div>
+                    </div>
+                    <form class="contact-form" action="#" method="POST" aria-label="Contact form">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" placeholder="E.g. Alexander Bloom" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="alex@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="service">Treatment of Interest</label>
+                            <input type="text" id="service" name="service" placeholder="Which service interests you?">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="4"
+                                placeholder="Tell us about your skin goals..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="background: var(--accent);">Send
+                            Request</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <span class="footer-logo logo">BLOOM</span>
+                    <p>Redefining aesthetics through the lens of longevity and luxury. Join the future of skin health.
+                    </p>
+                    <div class="social-links" role="list">
+                        <a href="#" class="social-link" aria-label="Instagram" role="listitem">IG</a>
+                        <a href="#" class="social-link" aria-label="LinkedIn" role="listitem">LI</a>
+                        <a href="#" class="social-link" aria-label="Twitter" role="listitem">TW</a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h5>Offerings</h5>
+                    <ul role="list">
+                        <li role="listitem"><a href="#">Skin Mapping</a></li>
+                        <li role="listitem"><a href="#">Advanced RF</a></li>
+                        <li role="listitem"><a href="#">Injectable Art</a></li>
+                        <li role="listitem"><a href="#">Membership</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h5>Atelier</h5>
+                    <ul role="list">
+                        <li role="listitem"><a href="#">Our Story</a></li>
+                        <li role="listitem"><a href="#">Careers</a></li>
+                        <li role="listitem"><a href="#">Studio Hire</a></li>
+                        <li role="listitem"><a href="#">Privilege Club</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h5>Newsletter</h5>
+                    <p style="font-size: 0.85rem; margin-bottom: 1rem;">Receive weekly curate skin protocols.</p>
+                    <div class="form-group" style="flex-direction: row; gap: 0;">
+                        <input type="email" placeholder="Email" style="border-radius: 0.5rem 0 0 0.5rem; width: 100%;">
+                        <button class="btn btn-primary" aria-label="Subscribe"
+                            style="padding: 0 1rem; border-radius: 0 0.5rem 0.5rem 0;">→</button>
+                    </div>
+                </div>
+            </div>
+            <div
+                style="margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+                <p>&copy; 2026 Bloom Beauty Studio. Seed: 525051149</p>
+                <div style="display: flex; gap: 2rem;">
+                    <a href="#" style="color: inherit; text-decoration: none;">Privacy Policy</a>
+                    <a href="#" style="color: inherit; text-decoration: none;">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- THEME TOGGLE ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const announcer = document.getElementById('theme-announcer');
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+
+            // A11Y Announcement
+            announcer.textContent = `Theme changed to ${newTheme} mode`;
+
+            // GSAP transition
+            gsap.to('body', { duration: 0.5, backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg') });
+        });
+
+        // --- HERO PARTICLES (SPECIAL FEATURE: SEED 525051149) ---
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const particleCount = 60;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.speedY = (Math.random() - 0.5) * 1.5;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+
+            update(mouseX, mouseY) {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Mouse interaction
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 200) {
+                    this.x -= dx / 50;
+                    this.y -= dy / 50;
+                }
+
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary');
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        let mouseX = -1000, mouseY = -1000;
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Move cursor blob
+            gsap.to('#blob', { x: mouseX, y: mouseY, duration: 1.2, ease: "power2.out" });
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update(mouseX, mouseY);
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        initParticles();
+        animate();
+
+        // --- GSAP ANIMATIONS (BOUNCE ANIMATION TYPE) ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                document.getElementById('site-header').classList.add('scrolled');
+            } else {
+                document.getElementById('site-header').classList.remove('scrolled');
+            }
+        });
+
+        // Hero Content Reveal
+        const heroTl = gsap.timeline();
+        heroTl.from(".hero-tag", { y: -30, opacity: 0, duration: 1, ease: "back.out(1.7)" })
+            .from(".hero h1", { x: -50, opacity: 0, duration: 1, ease: "back.out(1.7)" }, "-=0.6")
+            .from(".hero p", { y: 30, opacity: 0, duration: 1 }, "-=0.8")
+            .from(".cta-group .btn", { scale: 0.5, opacity: 0, stagger: 0.2, ease: "elastic.out(1, 0.5)", duration: 1.5 }, "-=0.6");
+
+        // Service Cards Entrance
+        gsap.from(".service-card", {
+            scrollTrigger: {
+                trigger: ".services-grid",
+                start: "top 80%"
+            },
+            y: 100,
+            opacity: 0,
+            stagger: 0.15,
+            duration: 1.2,
+            ease: "back.out(1.7)"
+        });
+
+        // Philosophy Section Reveal
+        gsap.from(".philosophy-image", {
+            scrollTrigger: {
+                trigger: ".philosophy",
+                start: "top 70%"
+            },
+            x: -100,
+            opacity: 0,
+            duration: 1.5,
+            ease: "power3.out"
+        });
+
+        gsap.from(".philosophy-content", {
+            scrollTrigger: {
+                trigger: ".philosophy",
+                start: "top 70%"
+            },
+            x: 100,
+            opacity: 0,
+            duration: 1.5,
+            ease: "power3.out"
+        });
+
+        // Form Entrance
+        gsap.from(".contact-wrapper", {
+            scrollTrigger: {
+                trigger: ".contact-wrapper",
+                start: "top 85%"
+            },
+            scale: 0.9,
+            opacity: 0,
+            duration: 1,
+            ease: "power2.out"
+        });
+
+    </script>
+</body>
+
+</html>

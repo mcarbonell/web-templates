@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luna Cut — Peluquería & Barbershop | lunacut.io</title>
+  <meta name="description" content="Luna Cut. Estilo, cuidado y experiencia. Peluquería y barbería en tu ciudad.">
+  <!-- Template seed: 785932133 | Business: Hair salon/Barbershop (Beauty) | Palette: Terracotta + Sage | Hero: Bento grid | Feature: Parallax | Anim: ease-out | Fonts: Fraunces + DM Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+  <style>
+    /* ===== DESIGN CHOICES (seed 785932133) =====
+       Palette 0: Warm terracotta (#C45C3E) + sage (#5C7A6B), cream bg, dark text for WCAG AA.
+       Hero layout 3: Bento grid — asymmetric blocks, headline in main cell, supporting copy and CTA in others.
+       Special feature 0: Parallax on hero background layer (subtle JS-driven).
+       Animation: ease-out for transitions; reduced-motion respected.
+       Semantic classes only; no inline styles. */
+
+    :root {
+      --color-bg: #F8F6F2;
+      --color-bg-elevated: #FFF;
+      --color-text: #1A1A1A;
+      --color-text-muted: #4A4A4A;
+      --color-accent: #C45C3E;
+      --color-accent-hover: #A84D32;
+      --color-secondary: #5C7A6B;
+      --color-secondary-muted: #7A9A8A;
+      --color-border: #E8E4DE;
+      --color-focus: #C45C3E;
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --radius: 0.75rem;
+      --radius-lg: 1.25rem;
+      --shadow: 0 4px 24px rgba(26, 26, 26, 0.06);
+      --shadow-lg: 0 12px 48px rgba(26, 26, 26, 0.08);
+      --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --parallax-speed: 0.15;
+    }
+
+    [data-theme="dark"] {
+      --color-bg: #1A1A1A;
+      --color-bg-elevated: #252525;
+      --color-text: #F0EDE8;
+      --color-text-muted: #B0ABA5;
+      --color-accent: #E07A5F;
+      --color-accent-hover: #F0A090;
+      --color-secondary: #7A9A8A;
+      --color-secondary-muted: #5C7A6B;
+      --color-border: #3A3A3A;
+      --color-focus: #E07A5F;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.4);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      [data-parallax] { transform: none !important; }
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 0.5rem;
+      z-index: 100;
+      padding: 0.75rem 1.25rem;
+      background: var(--color-accent);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius);
+      transition: top 0.2s var(--ease-out);
+    }
+    .skip-link:focus {
+      top: 0.5rem;
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    .page-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--color-bg-elevated);
+      border-bottom: 1px solid var(--color-border);
+      transition: background 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: var(--color-text);
+      text-decoration: none;
+    }
+    .logo:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    .nav-main {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-list {
+      display: none;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 0.25rem;
+    }
+    .nav-list.nav-list--open {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      right: 1rem;
+      background: var(--color-bg-elevated);
+      padding: 1rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    @media (min-width: 768px) {
+      .nav-list.nav-list--open {
+        position: static;
+        flex-direction: row;
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+      .nav-list { display: flex; }
+    }
+
+    .nav-list a {
+      padding: 0.5rem 0.75rem;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: var(--radius);
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-list a:hover {
+      color: var(--color-text);
+      background: var(--color-bg);
+    }
+    .nav-list a:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      padding: 0;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-bg);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .theme-toggle:hover {
+      background: var(--color-bg-elevated);
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+    .theme-toggle svg { width: 1.25rem; height: 1.25rem; }
+
+    .menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      padding: 0;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--color-bg);
+      color: var(--color-text);
+      cursor: pointer;
+    }
+    @media (min-width: 768px) { .menu-toggle { display: none; } }
+    .menu-toggle:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    .main-content { padding-bottom: 4rem; }
+
+    /* ----- Hero: Bento grid (layout 3) ----- */
+    .hero {
+      position: relative;
+      min-height: 85vh;
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr auto;
+      gap: 0;
+      padding: 2rem 1.5rem 3rem;
+      overflow: hidden;
+    }
+    @media (min-width: 768px) {
+      .hero {
+        grid-template-columns: 1.2fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        grid-template-areas:
+          "headline visual"
+          "cta visual";
+        min-height: 90vh;
+        padding: 3rem 2rem 4rem;
+      }
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: -20%;
+      z-index: 0;
+      background: linear-gradient(135deg, var(--color-secondary-muted) 0%, var(--color-secondary) 50%, var(--color-accent) 100%);
+      opacity: 0.12;
+      will-change: transform;
+    }
+
+    .hero-headline-cell {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1rem 0;
+    }
+    @media (min-width: 768px) { .hero-headline-cell { grid-area: headline; padding-right: 2rem; } }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(2.25rem, 6vw, 3.5rem);
+      line-height: 1.15;
+      margin: 0 0 1rem;
+      color: var(--color-text);
+      letter-spacing: -0.02em;
+    }
+
+    .hero-tagline {
+      font-size: 1.1rem;
+      color: var(--color-text-muted);
+      margin: 0 0 1.5rem;
+      max-width: 28ch;
+    }
+
+    .hero-cta-cell {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+    @media (min-width: 768px) { .hero-cta-cell { grid-area: cta; align-self: start; } }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.875rem 1.5rem;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: background 0.25s var(--ease-out), color 0.25s var(--ease-out), transform 0.2s var(--ease-out);
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+    .btn-primary {
+      background: var(--color-accent);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--color-accent-hover);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--color-accent);
+      border: 2px solid var(--color-accent);
+    }
+    .btn-secondary:hover {
+      background: var(--color-accent);
+      color: #fff;
+    }
+
+    .hero-visual-cell {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 0;
+    }
+    @media (min-width: 768px) { .hero-visual-cell { grid-area: visual; padding: 2rem; } }
+
+    .hero-visual-inner {
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 4/3;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(145deg, var(--color-secondary-muted), var(--color-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .hero-visual-inner svg {
+      width: 60%;
+      height: 60%;
+      opacity: 0.9;
+    }
+
+    /* ----- Sections common ----- */
+    .section {
+      padding: 3rem 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      color: var(--color-text);
+    }
+    .section-intro {
+      font-size: 1.05rem;
+      color: var(--color-text-muted);
+      margin: 0 0 2rem;
+      max-width: 60ch;
+    }
+
+    /* ----- Services ----- */
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    @media (min-width: 640px) {
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 960px) {
+      .services-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .service-card {
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: box-shadow 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+    }
+    .service-card:hover {
+      box-shadow: var(--shadow);
+      border-color: var(--color-secondary-muted);
+    }
+    .service-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      color: var(--color-text);
+    }
+    .service-card p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--color-text-muted);
+    }
+
+    /* ----- About / Why us ----- */
+    .about-inner {
+      display: grid;
+      gap: 2rem;
+    }
+    @media (min-width: 768px) {
+      .about-inner { grid-template-columns: 1fr 1fr; align-items: center; }
+    }
+    .about-text p {
+      margin: 0 0 1rem;
+      color: var(--color-text-muted);
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      list-style: none;
+      margin: 1rem 0 0;
+      padding: 0;
+    }
+    .about-stats li {
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+    .about-stats .stat-value {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: var(--color-accent);
+      display: block;
+    }
+    .about-stats .stat-label {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+    }
+    .about-visual .hero-visual-inner {
+      max-width: 100%;
+    }
+
+    /* ----- Testimonials ----- */
+    .testimonials-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .testimonials-list { grid-template-columns: repeat(2, 1fr); }
+    }
+    .testimonial-card {
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+    }
+    .testimonial-card blockquote {
+      margin: 0 0 1rem;
+      font-style: italic;
+      color: var(--color-text);
+    }
+    .testimonial-card cite {
+      font-style: normal;
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+
+    /* ----- CTA block ----- */
+    .cta-block {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      background: linear-gradient(180deg, var(--color-border) 0%, transparent 100%);
+      border-radius: var(--radius-lg);
+    }
+    .cta-block .section-title { margin-bottom: 0.5rem; }
+    .cta-block .section-intro { margin-left: auto; margin-right: auto; margin-bottom: 1.5rem; }
+    .cta-block .btn { margin: 0 0.25rem; }
+
+    /* ----- Contact ----- */
+    .contact-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 640px) {
+      .contact-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .contact-info {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .contact-info li {
+      margin-bottom: 0.75rem;
+      color: var(--color-text-muted);
+    }
+    .contact-info a {
+      color: var(--color-accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .contact-info a:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    /* ----- Footer ----- */
+    .page-footer {
+      padding: 2rem 1.5rem;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg-elevated);
+      margin-top: 2rem;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .page-footer .logo { font-size: 1.1rem; }
+    .footer-links {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 1rem;
+    }
+    .footer-links a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .footer-links a:hover { color: var(--color-text); }
+    .footer-links a:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+
+    /* ----- Aria live region (theme announcement) ----- */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Focus visible for all interactive elements (2px min) */
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip link: primer elemento enfocable para teclado (WCAG) -->
+  <a href="#main-content" class="skip-link">Ir al contenido principal</a>
+
+  <header class="page-header" role="banner">
+    <a href="#" class="logo" aria-label="Luna Cut — Inicio">Luna Cut</a>
+    <nav class="nav-main" role="navigation" aria-label="Principal">
+      <ul class="nav-list" id="nav-menu-mobile" role="list">
+        <li role="listitem"><a href="#services">Servicios</a></li>
+        <li role="listitem"><a href="#about">Nosotros</a></li>
+        <li role="listitem"><a href="#testimonials">Opiniones</a></li>
+        <li role="listitem"><a href="#contact">Contacto</a></li>
+      </ul>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema claro/oscuro" aria-pressed="false">
+        <svg class="icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+        <svg class="icon-moon" aria-hidden="true" hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-menu-mobile">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Anuncio de cambio de tema para lectores de pantalla -->
+  <div id="theme-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <main id="main-content" class="main-content" role="main">
+    <!-- Hero bento (layout 3): grid asimétrico, celda título + CTA + visual; parallax en .hero-bg -->
+    <section class="hero" role="region" aria-labelledby="hero-heading">
+      <div class="hero-bg" data-parallax aria-hidden="true"></div>
+      <div class="hero-headline-cell">
+        <h1 id="hero-heading" class="hero-title">Estilo que cuenta. Cuidado que se nota.</h1>
+        <p class="hero-tagline">Peluquería y barbería con experiencia. Cortes, color y barba en un espacio pensado para vos.</p>
+      </div>
+      <div class="hero-cta-cell">
+        <a href="#contact" class="btn btn-primary">Reservar turno</a>
+        <a href="#services" class="btn btn-secondary">Ver servicios</a>
+      </div>
+      <div class="hero-visual-cell">
+        <div class="hero-visual-inner">
+          <svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M60 20c-8 0-14 6-14 14s6 14 14 14 14-6 14-14-6-14-14-14z" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="M35 55 Q60 45 85 55" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <rect x="45" y="70" width="30" height="4" rx="1" fill="currentColor" opacity="0.6"/>
+            <path d="M30 38 L50 35 L70 38 L90 35" stroke="currentColor" stroke-width="1" fill="none" opacity="0.7"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="section" role="region" aria-labelledby="services-heading">
+      <h2 id="services-heading" class="section-title">Servicios</h2>
+      <p class="section-intro">Desde corte clásico hasta tratamientos y color. Todo en un mismo lugar.</p>
+      <ul class="services-grid" role="list">
+        <li class="service-card" role="listitem">
+          <h3>Corte &amp; barba</h3>
+          <p>Corte clásico o moderno y arreglo de barba con productos de primera.</p>
+        </li>
+        <li class="service-card" role="listitem">
+          <h3>Color &amp; mechas</h3>
+          <p>Coloración profesional, mechas y reflejos a medida.</p>
+        </li>
+        <li class="service-card" role="listitem">
+          <h3>Tratamientos</h3>
+          <p>Hidratación, keratina y tratamientos reparadores.</p>
+        </li>
+        <li class="service-card" role="listitem">
+          <h3>Peinado</h3>
+          <p>Peinados para eventos, novias y ocasiones especiales.</p>
+        </li>
+        <li class="service-card" role="listitem">
+          <h3>Niños</h3>
+          <p>Cortes para los más chicos en un ambiente tranquilo.</p>
+        </li>
+        <li class="service-card" role="listitem">
+          <h3>Consultoría</h3>
+          <p>Asesoramiento de look y rutina de cuidado capilar.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section id="about" class="section" role="region" aria-labelledby="about-heading">
+      <h2 id="about-heading" class="section-title">Por qué Luna Cut</h2>
+      <p class="section-intro">Años de oficio y pasión por el detalle en cada visita.</p>
+      <div class="about-inner">
+        <div class="about-text">
+          <p>Somos un equipo de estilistas y barberos con formación constante. Trabajamos con marcas premium y técnicas actualizadas para que salgas sintiéndote bien.</p>
+          <p>El ambiente es relajado y acogedor: café, música y atención personalizada.</p>
+          <ul class="about-stats" role="list">
+            <li role="listitem"><span class="stat-value">10+</span><span class="stat-label">Años de experiencia</span></li>
+            <li role="listitem"><span class="stat-value">5k+</span><span class="stat-label">Clientes satisfechos</span></li>
+          </ul>
+        </div>
+        <div class="about-visual" aria-hidden="true">
+          <div class="hero-visual-inner">
+            <svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="auto">
+              <rect x="20" y="30" width="160" height="60" rx="8" stroke="currentColor" stroke-width="2" fill="none" opacity="0.3"/>
+              <circle cx="70" cy="60" r="18" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <circle cx="130" cy="60" r="18" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <path d="M40 45 L60 55 L80 45 L100 55 L120 45 L140 55 L160 45" stroke="currentColor" stroke-width="1" fill="none" opacity="0.6"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="testimonials" class="section" role="region" aria-labelledby="testimonials-heading">
+      <h2 id="testimonials-heading" class="section-title">Qué dicen nuestros clientes</h2>
+      <p class="section-intro">La confianza de quienes nos eligen cada día.</p>
+      <ul class="testimonials-list" role="list">
+        <li class="testimonial-card" role="listitem">
+          <blockquote>“El mejor corte de la zona. Siempre salgo contento y con puntualidad.”</blockquote>
+          <cite>— Marcos, cliente habitual</cite>
+        </li>
+        <li class="testimonial-card" role="listitem">
+          <blockquote>“Probé el tratamiento de keratina y el pelo me quedó increíble. Recomiendo.”</blockquote>
+          <cite>— Ana, primera vez</cite>
+        </li>
+      </ul>
+    </section>
+
+    <section class="section cta-block" role="region" aria-labelledby="cta-heading">
+      <h2 id="cta-heading" class="section-title">Reservá tu turno</h2>
+      <p class="section-intro">Escribinos por WhatsApp o llamá para agendar. Te esperamos.</p>
+      <a href="#contact" class="btn btn-primary">Contactar ahora</a>
+    </section>
+
+    <section id="contact" class="section" role="region" aria-labelledby="contact-heading">
+      <h2 id="contact-heading" class="section-title">Contacto</h2>
+      <p class="section-intro">Visitanos o escribinos. Horarios de lunes a sábado.</p>
+      <div class="contact-grid">
+        <ul class="contact-info" role="list">
+          <li role="listitem">Dirección: Av. Ejemplo 1234, Local 2</li>
+          <li role="listitem">Tel: <a href="tel:+5491112345678">+54 9 11 1234-5678</a></li>
+          <li role="listitem">WhatsApp: <a href="https://wa.me/5491112345678">+54 9 11 1234-5678</a></li>
+          <li role="listitem">Email: <a href="mailto:hola@lunacut.io">hola@lunacut.io</a></li>
+        </ul>
+        <p class="section-intro">lunacut.io</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page-footer" role="contentinfo">
+    <div class="footer-inner">
+      <a href="#" class="logo">Luna Cut</a>
+      <ul class="footer-links" role="list">
+        <li role="listitem"><a href="#services">Servicios</a></li>
+        <li role="listitem"><a href="#about">Nosotros</a></li>
+        <li role="listitem"><a href="#contact">Contacto</a></li>
+      </ul>
+      <p class="footer-copy">© Luna Cut. Peluquería &amp; Barbershop. Template seed 785932133.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var STORAGE_KEY = 'lunacut-theme';
+      var root = document.documentElement;
+      var themeToggle = document.getElementById('theme-toggle');
+      var themeAnnounce = document.getElementById('theme-announce');
+      var iconSun = themeToggle && themeToggle.querySelector('.icon-sun');
+      var iconMoon = themeToggle && themeToggle.querySelector('.icon-moon');
+
+      function getStoredTheme() {
+        try {
+          return localStorage.getItem(STORAGE_KEY);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function setStoredTheme(value) {
+        try {
+          if (value) localStorage.setItem(STORAGE_KEY, value);
+          else localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {}
+      }
+
+      function getPreferredTheme() {
+        var stored = getStoredTheme();
+        if (stored) return stored;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          root.setAttribute('data-theme', 'dark');
+          if (iconSun) iconSun.hidden = true;
+          if (iconMoon) iconMoon.hidden = false;
+          if (themeToggle) themeToggle.setAttribute('aria-pressed', 'true');
+        } else {
+          root.removeAttribute('data-theme');
+          if (iconSun) iconSun.hidden = false;
+          if (iconMoon) iconMoon.hidden = true;
+          if (themeToggle) themeToggle.setAttribute('aria-pressed', 'false');
+        }
+        setStoredTheme(theme);
+        if (themeAnnounce) {
+          themeAnnounce.textContent = theme === 'dark' ? 'Tema oscuro activado.' : 'Tema claro activado.';
+        }
+      }
+
+      function toggleTheme() {
+        var current = root.getAttribute('data-theme');
+        var next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+      }
+
+      if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+      }
+
+      applyTheme(getPreferredTheme());
+
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        if (!getStoredTheme()) applyTheme(e.matches ? 'dark' : 'light');
+      });
+
+      // Parallax (special feature 0): subtle movement on hero background
+      var parallaxEl = document.querySelector('[data-parallax]');
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (parallaxEl && !prefersReducedMotion) {
+        var speed = 0.15;
+        function onScroll() {
+          var y = window.scrollY || window.pageYOffset;
+          parallaxEl.style.transform = 'translate3d(0, ' + (y * speed) + 'px, 0)';
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+      }
+
+      // Mobile menu
+      var menuToggle = document.getElementById('menu-toggle');
+      var navList = document.querySelector('.nav-list');
+      if (menuToggle && navList) {
+        menuToggle.addEventListener('click', function () {
+          var expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+          menuToggle.setAttribute('aria-expanded', !expanded);
+          menuToggle.setAttribute('aria-label', expanded ? 'Abrir menú' : 'Cerrar menú');
+          navList.classList.toggle('nav-list--open', !expanded);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

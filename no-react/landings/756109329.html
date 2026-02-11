@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMINA | Digital Excellence</title>
+    <meta name="description"
+        content="A next-generation digital experience powered by Lumina. Modern, striking, and optimized for the future.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* 
+        DESIGN DECOMPOSITION (Seed: 756109329)
+        =======================================
+        - 756: Primary Hue Index (756 % 360 = 36°) -> Vibrant Amber/Gold.
+        - 109: Architectural Layout -> 09 Style: Offset Asymmetry & Layered Depth.
+        - 32: Organic Form -> 32px squircle radius for modern soft-tech aesthetic.
+        - 9: Animation Energy -> High-frequency micro-interactions and smooth scroll reveals.
+        */
+
+        :root {
+            /* Light Theme (Default) */
+            --hue: 36;
+            --primary: hsl(var(--hue), 90%, 55%);
+            --primary-light: hsl(var(--hue), 90%, 65%);
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #555555;
+            --border: rgba(0, 0, 0, 0.08);
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            --radius: 32px;
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0b;
+            --surface: #141416;
+            --text: #f0f0f0;
+            --text-muted: #999999;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: rgba(20, 20, 22, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline-color: var(--primary);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        .syne {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            line-height: 1.1;
+            text-transform: uppercase;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        li {
+            list-style: none;
+        }
+
+        /* Utils */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 24px;
+            }
+        }
+
+        .section-padding {
+            padding: 120px 0;
+        }
+
+        @media (max-width: 768px) {
+            .section-padding {
+                padding: 80px 0;
+            }
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 32px;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(255, 174, 0, 0.3);
+            background-color: var(--primary-light);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: var(--surface);
+            border-color: var(--primary);
+        }
+
+        /* Texture Overlay */
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 24px 0;
+            transition: var(--transition);
+        }
+
+        header.scrolled {
+            padding: 16px 0;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        .nav-link {
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        .nav-link:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            transform: rotate(15deg);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 100px;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            z-index: -1;
+            opacity: 0.4;
+            filter: blur(100px);
+        }
+
+        .hero-blob {
+            position: absolute;
+            width: 40vw;
+            height: 40vw;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: drift 20s infinite alternate ease-in-out;
+            opacity: 0.3;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(-10%, -10%) rotate(0deg) scale(1);
+            }
+
+            100% {
+                transform: translate(10%, 10%) rotate(360deg) scale(1.2);
+            }
+        }
+
+        .hero-content {
+            max-width: 900px;
+            position: relative;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: var(--primary);
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+            margin-bottom: 24px;
+            transform: rotate(-2deg);
+        }
+
+        .hero-title {
+            font-size: 10vw;
+            line-height: 0.9;
+            margin-bottom: 32px;
+            letter-spacing: -4px;
+        }
+
+        @media (min-width: 1400px) {
+            .hero-title {
+                font-size: 140px;
+            }
+        }
+
+        .hero-description {
+            font-size: 20px;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin-bottom: 48px;
+        }
+
+        .hero-visual {
+            position: absolute;
+            right: -10%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50%;
+            z-index: -1;
+        }
+
+        .hero-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            transform: perspective(1000px) rotateY(-15deg);
+            animation: float 6s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: perspective(1000px) rotateY(-15deg) translateY(0);
+            }
+
+            50% {
+                transform: perspective(1000px) rotateY(-10deg) translateY(-20px);
+            }
+        }
+
+        /* Features Section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: scale(0.98);
+            border-color: var(--primary);
+        }
+
+        .feature-1 {
+            grid-column: span 8;
+        }
+
+        .feature-2 {
+            grid-column: span 4;
+        }
+
+        .feature-3 {
+            grid-column: span 4;
+        }
+
+        .feature-4 {
+            grid-column: span 8;
+        }
+
+        @media (max-width: 900px) {
+
+            .feature-1,
+            .feature-2,
+            .feature-3,
+            .feature-4 {
+                grid-column: span 12;
+            }
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--bg);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: var(--primary);
+        }
+
+        .feature-title {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .feature-text {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        /* Showcase Section */
+        .showcase {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .showcase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 64px;
+        }
+
+        .showcase-title {
+            font-size: 64px;
+            max-width: 600px;
+        }
+
+        .showcase-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 120px;
+        }
+
+        .project-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .project-item {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .project-item:nth-child(even) .project-info {
+                order: 2;
+            }
+        }
+
+        .project-img-wrapper {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+
+        .project-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .project-item:hover .project-img {
+            transform: scale(1.05);
+        }
+
+        .project-info {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .project-category {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .project-name {
+            font-size: 48px;
+        }
+
+        /* Process Section */
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin-top: 64px;
+        }
+
+        .step {
+            display: flex;
+            padding: 64px 0;
+            border-top: 1px solid var(--border);
+            gap: 40px;
+            transition: var(--transition);
+        }
+
+        .step:hover {
+            color: var(--primary);
+            padding-left: 20px;
+        }
+
+        .step-num {
+            font-size: 24px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            opacity: 0.3;
+        }
+
+        .step-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .step-title {
+            font-size: 32px;
+        }
+
+        .step-desc {
+            max-width: 600px;
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        /* Pricing */
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 64px;
+        }
+
+        .price-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 48px;
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            transition: var(--transition);
+        }
+
+        .price-card.featured {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .price-val {
+            font-size: 64px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .price-features li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Marquee */
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            background: var(--primary);
+            padding: 20px 0;
+            transform: rotate(-1deg);
+            width: 110vw;
+            margin-left: -5vw;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        .marquee-item {
+            display: inline-block;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 40px;
+            color: #000;
+            margin-right: 40px;
+            text-transform: uppercase;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Footer */
+        footer {
+            padding: 100px 0 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 64px;
+            margin-bottom: 80px;
+        }
+
+        @media (max-width: 900px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .footer-logo {
+            font-size: 32px;
+            margin-bottom: 24px;
+        }
+
+        .footer-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+    <div class="grain"></div>
+
+    <header id="header">
+        <div class="container nav-content">
+            <a href="#" class="logo">
+                <div class="logo-dot"></div>
+                LUMINA
+            </a>
+            <nav class="nav-links">
+                <a href="#work" class="nav-link">Work</a>
+                <a href="#features" class="nav-link">Services</a>
+                <a href="#process" class="nav-link">Process</a>
+                <a href="#pricing" class="nav-link">Pricing</a>
+            </nav>
+            <div style="display: flex; gap: 16px;">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <i data-lucide="moon"></i>
+                </button>
+                <a href="#" class="btn btn-primary" style="padding: 10px 24px;">Let's Talk</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Section 1: Hero -->
+        <section class="hero">
+            <div class="hero-bg">
+                <div class="hero-blob"
+                    style="top: 10%; right: 10%; background: var(--primary); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;">
+                </div>
+                <div class="hero-blob"
+                    style="bottom: 10%; left: -5%; width: 50vw; background: hsl(var(--hue), 70%, 50%); border-radius: 60% 40% 30% 70% / 50% 30% 70% 50%;">
+                </div>
+            </div>
+
+            <div class="container hero-content">
+                <span class="hero-tag">EST. 2026 / INNOVATION</span>
+                <h1 class="hero-title">WE CRAFT<br>DIGITAL<br>OBSESSIONS.</h1>
+                <p class="hero-description">
+                    Lumina is an award-winning studio refining the intersection between minimalist aesthetics and
+                    high-performance engineering.
+                </p>
+                <div style="display: flex; gap: 20px;">
+                    <a href="#work" class="btn btn-primary">Our Showcase <i data-lucide="arrow-right"></i></a>
+                    <a href="#features" class="btn btn-outline">Our Approach</a>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                        <i data-lucide="zap" style="color: var(--primary)"></i>
+                        <span style="font-weight: 700; font-size: 12px; opacity: 0.5;">REAL-TIME METRICS</span>
+                    </div>
+                    <div style="font-size: 32px; font-weight: 800; margin-bottom: 8px;">99.9%</div>
+                    <div style="color: var(--text-muted); font-size: 14px;">Operational Excellence delivered to every
+                        single pixel of your digital identity.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marquee -->
+        <div class="marquee">
+            <div class="marquee-content">
+                <span class="marquee-item">&#8226; USER CENTRIC DESIGN</span>
+                <span class="marquee-item">&#8226; AVANT-GARDE MOTION</span>
+                <span class="marquee-item">&#8226; PRECISION ENGINEERING</span>
+                <span class="marquee-item">&#8226; STRATEGIC BRANDING</span>
+                <!-- Duplicate for seamless loop -->
+                <span class="marquee-item">&#8226; USER CENTRIC DESIGN</span>
+                <span class="marquee-item">&#8226; AVANT-GARDE MOTION</span>
+                <span class="marquee-item">&#8226; PRECISION ENGINEERING</span>
+                <span class="marquee-item">&#8226; STRATEGIC BRANDING</span>
+            </div>
+        </div>
+
+        <!-- Section 2: Features -->
+        <section class="section-padding" id="features">
+            <div class="container">
+                <div style="text-align: center; max-width: 700px; margin: 0 auto 80px;">
+                    <h2 style="font-size: 48px; margin-bottom: 24px;">Services Tailored for the Elite</h2>
+                    <p style="color: var(--text-muted); font-size: 18px;">We don't just build websites. We create
+                        digital legacies that command attention and drive growth locally and globally.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card feature-1 reveal">
+                        <div class="feature-icon"><i data-lucide="layout"></i></div>
+                        <h3 class="feature-title">Intuitive Architectures</h3>
+                        <p class="feature-text">Our layouts are derived from human psychology, ensuring seamless
+                            navigation and maximum user retention across all platforms.</p>
+                    </div>
+                    <div class="feature-card feature-2 reveal" style="background: var(--primary); color: #000;">
+                        <div class="feature-icon" style="background: rgba(0,0,0,0.1); color: #000;"><i
+                                data-lucide="cpu"></i></div>
+                        <h3 class="feature-title" style="font-size: 24px;">Edge Computing</h3>
+                        <p style="opacity: 0.8;">Lightning fast load times powered by global edge deployment.</p>
+                    </div>
+                    <div class="feature-card feature-3 reveal">
+                        <div class="feature-icon"><i data-lucide="layers"></i></div>
+                        <h3 class="feature-title" style="font-size: 24px;">Scalable Systems</h3>
+                        <p class="feature-text">Architecture built to grow with your ambition, from MVP to Enterprise.
+                        </p>
+                    </div>
+                    <div class="feature-card feature-4 reveal">
+                        <div class="feature-icon"><i data-lucide="maximize"></i></div>
+                        <h3 class="feature-title">Visual Excellence</h3>
+                        <p class="feature-text">Art-directed aesthetics that elevate your brand beyond the competition.
+                            We specialize in high-fidelity motion and 3D integration.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Showcase (Dark) -->
+        <section class="section-padding showcase" id="work">
+            <div class="container">
+                <div class="showcase-header reveal">
+                    <h2 class="showcase-title">RECENT OCCURRENCES</h2>
+                    <a href="#" class="btn btn-outline" style="border-color: rgba(255,255,255,0.2); color: #fff;">View
+                        Archives</a>
+                </div>
+
+                <div class="showcase-grid">
+                    <div class="project-item reveal">
+                        <div class="project-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80"
+                                alt="Project 1" class="project-img">
+                        </div>
+                        <div class="project-info">
+                            <span class="project-category">FASHION & TECH</span>
+                            <h3 class="project-name">AVANT GARDEN</h3>
+                            <p style="opacity: 0.6; font-size: 18px;">A multi-sensory e-commerce experience for high-end
+                                boutique fashion.</p>
+                            <a href="#" class="btn btn-outline"
+                                style="width: fit-content; border-color: rgba(255,255,255,0.2); color: #fff;">Explore
+                                Case</a>
+                        </div>
+                    </div>
+
+                    <div class="project-item reveal">
+                        <div class="project-info">
+                            <span class="project-category">CYBER SECURITY</span>
+                            <h3 class="project-name">ORACLE CORE</h3>
+                            <p style="opacity: 0.6; font-size: 18px;">Designing the dashboard for the world's most
+                                secure decentralized network.</p>
+                            <a href="#" class="btn btn-outline"
+                                style="width: fit-content; border-color: rgba(255,255,255,0.2); color: #fff;">Explore
+                                Case</a>
+                        </div>
+                        <div class="project-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1200&q=80"
+                                alt="Project 2" class="project-img">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Process -->
+        <section class="section-padding" id="process">
+            <div class="container">
+                <h2 style="font-size: 14px; color: var(--primary); margin-bottom: 24px;">HOW WE OPERATE</h2>
+                <div class="process-steps">
+                    <div class="step reveal">
+                        <div class="step-num">01</div>
+                        <div class="step-content">
+                            <h3 class="step-title">DEEP DISCOVERY</h3>
+                            <p class="step-desc">We immerse ourselves in your brand's DNA to understand the core
+                                challenges and unique opportunities of your niche.</p>
+                        </div>
+                    </div>
+                    <div class="step reveal">
+                        <div class="step-num">02</div>
+                        <div class="step-content">
+                            <h3 class="step-title">PROTOTYPING</h3>
+                            <p class="step-desc">Rapid iteration of low and high-fidelity prototypes to find the optimal
+                                user flow and visual direction.</p>
+                        </div>
+                    </div>
+                    <div class="step reveal">
+                        <div class="step-num">03</div>
+                        <div class="step-content">
+                            <h3 class="step-title">PRECISION BUILD</h3>
+                            <p class="step-desc">Our engineers translate pixels into performance, creating lean,
+                                accessible, and ultra-fast applications.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Pricing -->
+        <section class="section-padding" id="pricing" style="background: var(--surface);">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 64px;">
+                    <h2 class="syne" style="font-size: 48px;">Investment Structures</h2>
+                </div>
+
+                <div class="pricing-cards">
+                    <div class="price-card reveal">
+                        <div>
+                            <h3 style="font-size: 24px; margin-bottom: 8px;">Starlight</h3>
+                            <p style="color: var(--text-muted);">Perfect for emerging startups.</p>
+                        </div>
+                        <div class="price-val">$2.5k<span style="font-size: 16px; opacity: 0.5;">/proj</span></div>
+                        <ul class="price-features">
+                            <li><i data-lucide="check" size="18"></i> Custom Landing Page</li>
+                            <li><i data-lucide="check" size="18"></i> Responsive Design</li>
+                            <li><i data-lucide="check" size="18"></i> Basic SEO Setup</li>
+                            <li><i data-lucide="check" size="18"></i> 2 Iterations</li>
+                        </ul>
+                        <button class="btn btn-outline">Choose Plan</button>
+                    </div>
+
+                    <div class="price-card featured reveal">
+                        <div>
+                            <h3 style="font-size: 24px; margin-bottom: 8px;">Supernova</h3>
+                            <p style="opacity: 0.8;">Our most popular trajectory.</p>
+                        </div>
+                        <div class="price-val">$5k<span style="font-size: 16px; opacity: 0.8;">/proj</span></div>
+                        <ul class="price-features">
+                            <li><i data-lucide="check" size="18"></i> Up to 5 Pages</li>
+                            <li><i data-lucide="check" size="18"></i> Custom Animations</li>
+                            <li><i data-lucide="check" size="18"></i> CMS Integration</li>
+                            <li><i data-lucide="check" size="18"></i> Unlimited Iterations</li>
+                        </ul>
+                        <button class="btn btn-primary" style="background: #000; color: #fff;">Accelerate Now</button>
+                    </div>
+
+                    <div class="price-card reveal">
+                        <div>
+                            <h3 style="font-size: 24px; margin-bottom: 8px;">Galaxy</h3>
+                            <p style="color: var(--text-muted);">Enterprise grade dominance.</p>
+                        </div>
+                        <div class="price-val">$12k<span style="font-size: 16px; opacity: 0.5;">+</span></div>
+                        <ul class="price-features">
+                            <li><i data-lucide="check" size="18"></i> Custom Web Application</li>
+                            <li><i data-lucide="check" size="18"></i> High-Fidelity 3D Assets</li>
+                            <li><i data-lucide="check" size="18"></i> Dedicated Support</li>
+                            <li><i data-lucide="check" size="18"></i> Full Brand Suite</li>
+                        </ul>
+                        <button class="btn btn-outline">Let's Interface</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="section-padding">
+            <div class="container" style="text-align: center;">
+                <h2 style="font-size: 8vw; letter-spacing: -4px; margin-bottom: 48px;">READY TO<br>ELEVATE?</h2>
+                <a href="mailto:hello@lumina.io" class="btn btn-primary"
+                    style="padding: 24px 64px; font-size: 24px;">Start a Converge <i data-lucide="mail"></i></a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="logo footer-logo">LUMINA</div>
+                    <p style="color: var(--text-muted); max-width: 300px;">Redefining the digital landscape through
+                        radical simplification and surgical precision.</p>
+                </div>
+                <div>
+                    <h4 class="footer-title">Navigation</h4>
+                    <div class="footer-links">
+                        <a href="#work">Projects</a>
+                        <a href="#features">Service</a>
+                        <a href="#process">Methods</a>
+                        <a href="#pricing">Capital</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">Connect</h4>
+                    <div class="footer-links">
+                        <a href="#">X (Twitter)</a>
+                        <a href="#">Instagram</a>
+                        <a href="#">LinkedIn</a>
+                        <a href="#">Behance</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">Newsletter</h4>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="email" placeholder="Email"
+                            style="background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 8px; width: 100%; color: var(--text);">
+                        <button class="btn btn-primary" style="padding: 10px;"><i data-lucide="send"
+                                size="16"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div>&copy; 2026 LUMINA STUDIO. ALL RIGHTS PROTECTED.</div>
+                <div style="display: flex; gap: 24px;">
+                    <a href="#">PRIVACY</a>
+                    <a href="#">TERMS</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const themeIcon = themeToggle.querySelector('i');
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+
+            // Update icon
+            themeIcon.setAttribute('data-lucide', newTheme === 'light' ? 'moon' : 'sun');
+            lucide.createIcons();
+
+            // Store preference
+            localStorage.setItem('lumina-theme', newTheme);
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('lumina-theme');
+        if (savedTheme) {
+            body.setAttribute('data-theme', savedTheme);
+            themeIcon.setAttribute('data-lucide', savedTheme === 'light' ? 'moon' : 'sun');
+            lucide.createIcons();
+        }
+
+        // Header Scroll Effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Reveal Animation on Scroll
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealOnScroll = () => {
+            const triggerBottom = window.innerHeight * 0.85;
+            revealElements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                if (elementTop < triggerBottom) {
+                    el.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll(); // Initial check
+
+        // Micro-interactions for buttons
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('mousemove', (e) => {
+                const rect = button.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                button.style.setProperty('--x', `${x}px`);
+                button.style.setProperty('--y', `${y}px`);
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuminZone.shop - Modern Electronics & Tech Accessories</title>
+    
+    <!-- Design Choices Based on Seed 725013692:
+         Business: Retail Shop (Electronics) - Full-screen video hero with particles
+         Colors: Cool palette (blues, teals, purples) 
+         Special Feature: Interactive particles background
+         Brand: LuminZone.shop - Modern tech focus
+         Animation: Back easing for smooth transitions
+    -->
+    
+    <style>
+        /* CSS Variables for Cool Color Palette */
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #0052a3;
+            --secondary: #00a8cc;
+            --accent: #6b46c1;
+            --text-dark: #1a1a2e;
+            --text-light: #e8f4f8;
+            --bg-light: #f0f9ff;
+            --bg-dark: #0f172a;
+            --gradient: linear-gradient(135deg, #0066cc 0%, #00a8cc 50%, #6b46c1 100%);
+        }
+        
+        [data-theme="dark"] {
+            --text-dark: #e8f4f8;
+            --text-light: #1a1a2e;
+            --bg-light: #0f172a;
+            --bg-dark: #f0f9ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            overflow-x: hidden;
+        }
+        
+        /* Accessibility: High contrast colors (WCAG AA compliant) */
+        .text-primary { color: var(--primary); }
+        .text-accent { color: var(--accent); }
+        .bg-gradient { background: var(--gradient); }
+        
+        /* Focus States - 2px minimum outline */
+        a:focus, button:focus, input:focus, textarea:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        /* Skip to Content Link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent);
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 100;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+        
+        /* ARIA Live Region for Theme Announcements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Header with Semantic HTML */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        [data-theme="dark"] header {
+            background: rgba(15, 23, 42, 0.95);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .menu-toggle[aria-expanded="true"] .hamburger:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .menu-toggle[aria-expanded="true"] .hamburger:nth-child(2) {
+            opacity: 0;
+        }
+        .menu-toggle[aria-expanded="true"] .hamburger:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+        
+        .hamburger {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            margin: 3px 0;
+            transition: 0.3s ease;
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            background: var(--gradient);
+            border: none;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Hero Section - Full Screen Video Style */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        /* Particles Canvas */
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+            animation: fadeInUp 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: var(--gradient);
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 102, 255, 0.3);
+        }
+        
+        /* Sections with Semantic HTML */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .services {
+            background: white;
+        }
+        
+        [data-theme="dark"] .services {
+            background: var(--bg-dark);
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--text-dark);
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .service-card {
+            background: var(--bg-light);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            color: white;
+        }
+        
+        .service-card:hover::before {
+            opacity: 1;
+        }
+        
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        /* Products Section */
+        .products {
+            background: var(--bg-light);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        [data-theme="dark"] .product-card {
+            background: var(--bg-dark);
+        }
+        
+        .product-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-price {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+        
+        /* About Section */
+        .about {
+            background: white;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        
+        [data-theme="dark"] .about {
+            background: var(--bg-dark);
+        }
+        
+        .about-text h2 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .about-features {
+            list-style: none;
+            margin-top: 2rem;
+        }
+        
+        .about-features li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .check-icon {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        .about-image {
+            width: 100%;
+            height: 400px;
+            background: var(--gradient);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+        }
+        
+        /* Contact Section */
+        .contact {
+            background: var(--bg-light);
+            text-align: center;
+        }
+        
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        [data-theme="dark"] .form-group input,
+        [data-theme="dark"] .form-group textarea {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+            border-color: #333;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            padding: 3rem 2rem 1rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: var(--secondary);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 1rem;
+            margin-top: 2rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            }
+            
+            [data-theme="dark"] .nav-links {
+                background: var(--bg-dark);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .about {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+        
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to Content Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- ARIA Live Region for Theme Announcements -->
+    <div aria-live="polite" class="sr-only" id="theme-announcement"></div>
+    
+    <!-- Header with Semantic Role -->
+    <header role="banner">
+        <nav role="navigation">
+            <div class="logo">LuminZone.shop</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#services">Services</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li>
+                    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+                        🌙
+                    </button>
+                </li>
+            </ul>
+            <button class="menu-toggle" aria-expanded="false" aria-label="Toggle mobile menu" onclick="toggleMenu()">
+                <div class="hamburger"></div>
+                <div class="hamburger"></div>
+                <div class="hamburger"></div>
+            </button>
+        </nav>
+    </header>
+    
+    <!-- Hero Section - Full Screen Video Style with Particles -->
+    <section class="hero" role="banner">
+        <canvas id="particles-canvas"></canvas>
+        <div class="hero-content">
+            <h1>Welcome to LuminZone.shop</h1>
+            <p>Discover Cutting-Edge Electronics & Tech Accessories That Light Up Your Life</p>
+            <a href="#products" class="cta-button">Shop Now</a>
+        </div>
+    </section>
+    
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Services Section -->
+        <section class="services" role="region" aria-labelledby="services-heading">
+            <h2 class="section-title" id="services-heading">Our Services</h2>
+            <ul class="services-grid" role="list">
+                <li class="service-card" role="listitem">
+                    <div class="service-icon">🚀</div>
+                    <h3>Fast Shipping</h3>
+                    <p>Free delivery on orders over $50. Get your tech delivered within 24 hours.</p>
+                </li>
+                <li class="service-card" role="listitem">
+                    <div class="service-icon">🛡️</div>
+                    <h3>Warranty Protection</h3>
+                    <p>All products come with comprehensive warranty and customer support.</p>
+                </li>
+                <li class="service-card" role="listitem">
+                    <div class="service-icon">💡</div>
+                    <h3>Expert Advice</h3>
+                    <p>Our tech specialists help you choose the perfect products for your needs.</p>
+                </li>
+            </ul>
+        </section>
+        
+        <!-- Products Section -->
+        <section class="products" role="region" aria-labelledby="products-heading">
+            <h2 class="section-title" id="products-heading">Featured Products</h2>
+            <ul class="products-grid" role="list">
+                <li class="product-card" role="listitem">
+                    <div class="product-image">📱</div>
+                    <div class="product-info">
+                        <h3>Smart Phone Cases</h3>
+                        <p>Premium protection with wireless charging compatibility</p>
+                        <div class="product-price">$29.99</div>
+                    </div>
+                </li>
+                <li class="product-card" role="listitem">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <h3>Wireless Earbuds</h3>
+                        <p>Crystal clear audio with active noise cancellation</p>
+                        <div class="product-price">$79.99</div>
+                    </div>
+                </li>
+                <li class="product-card" role="listitem">
+                    <div class="product-image">⌚</div>
+                    <div class="product-info">
+                        <h3>Smart Watches</h3>
+                        <p>Track fitness and stay connected on the go</p>
+                        <div class="product-price">$199.99</div>
+                    </div>
+                </li>
+                <li class="product-card" role="listitem">
+                    <div class="product-image">🔋</div>
+                    <div class="product-info">
+                        <h3>Power Banks</h3>
+                        <p>Fast charging portable power for all your devices</p>
+                        <div class="product-price">$49.99</div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+        
+        <!-- About Section -->
+        <section class="about" role="region" aria-labelledby="about-heading">
+            <div class="about-text">
+                <h2 id="about-heading">About LuminZone.shop</h2>
+                <p>We're passionate about bringing you the latest in technology and innovation. Since 2020, we've been curating the finest selection of electronics and accessories that blend style, functionality, and cutting-edge technology.</p>
+                <p>Our mission is to make quality tech accessible to everyone, ensuring that each product we offer meets the highest standards of performance and reliability.</p>
+                <ul class="about-features" role="list">
+                    <li role="listitem"><span class="check-icon">✓</span> 100% Authentic Products</li>
+                    <li role="listitem"><span class="check-icon">✓</span> 30-Day Money Back Guarantee</li>
+                    <li role="listitem"><span class="check-icon">✓</span> 24/7 Customer Support</li>
+                    <li role="listitem"><span class="check-icon">✓</span> Eco-Friendly Packaging</li>
+                </ul>
+            </div>
+            <div class="about-image">🏪</div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section class="contact" role="region" aria-labelledby="contact-heading">
+            <h2 class="section-title" id="contact-heading">Get in Touch</h2>
+            <form class="contact-form" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required aria-label="Your name">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required aria-label="Your email address">
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="4" required aria-label="Your message"></textarea>
+                </div>
+                <button type="submit" class="cta-button">Send Message</button>
+            </form>
+        </section>
+    </main>
+    
+    <!-- Footer with Semantic Role -->
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Shop</h3>
+                <ul role="list">
+                    <li role="listitem"><a href="#products">New Arrivals</a></li>
+                    <li role="listitem"><a href="#products">Best Sellers</a></li>
+                    <li role="listitem"><a href="#products">Sale Items</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul role="list">
+                    <li role="listitem"><a href="#contact">Contact Us</a></li>
+                    <li role="listitem"><a href="#services">Shipping Info</a></li>
+                    <li role="listitem"><a href="#services">Returns</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <ul role="list">
+                    <li role="listitem"><a href="#" aria-label="Facebook">Facebook</a></li>
+                    <li role="listitem"><a href="#" aria-label="Twitter">Twitter</a></li>
+                    <li role="listitem"><a href="#" aria-label="Instagram">Instagram</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 LuminZone.shop. All rights reserved. | Powered by Innovation</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeToggle = document.querySelector('.theme-toggle');
+            const announcement = document.getElementById('theme-announcement');
+            
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                themeToggle.textContent = '🌙';
+                announcement.textContent = 'Switched to light mode';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '☀️';
+                announcement.textContent = 'Switched to dark mode';
+            }
+        }
+        
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const menuToggle = document.querySelector('.menu-toggle');
+            const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+            
+            navLinks.classList.toggle('active');
+            menuToggle.setAttribute('aria-expanded', !isExpanded);
+        }
+        
+        // Form Submission Handler
+        function handleSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Simulate form submission
+            alert(`Thank you for your message, ${data.name}! We'll get back to you soon.`);
+            event.target.reset();
+        }
+        
+        // Particles Animation System
+        class ParticleSystem {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.init();
+            }
+            
+            init() {
+                this.resize();
+                this.createParticles();
+                this.animate();
+                
+                window.addEventListener('resize', () => this.resize());
+                this.canvas.addEventListener('mousemove', (e) => {
+                    this.mouseX = e.clientX;
+                    this.mouseY = e.clientY;
+                });
+            }
+            
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            createParticles() {
+                const particleCount = Math.floor((this.canvas.width * this.canvas.height) / 10000);
+                
+                for (let i = 0; i < particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 3 + 1,
+                        speedX: (Math.random() - 0.5) * 0.5,
+                        speedY: (Math.random() - 0.5) * 0.5,
+                        opacity: Math.random() * 0.5 + 0.2,
+                        hue: Math.random() * 60 + 180 // Cool colors (blues to purples)
+                    });
+                }
+            }
+            
+            updateParticle(particle) {
+                // Mouse interaction
+                const dx = this.mouseX - particle.x;
+                const dy = this.mouseY - particle.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 100) {
+                    const force = (100 - distance) / 100;
+                    particle.x -= (dx / distance) * force * 2;
+                    particle.y -= (dy / distance) * force * 2;
+                }
+                
+                // Regular movement
+                particle.x += particle.speedX;
+                particle.y += particle.speedY;
+                
+                // Wrap around edges
+                if (particle.x < 0) particle.x = this.canvas.width;
+                if (particle.x > this.canvas.width) particle.x = 0;
+                if (particle.y < 0) particle.y = this.canvas.height;
+                if (particle.y > this.canvas.height) particle.y = 0;
+            }
+            
+            drawParticle(particle) {
+                this.ctx.beginPath();
+                this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                this.ctx.fillStyle = `hsla(${particle.hue}, 70%, 60%, ${particle.opacity})`;
+                this.ctx.fill();
+            }
+            
+            connectParticles() {
+                for (let i = 0; i < this.particles.length; i++) {
+                    for (let j = i + 1; j < this.particles.length; j++) {
+                        const dx = this.particles[i].x - this.particles[j].x;
+                        const dy = this.particles[i].y - this.particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 100) {
+                            this.ctx.beginPath();
+                            this.ctx.strokeStyle = `hsla(200, 70%, 60%, ${0.1 * (1 - distance / 100)})`;
+                            this.ctx.lineWidth = 0.5;
+                            this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
+                            this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
+                            this.ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.particles.forEach(particle => {
+                    this.updateParticle(particle);
+                    this.drawParticle(particle);
+                });
+                
+                this.connectParticles();
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        
+        // Initialize particles on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('particles-canvas');
+            new ParticleSystem(canvas);
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // Header scroll effect
+            let lastScroll = 0;
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('header');
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll > 100) {
+                    header.style.background = 'rgba(255, 255, 255, 0.98)';
+                    header.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+                } else {
+                    header.style.background = 'rgba(255, 255, 255, 0.95)';
+                    header.style.boxShadow = 'none';
+                }
+                
+                lastScroll = currentScroll;
+            });
+            
+            // Intersection Observer for fade-in animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all sections
+            document.querySelectorAll('section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = 'opacity 0.6s ease, transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>

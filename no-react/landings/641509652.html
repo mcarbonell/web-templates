@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoastFlow | Future of Coffee</title>
+    <meta name="description" content="RoastFlow - Where precision meets passion. Experience coffee reimagined through technology and craft.">
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts - Nunito for organic, rounded typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for smooth morphing animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <style>
+        /* ============================================
+           DESIGN SYSTEM - CSS CUSTOM PROPERTIES
+           ============================================
+           Monochrome palette with warm yellow accent
+           Dice roll: Palette=4 (Monochrome), Accent=#FFEAA7
+           ============================================ */
+        
+        :root {
+            /* Light theme (default) */
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --bg-tertiary: #E9ECEF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #495057;
+            --text-muted: #6C757D;
+            --accent: #FFEAA7;
+            --accent-dark: #FDCB6E;
+            --border: #DEE2E6;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-lg: rgba(0, 0, 0, 0.15);
+            --blob-1: #FFEAA7;
+            --blob-2: #FDCB6E;
+            --blob-3: #FAB1A0;
+            --focus: #FFEAA7;
+        }
+        
+        [data-theme="dark"] {
+            /* Dark theme */
+            --bg-primary: #0D0D0D;
+            --bg-secondary: #1A1A1A;
+            --bg-tertiary: #262626;
+            --text-primary: #F8F9FA;
+            --text-secondary: #ADB5BD;
+            --text-muted: #6C757D;
+            --accent: #FFEAA7;
+            --accent-dark: #FDCB6E;
+            --border: #333333;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-lg: rgba(0, 0, 0, 0.5);
+            --blob-1: #FFEAA7;
+            --blob-2: #FDCB6E;
+            --blob-3: #FAB1A0;
+            --focus: #FFEAA7;
+        }
+        
+        /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+        
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        body {
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* ============================================
+           SKIP TO CONTENT - ACCESSIBILITY
+           ============================================ */
+        
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: var(--text-primary);
+            padding: 1rem 2rem;
+            border-radius: 0 0 12px 12px;
+            font-weight: 700;
+            text-decoration: none;
+            z-index: 10000;
+            transition: top 0.3s ease;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+            outline: 2px solid var(--text-primary);
+            outline-offset: 2px;
+        }
+        
+        /* ============================================
+           FOCUS STATES - ACCESSIBILITY
+           ============================================ */
+        
+        *:focus-visible {
+            outline: 2px solid var(--focus);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--focus);
+            outline-offset: 3px;
+        }
+        
+        /* ============================================
+           TYPOGRAPHY
+           ============================================ */
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            letter-spacing: -0.02em;
+        }
+        
+        h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            letter-spacing: -0.01em;
+        }
+        
+        h3 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .text-accent {
+            color: var(--accent-dark);
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        /* ============================================
+           LAYOUT UTILITIES
+           ============================================ */
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .section {
+            padding: 6rem 0;
+            position: relative;
+        }
+        
+        @media (max-width: 768px) {
+            .section {
+                padding: 4rem 0;
+            }
+        }
+        
+        /* ============================================
+           HEADER & NAVIGATION
+           ============================================ */
+        
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(var(--bg-primary), 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .nav-link:hover,
+        .nav-link:focus {
+            color: var(--text-primary);
+        }
+        
+        .nav-link:hover::after,
+        .nav-link:focus::after {
+            width: 100%;
+        }
+        
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            padding: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            width: 70px;
+            height: 36px;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+        
+        .theme-toggle svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--text-secondary);
+            transition: fill 0.3s ease, transform 0.3s ease;
+        }
+        
+        .theme-toggle[aria-pressed="true"] .sun-icon {
+            fill: var(--accent-dark);
+            transform: translateX(32px);
+        }
+        
+        .theme-toggle[aria-pressed="false"] .moon-icon {
+            fill: var(--accent-dark);
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: var(--accent);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        
+        [data-theme="dark"] .toggle-slider {
+            transform: translateX(34px);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .mobile-menu-toggle svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--text-primary);
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        @media (max-width: 768px) {
+            .main-nav {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: var(--bg-primary);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                border-bottom: 1px solid var(--border);
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .main-nav.is-open {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .nav-list {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+        
+        /* ============================================
+           HERO SECTION
+           ============================================
+           Dice roll: Hero=1 (Centered layout)
+           Full-bleed with morphing blobs
+           ============================================ */
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+        
+        /* Morphing Blob Container */
+        .blob-container {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .blob {
+            position: absolute;
+            filter: blur(60px);
+            opacity: 0.6;
+            will-change: transform;
+        }
+        
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--blob-1);
+            top: -10%;
+            left: -10%;
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        }
+        
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--blob-2);
+            bottom: -10%;
+            right: -10%;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+        }
+        
+        .blob-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--blob-3);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50% 50% 20% 80% / 25% 80% 20% 75%;
+            opacity: 0.4;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.96s ease forwards;
+            animation-delay: 0.12s;
+            opacity: 0;
+        }
+        
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s ease infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .hero-title {
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.96s ease forwards;
+            animation-delay: 0.24s;
+            opacity: 0;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 0.96s ease forwards;
+            animation-delay: 0.36s;
+            opacity: 0;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.96s ease forwards;
+            animation-delay: 0.48s;
+            opacity: 0;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border-color: var(--text-primary);
+        }
+        
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--shadow-lg);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+        
+        .btn-secondary:hover,
+        .btn-secondary:focus {
+            background: var(--bg-secondary);
+            border-color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-lg {
+            padding: 1.25rem 2.5rem;
+            font-size: 1.125rem;
+        }
+        
+        /* ============================================
+           MENU SECTION
+           ============================================ */
+        
+        .menu-section {
+            background: var(--bg-secondary);
+        }
+        
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 4rem;
+        }
+        
+        .section-label {
+            display: inline-block;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .menu-card {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-card:hover,
+        .menu-card:focus-within {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px var(--shadow);
+            border-color: var(--accent);
+        }
+        
+        .menu-card:hover::before,
+        .menu-card:focus-within::before {
+            transform: scaleX(1);
+        }
+        
+        .menu-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-card:hover .menu-icon {
+            background: var(--accent);
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .menu-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .menu-description {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+        
+        .menu-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        
+        .menu-price span {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+        
+        /* ============================================
+           ABOUT SECTION
+           ============================================ */
+        
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+        
+        .about-visual {
+            position: relative;
+        }
+        
+        .about-image {
+            width: 100%;
+            aspect-ratio: 4/5;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+        
+        .about-image::after {
+            content: '☕';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8rem;
+            opacity: 0.1;
+        }
+        
+        .about-stats {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px var(--shadow);
+            display: flex;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .about-stats {
+                right: 10px;
+                bottom: -10px;
+                padding: 1rem;
+                gap: 1rem;
+            }
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-dark);
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .about-content h2 {
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .feature-list li::before {
+            content: '✓';
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        /* ============================================
+           LOCATIONS SECTION
+           ============================================ */
+        
+        .locations-section {
+            background: var(--bg-secondary);
+        }
+        
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .location-card {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .location-card:hover,
+        .location-card:focus-within {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px var(--shadow);
+        }
+        
+        .location-map {
+            height: 180px;
+            background: var(--bg-tertiary);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .location-map::after {
+            content: '📍';
+            font-size: 3rem;
+            opacity: 0.3;
+        }
+        
+        .location-info {
+            padding: 1.5rem;
+        }
+        
+        .location-name {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .location-address {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .location-hours {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .status-open {
+            color: #00B894;
+        }
+        
+        .status-closed {
+            color: #FF7675;
+        }
+        
+        /* ============================================
+           CONTACT SECTION
+           ============================================ */
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+        
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+        
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .form-input,
+        .form-textarea {
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(255, 234, 167, 0.2);
+        }
+        
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-item:hover .contact-icon {
+            background: var(--accent);
+            transform: scale(1.1);
+        }
+        
+        .contact-details h4 {
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .contact-details p {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+        
+        /* ============================================
+           FOOTER
+           ============================================ */
+        
+        .site-footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 4rem 0 2rem;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .footer-brand {
+            max-width: 300px;
+        }
+        
+        .footer-logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .footer-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover,
+        .footer-links a:focus {
+            color: var(--accent-dark);
+        }
+        
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .footer-copyright {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+        
+        .social-link:hover,
+        .social-link:focus {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        /* ============================================
+           ANNOUNCEMENT REGION
+           ============================================ */
+        
+        .announcement-region {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 300px;
+        }
+        
+        .announcement {
+            background: var(--bg-primary);
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 30px var(--shadow-lg);
+            display: none;
+        }
+        
+        .announcement.is-visible {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* ============================================
+           SCROLL REVEAL ANIMATIONS
+           ============================================ */
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.96s ease, transform 0.96s ease;
+        }
+        
+        .reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Stagger children */
+        .reveal-stagger > * {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .reveal-stagger.is-visible > * {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.96s ease, transform 0.96s ease;
+        }
+        
+        .reveal-stagger.is-visible > *:nth-child(1) { transition-delay: 0s; }
+        .reveal-stagger.is-visible > *:nth-child(2) { transition-delay: 0.12s; }
+        .reveal-stagger.is-visible > *:nth-child(3) { transition-delay: 0.24s; }
+        .reveal-stagger.is-visible > *:nth-child(4) { transition-delay: 0.36s; }
+        .reveal-stagger.is-visible > *:nth-child(5) { transition-delay: 0.48s; }
+        .reveal-stagger.is-visible > *:nth-child(6) { transition-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header with role="banner" -->
+    <header class="site-header" role="banner">
+        <div class="header-inner">
+            <a href="#" class="logo" aria-label="RoastFlow Home">
+                <span class="logo-icon" aria-hidden="true">☕</span>
+                <span>RoastFlow</span>
+            </a>
+            
+            <!-- Mobile menu toggle -->
+            <button class="mobile-menu-toggle" 
+                    aria-label="Toggle navigation menu" 
+                    aria-expanded="false"
+                    aria-controls="main-nav"
+                    onclick="toggleMobileMenu()">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            
+            <!-- Navigation with role="navigation" -->
+            <nav class="main-nav" id="main-nav" role="navigation" aria-label="Main navigation">
+                <ul class="nav-list" role="list">
+                    <li role="listitem"><a href="#menu" class="nav-link">Menu</a></li>
+                    <li role="listitem"><a href="#about" class="nav-link">About</a></li>
+                    <li role="listitem"><a href="#locations" class="nav-link">Locations</a></li>
+                    <li role="listitem"><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+                
+                <!-- Theme Toggle with aria-pressed -->
+                <button class="theme-toggle" 
+                        id="theme-toggle"
+                        aria-label="Toggle dark mode" 
+                        aria-pressed="false"
+                        onclick="toggleTheme()"
+                        aria-live="polite">
+                    <span class="toggle-slider" aria-hidden="true"></span>
+                    <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main content with role="main" -->
+    <main id="main-content" role="main">
+        
+        <!-- Hero Section -->
+        <section class="hero" role="region" aria-labelledby="hero-heading">
+            <div class="blob-container" aria-hidden="true">
+                <div class="blob blob-1"></div>
+                <div class="blob blob-2"></div>
+                <div class="blob blob-3"></div>
+            </div>
+            
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span>Now Brewing in 12 Cities</span>
+                </div>
+                <h1 id="hero-heading" class="hero-title">
+                    Where Precision<br>Meets <span class="text-accent">Passion</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Experience coffee reimagined through technology and craft. 
+                    Every cup is a perfect balance of art and science.
+                </p>
+                <div class="hero-cta">
+                    <a href="#menu" class="btn btn-primary btn-lg">Explore Menu</a>
+                    <a href="#locations" class="btn btn-secondary btn-lg">Find Location</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Menu Section -->
+        <section id="menu" class="section menu-section" role="region" aria-labelledby="menu-heading">
+            <div class="container">
+                <header class="section-header reveal">
+                    <span class="section-label">Our Selection</span>
+                    <h2 id="menu-heading">Crafted for Perfection</h2>
+                    <p>Each beverage is precision-brewed using our proprietary RoastFlow technology, ensuring consistent excellence in every sip.</p>
+                </header>
+                
+                <div class="menu-grid reveal-stagger" role="list">
+                    <article class="menu-card" role="listitem">
+                        <div class="menu-icon" aria-hidden="true">☕</div>
+                        <h3 class="menu-title">Signature Espresso</h3>
+                        <p class="menu-description">Double shot with caramelized crema, extracted at precise 9-bar pressure</p>
+                        <div class="menu-price">$4.50 <span>/ 8oz</span></div>
+                    </article>
+                    
+                    <article class="menu-card" role="listitem">
+                        <div class="menu-icon" aria-hidden="true">🥛</div>
+                        <h3 class="menu-title">Nitro Cold Brew</h3>
+                        <p class="menu-description">24-hour steeped, nitrogen-infused for silky texture</p>
+                        <div class="menu-price">$5.50 <span>/ 12oz</span></div>
+                    </article>
+                    
+                    <article class="menu-card" role="listitem">
+                        <div class="menu-icon" aria-hidden="true">🍯</div>
+                        <h3 class="menu-title">Golden Latte</h3>
+                        <p class="menu-description">Turmeric-infused oat milk with wildflower honey</p>
+                        <div class="menu-price">$6.00 <span>/ 12oz</span></div>
+                    </article>
+                    
+                    <article class="menu-card" role="listitem">
+                        <div class="menu-icon" aria-hidden="true">🧪</div>
+                        <h3 class="menu-title">Pour-Over Lab</h3>
+                        <p class="menu-description">Single-origin beans, precision-timed extraction</p>
+                        <div class="menu-price">$7.00 <span>/ 10oz</span></div>
+                    </article>
+                    
+                    <article class="menu-card" role="listitem">
+                        <div class="menu-icon" aria-hidden="true">🧊</div>
+                        <h3 class="menu-title">Flash Brew Iced</h3>
+                        <p class="menu-description">Japanese-style flash chilled, zero dilution</p>
+                        <div class="menu-price">$5.00 <span>/ 16oz</span></div>
+                    </article>
+                    
+                    <article class="menu-card" role="listitem">
+                        <div class="menu-icon" aria-hidden="true">🌿</div>
+                        <h3 class="menu-title">Botanical Matcha</h3>
+                        <p class="menu-description">Ceremonial grade with adaptogenic herbs</p>
+                        <div class="menu-price">$6.50 <span>/ 12oz</span></div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section" role="region" aria-labelledby="about-heading">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="about-visual reveal">
+                        <div class="about-image" role="img" aria-label="Coffee brewing process illustration"></div>
+                        <div class="about-stats">
+                            <div class="stat-item">
+                                <span class="stat-value">98.6°</span>
+                                <span class="stat-label">Precision</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">12s</span>
+                                <span class="stat-label">Extraction</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">4.9★</span>
+                                <span class="stat-label">Rating</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="about-content reveal">
+                        <span class="section-label">Our Philosophy</span>
+                        <h2 id="about-heading">Technology Meets Tradition</h2>
+                        <p>At RoastFlow, we believe that great coffee is both an art and a science. Our proprietary brewing systems monitor temperature, pressure, and extraction time with laboratory precision.</p>
+                        <p>But technology is only a tool. Our master roasters bring decades of experience, carefully selecting beans from sustainable farms and roasting them to perfection.</p>
+                        
+                        <ul class="feature-list" role="list">
+                            <li role="listitem">Direct-trade beans from 8 countries</li>
+                            <li role="listitem">In-house roasting within 48 hours of brewing</li>
+                            <li role="listitem">Zero-waste brewing systems</li>
+                            <li role="listitem">Compostable packaging only</li>
+                        </ul>
+                        
+                        <a href="#contact" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Locations Section -->
+        <section id="locations" class="section locations-section" role="region" aria-labelledby="locations-heading">
+            <div class="container">
+                <header class="section-header reveal">
+                    <span class="section-label">Visit Us</span>
+                    <h2 id="locations-heading">Find Your Flow</h2>
+                    <p>12 locations across the city, each designed as a sanctuary for focus and flavor.</p>
+                </header>
+                
+                <div class="locations-grid reveal-stagger" role="list">
+                    <article class="location-card" role="listitem">
+                        <div class="location-map" role="img" aria-label="Map location for Downtown"></div>
+                        <div class="location-info">
+                            <h3 class="location-name">Downtown Core</h3>
+                            <p class="location-address">128 Innovation Ave, Tech District</p>
+                            <div class="location-hours">
+                                <span class="status-open" aria-label="Open now">●</span>
+                                <span>Open until 8:00 PM</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="location-card" role="listitem">
+                        <div class="location-map" role="img" aria-label="Map location for Arts District"></div>
+                        <div class="location-info">
+                            <h3 class="location-name">Arts District</h3>
+                            <p class="location-address">456 Creative Blvd, Gallery Row</p>
+                            <div class="location-hours">
+                                <span class="status-open" aria-label="Open now">●</span>
+                                <span>Open until 10:00 PM</span>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="location-card" role="listitem">
+                        <div class="location-map" role="img" aria-label="Map location for University"></div>
+                        <div class="location-info">
+                            <h3 class="location-name">University Hub</h3>
+                            <p class="location-address">789 Campus Dr, Student Center</p>
+                            <div class="location-hours">
+                                <span class="status-open" aria-label="Open now">●</span>
+                                <span>Open 24 Hours</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section" role="region" aria-labelledby="contact-heading">
+            <div class="container">
+                <header class="section-header reveal">
+                    <span class="section-label">Get in Touch</span>
+                    <h2 id="contact-heading">Start a Conversation</h2>
+                    <p>Questions about our brewing process, wholesale partnerships, or just want to say hello?</p>
+                </header>
+                
+                <div class="contact-grid reveal">
+                    <form class="contact-form" onsubmit="handleSubmit(event)" aria-label="Contact form">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" id="name" class="form-input" placeholder="Jane Doe" required aria-required="true">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" class="form-input" placeholder="jane@example.com" required aria-required="true">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea id="message" class="form-textarea" placeholder="Tell us what's on your mind..." required aria-required="true"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg">Send Message</button>
+                    </form>
+                    
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <div class="contact-icon" aria-hidden="true">📧</div>
+                            <div class="contact-details">
+                                <h4>Email Us</h4>
+                                <p>hello@roastflow.coffee</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon" aria-hidden="true">📞</div>
+                            <div class="contact-details">
+                                <h4>Call Us</h4>
+                                <p>1-800-FLOW-BREW</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon" aria-hidden="true">💬</div>
+                            <div class="contact-details">
+                                <h4>Live Chat</h4>
+                                <p>Available 7am - 9pm daily</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer with role="contentinfo" -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <span aria-hidden="true">☕</span>
+                        <span>RoastFlow</span>
+                    </div>
+                    <p class="footer-description">Precision brewing for the modern coffee lover. Where technology meets tradition in every cup.</p>
+                </div>
+                
+                <div>
+                    <h4 class="footer-title">Explore</h4>
+                    <ul class="footer-links" role="list">
+                        <li role="listitem"><a href="#menu">Menu</a></li>
+                        <li role="listitem"><a href="#about">About</a></li>
+                        <li role="listitem"><a href="#locations">Locations</a></li>
+                        <li role="listitem"><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="footer-title">Company</h4>
+                    <ul class="footer-links" role="list">
+                        <li role="listitem"><a href="#">Careers</a></li>
+                        <li role="listitem"><a href="#">Press</a></li>
+                        <li role="listitem"><a href="#">Wholesale</a></li>
+                        <li role="listitem"><a href="#">Sustainability</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="footer-title">Legal</h4>
+                    <ul class="footer-links" role="list">
+                        <li role="listitem"><a href="#">Privacy</a></li>
+                        <li role="listitem"><a href="#">Terms</a></li>
+                        <li role="listitem"><a href="#">Accessibility</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="footer-copyright">© 2024 RoastFlow Coffee. All rights reserved.</p>
+                <div class="social-links" role="list" aria-label="Social media links">
+                    <a href="#" class="social-link" role="listitem" aria-label="Instagram">📷</a>
+                    <a href="#" class="social-link" role="listitem" aria-label="Twitter">🐦</a>
+                    <a href="#" class="social-link" role="listitem" aria-label="LinkedIn">💼</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Announcement region for dynamic updates -->
+    <div class="announcement-region" aria-live="polite" aria-atomic="true">
+        <div class="announcement" id="announcement"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // ============================================
+        // THEME TOGGLE FUNCTIONALITY
+        // ============================================
+        
+        function toggleTheme() {
+            const html = document.documentElement;
+            const toggle = document.getElementById('theme-toggle');
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            toggle.setAttribute('aria-pressed', newTheme === 'dark');
+            
+            // Announce theme change to screen readers
+            announce(`Switched to ${newTheme} mode`);
+            
+            // Save preference
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        // Initialize theme from localStorage or system preference
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            const toggle = document.getElementById('theme-toggle');
+            
+            document.documentElement.setAttribute('data-theme', theme);
+            if (toggle) {
+                toggle.setAttribute('aria-pressed', theme === 'dark');
+            }
+        }
+        
+        // ============================================
+        // MOBILE MENU TOGGLE
+        // ============================================
+        
+        function toggleMobileMenu() {
+            const nav = document.getElementById('main-nav');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            const isOpen = nav.classList.contains('is-open');
+            
+            nav.classList.toggle('is-open');
+            toggle.setAttribute('aria-expanded', !isOpen);
+        }
+        
+        // ============================================
+        // ANNOUNCEMENT SYSTEM (for screen readers)
+        // ============================================
+        
+        function announce(message) {
+            const announcement = document.getElementById('announcement');
+            announcement.textContent = message;
+            announcement.classList.add('is-visible');
+            
+            setTimeout(() => {
+                announcement.classList.remove('is-visible');
+                announcement.textContent = '';
+            }, 3000);
+        }
+        
+        // ============================================
+        // SCROLL REVEAL ANIMATIONS
+        // ============================================
+        
+        function initScrollReveal() {
+            const reveals = document.querySelectorAll('.reveal, .reveal-stagger');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+            
+            reveals.forEach(el => observer.observe(el));
+        }
+        
+        // ============================================
+        // GSAP MORPHING BLOB ANIMATION
+        // Dice roll: Feature=1 (Morphing blobs)
+        // ============================================
+        
+        function initBlobAnimation() {
+            if (typeof gsap === 'undefined') return;
+            
+            // Animate blob 1
+            gsap.to('.blob-1', {
+                borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
+                x: 100,
+                y: 50,
+                rotation: 90,
+                duration: 12,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+            
+            // Animate blob 2
+            gsap.to('.blob-2', {
+                borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+                x: -80,
+                y: -30,
+                rotation: -45,
+                duration: 10,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut',
+                delay: 2
+            });
+            
+            // Animate blob 3
+            gsap.to('.blob-3', {
+                borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
+                scale: 1.2,
+                rotation: 180,
+                duration: 15,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut',
+                delay: 4
+            });
+        }
+        
+        // ============================================
+        // FORM HANDLING
+        // ============================================
+        
+        function handleSubmit(event) {
+            event.preventDefault();
+            announce('Thank you! Your message has been sent.');
+            event.target.reset();
+        }
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initScrollReveal();
+            initBlobAnimation();
+        });
+        
+        // Close mobile menu on resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                const nav = document.getElementById('main-nav');
+                const toggle = document.querySelector('.mobile-menu-toggle');
+                nav.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    </script>
+</body>
+</html>

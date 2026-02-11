@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Monolith | Seed 670386165</title>
+    
+    <!-- 
+    DESIGN EXPLANATION & SEED DECOMPOSITION (670386165)
+    
+    1. STYLE: Neo-Brutalism / Swiss International Style.
+       - No gradients, no border-radius. 
+       - Pure geometry and typography.
+    
+    2. SEED DECOMPOSITION (670386165):
+       - 6 (Layout): A strict 6-column CSS Grid system.
+       - 7 (Typography): Use of "Syne" (Artistic) + "Space Mono" (Utilitarian) Google Fonts.
+       - 0 (Radius): 0px border-radius everywhere. Hard edges.
+       - 3 (Palette): Tri-color scheme.
+         - Light: Alabaster / Black / International Orange.
+         - Dark: Black / Neon Lime / Deep Purple.
+       - 8 (Motion): Infinite marquee loop (figure-8 concept).
+       - 6 (Z-Index): Heavy use of layering and mix-blend-modes.
+       - 1 (Structure): Single axis scroll, breaking grid on mobile.
+       - 65 (Pattern): A 65deg noise texture overlay.
+    
+    3. DARING CHOICES:
+       - Navigation is placed at the bottom on mobile for ergonomics, floating on desktop.
+       - Excessive use of border-bottom for rhythm.
+       - "Hover-reveal" imagery using mix-blend-mode exclusion.
+    -->
+
+    <!-- External Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CSS RESET & VARIABLES --- */
+        :root {
+            /* Light Mode */
+            --bg-color: #F0F0F0;
+            --txt-color: #121212;
+            --accent-color: #FF3300; /* International Orange */
+            --secondary-color: #E0E0E0;
+            --border-width: 2px;
+            --grid-gap: 20px;
+            --noise-opacity: 0.05;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode */
+            --bg-color: #121212;
+            --txt-color: #CCFF00; /* Acid Lime */
+            --accent-color: #9D00FF; /* Electric Violet */
+            --secondary-color: #1F1F1F;
+            --noise-opacity: 0.1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            cursor: none; /* Custom cursor implementation */
+        }
+
+        html, body {
+            font-family: 'Space Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--txt-color);
+            transition: background-color 0.4s cubic-bezier(0.25, 1, 0.5, 1), color 0.4s;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            line-height: 0.9;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 10vw, 9rem);
+            letter-spacing: -0.04em;
+            position: relative;
+            z-index: 2;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 4rem);
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 60ch;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            position: relative;
+        }
+
+        /* --- NOISE TEXTURE (Seed 65) --- */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: var(--noise-opacity);
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        #cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-color);
+            background: transparent;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            mix-blend-mode: difference;
+        }
+
+        #cursor.hovered {
+            width: 80px;
+            height: 80px;
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* --- LAYOUT GRID --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr); /* Seed 6 */
+            gap: 0; /* Brutalist touching borders */
+            border-left: var(--border-width) solid var(--txt-color);
+            border-right: var(--border-width) solid var(--txt-color);
+            max-width: 1440px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Vertical grid lines */
+        .grid-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: var(--txt-color);
+            opacity: 0.2;
+            z-index: 0;
+        }
+        .gl-1 { left: 16.66%; }
+        .gl-2 { left: 33.33%; }
+        .gl-3 { left: 50%; }
+        .gl-4 { left: 66.66%; }
+        .gl-5 { left: 83.33%; }
+
+        /* --- HEADER --- */
+        header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            border-bottom: var(--border-width) solid var(--txt-color);
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        /* Toggle Switch */
+        .theme-toggle {
+            background: none;
+            border: var(--border-width) solid var(--txt-color);
+            color: var(--txt-color);
+            padding: 0.5rem 1.5rem;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            font-weight: 700;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--txt-color);
+            color: var(--bg-color);
+            box-shadow: 4px 4px 0 var(--accent-color);
+            transform: translate(-2px, -2px);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            grid-column: 1 / -1;
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem;
+            border-bottom: var(--border-width) solid var(--txt-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-sticker {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 150px;
+            height: 150px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 700;
+            color: var(--bg-color);
+            animation: rotate 10s linear infinite;
+            z-index: 1;
+            mix-blend-mode: exclusion;
+        }
+
+        .hero-img {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 50%;
+            height: 80%;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(120%);
+            opacity: 0.8;
+            z-index: 0;
+            transition: filter 0.5s;
+        }
+
+        .hero:hover .hero-img {
+            filter: grayscale(0%) contrast(100%);
+        }
+
+        /* --- MARQUEE (Seed 8) --- */
+        .marquee-container {
+            grid-column: 1 / -1;
+            background: var(--txt-color);
+            color: var(--bg-color);
+            padding: 1rem 0;
+            overflow: hidden;
+            white-space: nowrap;
+            border-bottom: var(--border-width) solid var(--txt-color);
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        .marquee-content span {
+            font-family: 'Syne', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-right: 4rem;
+            text-transform: uppercase;
+        }
+
+        /* --- GRID CONTENT --- */
+        .feature-block {
+            padding: 3rem 2rem;
+            border-bottom: var(--border-width) solid var(--txt-color);
+            border-right: var(--border-width) solid var(--txt-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 400px;
+            transition: background 0.3s;
+        }
+
+        .feature-block:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Asymmetric Layout (Seed 6 decomposition) */
+        .block-1 { grid-column: 1 / 4; }
+        .block-2 { grid-column: 4 / 7; border-right: none; }
+        .block-3 { grid-column: 1 / 3; }
+        .block-4 { grid-column: 3 / 7; border-right: none; }
+
+        .feature-number {
+            font-size: 5rem;
+            font-family: 'Syne', sans-serif;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--accent-color);
+            opacity: 0.5;
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            border: 2px solid var(--txt-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            align-self: flex-start;
+            transition: all 0.2s;
+        }
+
+        .cta-button:hover {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+            box-shadow: 6px 6px 0 var(--txt-color);
+            transform: translate(-3px, -3px);
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            grid-column: 1 / -1;
+            padding: 4rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            background: var(--txt-color);
+            color: var(--bg-color);
+        }
+
+        .footer-link {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-color);
+            padding-left: 10px;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .grid-container {
+                display: flex;
+                flex-direction: column;
+                border-left: none;
+                border-right: none;
+            }
+
+            .grid-line { display: none; }
+
+            .hero-img {
+                width: 100%;
+                height: 50%;
+                opacity: 0.4;
+            }
+            
+            h1 {
+                font-size: 15vw;
+            }
+
+            .feature-block {
+                border-right: none;
+            }
+            
+            #cursor {
+                display: none; /* Hide custom cursor on touch devices */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Noise Texture -->
+    <div class="noise-overlay"></div>
+    
+    <!-- Custom Cursor -->
+    <div id="cursor"></div>
+
+    <div class="grid-container">
+        <!-- Vertical Grid Lines for Aesthetic -->
+        <div class="grid-line gl-1"></div>
+        <div class="grid-line gl-2"></div>
+        <div class="grid-line gl-3"></div>
+        <div class="grid-line gl-4"></div>
+        <div class="grid-line gl-5"></div>
+
+        <header>
+            <div class="logo">Seed.670</div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+                Light/Dark
+            </button>
+        </header>
+
+        <main class="hero">
+            <div class="hero-sticker">
+                NOVEL<br>UNIQUE<br>BOLD
+            </div>
+            <!-- Decorative Abstract Image -->
+            <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop" alt="Abstract Brutalist Architecture" class="hero-img">
+            
+            <h1 class="interactive">DIGITAL<br>BRUTALISM</h1>
+            <p>Deconstructing the web, one grid line at a time. A study in raw aesthetics and functional minimalism.</p>
+        </main>
+
+        <div class="marquee-container">
+            <div class="marquee-content">
+                <span>/// NO GRADIENTS /// PURE HTML /// SEMANTIC STRUCTURE /// SEED: 670386165 /// STRIKING DESIGN /// NO GRADIENTS /// PURE HTML /// SEMANTIC STRUCTURE /// SEED: 670386165 /// STRIKING DESIGN</span>
+            </div>
+        </div>
+
+        <section class="feature-block block-1 interactive">
+            <div class="feature-number">06</div>
+            <h3>Asymmetric Grid</h3>
+            <p>Breaking the symmetry to create tension and visual interest. The structure defines the content, not the other way around.</p>
+            <a href="#" class="cta-button">Explore Layout</a>
+        </section>
+
+        <section class="feature-block block-2 interactive">
+            <div class="feature-number">07</div>
+            <h3>Typography First</h3>
+            <p>Using Syne for impact and Space Mono for data. The contrast between variable width and fixed width creates a unique texture.</p>
+            <a href="#" class="cta-button">Read Typography</a>
+        </section>
+
+        <section class="feature-block block-3 interactive">
+            <div class="feature-number">03</div>
+            <h3>Raw Color</h3>
+            <p>High saturation accents against monochrome backgrounds. No blurring, no softening. Just pure color values.</p>
+        </section>
+
+        <section class="feature-block block-4 interactive">
+            <div class="feature-number">86</div>
+            <h3>Performance</h3>
+            <p>Zero external frameworks. Plain CSS and Vanilla JS ensure lightning fast paint times and smooth scrolling on all devices.</p>
+            <a href="#" class="cta-button">View Source</a>
+        </section>
+
+        <footer>
+            <div class="footer-col">
+                <a href="#" class="footer-link interactive">Instagram</a>
+                <a href="#" class="footer-link interactive">Twitter</a>
+                <a href="#" class="footer-link interactive">Email</a>
+            </div>
+            <div class="footer-col" style="text-align: right;">
+                <p>&copy; 2023 Monolith Inc.</p>
+                <p>Seed Gen: 670386165</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // --- THEME TOGGLE LOGIC ---
+        const toggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+
+        // Check local storage or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            htmlElement.setAttribute('data-theme', savedTheme);
+        } else if (systemDark) {
+            htmlElement.setAttribute('data-theme', 'dark');
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Subtle rotation animation on click
+            toggleBtn.style.transform = 'rotate(180deg)';
+            setTimeout(() => {
+                toggleBtn.style.transform = 'rotate(0deg)';
+            }, 300);
+        });
+
+        // --- CUSTOM CURSOR LOGIC ---
+        const cursor = document.getElementById('cursor');
+        const interactiveElements = document.querySelectorAll('.interactive, a, button');
+
+        // Move cursor
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Hover effects
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('hovered');
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hovered');
+            });
+        });
+
+        // --- SCROLL REVEAL (Simple Intersection Observer) ---
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-block').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

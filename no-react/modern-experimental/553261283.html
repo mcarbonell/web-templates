@@ -1,0 +1,546 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOVA/GRID - Experimental Landing</title>
+  <!--
+    Design Notes
+    Seed: 553261283
+
+    Seed Decomposition -> Decisions
+    - [55] Dual-contrast palette with warm/cool split and bold text strokes.
+    - [32] Medium-high motion profile: kinetic headline loop + parallax drift.
+    - [61] Dense bento rhythm with asymmetrical card spans.
+    - [28] ASCII-to-canvas refresh tuned for mobile (throttled frame cadence).
+    - [3]  Three hero key words in rotating kinetic typography.
+
+    Techniques used
+    - ASCII-to-Canvas (mandatory effect)
+    - Bento Grid
+    - Gradient animated text
+    - Stroke text
+    - Aurora / gradient blobs
+    - Scroll snapping
+    - Glassmorphism
+    - Parallax
+    - Magnetic buttons
+    - Scramble text
+
+    Performance intent
+    - ASCII generation at reduced internal resolution and capped refresh interval.
+    - Passive scroll listeners and lightweight transforms only.
+    - No heavy libraries; plain semantic HTML/CSS/JS for Chrome/Firefox/Safari.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --bg-soft: #e6edf8;
+      --text: #0e1320;
+      --muted: #4f5d74;
+      --glass: rgba(255, 255, 255, 0.58);
+      --glass-border: rgba(255, 255, 255, 0.68);
+      --accent-a: #1ca0ff;
+      --accent-b: #ff4d86;
+      --accent-c: #15d6a0;
+      --hero-shadow: rgba(28, 160, 255, 0.2);
+    }
+
+    [data-theme="dark"] {
+      --bg: #070b12;
+      --bg-soft: #0f1727;
+      --text: #eff5ff;
+      --muted: #91a0be;
+      --glass: rgba(17, 25, 39, 0.56);
+      --glass-border: rgba(117, 139, 185, 0.26);
+      --accent-a: #5db5ff;
+      --accent-b: #ff6ea8;
+      --accent-c: #2ce7b8;
+      --hero-shadow: rgba(93, 181, 255, 0.3);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Sora", sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 15% 10%, color-mix(in oklab, var(--accent-a) 24%, transparent), transparent 26%),
+        radial-gradient(circle at 85% 30%, color-mix(in oklab, var(--accent-b) 18%, transparent), transparent 28%),
+        linear-gradient(140deg, var(--bg) 10%, var(--bg-soft) 100%);
+      background-attachment: fixed;
+    }
+
+    .aurora {
+      position: fixed;
+      inset: -20vmax;
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(48px) saturate(120%);
+      opacity: 0.58;
+      background:
+        radial-gradient(circle at 35% 35%, color-mix(in oklab, var(--accent-a) 56%, transparent), transparent 32%),
+        radial-gradient(circle at 70% 45%, color-mix(in oklab, var(--accent-b) 50%, transparent), transparent 34%),
+        radial-gradient(circle at 50% 75%, color-mix(in oklab, var(--accent-c) 44%, transparent), transparent 30%);
+      animation: auroraShift 14s ease-in-out infinite alternate;
+      transform-origin: center;
+    }
+
+    @keyframes auroraShift {
+      from { transform: rotate(-4deg) scale(1); }
+      to { transform: rotate(4deg) scale(1.12); }
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      background: color-mix(in oklab, var(--bg) 80%, transparent);
+      border-bottom: 1px solid color-mix(in oklab, var(--text) 14%, transparent);
+    }
+
+    .bar {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0.8rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-family: "Syne", sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-size: 1rem;
+    }
+
+    .theme-toggle {
+      border: 1px solid color-mix(in oklab, var(--text) 22%, transparent);
+      background: var(--glass);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.45rem 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .snap {
+      scroll-snap-type: y mandatory;
+    }
+
+    section {
+      scroll-snap-align: start;
+      min-height: 100svh;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem;
+      display: grid;
+      align-content: center;
+      position: relative;
+    }
+
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    .chip {
+      width: fit-content;
+      padding: 0.38rem 0.72rem;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklab, var(--text) 18%, transparent);
+      background: var(--glass);
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Syne", sans-serif;
+      font-size: clamp(2rem, 10vw, 5.8rem);
+      line-height: 0.92;
+      text-wrap: balance;
+    }
+
+    .stroke {
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--text);
+      text-shadow: 0 14px 40px var(--hero-shadow);
+    }
+
+    .gradient-word {
+      background: linear-gradient(92deg, var(--accent-a), var(--accent-b), var(--accent-c), var(--accent-a));
+      background-size: 220% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradientFlow 6s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes gradientFlow {
+      to { background-position: 200% 0; }
+    }
+
+    .kinetic {
+      display: inline-grid;
+      overflow: hidden;
+      vertical-align: bottom;
+      min-width: 5.8ch;
+      height: 1.1em;
+      border-bottom: 2px solid color-mix(in oklab, var(--text) 35%, transparent);
+    }
+
+    .kinetic span {
+      grid-area: 1 / 1;
+      opacity: 0;
+      animation: wordLoop 7.8s infinite;
+      will-change: transform, opacity;
+      transform: translateY(100%);
+    }
+
+    .kinetic span:nth-child(2) { animation-delay: 2.6s; }
+    .kinetic span:nth-child(3) { animation-delay: 5.2s; }
+
+    @keyframes wordLoop {
+      0%, 8% { opacity: 0; transform: translateY(95%); }
+      12%, 30% { opacity: 1; transform: translateY(0); }
+      38%, 100% { opacity: 0; transform: translateY(-95%); }
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 56ch;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: clamp(0.98rem, 2.8vw, 1.12rem);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 9.4rem;
+      border-radius: 999px;
+      padding: 0.78rem 1.12rem;
+      font-weight: 700;
+      border: 1px solid color-mix(in oklab, var(--text) 20%, transparent);
+      background: var(--glass);
+      color: var(--text);
+      backdrop-filter: blur(14px);
+      transition: transform 180ms ease;
+      will-change: transform;
+    }
+
+    .btn.primary {
+      border: none;
+      color: #fff;
+      background: linear-gradient(100deg, var(--accent-a), var(--accent-b));
+    }
+
+    .ascii-wrap {
+      border-radius: 18px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      overflow: hidden;
+      min-height: 11rem;
+      box-shadow: 0 14px 48px color-mix(in oklab, var(--text) 14%, transparent);
+      width: min(100%, 760px);
+    }
+
+    #ascii {
+      margin: 0;
+      padding: 1rem;
+      font-family: "Space Mono", monospace;
+      font-size: clamp(0.35rem, 1.45vw, 0.62rem);
+      line-height: 1.07;
+      letter-spacing: 0.03em;
+      color: color-mix(in oklab, var(--text) 88%, var(--accent-a));
+      white-space: pre;
+      overflow: hidden;
+      min-height: 12rem;
+    }
+
+    .bento {
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.75rem;
+      align-content: start;
+      padding-top: 4.5rem;
+      padding-bottom: 4.5rem;
+    }
+
+    .card {
+      border-radius: 18px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      padding: 1rem;
+      min-height: 8rem;
+      box-shadow: 0 14px 40px color-mix(in oklab, var(--text) 11%, transparent);
+    }
+
+    .card h2, .card h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-family: "Syne", sans-serif;
+      line-height: 1;
+    }
+
+    .card p { margin: 0; color: var(--muted); line-height: 1.45; }
+
+    .span-6 { grid-column: span 6; }
+    .span-4 { grid-column: span 4; }
+    .span-3 { grid-column: span 3; }
+    .span-2 { grid-column: span 2; }
+
+    .metric {
+      font-family: "Syne", sans-serif;
+      font-size: clamp(1.5rem, 7vw, 2.6rem);
+      margin: 0.1rem 0;
+      line-height: 1;
+    }
+
+    .parallax { --py: 0; transform: translateY(calc(var(--py, 0) * 1px)); will-change: transform; }
+
+    footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1rem 3rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 720px) {
+      .bento { grid-template-columns: repeat(2, 1fr); }
+      .span-6, .span-4, .span-3, .span-2 { grid-column: span 2; }
+      section { min-height: 100svh; }
+      #ascii { min-height: 10rem; }
+    }
+  </style>
+</head>
+<body class="snap">
+  <div class="aurora" aria-hidden="true"></div>
+  <header class="site-header">
+    <nav class="bar" aria-label="Primary">
+      <div class="logo" data-scramble="NOVA/GRID">NOVA/GRID</div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme">Dark Mode</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="top" aria-label="Hero">
+      <p class="chip">Experimental Product Studio</p>
+      <h1>
+        Build
+        <span class="kinetic" aria-label="creative outcomes">
+          <span class="gradient-word">brands</span>
+          <span class="gradient-word">systems</span>
+          <span class="gradient-word">futures</span>
+        </span>
+        with
+        <span class="stroke">radical clarity</span>
+      </h1>
+      <p class="lead">A mobile-first landing concept where motion and typography lead the story. Scroll through tactile bento modules and a live ASCII canvas signature tuned for smooth performance.</p>
+      <div class="actions">
+        <a class="btn primary magnetic" href="#work" data-scramble="Start Project">Start Project</a>
+        <a class="btn magnetic" href="#method" data-scramble="See Method">See Method</a>
+      </div>
+      <figure class="ascii-wrap parallax" aria-label="Live ASCII scene">
+        <pre id="ascii" aria-live="off">Initializing...</pre>
+      </figure>
+    </section>
+
+    <section class="bento" id="work" aria-label="Capabilities">
+      <article class="card span-6 parallax">
+        <h2>Creative Ops in a Single Motion Language</h2>
+        <p>From identity to launch systems, every surface speaks one visual dialect. The result is unmistakable presence and fast iteration.</p>
+      </article>
+      <article class="card span-4 parallax">
+        <h3>Signal</h3>
+        <p class="metric">93%</p>
+        <p>Average lift in visual recall in user tests for high-contrast narrative layouts.</p>
+      </article>
+      <article class="card span-2 parallax">
+        <h3>Latency</h3>
+        <p class="metric">16ms</p>
+        <p>Motion stack budget target per frame on mid-range mobile hardware.</p>
+      </article>
+      <article class="card span-3 parallax">
+        <h3>System</h3>
+        <p>Design tokens + semantic components + copy rhythm templates.</p>
+      </article>
+      <article class="card span-3 parallax">
+        <h3>Engine</h3>
+        <p>CSS transforms, GPU-friendly animation, and lightweight JavaScript interactions.</p>
+      </article>
+    </section>
+
+    <section class="bento" id="method" aria-label="Method">
+      <article class="card span-2"><h3>01 Discover</h3><p>Map intent, audience, and emotional targets.</p></article>
+      <article class="card span-2"><h3>02 Distill</h3><p>Reduce the system to a memorable visual thesis.</p></article>
+      <article class="card span-2"><h3>03 Deploy</h3><p>Ship and tune through behavior analytics.</p></article>
+      <article class="card span-6">
+        <h2 data-scramble="Every Pixel Has A Point Of View">Every Pixel Has A Point Of View</h2>
+        <p>The layout uses snap-scrolling sections, bold typography, and glass cards to keep interaction focused while preserving visual surprise.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    Seed 553261283 · NOVA/GRID concept page · Built in plain HTML, CSS and JavaScript.
+  </footer>
+
+  <script>
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    function setTheme(theme) {
+      root.setAttribute('data-theme', theme);
+      toggle.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+      localStorage.setItem('theme', theme);
+    }
+
+    setTheme(stored || (prefersDark ? 'dark' : 'light'));
+    toggle.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+    });
+
+    const asciiEl = document.getElementById('ascii');
+    const source = document.createElement('canvas');
+    const ctx = source.getContext('2d', { willReadFrequently: true });
+    const width = 132;
+    const height = 48;
+    source.width = width;
+    source.height = height;
+    const chars = ' .,:;i1tfLCG08@';
+    let lastAscii = 0;
+
+    function renderAscii(ts) {
+      if (ts - lastAscii < 55) {
+        requestAnimationFrame(renderAscii);
+        return;
+      }
+      lastAscii = ts;
+      const t = ts * 0.0011;
+
+      ctx.clearRect(0, 0, width, height);
+      const grad = ctx.createLinearGradient(0, 0, width, height);
+      grad.addColorStop(0, '#1ca0ff');
+      grad.addColorStop(0.5, '#ff4d86');
+      grad.addColorStop(1, '#15d6a0');
+      ctx.fillStyle = '#0b1020';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        const x = (Math.sin(t + i * 1.7) * 0.35 + 0.5) * width;
+        const y = (Math.cos(t * 1.2 + i * 1.3) * 0.35 + 0.5) * height;
+        const r = 10 + (i * 4);
+        ctx.fillStyle = grad;
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('NOVA/GRID', 8, 26);
+
+      const pixels = ctx.getImageData(0, 0, width, height).data;
+      let out = '';
+      for (let y = 0; y < height; y += 2) {
+        for (let x = 0; x < width; x += 2) {
+          const idx = (y * width + x) * 4;
+          const r = pixels[idx];
+          const g = pixels[idx + 1];
+          const b = pixels[idx + 2];
+          const l = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          out += chars[Math.min(chars.length - 1, (l * chars.length) | 0)];
+        }
+        out += '\n';
+      }
+      asciiEl.textContent = out;
+      requestAnimationFrame(renderAscii);
+    }
+    requestAnimationFrame(renderAscii);
+
+    const parallaxEls = Array.from(document.querySelectorAll('.parallax'));
+    function onScroll() {
+      const y = window.scrollY;
+      for (const el of parallaxEls) {
+        const rect = el.getBoundingClientRect();
+        const centerOffset = rect.top + rect.height * 0.5 - window.innerHeight * 0.5;
+        const drift = Math.max(-12, Math.min(12, -centerOffset * 0.025 + y * 0.0002));
+        el.style.setProperty('--py', drift.toFixed(2));
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    function scramble(el) {
+      const base = el.dataset.scramble || el.textContent;
+      const glyphs = '!<>-_\\/[]{}=+*^?#________';
+      let i = 0;
+      const timer = setInterval(() => {
+        const next = base
+          .split('')
+          .map((ch, idx) => (idx < i ? base[idx] : glyphs[(Math.random() * glyphs.length) | 0]))
+          .join('');
+        el.textContent = next;
+        i += 1 / 2;
+        if (i >= base.length) {
+          el.textContent = base;
+          clearInterval(timer);
+        }
+      }, 24);
+    }
+
+    document.querySelectorAll('[data-scramble]').forEach((el) => {
+      el.addEventListener('mouseenter', () => scramble(el));
+      el.addEventListener('focus', () => scramble(el));
+    });
+
+    document.querySelectorAll('.magnetic').forEach((el) => {
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const x = e.clientX - r.left - r.width / 2;
+        const y = e.clientY - r.top - r.height / 2;
+        el.style.transform = `translate(${x * 0.12}px, ${y * 0.12}px)`;
+      });
+      el.addEventListener('pointerleave', () => {
+        el.style.transform = 'translate(0, 0)';
+      });
+    });
+  </script>
+</body>
+</html>

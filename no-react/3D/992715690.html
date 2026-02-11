@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS // 992715690</title>
+    
+    <!-- 
+    ============================================
+    DESIGN SYSTEM - SEED 992715690
+    ============================================
+    
+    CHAOS LEVEL: 9/9 (MAXIMUM)
+    - Extreme asymmetry with broken grid
+    - Elements breaking containers
+    - Overlapping layers with z-index chaos
+    - Unconventional scroll parallax
+    - Glitch effects and distortion
+    
+    COLOR PALETTE (Seed Digit 2):
+    - Primary: Acid Neon Green (#39FF14) - Electric, futuristic
+    - Secondary: Hot Magenta (#FF00FF) - High contrast accent
+    - Dark: Deep Void (#0A0A0F) - Space-like darkness
+    - Light: Pure White (#FFFFFF) - High contrast text
+    
+    TYPOGRAPHY (Seed Digit 6):
+    - Variable font: Inter (weight animation capable)
+    - Display: Extreme weight variations (100-900)
+    - Chaos effect: Rotated text blocks, vertical text
+    
+    3D ELEMENTS (Seed Digit 1):
+    - Minimal but impactful: Floating geometric shards
+    - THREE.js particle field with mouse interaction
+    - Low poly aesthetic for performance
+    
+    ANIMATION STYLE (Seed Digit 5):
+    - Physics-based cursor following
+    - GSAP ScrollTrigger with skew effects
+    - Magnetic buttons with spring physics
+    
+    SPECIAL EFFECT (Seed Digit 9):
+    - Custom WebGL shader background
+    - Perlin noise distortion field
+    - RGB shift on scroll
+    
+    SHAPE LANGUAGE (Seed Digit 0):
+    - Organic blob morphing shapes
+    - Smooth curves, no sharp corners
+    - Liquid-like transitions
+    ============================================
+    -->
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        /* ============================================
+           CSS CUSTOM PROPERTIES - THEME SYSTEM
+           ============================================ */
+        :root {
+            /* Core Colors */
+            --color-primary: #39FF14;
+            --color-secondary: #FF00FF;
+            --color-accent: #00FFFF;
+            --color-void: #0A0A0F;
+            --color-surface: #12121A;
+            --color-surface-light: #1E1E2E;
+            --color-text: #FFFFFF;
+            --color-text-muted: #888899;
+            
+            /* Chaos Variables */
+            --chaos-rotation: 0deg;
+            --chaos-skew: 0deg;
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+            
+            /* Timing */
+            --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-medium: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-slow: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            
+            /* Spacing Chaos */
+            --space-xs: clamp(0.5rem, 1vw, 1rem);
+            --space-sm: clamp(1rem, 2vw, 2rem);
+            --space-md: clamp(2rem, 4vw, 4rem);
+            --space-lg: clamp(4rem, 8vw, 8rem);
+            --space-xl: clamp(6rem, 12vw, 12rem);
+            
+            /* Easing */
+            --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-magnetic: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        /* Light Mode Override */
+        [data-theme="light"] {
+            --color-void: #F5F5F7;
+            --color-surface: #FFFFFF;
+            --color-surface-light: #E8E8ED;
+            --color-text: #0A0A0F;
+            --color-text-muted: #666677;
+            --color-primary: #008800;
+            --color-secondary: #CC00CC;
+        }
+        
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--color-void);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            cursor: none;
+            transition: background-color var(--transition-medium);
+        }
+        
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s var(--ease-elastic), 
+                        height 0.3s var(--ease-elastic),
+                        background-color 0.3s;
+            mix-blend-mode: difference;
+        }
+        
+        .cursor.hover {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(57, 255, 20, 0.1);
+        }
+        
+        .cursor-dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background-color: var(--color-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* ============================================
+           WEBGL BACKGROUND CANVAS
+           ============================================ */
+        .webgl-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+        
+        /* ============================================
+           THEME TOGGLE
+           ============================================ */
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 32px;
+            background-color: var(--color-surface-light);
+            border-radius: 16px;
+            cursor: none;
+            z-index: 1000;
+            overflow: hidden;
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            transition: all var(--transition-fast);
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+        }
+        
+        .theme-toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-radius: 50%;
+            transition: transform 0.4s var(--ease-elastic);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        [data-theme="light"] .theme-toggle-slider {
+            transform: translateX(28px);
+        }
+        
+        .theme-icon {
+            width: 14px;
+            height: 14px;
+            fill: var(--color-void);
+        }
+        
+        /* ============================================
+           NAVIGATION
+           ============================================ */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            mix-blend-mode: difference;
+        }
+        
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            color: var(--color-text);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+        
+        .nav-link {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-text);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            padding: 0.5rem 0;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--color-primary);
+            transform: translateX(-101%);
+            transition: transform 0.4s var(--ease-expo);
+        }
+        
+        .nav-link:hover::after {
+            transform: translateX(0);
+        }
+        
+        /* ============================================
+           HERO SECTION - CHAOS LEVEL 9
+           ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: var(--space-lg);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 1400px;
+        }
+        
+        /* Asymmetric title layout */
+        .hero-title {
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 900;
+            line-height: 0.85;
+            letter-spacing: -0.06em;
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+        
+        .hero-title-line {
+            display: block;
+            position: relative;
+        }
+        
+        .hero-title-line:first-child {
+            transform: translateX(-10%) rotate(-2deg);
+            color: var(--color-text);
+        }
+        
+        .hero-title-line:nth-child(2) {
+            transform: translateX(5%) rotate(1deg);
+            color: transparent;
+            -webkit-text-stroke: 2px var(--color-primary);
+            text-stroke: 2px var(--color-primary);
+        }
+        
+        .hero-title-line:last-child {
+            transform: translateX(-5%) rotate(-1deg);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Glitch effect overlay */
+        .hero-title-glitch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            font-weight: 300;
+            color: var(--color-text-muted);
+            max-width: 600px;
+            margin: 0 auto var(--space-md);
+            transform: rotate(0.5deg);
+        }
+        
+        /* CTA Button with magnetic effect */
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 3rem;
+            background-color: transparent;
+            border: 2px solid var(--color-primary);
+            color: var(--color-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-fast);
+            transform: skewX(-5deg);
+        }
+        
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-primary);
+            transition: left 0.4s var(--ease-expo);
+            z-index: -1;
+        }
+        
+        .hero-cta:hover {
+            color: var(--color-void);
+            transform: skewX(-5deg) translateY(-3px);
+            box-shadow: 0 10px 40px rgba(57, 255, 20, 0.4);
+        }
+        
+        .hero-cta:hover::before {
+            left: 0;
+        }
+        
+        .hero-cta-text {
+            transform: skewX(5deg);
+        }
+        
+        /* Floating organic blobs */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.5;
+            pointer-events: none;
+            animation: blob-float 20s ease-in-out infinite;
+        }
+        
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--color-primary), transparent);
+            top: -10%;
+            right: -10%;
+            animation-delay: 0s;
+        }
+        
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--color-secondary), transparent);
+            bottom: -5%;
+            left: -5%;
+            animation-delay: -5s;
+        }
+        
+        .blob-3 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--color-accent), transparent);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+        
+        @keyframes blob-float {
+            0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            25% { transform: translate(50px, -50px) scale(1.1) rotate(90deg); border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+            50% { transform: translate(-30px, 30px) scale(0.9) rotate(180deg); border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%; }
+            75% { transform: translate(30px, 50px) scale(1.05) rotate(270deg); border-radius: 60% 40% 60% 30% / 70% 30% 50% 60%; }
+        }
+        
+        /* 3D Canvas Container */
+        .hero-3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* ============================================
+           FEATURES SECTION - BROKEN GRID
+           ============================================ */
+        .features {
+            padding: var(--space-xl) var(--space-lg);
+            position: relative;
+        }
+        
+        .features-header {
+            margin-bottom: var(--space-lg);
+            position: relative;
+        }
+        
+        .features-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--color-primary);
+            margin-bottom: var(--space-sm);
+            display: block;
+            transform: rotate(-90deg) translateX(-100%);
+            transform-origin: left top;
+            position: absolute;
+            left: -2rem;
+            top: 0;
+        }
+        
+        .features-title {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+        }
+        
+        /* Broken Grid Layout */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: var(--space-md);
+            position: relative;
+        }
+        
+        .feature-card {
+            background-color: var(--color-surface);
+            border: 1px solid rgba(57, 255, 20, 0.1);
+            padding: var(--space-md);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-medium);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.6s var(--ease-expo);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+            border-color: rgba(57, 255, 20, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        /* Asymmetric card placement */
+        .feature-card-1 {
+            grid-column: 1 / 7;
+            grid-row: 1;
+            transform: translateY(50px) rotate(-1deg);
+        }
+        
+        .feature-card-2 {
+            grid-column: 6 / 13;
+            grid-row: 1;
+            transform: translateY(-30px) rotate(1deg);
+            z-index: 2;
+        }
+        
+        .feature-card-3 {
+            grid-column: 2 / 8;
+            grid-row: 2;
+            transform: translateY(20px) rotate(-0.5deg);
+        }
+        
+        .feature-card-4 {
+            grid-column: 7 / 12;
+            grid-row: 2;
+            transform: translateY(-40px) rotate(0.5deg);
+        }
+        
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: var(--space-sm);
+            position: relative;
+        }
+        
+        .feature-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: var(--color-primary);
+            stroke-width: 1.5;
+            fill: none;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-xs);
+            letter-spacing: -0.02em;
+        }
+        
+        .feature-desc {
+            font-size: 1rem;
+            color: var(--color-text-muted);
+            line-height: 1.7;
+        }
+        
+        /* ============================================
+           SHOWCASE SECTION - PARALLAX CHAOS
+           ============================================ */
+        .showcase {
+            padding: var(--space-xl) 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .showcase-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+        
+        .showcase-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            position: relative;
+        }
+        
+        .showcase-item:nth-child(even) {
+            direction: rtl;
+        }
+        
+        .showcase-item:nth-child(even) > * {
+            direction: ltr;
+        }
+        
+        .showcase-visual {
+            position: relative;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            transform: perspective(1000px) rotateY(-5deg);
+            transition: transform 0.6s var(--ease-expo);
+        }
+        
+        .showcase-item:hover .showcase-visual {
+            transform: perspective(1000px) rotateY(0deg);
+        }
+        
+        .showcase-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(1.2);
+            transition: all 0.6s var(--ease-expo);
+        }
+        
+        .showcase-item:hover .showcase-image {
+            filter: grayscale(0%) contrast(1);
+            transform: scale(1.05);
+        }
+        
+        .showcase-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.2), rgba(255, 0, 255, 0.2));
+            mix-blend-mode: overlay;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        
+        .showcase-item:hover .showcase-overlay {
+            opacity: 1;
+        }
+        
+        .showcase-number {
+            position: absolute;
+            top: -40px;
+            left: -20px;
+            font-size: clamp(6rem, 12vw, 10rem);
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(57, 255, 20, 0.3);
+            text-stroke: 1px rgba(57, 255, 20, 0.3);
+            z-index: -1;
+            line-height: 1;
+        }
+        
+        .showcase-content {
+            padding: var(--space-md);
+            position: relative;
+        }
+        
+        .showcase-tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: rgba(57, 255, 20, 0.1);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            color: var(--color-primary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: var(--space-sm);
+            transform: skewX(-10deg);
+        }
+        
+        .showcase-title {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: var(--space-sm);
+            letter-spacing: -0.03em;
+        }
+        
+        .showcase-desc {
+            font-size: 1.125rem;
+            color: var(--color-text-muted);
+            line-height: 1.8;
+            margin-bottom: var(--space-md);
+        }
+        
+        .showcase-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--color-primary);
+            font-weight: 600;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .showcase-link::after {
+            content: '→';
+            transition: transform 0.3s var(--ease-elastic);
+        }
+        
+        .showcase-link:hover::after {
+            transform: translateX(8px);
+        }
+        
+        /* ============================================
+           STATS SECTION - SCATTERED LAYOUT
+           ============================================ */
+        .stats {
+            padding: var(--space-xl) var(--space-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stats-bg-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(10rem, 25vw, 20rem);
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(57, 255, 20, 0.1);
+            text-stroke: 1px rgba(57, 255, 20, 0.1);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: var(--space-md);
+            position: relative;
+        }
+        
+        /* Scattered positions */
+        .stat-item:nth-child(1) { transform: translateY(0) rotate(-2deg); }
+        .stat-item:nth-child(2) { transform: translateY(40px) rotate(1deg); }
+        .stat-item:nth-child(3) { transform: translateY(-20px) rotate(-1deg); }
+        .stat-item:nth-child(4) { transform: translateY(30px) rotate(2deg); }
+        
+        .stat-number {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: var(--space-xs);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--color-text-muted);
+        }
+        
+        /* ============================================
+           CTA SECTION - FULL BLEED
+           ============================================ */
+        .cta {
+            padding: var(--space-xl) var(--space-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-title {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: var(--space-md);
+            letter-spacing: -0.04em;
+        }
+        
+        .cta-title-accent {
+            display: block;
+            color: var(--color-primary);
+            transform: rotate(-2deg);
+        }
+        
+        .cta-text {
+            font-size: 1.25rem;
+            color: var(--color-text-muted);
+            max-width: 600px;
+            margin: 0 auto var(--space-lg);
+            line-height: 1.8;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem 4rem;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: var(--color-void);
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-decoration: none;
+            border: none;
+            cursor: none;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-fast);
+            transform: skewX(-5deg);
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+        
+        .cta-button:hover {
+            transform: skewX(-5deg) translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(57, 255, 20, 0.4);
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+        
+        .cta-button-text {
+            transform: skewX(5deg);
+        }
+        
+        /* Animated border */
+        .cta-border {
+            position: absolute;
+            inset: 20px;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+            pointer-events: none;
+        }
+        
+        .cta-border::before,
+        .cta-border::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-primary);
+            transition: all 0.4s var(--ease-expo);
+        }
+        
+        .cta-border::before {
+            top: -2px;
+            left: -2px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .cta-border::after {
+            bottom: -2px;
+            right: -2px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            padding: var(--space-lg);
+            border-top: 1px solid rgba(57, 255, 20, 0.1);
+            position: relative;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: var(--space-lg);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .footer-brand {
+            max-width: 300px;
+        }
+        
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            margin-bottom: var(--space-sm);
+            color: var(--color-text);
+        }
+        
+        .footer-desc {
+            font-size: 0.9375rem;
+            color: var(--color-text-muted);
+            line-height: 1.7;
+        }
+        
+        .footer-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: var(--space-sm);
+            color: var(--color-primary);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-link {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-link a {
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.9375rem;
+            transition: color var(--transition-fast);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--color-primary);
+            transition: width var(--transition-fast);
+        }
+        
+        .footer-link a:hover {
+            color: var(--color-text);
+        }
+        
+        .footer-link a:hover::after {
+            width: 100%;
+        }
+        
+        .footer-bottom {
+            max-width: 1400px;
+            margin: var(--space-lg) auto 0;
+            padding-top: var(--space-md);
+            border-top: 1px solid rgba(57, 255, 20, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-copyright {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .social-link {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+            border-radius: 50%;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+        
+        .social-link:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            transform: translateY(-3px);
+        }
+        
+        .social-link svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        
+        /* ============================================
+           MOBILE RESPONSIVE
+           ============================================ */
+        @media (max-width: 1024px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-card-1,
+            .feature-card-2,
+            .feature-card-3,
+            .feature-card-4 {
+                grid-column: 1;
+                transform: none;
+            }
+            
+            .showcase-item {
+                grid-template-columns: 1fr;
+            }
+            
+            .showcase-item:nth-child(even) {
+                direction: ltr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                cursor: auto;
+            }
+            
+            .cursor,
+            .cursor-dot {
+                display: none;
+            }
+            
+            .hero-title-line {
+                transform: none !important;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-item {
+                transform: none !important;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-md);
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                gap: var(--space-sm);
+                text-align: center;
+            }
+            
+            .blob {
+                opacity: 0.3;
+            }
+        }
+        
+        /* ============================================
+           ACCESSIBILITY
+           ============================================ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .blob {
+                animation: none;
+            }
+        }
+        
+        /* Focus styles */
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 4px;
+        }
+        
+        /* Selection */
+        ::selection {
+            background-color: var(--color-primary);
+            color: var(--color-void);
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
+    
+    <!-- WebGL Background Canvas -->
+    <canvas class="webgl-bg" id="webgl-bg"></canvas>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <div class="theme-toggle-slider">
+            <svg class="theme-icon" viewBox="0 0 24 24" id="theme-icon">
+                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+        </div>
+    </button>
+    
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-logo">NEXUS</div>
+        <ul class="nav-links">
+            <li><a href="#features" class="nav-link">Features</a></li>
+            <li><a href="#showcase" class="nav-link">Showcase</a></li>
+            <li><a href="#stats" class="nav-link">Stats</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <!-- Organic Blob Shapes -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        
+        <!-- 3D Canvas Container -->
+        <div class="hero-3d" id="hero-3d"></div>
+        
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="hero-title-line" data-speed="0.8">CREATE</span>
+                <span class="hero-title-line" data-speed="1.2">THE</span>
+                <span class="hero-title-line" data-speed="1.0">FUTURE</span>
+            </h1>
+            <p class="hero-subtitle">
+                Award-winning digital experiences that push boundaries. 
+                We craft immersive solutions for visionary brands.
+            </p>
+            <a href="#showcase" class="hero-cta magnetic-btn">
+                <span class="hero-cta-text">Explore Work</span>
+            </a>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="features-header">
+            <span class="features-label">Capabilities</span>
+            <h2 class="features-title">Breaking<br>Conventions</h2>
+        </div>
+        
+        <div class="features-grid">
+            <article class="feature-card feature-card-1">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 64 64">
+                        <circle cx="32" cy="32" r="28"/>
+                        <path d="M32 16v16l12 8"/>
+                        <path d="M16 32h8M40 32h8"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Immersive 3D</h3>
+                <p class="feature-desc">
+                    Cutting-edge WebGL experiences that transport users into digital worlds. 
+                    From interactive product showcases to full virtual environments.
+                </p>
+            </article>
+            
+            <article class="feature-card feature-card-2">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 64 64">
+                        <polygon points="32,8 56,24 56,48 32,56 8,48 8,24"/>
+                        <path d="M32 8v48M8 24l24 8 24-8"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Motion Design</h3>
+                <p class="feature-desc">
+                    Physics-based animations and micro-interactions that feel natural and responsive. 
+                    Every movement tells part of your story.
+                </p>
+            </article>
+            
+            <article class="feature-card feature-card-3">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 64 64">
+                        <rect x="8" y="16" width="48" height="32" rx="4"/>
+                        <path d="M20 28h24M20 36h16"/>
+                        <circle cx="48" cy="36" r="4"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Brand Systems</h3>
+                <p class="feature-desc">
+                    Comprehensive visual identities that scale across every touchpoint. 
+                    Cohesive, memorable, and distinctly yours.
+                </p>
+            </article>
+            
+            <article class="feature-card feature-card-4">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 64 64">
+                        <path d="M8 48V16l24-8 24 8v32l-24 8-24-8z"/>
+                        <path d="M32 8v48M8 16l24 8 24-8"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Digital Strategy</h3>
+                <p class="feature-desc">
+                    Data-driven approaches to digital presence. We align creative vision 
+                    with business objectives for measurable impact.
+                </p>
+            </article>
+        </div>
+    </section>
+    
+    <!-- Showcase Section -->
+    <section class="showcase" id="showcase">
+        <div class="showcase-container">
+            <article class="showcase-item">
+                <div class="showcase-visual">
+                    <span class="showcase-number">01</span>
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=600&fit=crop" 
+                         alt="Abstract neon geometric shapes" 
+                         class="showcase-image">
+                    <div class="showcase-overlay"></div>
+                </div>
+                <div class="showcase-content">
+                    <span class="showcase-tag">Case Study</span>
+                    <h3 class="showcase-title">Lumina Protocol</h3>
+                    <p class="showcase-desc">
+                        A revolutionary DeFi platform interface featuring real-time 3D data visualization, 
+                        fluid animations, and an intuitive trading experience that processes $2B+ monthly volume.
+                    </p>
+                    <a href="#" class="showcase-link">View Project</a>
+                </div>
+            </article>
+            
+            <article class="showcase-item">
+                <div class="showcase-visual">
+                    <span class="showcase-number">02</span>
+                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&h=600&fit=crop" 
+                         alt="Futuristic gaming setup with neon lights" 
+                         class="showcase-image">
+                    <div class="showcase-overlay"></div>
+                </div>
+                <div class="showcase-content">
+                    <span class="showcase-tag">Game Design</span>
+                    <h3 class="showcase-title">Nexus Arena</h3>
+                    <p class="showcase-desc">
+                        Next-gen esports platform with immersive spectator modes, 
+                        AR integrations, and a community ecosystem of 5M+ active players.
+                    </p>
+                    <a href="#" class="showcase-link">View Project</a>
+                </div>
+            </article>
+            
+            <article class="showcase-item">
+                <div class="showcase-visual">
+                    <span class="showcase-number">03</span>
+                    <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=600&fit=crop" 
+                         alt="Abstract digital art with flowing lines" 
+                         class="showcase-image">
+                    <div class="showcase-overlay"></div>
+                </div>
+                <div class="showcase-content">
+                    <span class="showcase-tag">Web Experience</span>
+                    <h3 class="showcase-title">Aether Studio</h3>
+                    <p class="showcase-desc">
+                        An architectural visualization platform using WebGL to render 
+                        photorealistic spaces in real-time. Featured in Awwwards Site of the Day.
+                    </p>
+                    <a href="#" class="showcase-link">View Project</a>
+                </div>
+            </article>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="stats" id="stats">
+        <span class="stats-bg-text">NEXUS</span>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-target="150">0</div>
+                <div class="stat-label">Projects Delivered</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="47">0</div>
+                <div class="stat-label">Awards Won</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="12">0</div>
+                <div class="stat-label">Years Experience</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="98">0</div>
+                <div class="stat-label">Client Satisfaction</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta" id="contact">
+        <div class="cta-border"></div>
+        <div class="cta-container">
+            <h2 class="cta-title">
+                Ready to Create
+                <span class="cta-title-accent">Something Extraordinary?</span>
+            </h2>
+            <p class="cta-text">
+                Let's collaborate on your next project. We bring visionary ideas to life 
+                through cutting-edge design and technology.
+            </p>
+            <a href="mailto:hello@nexus.studio" class="cta-button magnetic-btn">
+                <span class="cta-button-text">Start a Project</span>
+            </a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="footer-logo">NEXUS</div>
+                <p class="footer-desc">
+                    Award-winning digital agency crafting immersive experiences for forward-thinking brands worldwide.
+                </p>
+            </div>
+            
+            <div class="footer-column">
+                <h4 class="footer-title">Services</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">Web Design</a></li>
+                    <li class="footer-link"><a href="#">3D Development</a></li>
+                    <li class="footer-link"><a href="#">Brand Identity</a></li>
+                    <li class="footer-link"><a href="#">Motion Design</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h4 class="footer-title">Company</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">About Us</a></li>
+                    <li class="footer-link"><a href="#">Careers</a></li>
+                    <li class="footer-link"><a href="#">Blog</a></li>
+                    <li class="footer-link"><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h4 class="footer-title">Connect</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">Twitter</a></li>
+                    <li class="footer-link"><a href="#">Instagram</a></li>
+                    <li class="footer-link"><a href="#">LinkedIn</a></li>
+                    <li class="footer-link"><a href="#">Dribbble</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p class="footer-copyright">© 2026 NEXUS Studio. All rights reserved. Template ID: 992715690</p>
+            <div class="footer-social">
+                <a href="#" class="social-link" aria-label="Twitter">
+                    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="#" class="social-link" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </a>
+                <a href="#" class="social-link" aria-label="LinkedIn">
+                    <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        /*
+        ============================================
+        JAVASCRIPT ARCHITECTURE
+        ============================================
+        
+        1. Custom Cursor System
+           - Physics-based following
+           - Magnetic button interactions
+           - Hover state transformations
+        
+        2. WebGL Background Shader
+           - Perlin noise distortion field
+           - Mouse-reactive particles
+           - RGB shift effects on scroll
+        
+        3. GSAP Scroll Animations
+           - Parallax effects
+           - Staggered reveals
+           - Skew and rotation on scroll velocity
+        
+        4. Theme Toggle
+           - LocalStorage persistence
+           - Smooth CSS variable transitions
+        
+        5. Stats Counter Animation
+           - Intersection Observer triggered
+           - Easing functions for natural feel
+        
+        6. Magnetic Buttons
+           - Spring physics on hover
+           - Returns to center on leave
+        ============================================
+        */
+        
+        // ============================================
+        // CUSTOM CURSOR SYSTEM
+        // ============================================
+        const cursor = document.querySelector('.cursor');
+        const cursorDot = document.querySelector('.cursor-dot');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        let dotX = 0, dotY = 0;
+        let isActive = true;
+        let inactivityTimeout;
+        
+        // Check if touch device
+        const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+        
+        if (!isTouchDevice) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                
+                // Update CSS variables for other effects
+                document.documentElement.style.setProperty('--mouse-x', mouseX + 'px');
+                document.documentElement.style.setProperty('--mouse-y', mouseY + 'px');
+                
+                // Reset inactivity
+                isActive = true;
+                clearTimeout(inactivityTimeout);
+                inactivityTimeout = setTimeout(() => { isActive = false; }, 100);
+            });
+            
+            // Smooth cursor animation
+            function animateCursor() {
+                if (isActive) {
+                    // Smooth follow with different speeds
+                    cursorX += (mouseX - cursorX) * 0.15;
+                    cursorY += (mouseY - cursorY) * 0.15;
+                    dotX += (mouseX - dotX) * 0.35;
+                    dotY += (mouseY - dotY) * 0.35;
+                    
+                    cursor.style.left = cursorX + 'px';
+                    cursor.style.top = cursorY + 'px';
+                    cursorDot.style.left = dotX + 'px';
+                    cursorDot.style.top = dotY + 'px';
+                }
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+            
+            // Hover effects
+            const hoverElements = document.querySelectorAll('a, button, .magnetic-btn');
+            hoverElements.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+            });
+        }
+        
+        // ============================================
+        // MAGNETIC BUTTONS
+        // ============================================
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        
+        if (!isTouchDevice) {
+            magneticBtns.forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    gsap.to(btn, {
+                        x: x * 0.3,
+                        y: y * 0.3,
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    });
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    gsap.to(btn, {
+                        x: 0,
+                        y: 0,
+                        duration: 0.5,
+                        ease: 'elastic.out(1, 0.3)'
+                    });
+                });
+            });
+        }
+        
+        // ============================================
+        // THEME TOGGLE
+        // ============================================
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const sunPath = 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z';
+        const moonPath = 'M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z';
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+            
+            // Trigger shader color update
+            if (shaderMaterial) {
+                updateShaderColors(newTheme);
+            }
+        });
+        
+        function updateThemeIcon(theme) {
+            themeIcon.querySelector('path').setAttribute('d', theme === 'dark' ? sunPath : moonPath);
+        }
+        
+        // ============================================
+        // WEBGL BACKGROUND SHADER
+        // ============================================
+        const canvas = document.getElementById('webgl-bg');
+        let renderer, scene, camera, shaderMaterial;
+        let animationId;
+        
+        function initWebGL() {
+            // Check WebGL support
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (!gl) {
+                console.log('WebGL not supported, falling back to CSS');
+                return;
+            }
+            
+            // Setup Three.js
+            scene = new THREE.Scene();
+            camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+            camera.position.z = 1;
+            
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                alpha: true,
+                antialias: false,
+                powerPreference: 'high-performance'
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            // Shader material
+            const vertexShader = `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = vec4(position, 1.0);
+                }
+            `;
+            
+            const fragmentShader = `
+                uniform float uTime;
+                uniform vec2 uMouse;
+                uniform vec2 uResolution;
+                uniform vec3 uColor1;
+                uniform vec3 uColor2;
+                uniform vec3 uColor3;
+                varying vec2 vUv;
+                
+                // Simplex noise function
+                vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+                vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+                
+                float snoise(vec3 v) {
+                    const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+                    const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+                    
+                    vec3 i = floor(v + dot(v, C.yyy));
+                    vec3 x0 = v - i + dot(i, C.xxx);
+                    
+                    vec3 g = step(x0.yzx, x0.xyz);
+                    vec3 l = 1.0 - g;
+                    vec3 i1 = min(g.xyz, l.zxy);
+                    vec3 i2 = max(g.xyz, l.zxy);
+                    
+                    vec3 x1 = x0 - i1 + C.xxx;
+                    vec3 x2 = x0 - i2 + C.yyy;
+                    vec3 x3 = x0 - D.yyy;
+                    
+                    i = mod289(i);
+                    vec4 p = permute(permute(permute(
+                        i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                        + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                        + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+                    
+                    float n_ = 0.142857142857;
+                    vec3 ns = n_ * D.wyz - D.xzx;
+                    
+                    vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+                    
+                    vec4 x_ = floor(j * ns.z);
+                    vec4 y_ = floor(j - 7.0 * x_);
+                    
+                    vec4 x = x_ *ns.x + ns.yyyy;
+                    vec4 y = y_ *ns.x + ns.yyyy;
+                    vec4 h = 1.0 - abs(x) - abs(y);
+                    
+                    vec4 b0 = vec4(x.xy, y.xy);
+                    vec4 b1 = vec4(x.zw, y.zw);
+                    
+                    vec4 s0 = floor(b0)*2.0 + 1.0;
+                    vec4 s1 = floor(b1)*2.0 + 1.0;
+                    vec4 sh = -step(h, vec4(0.0));
+                    
+                    vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+                    vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+                    
+                    vec3 p0 = vec3(a0.xy, h.x);
+                    vec3 p1 = vec3(a0.zw, h.y);
+                    vec3 p2 = vec3(a1.xy, h.z);
+                    vec3 p3 = vec3(a1.zw, h.w);
+                    
+                    vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+                    p0 *= norm.x;
+                    p1 *= norm.y;
+                    p2 *= norm.z;
+                    p3 *= norm.w;
+                    
+                    vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                    m = m * m;
+                    return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+                }
+                
+                void main() {
+                    vec2 uv = vUv;
+                    vec2 mouse = uMouse;
+                    
+                    // Create flowing noise
+                    float noise1 = snoise(vec3(uv * 2.0, uTime * 0.1));
+                    float noise2 = snoise(vec3(uv * 4.0 + 100.0, uTime * 0.15));
+                    float noise3 = snoise(vec3(uv * 1.0 + 200.0, uTime * 0.08));
+                    
+                    // Mouse influence
+                    float mouseDist = distance(uv, mouse);
+                    float mouseInfluence = smoothstep(0.5, 0.0, mouseDist) * 0.3;
+                    
+                    // Combine noises
+                    float finalNoise = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
+                    finalNoise += mouseInfluence;
+                    
+                    // Create color gradient
+                    vec3 color = mix(uColor1, uColor2, finalNoise * 0.5 + 0.5);
+                    color = mix(color, uColor3, noise2 * 0.3 + 0.2);
+                    
+                    // Add subtle vignette
+                    float vignette = 1.0 - smoothstep(0.3, 1.0, length(uv - 0.5));
+                    color *= vignette * 0.3 + 0.7;
+                    
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `;
+            
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            shaderMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+                    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                    uColor1: { value: new THREE.Color(isDark ? 0x0A0A0F : 0xF5F5F7) },
+                    uColor2: { value: new THREE.Color(isDark ? 0x12121A : 0xE8E8ED) },
+                    uColor3: { value: new THREE.Color(isDark ? 0x1E1E2E : 0xFFFFFF) }
+                },
+                vertexShader,
+                fragmentShader
+            });
+            
+            const geometry = new THREE.PlaneGeometry(2, 2);
+            const mesh = new THREE.Mesh(geometry, shaderMaterial);
+            scene.add(mesh);
+            
+            // Mouse move handler
+            document.addEventListener('mousemove', (e) => {
+                if (shaderMaterial) {
+                    shaderMaterial.uniforms.uMouse.value.x = e.clientX / window.innerWidth;
+                    shaderMaterial.uniforms.uMouse.value.y = 1.0 - e.clientY / window.innerHeight;
+                }
+            });
+            
+            // Animation loop
+            let lastTime = 0;
+            function animate(currentTime) {
+                animationId = requestAnimationFrame(animate);
+                
+                // Limit to 30fps for performance
+                if (currentTime - lastTime < 33) return;
+                lastTime = currentTime;
+                
+                if (shaderMaterial) {
+                    shaderMaterial.uniforms.uTime.value = currentTime * 0.001;
+                }
+                
+                renderer.render(scene, camera);
+            }
+            animate(0);
+            
+            // Resize handler
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                shaderMaterial.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+            });
+            
+            // Visibility handling
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    cancelAnimationFrame(animationId);
+                } else {
+                    animate(0);
+                }
+            });
+        }
+        
+        function updateShaderColors(theme) {
+            if (!shaderMaterial) return;
+            
+            const isDark = theme === 'dark';
+            shaderMaterial.uniforms.uColor1.value.setHex(isDark ? 0x0A0A0F : 0xF5F5F7);
+            shaderMaterial.uniforms.uColor2.value.setHex(isDark ? 0x12121A : 0xE8E8ED);
+            shaderMaterial.uniforms.uColor3.value.setHex(isDark ? 0x1E1E2E : 0xFFFFFF);
+        }
+        
+        // Initialize WebGL
+        initWebGL();
+        
+        // ============================================
+        // GSAP SCROLL ANIMATIONS
+        // ============================================
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Hero parallax
+        gsap.to('.hero-title-line', {
+            scrollTrigger: {
+                trigger: '.hero',
+                start: 'top top',
+                end: 'bottom top',
+                scrub: 1
+            },
+            y: (i) => (i + 1) * 100,
+            opacity: 0
+        });
+        
+        // Blob parallax
+        gsap.to('.blob', {
+            scrollTrigger: {
+                trigger: '.hero',
+                start: 'top top',
+                end: 'bottom top',
+                scrub: 1
+            },
+            y: -200,
+            scale: 1.5
+        });
+        
+        // Feature cards stagger
+        gsap.from('.feature-card', {
+            scrollTrigger: {
+                trigger: '.features-grid',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            y: 100,
+            opacity: 0,
+            rotation: 5,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: 'power3.out'
+        });
+        
+        // Showcase items
+        document.querySelectorAll('.showcase-item').forEach((item, i) => {
+            gsap.from(item, {
+                scrollTrigger: {
+                    trigger: item,
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                },
+                x: i % 2 === 0 ? -100 : 100,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out'
+            });
+        });
+        
+        // Stats animation
+        const statNumbers = document.querySelectorAll('.stat-number');
+        
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = parseInt(entry.target.getAttribute('data-target'));
+                    animateNumber(entry.target, target);
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        statNumbers.forEach(stat => statsObserver.observe(stat));
+        
+        function animateNumber(element, target) {
+            let current = 0;
+            const increment = target / 60;
+            const suffix = element.nextElementSibling.textContent.includes('Satisfaction') ? '%' : '+';
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current) + suffix;
+            }, 25);
+        }
+        
+        // CTA section animation
+        gsap.from('.cta-title', {
+            scrollTrigger: {
+                trigger: '.cta',
+                start: 'top 70%',
+                toggleActions: 'play none none reverse'
+            },
+            y: 80,
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power3.out'
+        });
+        
+        gsap.from('.cta-text', {
+            scrollTrigger: {
+                trigger: '.cta',
+                start: 'top 70%',
+                toggleActions: 'play none none reverse'
+            },
+            y: 60,
+            opacity: 0,
+            duration: 0.8,
+            delay: 0.2,
+            ease: 'power3.out'
+        });
+        
+        gsap.from('.cta-button', {
+            scrollTrigger: {
+                trigger: '.cta',
+                start: 'top 70%',
+                toggleActions: 'play none none reverse'
+            },
+            y: 40,
+            opacity: 0,
+            duration: 0.8,
+            delay: 0.4,
+            ease: 'power3.out'
+        });
+        
+        // Footer links stagger
+        gsap.from('.footer-link', {
+            scrollTrigger: {
+                trigger: '.footer',
+                start: 'top 90%',
+                toggleActions: 'play none none reverse'
+            },
+            y: 20,
+            opacity: 0,
+            duration: 0.5,
+            stagger: 0.05,
+            ease: 'power2.out'
+        });
+        
+        // ============================================
+        // SMOOTH SCROLL FOR NAV LINKS
+        // ============================================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    gsap.to(window, {
+                        duration: 1,
+                        scrollTo: { y: target, offsetY: 80 },
+                        ease: 'power3.inOut'
+                    });
+                }
+            });
+        });
+        
+        // ============================================
+        // SCROLL VELOCITY SKEW EFFECT
+        // ============================================
+        let lastScrollTop = 0;
+        let skewTarget = 0;
+        let currentSkew = 0;
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset;
+            const velocity = scrollTop - lastScrollTop;
+            skewTarget = Math.max(-5, Math.min(5, velocity * 0.1));
+            lastScrollTop = scrollTop;
+        }, { passive: true });
+        
+        function updateSkew() {
+            currentSkew += (skewTarget - currentSkew) * 0.1;
+            skewTarget *= 0.95;
+            
+            document.querySelectorAll('.feature-card, .showcase-visual').forEach(el => {
+                el.style.transform = el.style.transform.replace(/skewY\([^)]+\)/, '') + ` skewY(${currentSkew}deg)`;
+            });
+            
+            requestAnimationFrame(updateSkew);
+        }
+        updateSkew();
+        
+        // ============================================
+        // HERO TITLE INTERACTION
+        // ============================================
+        const heroLines = document.querySelectorAll('.hero-title-line');
+        
+        if (!isTouchDevice) {
+            document.querySelector('.hero').addEventListener('mousemove', (e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
+                
+                heroLines.forEach((line, i) => {
+                    const speed = parseFloat(line.getAttribute('data-speed')) || 1;
+                    gsap.to(line, {
+                        x: x * 30 * speed,
+                        y: y * 20 * speed,
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+</html>

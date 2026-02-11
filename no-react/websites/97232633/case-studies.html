@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Studies | Alex Chen - Creative Developer</title>
+  <meta name="description" content="Explore my portfolio of web development, design, and branding projects. Real results for real clients.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  
+  <!-- Page-specific Critical CSS -->
+  <style>
+    /* Page Header */
+    .page-header {
+      padding: calc(var(--header-height) + var(--space-2xl)) 0 var(--space-xl);
+      text-align: center;
+      position: relative;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-mesh);
+      opacity: 0.5;
+      z-index: 0;
+    }
+    
+    .page-header-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .page-header h1 {
+      margin-bottom: var(--space-md);
+    }
+    
+    .page-header p {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: var(--space-sm) var(--space-md);
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-xl);
+      color: var(--color-text-secondary);
+      font-family: var(--font-primary);
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .filter-btn:hover,
+    .filter-btn.is-active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-bg-darker);
+    }
+    
+    /* Projects Grid (Digit 7 = 3: Moderate-airy density) */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-xl);
+    }
+    
+    .project-card {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      aspect-ratio: 16/10;
+      group: project;
+    }
+    
+    .project-card.featured {
+      grid-column: 1 / -1;
+      aspect-ratio: 21/9;
+    }
+    
+    .project-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--duration-slow) var(--ease-out-expo);
+    }
+    
+    .project-card:hover img {
+      transform: scale(1.05);
+    }
+    
+    .project-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,15,0.95) 0%, rgba(10,10,15,0.5) 50%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--space-xl);
+      opacity: 0;
+      transition: opacity var(--duration-normal) var(--ease-out-expo);
+    }
+    
+    .project-card:hover .project-overlay {
+      opacity: 1;
+    }
+    
+    .project-category {
+      color: var(--color-primary);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .project-title {
+      font-size: 1.5rem;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .project-card.featured .project-title {
+      font-size: 2rem;
+    }
+    
+    .project-description {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-md);
+      max-width: 500px;
+    }
+    
+    .project-meta {
+      display: flex;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-md);
+    }
+    
+    .project-meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .project-meta-label {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .project-meta-value {
+      font-size: 1rem;
+      color: var(--color-text-primary);
+      font-weight: 600;
+    }
+    
+    .project-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+    
+    .project-link::after {
+      content: '→';
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .project-card:hover .project-link::after {
+      transform: translateX(4px);
+    }
+    
+    /* Results Section */
+    .results-section {
+      background: var(--color-bg-darker);
+    }
+    
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-lg);
+    }
+    
+    .result-card {
+      text-align: center;
+      padding: var(--space-xl);
+    }
+    
+    .result-number {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      display: block;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .result-label {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+    }
+    
+    /* Testimonials */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+    }
+    
+    .testimonial-card {
+      padding: var(--space-xl);
+    }
+    
+    .testimonial-quote {
+      font-family: var(--font-secondary);
+      font-size: 1.125rem;
+      font-style: italic;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text-primary);
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gradient-hero);
+    }
+    
+    .testimonial-name {
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    
+    .testimonial-role {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    /* CTA Section */
+    .cta-section {
+      text-align: center;
+      padding: var(--space-3xl) 0;
+      position: relative;
+    }
+    
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-glow);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    
+    .cta-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .cta-section h2 {
+      margin-bottom: var(--space-md);
+    }
+    
+    .cta-section p {
+      margin: 0 auto var(--space-xl);
+      max-width: 600px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .project-card.featured {
+        aspect-ratio: 16/10;
+      }
+      
+      .results-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .results-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      .project-meta {
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+      
+      .filter-bar {
+        gap: var(--space-xs);
+      }
+      
+      .filter-btn {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.875rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header" data-header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">
+          <span class="logo-text">AC</span>
+        </a>
+        
+        <nav class="main-nav" data-main-nav>
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="about.html" class="nav-link">About</a></li>
+            <li><a href="services.html" class="nav-link">Services</a></li>
+            <li><a href="case-studies.html" class="nav-link">Work</a></li>
+            <li><a href="blog.html" class="nav-link">Blog</a></li>
+            <li><a href="contact.html" class="nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+            <span class="theme-icon">🌙</span>
+          </button>
+          <a href="contact.html" class="btn btn-primary btn-sm">Let's Talk</a>
+          <button class="mobile-toggle" data-mobile-toggle aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <main>
+    <!-- Page Header -->
+    <section class="page-header">
+      <div class="container">
+        <div class="page-header-content reveal">
+          <h1>Selected <span class="text-gradient">Work</span></h1>
+          <p>A curated collection of projects that showcase my expertise in design, development, and digital strategy.</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Filter -->
+    <section class="section-sm">
+      <div class="container">
+        <div class="filter-bar reveal">
+          <button class="filter-btn is-active">All</button>
+          <button class="filter-btn">Web Development</button>
+          <button class="filter-btn">UI/UX Design</button>
+          <button class="filter-btn">Branding</button>
+          <button class="filter-btn">E-commerce</button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Projects Grid -->
+    <section class="section">
+      <div class="container">
+        <div class="projects-grid stagger-children">
+          <!-- Featured Project -->
+          <article class="project-card card featured reveal" data-tilt>
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=514&fit=crop" alt="Luxe E-commerce">
+            <div class="project-overlay">
+              <span class="project-category">E-commerce</span>
+              <h2 class="project-title">Luxe Fashion E-commerce</h2>
+              <p class="project-description">A premium shopping experience for a high-end fashion brand, featuring 3D product views and AI-powered recommendations.</p>
+              <div class="project-meta">
+                <div class="project-meta-item">
+                  <span class="project-meta-label">Client</span>
+                  <span class="project-meta-value">Luxe Fashion</span>
+                </div>
+                <div class="project-meta-item">
+                  <span class="project-meta-label">Year</span>
+                  <span class="project-meta-value">2023</span>
+                </div>
+                <div class="project-meta-item">
+                  <span class="project-meta-label">Results</span>
+                  <span class="project-meta-value">+150% Revenue</span>
+                </div>
+              </div>
+              <a href="case-study.html" class="project-link">View Case Study</a>
+            </div>
+          </article>
+          
+          <!-- Project 2 -->
+          <article class="project-card card reveal" data-tilt>
+            <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=500&fit=crop" alt="FinTech App">
+            <div class="project-overlay">
+              <span class="project-category">UI/UX Design</span>
+              <h3 class="project-title">FinTech Mobile App</h3>
+              <p class="project-description">Complete redesign of a banking app with focus on accessibility and user experience.</p>
+              <a href="case-study.html" class="project-link">View Case Study</a>
+            </div>
+          </article>
+          
+          <!-- Project 3 -->
+          <article class="project-card card reveal" data-tilt>
+            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=500&fit=crop" alt="Tech Startup">
+            <div class="project-overlay">
+              <span class="project-category">Branding</span>
+              <h3 class="project-title">Tech Startup Rebrand</h3>
+              <p class="project-description">Complete brand identity overhaul for an AI-powered SaaS company.</p>
+              <a href="case-study.html" class="project-link">View Case Study</a>
+            </div>
+          </article>
+          
+          <!-- Project 4 -->
+          <article class="project-card card reveal" data-tilt>
+            <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?w=800&h=500&fit=crop" alt="Analytics Dashboard">
+            <div class="project-overlay">
+              <span class="project-category">Web Development</span>
+              <h3 class="project-title">Analytics Dashboard</h3>
+              <p class="project-description">Real-time data visualization platform for enterprise clients.</p>
+              <a href="case-study.html" class="project-link">View Case Study</a>
+            </div>
+          </article>
+          
+          <!-- Project 5 -->
+          <article class="project-card card reveal" data-tilt>
+            <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?w=800&h=500&fit=crop" alt="SaaS Platform">
+            <div class="project-overlay">
+              <span class="project-category">Web Development</span>
+              <h3 class="project-title">SaaS Platform</h3>
+              <p class="project-description">Full-stack development of a project management tool for remote teams.</p>
+              <a href="case-study.html" class="project-link">View Case Study</a>
+            </div>
+          </article>
+          
+          <!-- Project 6 -->
+          <article class="project-card card reveal" data-tilt>
+            <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=500&fit=crop" alt="Design System">
+            <div class="project-overlay">
+              <span class="project-category">UI/UX Design</span>
+              <h3 class="project-title">Enterprise Design System</h3>
+              <p class="project-description">Comprehensive component library and design guidelines for a Fortune 500 company.</p>
+              <a href="case-study.html" class="project-link">View Case Study</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Results -->
+    <section class="section results-section">
+      <div class="container">
+        <div class="section-header reveal text-center">
+          <h2>Results That <span class="text-gradient">Speak</span></h2>
+          <p>Measurable impact across all projects.</p>
+        </div>
+        
+        <div class="results-grid stagger-children">
+          <div class="result-card card reveal">
+            <span class="result-number">150%</span>
+            <span class="result-label">Average Revenue Increase</span>
+          </div>
+          <div class="result-card card reveal">
+            <span class="result-number">40%</span>
+            <span class="result-label">Conversion Rate Improvement</span>
+          </div>
+          <div class="result-card card reveal">
+            <span class="result-number">2.5s</span>
+            <span class="result-label">Average Load Time</span>
+          </div>
+          <div class="result-card card reveal">
+            <span class="result-number">98%</span>
+            <span class="result-label">Client Satisfaction</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Testimonials -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header reveal text-center">
+          <h2>Client <span class="text-gradient">Stories</span></h2>
+          <p>What partners say about working together.</p>
+        </div>
+        
+        <div class="testimonials-grid stagger-children">
+          <blockquote class="testimonial-card card reveal">
+            <p class="testimonial-quote">"Alex's work transformed our digital presence completely. The attention to detail and strategic thinking exceeded all expectations."</p>
+            <footer class="testimonial-author">
+              <div class="testimonial-avatar"></div>
+              <div>
+                <div class="testimonial-name">Emma Wilson</div>
+                <div class="testimonial-role">CMO, Luxe Fashion</div>
+              </div>
+            </footer>
+          </blockquote>
+          
+          <blockquote class="testimonial-card card reveal">
+            <p class="testimonial-quote">"The design system Alex created has streamlined our entire product development process. A true game-changer."</p>
+            <footer class="testimonial-author">
+              <div class="testimonial-avatar"></div>
+              <div>
+                <div class="testimonial-name">David Park</div>
+                <div class="testimonial-role">VP Product, TechCorp</div>
+              </div>
+            </footer>
+          </blockquote>
+          
+          <blockquote class="testimonial-card card reveal">
+            <p class="testimonial-quote">"Professional, creative, and incredibly skilled. Alex delivered a website that perfectly captures our brand essence."</p>
+            <footer class="testimonial-author">
+              <div class="testimonial-avatar"></div>
+              <div>
+                <div class="testimonial-name">Lisa Chen</div>
+                <div class="testimonial-role">Founder, StartupXYZ</div>
+              </div>
+            </footer>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+    
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-content reveal">
+          <h2>Have a Project in Mind?</h2>
+          <p>Let's create something amazing together. I'm always excited to work on challenging projects with ambitious clients.</p>
+          <div class="hero-actions" style="justify-content: center;">
+            <a href="contact.html" class="btn btn-primary">Start a Conversation</a>
+            <a href="services.html" class="btn btn-ghost">View Services</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-text">AC</span>
+          </a>
+          <p>Creative developer & designer crafting digital experiences that make an impact.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="GitHub">⌘</a>
+            <a href="#" aria-label="Dribbble">🏀</a>
+          </div>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="case-studies.html">Work</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="services.html">Web Development</a></li>
+            <li><a href="services.html">UI/UX Design</a></li>
+            <li><a href="services.html">Branding</a></li>
+            <li><a href="services.html">Consulting</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hello@alexchen.dev">hello@alexchen.dev</a></li>
+            <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
+            <li>San Francisco, CA</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Alex Chen. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  
+  <!-- Shared Component Styles -->
+  <style>
+    /* Header Styles */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: var(--header-height);
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+    
+    .header.is-scrolled {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .header.is-hidden {
+      transform: translateY(-100%);
+    }
+    
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+    
+    .logo {
+      font-family: var(--font-primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    
+    .logo-text {
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .main-nav {
+      display: flex;
+    }
+    
+    .nav-list {
+      display: flex;
+      gap: var(--space-xl);
+      list-style: none;
+    }
+    
+    .nav-link {
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      position: relative;
+      padding: var(--space-sm) 0;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-hero);
+      transition: width var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .nav-link:hover,
+    .nav-link.is-active {
+      color: var(--color-text-primary);
+    }
+    
+    .nav-link:hover::after,
+    .nav-link.is-active::after {
+      width: 100%;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: var(--color-primary);
+    }
+    
+    .btn-sm {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.875rem;
+    }
+    
+    .mobile-toggle {
+      display: none;
+      width: 40px;
+      height: 40px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    
+    .mobile-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--color-text-primary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    /* Footer Styles */
+    .footer {
+      background: var(--color-bg-darker);
+      padding: var(--space-2xl) 0 var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .footer-brand p {
+      margin: var(--space-md) 0 var(--space-lg);
+      font-size: 1rem;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .social-links a:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    
+    .footer-nav h4 {
+      font-size: 1rem;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text-primary);
+    }
+    
+    .footer-nav ul {
+      list-style: none;
+    }
+    
+    .footer-nav li {
+      margin-bottom: var(--space-sm);
+    }
+    
+    .footer-nav a {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+      transition: color var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .footer-nav a:hover {
+      color: var(--color-primary);
+    }
+    
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-bottom p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    .footer-legal {
+      display: flex;
+      gap: var(--space-lg);
+    }
+    
+    .footer-legal a {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-nav {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        background: var(--color-bg-card);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: var(--space-lg);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--duration-normal) var(--ease-out-expo);
+      }
+      
+      .main-nav.is-open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .nav-list {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+      
+      .mobile-toggle {
+        display: flex;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-md);
+        text-align: center;
+      }
+    }
+  </style>
+</body>
+</html>

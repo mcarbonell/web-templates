@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<!--
+  BLOG.HTML - Blog Listing | SEED: 195460458 | SaaS
+  [7] List Density: 4 = Balanced article cards
+  [9] Typography: Playfair Display for article titles
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Nexus</title>
+    <meta name="description"
+        content="Insights on productivity, team collaboration, and the future of work from the Nexus team.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .blog-hero {
+            padding: calc(72px + var(--space-16)) 0 var(--space-12);
+            text-align: center;
+            background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--surface-primary) 100%);
+        }
+
+        [data-theme="dark"] .blog-hero {
+            background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--surface-primary) 100%);
+        }
+
+        .blog-grid {
+            display: grid;
+            gap: var(--space-8);
+        }
+
+        @media (min-width: 1024px) {
+            .blog-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        .article-card {
+            display: flex;
+            flex-direction: column;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-subtle);
+            transition: all var(--duration-normal);
+        }
+
+        .article-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .article-image {
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, var(--color-primary-400), var(--color-accent-500));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .article-content {
+            padding: var(--space-6);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: var(--space-3);
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-3);
+        }
+
+        .article-category {
+            color: var(--color-primary-500);
+            font-weight: var(--font-semibold);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+        }
+
+        .article-title {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-3);
+            line-height: var(--leading-snug);
+        }
+
+        .article-excerpt {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+            flex: 1;
+        }
+
+        .article-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-top: auto;
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .author-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--color-primary-300), var(--color-accent-400));
+        }
+
+        .author-name {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .author-role {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .featured-article {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        @media (min-width: 768px) {
+            .featured-article {
+                grid-template-columns: 1.2fr 1fr;
+            }
+        }
+
+        .featured-article .article-image {
+            aspect-ratio: 4/3;
+            font-size: 5rem;
+        }
+
+        .featured-article .article-title {
+            font-size: var(--text-3xl);
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-section {
+            background: var(--surface-secondary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        .sidebar-title {
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-4);
+        }
+
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .category-link {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2) 0;
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            transition: color var(--duration-fast);
+        }
+
+        .category-link:hover {
+            color: var(--color-primary-500);
+        }
+
+        .newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .article-list {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        @media (min-width: 768px) {
+            .article-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .article-card-sm {
+            display: flex;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            transition: all var(--duration-fast);
+        }
+
+        .article-card-sm:hover {
+            border-color: var(--color-primary-300);
+        }
+
+        .article-card-sm .article-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-md);
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--color-primary-300), var(--color-accent-400));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .article-card-sm .article-title {
+            font-size: var(--text-base);
+            margin-bottom: var(--space-1);
+        }
+
+        .article-card-sm .article-meta {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav">
+        <div class="container nav-container">
+            <a href="index.html" class="nav-logo">Nexus</a>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link">Features</a>
+                <a href="pricing.html" class="nav-link">Pricing</a>
+                <a href="case-studies.html" class="nav-link">Case Studies</a>
+                <a href="blog.html" class="nav-link active">Blog</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" aria-label="Toggle theme"></button>
+                <a href="contact.html" class="btn btn-primary mobile\:hidden">Get Started</a>
+                <button class="nav-toggle" aria-label="Toggle menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-menu">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="services.html" class="nav-link">Features</a>
+            <a href="blog.html" class="nav-link active">Blog</a>
+            <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-hero">
+            <div class="container">
+                <span class="text-overline text-accent reveal">Blog</span>
+                <h1 class="heading-1 reveal" style="margin: var(--space-4) 0 var(--space-6);">Insights & Ideas</h1>
+                <p class="text-body-lg text-secondary reveal" style="max-width: 500px; margin: 0 auto;">Thoughts on
+                    productivity, team collaboration, and building better workflows.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <!-- Featured Article -->
+                <a href="blog-post.html" class="featured-article reveal"
+                    style="margin-bottom: var(--space-12); text-decoration: none;">
+                    <div class="article-image">📚</div>
+                    <div style="display: flex; flex-direction: column; justify-content: center;">
+                        <span class="badge badge-accent"
+                            style="width: fit-content; margin-bottom: var(--space-4);">Featured</span>
+                        <span class="article-category">Productivity</span>
+                        <h2 class="article-title" style="color: var(--text-primary);">The Complete Guide to AI-Powered
+                            Workflows in 2024</h2>
+                        <p class="article-excerpt">Discover how artificial intelligence is transforming the way teams
+                            work, and learn practical strategies for implementing AI in your organization.</p>
+                        <div class="article-author">
+                            <div class="author-avatar"></div>
+                            <div>
+                                <div class="author-name">Sarah Chen</div>
+                                <div class="author-role">CTO • Jan 15, 2024 • 12 min read</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="blog-grid">
+                    <div>
+                        <h2 class="heading-4 reveal" style="margin-bottom: var(--space-6);">Latest Articles</h2>
+                        <div class="article-list" style="margin-bottom: var(--space-8);">
+                            <a href="blog-post.html" class="article-card reveal">
+                                <div class="article-image"
+                                    style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">🎯</div>
+                                <div class="article-content">
+                                    <div class="article-meta">
+                                        <span class="article-category">Strategy</span>
+                                        <span>•</span>
+                                        <span>Jan 12, 2024</span>
+                                    </div>
+                                    <h3 class="article-title">5 Signs Your Team Needs Better Collaboration Tools</h3>
+                                    <p class="article-excerpt">Are scattered tools and manual processes slowing your
+                                        team down? Here's how to know when it's time for a change.</p>
+                                    <div class="article-author">
+                                        <div class="author-avatar"
+                                            style="background: linear-gradient(135deg, #ec4899, #8b5cf6);"></div>
+                                        <div>
+                                            <div class="author-name">Alex Rivera</div>
+                                            <div class="author-role">5 min read</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+
+                            <a href="blog-post.html" class="article-card reveal">
+                                <div class="article-image"
+                                    style="background: linear-gradient(135deg, #10b981, #06b6d4);">⚡</div>
+                                <div class="article-content">
+                                    <div class="article-meta">
+                                        <span class="article-category">Automation</span>
+                                        <span>•</span>
+                                        <span>Jan 8, 2024</span>
+                                    </div>
+                                    <h3 class="article-title">Automating Your First Workflow: A Step-by-Step Guide</h3>
+                                    <p class="article-excerpt">Learn how to identify automation opportunities and build
+                                        your first workflow in under 30 minutes.</p>
+                                    <div class="article-author">
+                                        <div class="author-avatar"
+                                            style="background: linear-gradient(135deg, #f59e0b, #ef4444);"></div>
+                                        <div>
+                                            <div class="author-name">Jordan Kim</div>
+                                            <div class="author-role">8 min read</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+
+                            <a href="blog-post.html" class="article-card reveal">
+                                <div class="article-image"
+                                    style="background: linear-gradient(135deg, #f59e0b, #ec4899);">🔮</div>
+                                <div class="article-content">
+                                    <div class="article-meta">
+                                        <span class="article-category">Future of Work</span>
+                                        <span>•</span>
+                                        <span>Jan 5, 2024</span>
+                                    </div>
+                                    <h3 class="article-title">The Rise of Async-First Teams: Why It Matters</h3>
+                                    <p class="article-excerpt">Synchronous work is burning out your team. Here's how
+                                        async-first companies are winning the talent war.</p>
+                                    <div class="article-author">
+                                        <div class="author-avatar"
+                                            style="background: linear-gradient(135deg, #3b82f6, #06b6d4);"></div>
+                                        <div>
+                                            <div class="author-name">Sam Patel</div>
+                                            <div class="author-role">6 min read</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+
+                            <a href="blog-post.html" class="article-card reveal">
+                                <div class="article-image"
+                                    style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">🧠</div>
+                                <div class="article-content">
+                                    <div class="article-meta">
+                                        <span class="article-category">AI</span>
+                                        <span>•</span>
+                                        <span>Jan 2, 2024</span>
+                                    </div>
+                                    <h3 class="article-title">How AI Learns Your Team's Patterns</h3>
+                                    <p class="article-excerpt">A behind-the-scenes look at how machine learning
+                                        personalizes your workflow experience.</p>
+                                    <div class="article-author">
+                                        <div class="author-avatar"
+                                            style="background: linear-gradient(135deg, #10b981, #22d3ee);"></div>
+                                        <div>
+                                            <div class="author-name">Morgan Lee</div>
+                                            <div class="author-role">10 min read</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="text-center">
+                            <button class="btn btn-secondary">Load More Articles</button>
+                        </div>
+                    </div>
+
+                    <aside class="sidebar reveal">
+                        <div class="sidebar-section">
+                            <h3 class="sidebar-title">Categories</h3>
+                            <nav class="category-list">
+                                <a href="#" class="category-link"><span>Productivity</span><span>24</span></a>
+                                <a href="#" class="category-link"><span>Automation</span><span>18</span></a>
+                                <a href="#" class="category-link"><span>AI & ML</span><span>15</span></a>
+                                <a href="#" class="category-link"><span>Team Culture</span><span>12</span></a>
+                                <a href="#" class="category-link"><span>Future of Work</span><span>9</span></a>
+                                <a href="#" class="category-link"><span>Product Updates</span><span>7</span></a>
+                            </nav>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <h3 class="sidebar-title">Popular Posts</h3>
+                            <div class="flex flex-col gap-4">
+                                <a href="blog-post.html" class="article-card-sm">
+                                    <div class="article-thumb">🚀</div>
+                                    <div>
+                                        <h4 class="article-title" style="color: var(--text-primary);">Getting Started
+                                            with Nexus</h4>
+                                        <div class="article-meta"><span>Dec 28</span></div>
+                                    </div>
+                                </a>
+                                <a href="blog-post.html" class="article-card-sm">
+                                    <div class="article-thumb">📊</div>
+                                    <div>
+                                        <h4 class="article-title" style="color: var(--text-primary);">Measuring Team
+                                            Productivity</h4>
+                                        <div class="article-meta"><span>Dec 20</span></div>
+                                    </div>
+                                </a>
+                                <a href="blog-post.html" class="article-card-sm">
+                                    <div class="article-thumb">🔒</div>
+                                    <div>
+                                        <h4 class="article-title" style="color: var(--text-primary);">Security Best
+                                            Practices</h4>
+                                        <div class="article-meta"><span>Dec 15</span></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section"
+                            style="background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500)); color: #fff;">
+                            <h3 style="font-weight: var(--font-semibold); margin-bottom: var(--space-2);">📬 Newsletter
+                            </h3>
+                            <p style="font-size: var(--text-sm); opacity: 0.9; margin-bottom: var(--space-4);">Get
+                                weekly insights on productivity and team collaboration.</p>
+                            <form class="newsletter-form">
+                                <input type="email" placeholder="your@email.com" class="form-input"
+                                    style="background: rgba(255,255,255,0.9); border: none;">
+                                <button type="submit" class="btn"
+                                    style="background: var(--color-neutral-900); color: #fff; width: 100%;">Subscribe</button>
+                            </form>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-logo">Nexus</div>
+                    <p class="footer-desc">Empowering teams to work smarter.</p>
+                </div>
+                <div>
+                    <h4 class="footer-title">Product</h4>
+                    <nav class="footer-links">
+                        <a href="services.html" class="footer-link">Features</a>
+                        <a href="pricing.html" class="footer-link">Pricing</a>
+                    </nav>
+                </div>
+                <div>
+                    <h4 class="footer-title">Company</h4>
+                    <nav class="footer-links">
+                        <a href="about.html" class="footer-link">About</a>
+                        <a href="contact.html" class="footer-link">Contact</a>
+                    </nav>
+                </div>
+                <div>
+                    <h4 class="footer-title">Legal</h4>
+                    <nav class="footer-links">
+                        <a href="#" class="footer-link">Privacy</a>
+                        <a href="#" class="footer-link">Terms</a>
+                    </nav>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copy">&copy; 2024 Nexus. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="cookie-banner">
+        <div class="cookie-content">
+            <p class="cookie-text">We use cookies to improve your experience.</p>
+            <div class="cookie-actions">
+                <button class="btn btn-sm btn-ghost" data-decline>Decline</button>
+                <button class="btn btn-sm btn-primary" data-accept>Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>

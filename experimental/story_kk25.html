@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luna's First Flight - An Animated Story</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            background: #1a0a2e;
+            font-family: 'Georgia', serif;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #a8d5ff;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        #storyCanvas {
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+            max-width: 100%;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            color: #1a0a2e;
+            font-weight: bold;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #4a3b6b;
+            color: #fff;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a4b7b;
+        }
+        
+        .story-text {
+            max-width: 800px;
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            line-height: 1.8;
+            font-size: 1.1em;
+            min-height: 80px;
+        }
+        
+        .scene-indicator {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>✨ Luna's First Flight ✨</h1>
+    <p class="subtitle">A story about finding your own light</p>
+    
+    <canvas id="storyCanvas" width="800" height="500"></canvas>
+    
+    <div class="controls">
+        <button class="btn-primary" onclick="startStory()">▶ Start Story</button>
+        <button class="btn-secondary" onclick="pauseStory()">⏸ Pause</button>
+        <button class="btn-secondary" onclick="nextScene()">⏭ Next Scene</button>
+        <button class="btn-secondary" onclick="toggleSound()">🔊 Sound On</button>
+    </div>
+    
+    <div class="story-text" id="storyText">
+        Click "Start Story" to begin Luna's adventure...
+    </div>
+    <div class="scene-indicator" id="sceneIndicator">Scene: Introduction</div>
+
+    <script>
+        const canvas = document.getElementById('storyCanvas');
+        const ctx = canvas.getContext('2d');
+        const storyText = document.getElementById('storyText');
+        const sceneIndicator = document.getElementById('sceneIndicator');
+        
+        // Story state
+        let currentScene = 0;
+        let isPlaying = false;
+        let animationId = null;
+        let sceneTime = 0;
+        let particles = [];
+        
+        // Story scenes configuration
+        const scenes = [
+            {
+                name: "The Meadow at Dusk",
+                text: "Little Luna was a firefly who couldn't glow. While her brothers and sisters lit up the meadow every evening, Luna stayed dark and small.",
+                duration: 6000,
+                setup: setupMeadow,
+                draw: drawMeadow
+            },
+            {
+                name: "Luna Feels Left Out",
+                text: "\"Maybe I'm not a real firefly,\" she sighed, watching the others dance in beautiful patterns of light.",
+                duration: 5000,
+                setup: setupLeftOut,
+                draw: drawLeftOut
+            },
+            {
+                name: "A Friend in Need",
+                text: "One night, a lost baby rabbit hopped into the tall grass, crying for its mother. The other fireflies were too busy dancing to notice.",
+                duration: 5500,
+                setup: setupRabbitLost,
+                draw: drawRabbitLost
+            },
+            {
+                name: "Luna's Choice",
+                text: "Luna wanted to help. She closed her eyes and thought of warm things: hot cocoa, summer sun, her mother's hug...",
+                duration: 5000,
+                setup: setupLunaChooses,
+                draw: drawLunaChooses
+            },
+            {
+                name: "The First Glow",
+                text: "Her belly began to tingle... Blink. BLINK! A soft golden light flickered from her tail!",
+                duration: 5000,
+                setup: setupFirstGlow,
+                draw: drawFirstGlow
+            },
+            {
+                name: "Guiding Light",
+                text: "She guided the baby rabbit home, blinking her light like a little lantern through the dark grass.",
+                duration: 5500,
+                setup: setupGuiding,
+                draw: drawGuiding
+            },
+            {
+                name: "A Happy Ending",
+                text: "\"You saved me!\" said the rabbit. Luna realized she was meant to shine when it mattered most.",
+                duration: 5000,
+                setup: setupReunion,
+                draw: drawReunion
+            },
+            {
+                name: "Luna's Purpose",
+                text: "From that night on, whenever someone needed help, Luna glowed the brightest of all. The end. ✨",
+                duration: 6000,
+                setup: setupProudLuna,
+                draw: drawProudLuna
+            }
+        ];
+        
+        // Particle class for fireflies, stars, magic
+        class Particle {
+            constructor(x, y, type, color) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.color = color;
+                this.life = 1;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.size = Math.random() * 3 + 1;
+                this.angle = Math.random() * Math.PI * 2;
+            }
+            
+            update() {
+                this.angle += 0.05;
+                this.x += this.vx + Math.sin(this.angle) * 0.5;
+                this.y += this.vy + Math.cos(this.angle) * 0.3;
+                this.life -= 0.01;
+                
+                if (this.type === 'firefly') {
+                    this.vx *= 0.99;
+                    this.vy *= 0.99;
+                }
+            }
+            
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.life * (0.5 + 0.5 * Math.sin(this.angle * 3));
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        
+        // Helper functions
+        function drawGradientSky(ctx, colors) {
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            colors.forEach((c, i) => grad.addColorStop(i / (colors.length - 1), c));
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        function drawStars(ctx, count, twinkle) {
+            for (let i = 0; i < count; i++) {
+                const x = (i * 137.5) % canvas.width;
+                const y = (i * 89.7) % (canvas.height * 0.6);
+                const size = (i % 3) + 1;
+                const alpha = 0.3 + 0.7 * Math.sin(twinkle + i);
+                
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function drawGrass(ctx, yBase, color) {
+            ctx.fillStyle = color;
+            for (let x = 0; x < canvas.width; x += 15) {
+                const height = 30 + Math.sin(x * 0.05) * 15 + Math.random() * 10;
+                const sway = Math.sin(sceneTime * 0.002 + x * 0.01) * 5;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, yBase);
+                ctx.quadraticCurveTo(x + sway, yBase - height / 2, x + sway * 2, yBase - height);
+                ctx.quadraticCurveTo(x + sway + 5, yBase - height / 2, x + 10, yBase);
+                ctx.fill();
+            }
+        }
+        
+        function drawFirefly(ctx, x, y, glowIntensity, color, isLuna = false) {
+            const glow = glowIntensity * (0.7 + 0.3 * Math.sin(sceneTime * 0.01));
+            
+            // Glow effect
+            if (glow > 0.1) {
+                ctx.save();
+                ctx.globalAlpha = glow * 0.5;
+                const grad = ctx.createRadialGradient(x, y, 0, x, y, 40);
+                grad.addColorStop(0, color);
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(x, y, 40, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+            
+            // Body
+            ctx.fillStyle = isLuna ? '#4a3b6b' : '#2d4a22';
+            ctx.beginPath();
+            ctx.ellipse(x, y, 6, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Light organ
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.3 + glow * 0.7;
+            ctx.beginPath();
+            ctx.ellipse(x, y + 5, 4, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            
+            // Wings (animated)
+            const wingFlap = Math.sin(sceneTime * 0.02) * 0.3;
+            ctx.fillStyle = 'rgba(200, 220, 255, 0.6)';
+            ctx.beginPath();
+            ctx.ellipse(x - 8, y - 5, 12, 4, -0.5 + wingFlap, 0, Math.PI * 2);
+            ctx.ellipse(x + 8, y - 5, 12, 4, 0.5 - wingFlap, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eyes
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(x - 2, y - 6, 2, 0, Math.PI * 2);
+            ctx.arc(x + 2, y - 6, 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(x - 2, y - 6, 1, 0, Math.PI * 2);
+            ctx.arc(x + 2, y - 6, 1, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function drawRabbit(ctx, x, y, scale, emotion, hasTears = false) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+            
+            // Body
+            ctx.fillStyle = '#c4a574';
+            ctx.beginPath();
+            ctx.ellipse(0, 20, 35, 25, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(0, -10, 25, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ears
+            const earTwitch = Math.sin(sceneTime * 0.003) * 3;
+            ctx.beginPath();
+            ctx.ellipse(-12, -45 + earTwitch, 8, 25, -0.3, 0, Math.PI * 2);
+            ctx.ellipse(12, -45 - earTwitch, 8, 25, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Inner ears
+            ctx.fillStyle = '#e8b4b4';
+            ctx.beginPath();
+            ctx.ellipse(-12, -45 + earTwitch, 4, 18, -0.3, 0, Math.PI * 2);
+            ctx.ellipse(12, -45 - earTwitch, 4, 18, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Face
+            ctx.fillStyle = '#8b7355';
+            // Eyes
+            if (emotion === 'sad') {
+                ctx.beginPath();
+                ctx.arc(-10, -15, 4, 0, Math.PI, false);
+                ctx.arc(10, -15, 4, 0, Math.PI, false);
+                ctx.stroke();
+            } else {
+                ctx.beginPath();
+                ctx.arc(-10, -15, 5, 0, Math.PI * 2);
+                ctx.arc(10, -15, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(-8, -17, 2, 0, Math.PI * 2);
+                ctx.arc(12, -17, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Nose
+            ctx.fillStyle = '#ff9999';
+            ctx.beginPath();
+            ctx.moveTo(0, -5);
+            ctx.lineTo(-5, 0);
+            ctx.lineTo(5, 0);
+            ctx.fill();
+            
+            // Mouth
+            ctx.strokeStyle = '#8b7355';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            if (emotion === 'happy') {
+                ctx.arc(0, 0, 8, 0, Math.PI, false);
+            } else {
+                ctx.moveTo(-5, 5);
+                ctx.lineTo(0, 8);
+                ctx.lineTo(5, 5);
+            }
+            ctx.stroke();
+            
+            // Tears
+            if (hasTears && Math.sin(sceneTime * 0.01) > 0) {
+                ctx.fillStyle = '#87ceeb';
+                ctx.beginPath();
+                ctx.arc(-10, -8, 3, 0, Math.PI * 2);
+                ctx.arc(10, -8, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+        
+        function drawThoughtBubble(ctx, x, y, content) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 2;
+            
+            // Bubble
+            ctx.beginPath();
+            ctx.ellipse(x, y, 60, 40, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
+            // Tail
+            ctx.beginPath();
+            ctx.moveTo(x - 20, y + 35);
+            ctx.lineTo(x - 10, y + 55);
+            ctx.lineTo(x, y + 38);
+            ctx.fill();
+            ctx.stroke();
+            
+            // Content
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            content.forEach((line, i) => {
+                ctx.fillText(line, x, y - 10 + i * 18);
+            });
+            
+            ctx.restore();
+        }
+        
+        // Scene setups and draws
+        function setupMeadow() {
+            particles = [];
+            for (let i = 0; i < 15; i++) {
+                particles.push(new Particle(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height * 0.6,
+                    'firefly',
+                    '#adff2f'
+                ));
+            }
+        }
+        
+        function drawMeadow() {
+            drawGradientSky(ctx, ['#1a0a2e', '#4a3b6b', '#ff8c42']);
+            drawStars(ctx, 50, sceneTime * 0.001);
+            
+            // Moon
+            ctx.fillStyle = '#fff8dc';
+            ctx.shadowBlur = 30;
+            ctx.shadowColor = '#fff8dc';
+            ctx.beginPath();
+            ctx.arc(700, 80, 40, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            // Distant hills
+            ctx.fillStyle = '#2d4a22';
+            ctx.beginPath();
+            ctx.moveTo(0, 350);
+            ctx.quadraticCurveTo(200, 300, 400, 340);
+            ctx.quadraticCurveTo(600, 380, 800, 320);
+            ctx.lineTo(800, 500);
+            ctx.lineTo(0, 500);
+            ctx.fill();
+            
+            drawGrass(ctx, 400, '#3d6b22');
+            drawGrass(ctx, 450, '#4a7c2e');
+            
+            // Dancing fireflies
+            particles.forEach((p, i) => {
+                p.x = 200 + Math.sin(sceneTime * 0.002 + i) * 150 + Math.cos(sceneTime * 0.003 + i * 0.5) * 50;
+                p.y = 200 + Math.cos(sceneTime * 0.002 + i * 0.7) * 80 + Math.sin(sceneTime * 0.004) * 30;
+                p.draw(ctx);
+            });
+            
+            // Luna - dark and small
+            const lunaY = 380 + Math.sin(sceneTime * 0.003) * 5;
+            drawFirefly(ctx, 600, lunaY, 0.1, '#4a3b6b', true);
+        }
+        
+        function setupLeftOut() {
+            particles = [];
+        }
+        
+        function drawLeftOut() {
+            drawGradientSky(ctx, ['#0d0518', '#2a1f3d', '#4a3b6b']);
+            drawStars(ctx, 60, sceneTime * 0.001);
+            
+            // Large leaf for Luna
+            ctx.fillStyle = '#2d5a27';
+            ctx.beginPath();
+            ctx.ellipse(400, 350, 200, 80, 0.1, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#1a3d17';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Veins
+            ctx.strokeStyle = '#3d7a37';
+            ctx.lineWidth = 2;
+            for (let i = -3; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(400 + i * 40, 290);
+                ctx.quadraticCurveTo(400 + i * 50, 350, 400 + i * 40, 410);
+                ctx.stroke();
+            }
+            
+            // Sad Luna
+            const breathe = Math.sin(sceneTime * 0.002) * 2;
+            drawFirefly(ctx, 400, 340 + breathe, 0.05, '#4a3b6b', true);
+            
+            // Distant dancing lights (small)
+            for (let i = 0; i < 8; i++) {
+                const fx = 100 + (i * 80) + Math.sin(sceneTime * 0.003 + i) * 30;
+                const fy = 150 + Math.cos(sceneTime * 0.004 + i) * 40;
+                const glow = 0.5 + 0.5 * Math.sin(sceneTime * 0.01 + i);
+                
+                ctx.fillStyle = `rgba(173, 255, 47, ${glow})`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#adff2f';
+                ctx.beginPath();
+                ctx.arc(fx, fy, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+        
+        function setupRabbitLost() {
+            particles = [];
+        }
+        
+        function drawRabbitLost() {
+            drawGradientSky(ctx, ['#0a0510', '#1f1a2e', '#3d3452']);
+            drawStars(ctx, 40, sceneTime * 0.001);
+            
+            drawGrass(ctx, 380, '#2d4a22');
+            drawGrass(ctx, 420, '#3d5a32');
+            drawGrass(ctx, 480, '#4a6b3a');
+            
+            // Tall grass hiding rabbit
+            ctx.fillStyle = '#1a3d17';
+            for (let x = 280; x < 520; x += 20) {
+                const h = 100 + Math.sin(x) * 30;
+                const sway = Math.sin(sceneTime * 0.002 + x * 0.05) * 8;
+                ctx.beginPath();
+                ctx.moveTo(x, 500);
+                ctx.quadraticCurveTo(x + sway, 500 - h/2, x + sway * 1.5, 500 - h);
+                ctx.lineTo(x + 15 + sway * 1.5, 500 - h + 10);
+                ctx.quadraticCurveTo(x + 15 + sway, 500 - h/2 + 5, x + 15, 500);
+                ctx.fill();
+            }
+            
+            // Peekaboo rabbit
+            const rabbitY = 420 + Math.sin(sceneTime * 0.004) * 5;
+            drawRabbit(ctx, 400, rabbitY, 1.2, 'sad', true);
+            
+            // Fireflies dancing (ignoring)
+            for (let i = 0; i < 6; i++) {
+                const t = sceneTime * 0.003 + i * 1.5;
+                const fx = 150 + Math.sin(t) * 100;
+                const fy = 180 + Math.cos(t * 0.7) * 60;
+                const glow = 0.6 + 0.4 * Math.sin(sceneTime * 0.015 + i);
+                
+                drawFirefly(ctx, fx, fy, glow, '#adff2f', false);
+            }
+            
+            // Luna notices (small in corner)
+            drawFirefly(ctx, 700, 200, 0.1, '#4a3b6b', true);
+        }
+        
+        function setupLunaChooses() {
+            particles = [];
+        }
+        
+        function drawLunaChooses() {
+            drawGradientSky(ctx, ['#0d0518', '#1a0a2e', '#2d1f4a']);
+            drawStars(ctx, 50, sceneTime * 0.001);
+            
+            drawGrass(ctx, 400, '#2d4a22');
+            
+            // Luna center, eyes closed
+            const lunaY = 300 + Math.sin(sceneTime * 0.002) * 3;
+            
+            // Glow building up (subtle)
+            const buildUp = Math.min(1, sceneTime / 2000) * 0.3;
+            drawFirefly(ctx, 400, lunaY, buildUp, '#ffd700', true);
+            
+            // Thought bubbles appearing sequentially
+            const thoughts = [
+                { x: 250, y: 180, text: ['☕ Hot', 'cocoa'], time: 0 },
+                { x: 550, y: 160, text: ['☀️ Summer', 'sun'], time: 800 },
+                { x: 400, y: 120, text: ['🤗 Mom\'s', 'hug'], time: 1600 }
+            ];
+            
+            thoughts.forEach(t => {
+                if (sceneTime > t.time) {
+                    const fade = Math.min(1, (sceneTime - t.time) / 500);
+                    ctx.save();
+                    ctx.globalAlpha = fade;
+                    drawThoughtBubble(ctx, t.x, t.y, t.text);
+                    ctx.restore();
+                }
+            });
+            
+            // Warm particles rising
+            if (sceneTime > 2000 && Math.random() > 0.7) {
+                particles.push(new Particle(
+                    400 + (Math.random() - 0.5) * 40,
+                    300,
+                    'magic',
+                    '#ffd700'
+                ));
+            }
+            
+            particles = particles.filter(p => {
+                p.update();
+                p.draw(ctx);
+                return p.life > 0;
+            });
+        }
+        
+        function setupFirstGlow() {
+            particles = [];
+        }
+        
+        function drawFirstGlow() {
+            // Background gets warmer
+            const warmth = Math.min(1, sceneTime / 2000);
+            const r1 = Math.floor(13 + warmth * 30);
+            const g1 = Math.floor(5 + warmth * 20);
+            const b1 = Math.floor(24 + warmth * 10);
+            
+            drawGradientSky(ctx, [
+                `rgb(${r1}, ${g1}, ${b1})`,
+                `rgb(${26 + warmth * 40}, ${10 + warmth * 30}, ${46 + warmth * 20})`,
+                `rgb(${255 * warmth}, ${140 + warmth * 60}, ${66 + warmth * 40})`
+            ]);
+            
+            drawStars(ctx, 50, sceneTime * 0.001);
+            drawGrass(ctx, 400, `rgb(${45 + warmth * 30}, ${74 + warmth * 20}, ${34 + warmth * 10})`);
+            
+            // Luna's dramatic glow
+            const pulse = (Math.sin(sceneTime * 0.02) + 1) / 2;
+            const baseGlow = Math.min(1, sceneTime / 1500);
+            const glowIntensity = baseGlow * (0.7 + 0.3 * pulse);
+            
+            // Shockwave rings
+            if (sceneTime > 1000 && sceneTime < 3000) {
+                const ringProgress = (sceneTime - 1000) / 2000;
+                ctx.strokeStyle = `rgba(255, 215, 0, ${1 - ringProgress})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(400, 300, 50 + ringProgress * 200, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Luna with golden glow
+            drawFirefly(ctx, 400, 300, glowIntensity, '#ffd700', true);
+            
+            // Burst particles
+            if (sceneTime > 1200 && sceneTime < 2000 && Math.random() > 0.5) {
+                for (let i = 0; i < 3; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 2 + Math.random() * 3;
+                    const p = new Particle(400, 300, 'spark', '#ffd700');
+                    p.vx = Math.cos(angle) * speed;
+                    p.vy = Math.sin(angle) * speed;
+                    particles.push(p);
+                }
+            }
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw(ctx);
+            });
+        }
+        
+        function setupGuiding() {
+            particles = [];
+        }
+        
+        function drawGuiding() {
+            drawGradientSky(ctx, ['#0a0510', '#1a1020', '#2a2030']);
+            drawStars(ctx, 30, sceneTime * 0.001);
+            
+            // Dark path through grass
+            drawGrass(ctx, 350, '#1a3d17');
+            drawGrass(ctx, 400, '#152d12');
+            drawGrass(ctx, 450, '#1a3d17');
+            
+            // Luna leading with blinking light
+            const pathProgress = (sceneTime % 4000) / 4000;
+            const lunaX = 200 + pathProgress * 400;
+            const lunaY = 320 + Math.sin(pathProgress * Math.PI * 4) * 30;
+            
+            // Blink pattern: guide signal
+            const blink = Math.sin(sceneTime * 0.015) > 0 ? 1 : 0.3;
+            drawFirefly(ctx, lunaX, lunaY, blink, '#ffd700', true);
+            
+            // Light trail
+            ctx.strokeStyle = `rgba(255, 215, 0, ${0.3 * blink})`;
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(200, 350);
+            for (let t = 0; t <= pathProgress; t += 0.05) {
+                const px = 200 + t * 400;
+                const py = 320 + Math.sin(t * Math.PI * 4) * 30;
+                ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            
+            // Following rabbit
+            const rabbitX = lunaX - 80 - Math.sin(sceneTime * 0.01) * 10;
+            const rabbitY = 380;
+            drawRabbit(ctx, rabbitX, rabbitY, 1, 'happy', false);
+            
+            // Destination (warm glow)
+            const homeGlow = 0.5 + 0.5 * Math.sin(sceneTime * 0.005);
+            ctx.fillStyle = `rgba(255, 200, 100, ${homeGlow * 0.3})`;
+            ctx.beginPath();
+            ctx.arc(650, 350, 80, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function setupReunion() {
+            particles = [];
+            for (let i = 0; i < 20; i++) {
+                particles.push(new Particle(
+                    400 + (Math.random() - 0.5) * 200,
+                    200 + Math.random() * 200,
+                    'celebration',
+                    '#ffd700'
+                ));
+            }
+        }
+        
+        function drawReunion() {
+            drawGradientSky(ctx, ['#0d0518', '#2a1f3d', '#4a3b6b']);
+            drawStars(ctx, 60, sceneTime * 0.001);
+            
+            drawGrass(ctx, 400, '#3d6b22');
+            drawGrass(ctx, 450, '#4a7c2e');
+            
+            // Warm family burrow glow
+            ctx.fillStyle = 'rgba(255, 200, 100, 0.2)';
+            ctx.beginPath();
+            ctx.arc(600, 320, 100, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Mother rabbit
+            drawRabbit(ctx, 550, 340, 1.3, 'happy', false);
+            
+            // Baby rabbit (hopping with joy)
+            const hop = Math.abs(Math.sin(sceneTime * 0.01)) * 20;
+            drawRabbit(ctx, 480, 360 - hop, 1, 'happy', false);
+            
+            // Luna proud nearby
+            const proudPulse = 0.8 + 0.2 * Math.sin(sceneTime * 0.008);
+            drawFirefly(ctx, 350, 280, proudPulse, '#ffd700', true);
+            
+            // Celebration particles
+            particles.forEach(p => {
+                p.vy -= 0.05; // float up
+                p.update();
+                p.draw(ctx);
+                if (p.life <= 0) {
+                    p.x = 400 + (Math.random() - 0.5) * 200;
+                    p.y = 400;
+                    p.vy = -2 - Math.random() * 2;
+                    p.life = 1;
+                }
+            });
+            
+            // Hearts
+            ctx.fillStyle = '#ff6b9d';
+            ctx.font = '24px Arial';
+            const hearts = ['❤️', '💛', '✨'];
+            hearts.forEach((h, i) => {
+                const hx = 300 + i * 150 + Math.sin(sceneTime * 0.003 + i) * 20;
+                const hy = 200 + Math.cos(sceneTime * 0.004 + i) * 15;
+                ctx.fillText(h, hx, hy);
+            });
+        }
+        
+        function setupProudLuna() {
+            particles = [];
+            for (let i = 0; i < 30; i++) {
+                particles.push(new Particle(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height,
+                    'firefly',
+                    '#ffd700'
+                ));
+            }
+        }
+        
+        function drawProudLuna() {
+            // Beautiful twilight
+            drawGradientSky(ctx, ['#1a0a2e', '#4a3b6b', '#8b5a9f', '#ff8c42']);
+            drawStars(ctx, 80, sceneTime * 0.001);
+            
+            // Moon
+            ctx.fillStyle = '#fff8dc';
+            ctx.shadowBlur = 50;
+            ctx.shadowColor = '#fff8dc';
+            ctx.beginPath();
+            ctx.arc(100, 100, 50, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            drawGrass(ctx, 380, '#3d6b22');
+            drawGrass(ctx, 430, '#4a7c2e');
+            drawGrass(ctx, 480, '#5a8c3a');
+            
+            // Luna flying proudly - figure 8 but with purpose
+            const t = sceneTime * 0.002;
+            const lunaX = 400 + Math.sin(t) * 200;
+            const lunaY = 250 + Math.sin(t * 2) * 80;
+            
+            // Always bright, but pulses with heartbeat
+            const heartbeat = 0.9 + 0.1 * Math.sin(sceneTime * 0.02);
+            drawFirefly(ctx, lunaX, lunaY, heartbeat, '#ffd700', true);
+            
+            // Other fireflies now follow Luna's pattern (she's the leader)
+            particles.forEach((p, i) => {
+                const offset = i * 0.5;
+                const px = lunaX + Math.sin(t + offset) * (50 + i * 10);
+                const py = lunaY + Math.cos(t * 1.5 + offset) * (30 + i * 5);
+                
+                ctx.fillStyle = '#adff2f';
+                ctx.globalAlpha = 0.6 + 0.4 * Math.sin(sceneTime * 0.01 + i);
+                ctx.beginPath();
+                ctx.arc(px, py, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+            
+            // Small animals watching in admiration
+            drawRabbit(ctx, 200, 420, 0.8, 'happy', false);
+            drawRabbit(ctx, 600, 400, 0.7, 'happy', false);
+            
+            // "The End" sparkle
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 48px Georgia';
+            ctx.textAlign = 'center';
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#ffd700';
+            const endAlpha = 0.5 + 0.5 * Math.sin(sceneTime * 0.003);
+            ctx.globalAlpha = endAlpha;
+            ctx.fillText('✨ The End ✨', 400, 80);
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+        }
+        
+        // Main animation loop
+        function animate() {
+            if (!isPlaying) return;
+            
+            sceneTime += 16; // ~60fps
+            
+            // Check scene transition
+            const currentSceneData = scenes[currentScene];
+            if (sceneTime > currentSceneData.duration) {
+                nextScene();
+                return;
+            }
+            
+            // Clear and draw
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            currentSceneData.draw();
+            
+            // Progress bar
+            const progress = sceneTime / currentSceneData.duration;
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+            ctx.fillRect(0, 490, canvas.width, 10);
+            ctx.fillStyle = '#ffd700';
+            ctx.fillRect(0, 490, canvas.width * progress, 10);
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // Control functions
+        function startStory() {
+            if (!isPlaying) {
+                isPlaying = true;
+                sceneTime = 0;
+                scenes[currentScene].setup();
+                storyText.textContent = scenes[currentScene].text;
+                sceneIndicator.textContent = `Scene ${currentScene + 1}: ${scenes[currentScene].name}`;
+                animate();
+            }
+        }
+        
+        function pauseStory() {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                animate();
+            } else {
+                cancelAnimationFrame(animationId);
+            }
+        }
+        
+        function nextScene() {
+            currentScene = (currentScene + 1) % scenes.length;
+            sceneTime = 0;
+            scenes[currentScene].setup();
+            storyText.textContent = scenes[currentScene].text;
+            sceneIndicator.textContent = `Scene ${currentScene + 1}: ${scenes[currentScene].name}`;
+            
+            if (!isPlaying) {
+                isPlaying = true;
+                animate();
+            }
+        }
+        
+        function toggleSound() {
+            // Placeholder for sound functionality
+            alert('🔔 Sound effects would play here! (Crickets, soft music, magical chimes)');
+        }
+        
+        // Initial setup
+        setupMeadow();
+        drawMeadow();
+    </script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<!--
+  CHECKOUT.HTML - Checkout Page | SEED: 195460458 | SaaS
+  [7] Form Density: 4 = Balanced, clean checkout flow
+  [6] Corners: Moderately rounded inputs
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Nexus</title>
+    <meta name="description"
+        content="Complete your Nexus subscription. Secure checkout with enterprise-grade encryption.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .checkout-page {
+            padding: calc(72px + var(--space-8)) 0 var(--space-16);
+            min-height: 100vh;
+            background: var(--surface-secondary);
+        }
+
+        .checkout-grid {
+            display: grid;
+            gap: var(--space-8);
+        }
+
+        @media (min-width: 1024px) {
+            .checkout-grid {
+                grid-template-columns: 1.3fr 1fr;
+            }
+        }
+
+        .checkout-form {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+        }
+
+        .checkout-summary {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .form-section {
+            margin-bottom: var(--space-8);
+        }
+
+        .form-section-title {
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .form-row {
+            display: grid;
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        @media (min-width: 640px) {
+            .form-row--2 {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .form-row--3 {
+                grid-template-columns: 2fr 1fr 1fr;
+            }
+        }
+
+        .plan-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            border: 2px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--duration-fast);
+        }
+
+        .plan-option:hover {
+            border-color: var(--color-primary-300);
+        }
+
+        .plan-option.selected {
+            border-color: var(--color-primary-500);
+            background: var(--color-primary-50);
+        }
+
+        [data-theme="dark"] .plan-option.selected {
+            background: var(--color-primary-900);
+        }
+
+        .plan-option input {
+            display: none;
+        }
+
+        .plan-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-strong);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .plan-option.selected .plan-radio {
+            border-color: var(--color-primary-500);
+        }
+
+        .plan-option.selected .plan-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--color-primary-500);
+            border-radius: var(--radius-full);
+        }
+
+        .plan-info {
+            flex: 1;
+        }
+
+        .plan-name {
+            font-weight: var(--font-semibold);
+        }
+
+        .plan-desc {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .plan-price {
+            font-weight: var(--font-bold);
+            color: var(--color-primary-500);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-3) 0;
+            font-size: var(--text-sm);
+        }
+
+        .summary-row.total {
+            font-weight: var(--font-bold);
+            font-size: var(--text-lg);
+            border-top: 2px solid var(--border-default);
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+        }
+
+        .security-badges {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+            margin-top: var(--space-6);
+            padding-top: var(--space-6);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .card-icons {
+            display: flex;
+            gap: var(--space-2);
+            margin-top: var(--space-2);
+        }
+
+        .card-icon {
+            width: 36px;
+            height: 24px;
+            background: var(--surface-tertiary);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--text-tertiary);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav">
+        <div class="container nav-container">
+            <a href="index.html" class="nav-logo">Nexus</a>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link">Features</a>
+                <a href="pricing.html" class="nav-link">Pricing</a>
+                <a href="case-studies.html" class="nav-link">Case Studies</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" aria-label="Toggle theme"></button>
+                <button class="nav-toggle" aria-label="Toggle menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-menu">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="services.html" class="nav-link">Features</a>
+            <a href="pricing.html" class="nav-link">Pricing</a>
+            <a href="about.html" class="nav-link">About</a>
+            <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <main class="checkout-page">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: var(--space-8);">
+                <h1 class="heading-2 reveal">Complete Your Order</h1>
+                <p class="text-secondary reveal">You're one step away from transforming your workflow.</p>
+            </div>
+
+            <div class="checkout-grid">
+                <form class="checkout-form reveal" data-validate>
+                    <!-- Plan Selection -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">1. Choose Your Plan</h2>
+                        <div class="flex flex-col gap-4">
+                            <label class="plan-option selected">
+                                <input type="radio" name="plan" value="pro-monthly" checked>
+                                <span class="plan-radio"></span>
+                                <div class="plan-info">
+                                    <div class="plan-name">Pro Monthly</div>
+                                    <div class="plan-desc">Billed monthly, cancel anytime</div>
+                                </div>
+                                <div class="plan-price">$29/mo</div>
+                            </label>
+                            <label class="plan-option">
+                                <input type="radio" name="plan" value="pro-annual">
+                                <span class="plan-radio"></span>
+                                <div class="plan-info">
+                                    <div class="plan-name">Pro Annual</div>
+                                    <div class="plan-desc">Save 20% — best value!</div>
+                                </div>
+                                <div class="plan-price">$23/mo</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Account Info -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">2. Account Information</h2>
+                        <div class="form-row form-row--2">
+                            <div class="form-group">
+                                <label class="form-label" for="firstName">First Name*</label>
+                                <input type="text" id="firstName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="lastName">Last Name*</label>
+                                <input type="text" id="lastName" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="email">Work Email*</label>
+                            <input type="email" id="email" class="form-input" required placeholder="you@company.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="company">Company Name</label>
+                            <input type="text" id="company" class="form-input">
+                        </div>
+                    </div>
+
+                    <!-- Payment Info -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">3. Payment Details</h2>
+                        <div class="form-group" style="margin-bottom: var(--space-4);">
+                            <label class="form-label" for="cardName">Name on Card*</label>
+                            <input type="text" id="cardName" class="form-input" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: var(--space-4);">
+                            <label class="form-label" for="cardNumber">Card Number*</label>
+                            <input type="text" id="cardNumber" class="form-input" required
+                                placeholder="1234 5678 9012 3456">
+                            <div class="card-icons">
+                                <span class="card-icon">VISA</span>
+                                <span class="card-icon">MC</span>
+                                <span class="card-icon">AMEX</span>
+                            </div>
+                        </div>
+                        <div class="form-row form-row--3">
+                            <div class="form-group">
+                                <label class="form-label" for="expiry">Expiry Date*</label>
+                                <input type="text" id="expiry" class="form-input" required placeholder="MM/YY">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="cvv">CVV*</label>
+                                <input type="text" id="cvv" class="form-input" required placeholder="123">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="zip">ZIP*</label>
+                                <input type="text" id="zip" class="form-input" required placeholder="12345">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-accent btn-lg" style="width: 100%;">
+                        Start 14-Day Free Trial
+                    </button>
+                    <p class="text-center"
+                        style="margin-top: var(--space-3); font-size: var(--text-xs); color: var(--text-tertiary);">
+                        By subscribing, you agree to our <a href="#" style="color: var(--text-link);">Terms</a> and <a
+                            href="#" style="color: var(--text-link);">Privacy Policy</a>.
+                    </p>
+                </form>
+
+                <div class="checkout-summary reveal">
+                    <h2 class="heading-5" style="margin-bottom: var(--space-6);">Order Summary</h2>
+
+                    <div class="summary-row">
+                        <span>Plan</span>
+                        <span id="summaryPlan">Pro Monthly</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Users</span>
+                        <span>1 user</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="summarySubtotal">$29.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Trial Discount</span>
+                        <span style="color: var(--color-success);">-$29.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Due Today</span>
+                        <span style="color: var(--color-success);">$0.00</span>
+                    </div>
+
+                    <div
+                        style="background: var(--color-primary-50); border-radius: var(--radius-lg); padding: var(--space-4); margin-top: var(--space-6);">
+                        <p style="font-size: var(--text-sm); color: var(--color-primary-700);">
+                            <strong>🎉 14-Day Free Trial</strong><br>
+                            You won't be charged until your trial ends. Cancel anytime.
+                        </p>
+                    </div>
+
+                    <div class="security-badges">
+                        <div class="security-badge">
+                            <span>🔒</span> SSL Secured
+                        </div>
+                        <div class="security-badge">
+                            <span>✓</span> SOC 2 Certified
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+                <p class="footer-copy">&copy; 2024 Nexus. All rights reserved.</p>
+                <div class="flex gap-4" style="font-size: var(--text-sm);">
+                    <a href="#" class="footer-link">Privacy</a>
+                    <a href="#" class="footer-link">Terms</a>
+                    <a href="contact.html" class="footer-link">Help</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Plan selection
+        document.querySelectorAll('.plan-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.plan-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                option.querySelector('input').checked = true;
+
+                const isAnnual = option.querySelector('input').value.includes('annual');
+                document.getElementById('summaryPlan').textContent = isAnnual ? 'Pro Annual' : 'Pro Monthly';
+                document.getElementById('summarySubtotal').textContent = isAnnual ? '$23.00' : '$29.00';
+            });
+        });
+    </script>
+</body>
+
+</html>

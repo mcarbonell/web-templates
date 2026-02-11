@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dither Lab | Efectos de Fondo Avanzados</title>
+    <meta name="description"
+        content="Una demo interactiva de efectos de fondo con dithering, ruido y estética digital moderna.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --primary: #ffffff;
+            --accent: #ff3e00;
+            --accent-soft: rgba(255, 62, 0, 0.2);
+            --text-main: #f0f0f0;
+            --text-dim: #a0a0a0;
+            --panel-bg: rgba(15, 15, 15, 0.8);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --transition: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- Background Layers --- */
+        #bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-layer.active {
+            opacity: 1;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- Effect 1: Noise Grain + Gradient (Modern SaaS) --- */
+        #layer-grain {
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    #2a2a2a 0%, #050505 100%);
+        }
+
+        #layer-grain::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.15;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        /* --- Effect 2: Dot Matrix / Halftone --- */
+        .halftone-svg {
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        /* --- UI Components --- */
+        #ui-wrapper {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            pointer-events: none;
+        }
+
+        #control-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--panel-border);
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            pointer-events: auto;
+            transform: translateX(0);
+            transition: var(--transition);
+        }
+
+        .panel-header h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .panel-header p {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            font-weight: 300;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .group-label {
+            font-family: 'JetBrains+Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent);
+            border-bottom: 1px solid var(--accent-soft);
+            padding-bottom: 0.5rem;
+        }
+
+        .effect-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            padding: 1rem;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .effect-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .effect-btn.active {
+            background: var(--primary);
+            color: #000;
+        }
+
+        .effect-btn .icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .main-content {
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            pointer-events: none;
+        }
+
+        .hero-text {
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease 0.2s;
+        }
+
+        .hero-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-text h2 {
+            font-size: 4rem;
+            line-height: 0.9;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        /* --- Footer Info --- */
+        .footer-info {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-family: 'JetBrains+Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            display: flex;
+            gap: 2rem;
+            z-index: 20;
+        }
+
+        /* --- Tooltip --- */
+        .tooltip {
+            position: fixed;
+            pointer-events: none;
+            background: var(--accent);
+            color: white;
+            padding: 4px 8px;
+            font-family: 'JetBrains+Mono', monospace;
+            font-size: 10px;
+            z-index: 100;
+            border-radius: 2px;
+            display: none;
+        }
+
+        /* Custom Scrollbar */
+        #control-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #control-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        @media (max-width: 900px) {
+            #ui-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            #control-panel {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                height: 40%;
+                border-right: none;
+                border-top: 1px solid var(--panel-border);
+            }
+
+            .main-content {
+                height: 60%;
+            }
+
+            .hero-text h2 {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Dynamic Classes for Effects */
+        .glitch-text {
+            animation: glitch 1s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: 2px 0 red, -2px 0 blue;
+            }
+
+            50% {
+                text-shadow: -2px 0 red, 2px 0 blue;
+            }
+
+            100% {
+                text-shadow: 1px 0 red, -1px 0 blue;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="bg-container">
+        <!-- Effect 1: Grainy SaaS Gradient -->
+        <div id="layer-grain" class="bg-layer active"></div>
+
+        <!-- Effect 2: Ordered Bayer Dither (Canvas) -->
+        <div id="layer-bayer" class="bg-layer">
+            <canvas id="canvas-bayer"></canvas>
+        </div>
+
+        <!-- Effect 3: Blue Noise Flow (Canvas) -->
+        <div id="layer-blue" class="bg-layer">
+            <canvas id="canvas-blue"></canvas>
+        </div>
+
+        <!-- Effect 4: Halftone CMYK (SVG) -->
+        <div id="layer-halftone" class="bg-layer">
+            <svg class="halftone-svg" xmlns="http://www.w3.org/2000/svg">
+                <filter id="halftone">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="1" result="noise" />
+                    <feDiffuseLighting in="noise" lighting-color="white" surfaceScale="2">
+                        <feDistantLight azimuth="45" elevation="45" />
+                    </feDiffuseLighting>
+                </filter>
+                <rect width="100%" height="100%" fill="#0a0a0a" />
+                <pattern id="dotPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="10" cy="10" r="8" fill="white">
+                        <animate attributeName="r" values="2;8;2" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                </pattern>
+                <rect width="100%" height="100%" fill="url(#dotPattern)"
+                    style="mix-blend-mode: overlay; opacity: 0.8;" />
+            </svg>
+        </div>
+
+        <!-- Effect 5: Stochastic Liquid (Canvas) -->
+        <div id="layer-stochastic" class="bg-layer">
+            <canvas id="canvas-stochastic"></canvas>
+        </div>
+    </div>
+
+    <div id="ui-wrapper">
+        <aside id="control-panel">
+            <header class="panel-header">
+                <h1>DITHER LAB</h1>
+                <p>Nuevas Fronteras en Textura Digital</p>
+            </header>
+
+            <div class="control-group">
+                <span class="group-label">Colección de Algoritmos</span>
+                <button class="effect-btn active" data-effect="grain">
+                    <div class="icon"></div>
+                    Modern Grain
+                </button>
+                <button class="effect-btn" data-effect="bayer">
+                    <div class="icon"></div>
+                    Ordered Bayer (8-bit)
+                </button>
+                <button class="effect-btn" data-effect="blue">
+                    <div class="icon"></div>
+                    Blue Noise Flow
+                </button>
+                <button class="effect-btn" data-effect="halftone">
+                    <div class="icon"></div>
+                    Halftone Matrix
+                </button>
+                <button class="effect-btn" data-effect="stochastic">
+                    <div class="icon"></div>
+                    Stochastic Liquid
+                </button>
+            </div>
+
+            <div class="control-group">
+                <span class="group-label">Propiedades</span>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">
+                    Utiliza el ratón para interactuar con los patrones en tiempo real.
+                </p>
+            </div>
+
+            <div style="margin-top: auto; padding-top: 2rem;">
+                <p style="font-size: 0.7rem; color: var(--text-dim); font-family: 'JetBrains+Mono';">
+                    VERSION 2.0.4<br>
+                    EXPERIMENTAL_RENDERER_ENABLED
+                </p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div id="hero-text" class="hero-text visible">
+                <h2 id="effect-title">Modern Grain</h2>
+                <p id="effect-desc">Un granulado suave de alta frecuencia combinado con gradientes dinámicos. Ideal para
+                    interfaces minimalistas y premium que buscan profundidad sin ruido excesivo.</p>
+                <div style="display: flex; gap: 1rem;">
+                    <span
+                        style="padding: 0.5rem 1rem; border: 1px solid var(--accent); color: var(--accent); font-size: 0.7rem; border-radius: 4px; font-family: 'JetBrains+Mono';">SVG_FILTER</span>
+                    <span
+                        style="padding: 0.5rem 1rem; border: 1px solid var(--text-dim); color: var(--text-dim); font-size: 0.7rem; border-radius: 4px; font-family: 'JetBrains+Mono';">60FPS_READY</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="footer-info">
+        <span>X: <span id="pos-x">0</span></span>
+        <span>Y: <span id="pos-y">0</span></span>
+        <span>FPS: <span id="fps-val">60</span></span>
+    </div>
+
+    <div id="cursor-tooltip" class="tooltip">DITHER_SAMPLE_0XFF</div>
+
+    <script>
+        const layers = {
+            grain: {
+                title: "Modern Grain",
+                desc: "Un granulado suave de alta frecuencia combinado con gradientes dinámicos. Ideal para interfaces minimalistas y premium que buscan profundidad sin ruido excesivo.",
+                el: document.getElementById('layer-grain'),
+                type: "CSS/SVG"
+            },
+            bayer: {
+                title: "Ordered Bayer",
+                desc: "Algoritmo de dithering clásico de los 80 que utiliza la matriz de Bayer para simular sombras. Un viaje nostálgico a la estética del hardware limitado.",
+                el: document.getElementById('layer-bayer'),
+                type: "CANVAS_JS"
+            },
+            blue: {
+                title: "Blue Noise Flow",
+                desc: "Ruido azul distribuido uniformemente que evita patrones repetitivos. Se anima imitando campos de fuerza (flow fields) digitales.",
+                el: document.getElementById('layer-blue'),
+                type: "CANVAS_MATH"
+            },
+            halftone: {
+                title: "Halftone Matrix",
+                desc: "Simulación de impresión por puntos. Los círculos varían su tamaño según la luminosidad, creando un efecto de cómic o periódico retro.",
+                el: document.getElementById('layer-halftone'),
+                type: "SVG_PATTERN"
+            },
+            stochastic: {
+                title: "Stochastic Liquid",
+                desc: "Dithering basado en probabilidad que genera texturas orgánicas similares a fluidos. Reacciona violentamente al movimiento del cursor.",
+                el: document.getElementById('layer-stochastic'),
+                type: "CANVAS_INTERACTIVE"
+            }
+        };
+
+        let activeEffect = 'grain';
+        const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+        const fpsEl = document.getElementById('fps-val');
+        const posXEl = document.getElementById('pos-x');
+        const posYEl = document.getElementById('pos-y');
+
+        // --- Mouse Tracking ---
+        window.addEventListener('mousemove', (e) => {
+            mouse.targetX = e.clientX;
+            mouse.targetY = e.clientY;
+
+            document.documentElement.style.setProperty('--mouse-x', `${(e.clientX / window.innerWidth) * 100}%`);
+            document.documentElement.style.setProperty('--mouse-y', `${(e.clientY / window.innerHeight) * 100}%`);
+
+            posXEl.innerText = Math.round(e.clientX);
+            posYEl.innerText = Math.round(e.clientY);
+        });
+
+        // --- Switch Logic ---
+        document.querySelectorAll('.effect-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const effect = btn.dataset.effect;
+                if (activeEffect === effect) return;
+
+                // UI Update
+                document.querySelector('.effect-btn.active').classList.remove('active');
+                btn.classList.add('active');
+
+                // Content Update
+                const heroText = document.getElementById('hero-text');
+                heroText.classList.remove('visible');
+
+                setTimeout(() => {
+                    document.getElementById('effect-title').innerText = layers[effect].title;
+                    document.getElementById('effect-desc').innerText = layers[effect].desc;
+                    heroText.classList.add('visible');
+                }, 300);
+
+                // Layer Switch
+                layers[activeEffect].el.classList.remove('active');
+                layers[effect].el.classList.add('active');
+
+                activeEffect = effect;
+
+                // Trigger init if needed
+                if (effect === 'bayer') initBayer();
+                if (effect === 'blue') initBlue();
+                if (effect === 'stochastic') initStochastic();
+            });
+        });
+
+        // --- Canvas 1: Bayer Dither ---
+        const bayerCanvas = document.getElementById('canvas-bayer');
+        const bayerCtx = bayerCanvas.getContext('2d');
+        const bayerMatrix = [
+            [0, 32, 8, 40, 2, 34, 10, 42],
+            [48, 16, 56, 24, 50, 18, 58, 26],
+            [12, 44, 4, 36, 14, 46, 6, 38],
+            [60, 28, 52, 20, 62, 30, 54, 22],
+            [3, 35, 11, 43, 1, 33, 9, 41],
+            [51, 19, 59, 27, 49, 17, 57, 25],
+            [15, 47, 7, 39, 13, 45, 5, 37],
+            [63, 31, 55, 23, 61, 29, 53, 21]
+        ];
+
+        function initBayer() {
+            bayerCanvas.width = window.innerWidth / 4; // Low res for effect
+            bayerCanvas.height = window.innerHeight / 4;
+            animateBayer();
+        }
+
+        function animateBayer() {
+            if (activeEffect !== 'bayer') return;
+
+            const w = bayerCanvas.width;
+            const h = bayerCanvas.height;
+            const imgData = bayerCtx.createImageData(w, h);
+            const data = imgData.data;
+            const time = Date.now() * 0.001;
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const idx = (y * w + x) * 4;
+
+                    // Procedural content (Moving Gradients)
+                    const cx = x / w - 0.5;
+                    const cy = y / h - 0.5;
+                    const noise = Math.sin(x * 0.1 + time) * Math.cos(y * 0.1 + time);
+                    const val = (Math.sin(Math.sqrt(cx * cx + cy * cy) * 10 - time) + 1) / 2;
+
+                    const threshold = bayerMatrix[y % 8][x % 8] / 64;
+                    const dithered = val > threshold ? 255 : 0;
+
+                    data[idx] = dithered; // R
+                    data[idx + 1] = dithered * 0.2; // G
+                    data[idx + 2] = dithered * 0.5; // B
+                    data[idx + 3] = 255;
+                }
+            }
+            bayerCtx.putImageData(imgData, 0, 0);
+            requestAnimationFrame(animateBayer);
+        }
+
+        // --- Canvas 2: Blue Noise Flow ---
+        const blueCanvas = document.getElementById('canvas-blue');
+        const blueCtx = blueCanvas.getContext('2d');
+
+        function initBlue() {
+            blueCanvas.width = window.innerWidth;
+            blueCanvas.height = window.innerHeight;
+            animateBlue();
+        }
+
+        function animateBlue() {
+            if (activeEffect !== 'blue') return;
+
+            blueCtx.fillStyle = 'rgba(5, 5, 5, 0.1)';
+            blueCtx.fillRect(0, 0, blueCanvas.width, blueCanvas.height);
+
+            const time = Date.now() * 0.0005;
+            blueCtx.fillStyle = '#fff';
+
+            for (let i = 0; i < 200; i++) {
+                const x = (Math.sin(i * 0.5 + time) * 0.4 + 0.5) * blueCanvas.width;
+                const y = (Math.cos(i * 0.3 + time * 0.8) * 0.4 + 0.5) * blueCanvas.height;
+
+                // Blue noise dots
+                blueCtx.globalAlpha = Math.random() * 0.5;
+                const size = Math.random() * 2;
+                blueCtx.fillRect(x + (Math.random() - 0.5) * 50, y + (Math.random() - 0.5) * 50, size, size);
+            }
+            blueCtx.globalAlpha = 1;
+
+            requestAnimationFrame(animateBlue);
+        }
+
+        // --- Canvas 3: Stochastic Liquid ---
+        const stochCanvas = document.getElementById('canvas-stochastic');
+        const stochCtx = stochCanvas.getContext('2d');
+
+        function initStochastic() {
+            stochCanvas.width = window.innerWidth / 2;
+            stochCanvas.height = window.innerHeight / 2;
+            animateStochastic();
+        }
+
+        function animateStochastic() {
+            if (activeEffect !== 'stochastic') return;
+
+            const w = stochCanvas.width;
+            const h = stochCanvas.height;
+            const imgData = stochCtx.createImageData(w, h);
+            const data = imgData.data;
+            const time = Date.now() * 0.002;
+
+            const mx = (mouse.targetX / window.innerWidth) * w;
+            const my = (mouse.targetY / window.innerHeight) * h;
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const idx = (y * w + x) * 4;
+
+                    const dx = x - mx;
+                    const dy = y - my;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    const base = Math.sin(x * 0.05 + time) + Math.cos(y * 0.05 - time);
+                    const grad = 1.0 - (dist / (w * 0.3));
+                    let intensity = (base * 0.5 + 0.5) * grad;
+
+                    // Stochastic check
+                    if (Math.random() < intensity) {
+                        data[idx] = 255;
+                        data[idx + 1] = 62;
+                        data[idx + 2] = 0;
+                    } else {
+                        data[idx] = 5;
+                        data[idx + 1] = 5;
+                        data[idx + 2] = 5;
+                    }
+                    data[idx + 3] = 255;
+                }
+            }
+            stochCtx.putImageData(imgData, 0, 0);
+            requestAnimationFrame(animateStochastic);
+        }
+
+        // FPS Counter
+        let lastTime = performance.now();
+        let frames = 0;
+        function updateFPS() {
+            const now = performance.now();
+            frames++;
+            if (now > lastTime + 1000) {
+                const fps = Math.round((frames * 1000) / (now - lastTime));
+                fpsEl.innerText = fps;
+                frames = 0;
+                lastTime = now;
+            }
+            requestAnimationFrame(updateFPS);
+        }
+        updateFPS();
+
+        // Initial state
+        window.addEventListener('load', () => {
+            document.getElementById('hero-text').classList.add('visible');
+        });
+
+    </script>
+</body>
+
+</html>

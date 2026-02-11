@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NebulaGrid - Connect Your Universe</title>
+  
+  <!-- 
+    TEMPLATE ID: 73073137
+    DESIGN DECISIONS:
+    - Color Scheme: Cyberpunk (roll 4) - Electric purple (#8B5CF6) + cyan (#0EA5E9) on dark
+    - Hero Layout: Full-screen overlay (roll 2) - Immersive background with floating content
+    - Layout Approach: Traditional stacked (roll 3) - Clean vertical flow
+    - Typography: Elegant serif (roll 0) - Playfair Display for headings
+    - Special Feature: 3D tilt cards (roll 2) + morphing shapes (sub-roll) + particles (sub-roll)
+    - Animation: Spring physics (roll 0) - 0.32s duration, 72ms stagger
+    - Section Style: Modular blocks (roll 3) - Distinct section separation
+    - Brand Style: Nature fusion (roll 1) - Nebula + Grid combination
+    - Cards: Sharp corners (0px radius, roll 0) - Brutalist contrast
+    - Spacing: 1.25x scale (generous breathing room)
+  -->
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    /* === CSS VARIABLES & THEMES === */
+    :root {
+      /* Core cyberpunk palette - Purple (274°) + Cyan (201°) */
+      --accent-primary: hsl(274, 85%, 58%);
+      --accent-secondary: hsl(201, 95%, 48%);
+      --accent-gradient: linear-gradient(6deg, hsl(274, 85%, 58%) 0%, hsl(201, 95%, 48%) 100%);
+      
+      /* Dark theme (default) */
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-tertiary: #1a1a25;
+      --text-primary: #fafafa;
+      --text-secondary: #a0a0b0;
+      --text-muted: #606070;
+      --border-color: rgba(139, 92, 246, 0.2);
+      --shadow-color: rgba(139, 92, 246, 0.3);
+      --glow-color: rgba(139, 92, 246, 0.5);
+      
+      /* Typography */
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      
+      /* Spacing scale (1.25x) */
+      --space-xs: 0.5rem;
+      --space-sm: 0.875rem;
+      --space-md: 1.25rem;
+      --space-lg: 2rem;
+      --space-xl: 3.125rem;
+      --space-2xl: 5rem;
+      --space-3xl: 7.8125rem;
+      
+      /* Animation timing - Spring physics */
+      --duration-fast: 0.2s;
+      --duration-base: 0.32s;
+      --duration-slow: 0.6s;
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    [data-theme="light"] {
+      --bg-primary: #fafafa;
+      --bg-secondary: #f0f0f5;
+      --bg-tertiary: #e8e8f0;
+      --text-primary: #0a0a0f;
+      --text-secondary: #4a4a5a;
+      --text-muted: #808090;
+      --border-color: rgba(139, 92, 246, 0.15);
+      --shadow-color: rgba(0, 0, 0, 0.1);
+      --glow-color: rgba(139, 92, 246, 0.2);
+    }
+    
+    /* === RESET & BASE === */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color var(--duration-base) var(--ease-smooth),
+                  color var(--duration-base) var(--ease-smooth);
+    }
+    
+    h1, h2, h3, h4 {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    /* === PARTICLES CANVAS === */
+    #particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    /* === NAVIGATION === */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: var(--space-md) var(--space-xl);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      transition: all var(--duration-base) var(--ease-smooth);
+    }
+    
+    [data-theme="light"] .nav {
+      background: rgba(250, 250, 250, 0.85);
+    }
+    
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: var(--space-lg);
+      align-items: center;
+    }
+    
+    .nav-link {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color var(--duration-fast) var(--ease-smooth);
+      position: relative;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-gradient);
+      transition: width var(--duration-base) var(--ease-spring);
+    }
+    
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    /* Theme Toggle */
+    .theme-toggle {
+      width: 48px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      position: relative;
+      transition: all var(--duration-base) var(--ease-smooth);
+    }
+    
+    .theme-toggle::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      transition: transform var(--duration-base) var(--ease-spring);
+    }
+    
+    [data-theme="light"] .theme-toggle::before {
+      transform: translateX(24px);
+      background: var(--accent-secondary);
+    }
+    
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      padding: var(--space-xs);
+    }
+    
+    .mobile-menu-btn span {
+      width: 24px;
+      height: 2px;
+      background: var(--text-primary);
+      transition: all var(--duration-base) var(--ease-spring);
+    }
+    
+    /* === HERO SECTION === */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: var(--space-2xl) var(--space-xl);
+    }
+    
+    /* Morphing background shapes */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+    
+    .morph-shape {
+      position: absolute;
+      filter: blur(80px);
+      opacity: 0.6;
+      animation: morph 20s ease-in-out infinite;
+    }
+    
+    .morph-shape-1 {
+      width: 600px;
+      height: 600px;
+      background: var(--accent-primary);
+      top: -200px;
+      right: -100px;
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      animation-delay: 0s;
+    }
+    
+    .morph-shape-2 {
+      width: 500px;
+      height: 500px;
+      background: var(--accent-secondary);
+      bottom: -150px;
+      left: -100px;
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      animation-delay: -5s;
+    }
+    
+    .morph-shape-3 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+      animation-delay: -10s;
+      opacity: 0.3;
+    }
+    
+    @keyframes morph {
+      0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+      25% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
+      50% { border-radius: 30% 70% 30% 70% / 70% 50% 30% 50%; }
+      75% { border-radius: 50% 50% 30% 70% / 50% 70% 50% 50%; }
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 900px;
+    }
+    
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-md);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-primary);
+      margin-bottom: var(--space-lg);
+      animation: fadeInUp 0.6s var(--ease-spring) forwards;
+      animation-delay: 72ms;
+      opacity: 0;
+    }
+    
+    .hero-badge svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    .hero-title {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: var(--space-lg);
+      animation: fadeInUp 0.6s var(--ease-spring) forwards;
+      animation-delay: 144ms;
+      opacity: 0;
+    }
+    
+    .hero-title span {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero-subtitle {
+      font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto var(--space-xl);
+      font-weight: 300;
+      animation: fadeInUp 0.6s var(--ease-spring) forwards;
+      animation-delay: 216ms;
+      opacity: 0;
+    }
+    
+    .hero-cta {
+      display: flex;
+      gap: var(--space-md);
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.6s var(--ease-spring) forwards;
+      animation-delay: 288ms;
+      opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* === BUTTONS === */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-md) var(--space-xl);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      border-radius: 0;
+      transition: all var(--duration-base) var(--ease-spring);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary {
+      background: var(--accent-gradient);
+      color: white;
+      box-shadow: 0 4px 20px var(--shadow-color);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px var(--glow-color);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+    }
+    
+    .btn-secondary:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      transform: translateY(-3px);
+    }
+    
+    .btn svg {
+      width: 20px;
+      height: 20px;
+      transition: transform var(--duration-base) var(--ease-spring);
+    }
+    
+    .btn:hover svg {
+      transform: translateX(4px);
+    }
+    
+    /* === SECTION BASE === */
+    .section {
+      padding: var(--space-3xl) var(--space-xl);
+      position: relative;
+    }
+    
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto var(--space-2xl);
+    }
+    
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent-primary);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .section-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      margin-bottom: var(--space-md);
+    }
+    
+    .section-subtitle {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+    }
+    
+    /* === FEATURES SECTION === */
+    .features {
+      background: var(--bg-secondary);
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    /* 3D Tilt Cards */
+    .feature-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      padding: var(--space-xl);
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform var(--duration-base) var(--ease-spring),
+                  box-shadow var(--duration-base) var(--ease-smooth);
+      cursor: pointer;
+    }
+    
+    .feature-card:hover {
+      box-shadow: 0 20px 40px var(--shadow-color);
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent-gradient);
+      opacity: 0;
+      transition: opacity var(--duration-base) var(--ease-smooth);
+      z-index: 0;
+    }
+    
+    .feature-card:hover::before {
+      opacity: 0.05;
+    }
+    
+    .feature-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+      position: relative;
+      z-index: 1;
+      transition: all var(--duration-base) var(--ease-spring);
+    }
+    
+    .feature-card:hover .feature-icon {
+      background: var(--accent-gradient);
+      transform: translateZ(30px);
+    }
+    
+    .feature-icon svg {
+      width: 28px;
+      height: 28px;
+      color: var(--accent-primary);
+      transition: color var(--duration-base) var(--ease-smooth);
+    }
+    
+    .feature-card:hover .feature-icon svg {
+      color: white;
+    }
+    
+    .feature-title {
+      font-size: 1.5rem;
+      margin-bottom: var(--space-sm);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .feature-text {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* === STATS SECTION === */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-lg);
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: var(--space-lg);
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      transition: all var(--duration-base) var(--ease-spring);
+    }
+    
+    .stat-item:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-primary);
+      box-shadow: 0 10px 30px var(--shadow-color);
+    }
+    
+    .stat-number {
+      font-family: var(--font-serif);
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    /* === SHOWCASE SECTION === */
+    .showcase {
+      background: var(--bg-secondary);
+      overflow: hidden;
+    }
+    
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2xl);
+      max-width: 1200px;
+      margin: 0 auto;
+      align-items: center;
+    }
+    
+    .showcase-visual {
+      position: relative;
+    }
+    
+    .showcase-frame {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      padding: var(--space-md);
+      position: relative;
+      transform: perspective(1000px) rotateY(-5deg);
+      transition: transform var(--duration-base) var(--ease-spring);
+    }
+    
+    .showcase-frame:hover {
+      transform: perspective(1000px) rotateY(0deg);
+    }
+    
+    .showcase-frame-inner {
+      background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .showcase-frame-inner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent-gradient);
+      opacity: 0.1;
+    }
+    
+    .showcase-dots {
+      display: flex;
+      gap: 6px;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .showcase-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+    }
+    
+    .showcase-dot:nth-child(1) { background: #ff5f56; }
+    .showcase-dot:nth-child(2) { background: #ffbd2e; }
+    .showcase-dot:nth-child(3) { background: #27ca40; }
+    
+    .showcase-content h3 {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-md);
+    }
+    
+    .showcase-content p {
+      color: var(--text-secondary);
+      font-size: 1.0625rem;
+      line-height: 1.8;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      color: var(--text-secondary);
+    }
+    
+    .feature-list svg {
+      width: 20px;
+      height: 20px;
+      color: var(--accent-secondary);
+      flex-shrink: 0;
+    }
+    
+    /* === PRICING SECTION === */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    
+    .pricing-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: var(--space-xl);
+      position: relative;
+      transition: all var(--duration-base) var(--ease-spring);
+    }
+    
+    .pricing-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px var(--shadow-color);
+    }
+    
+    .pricing-card.featured {
+      background: var(--bg-primary);
+      border-color: var(--accent-primary);
+      transform: scale(1.05);
+    }
+    
+    .pricing-card.featured:hover {
+      transform: scale(1.05) translateY(-10px);
+    }
+    
+    .pricing-badge {
+      position: absolute;
+      top: 0;
+      right: var(--space-md);
+      transform: translateY(-50%);
+      background: var(--accent-gradient);
+      color: white;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: var(--space-xs) var(--space-sm);
+    }
+    
+    .pricing-name {
+      font-size: 1.25rem;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .pricing-desc {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .pricing-price {
+      font-family: var(--font-serif);
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .pricing-price span {
+      font-size: 1rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    
+    .pricing-features {
+      list-style: none;
+      margin: var(--space-lg) 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+    }
+    
+    .pricing-features li.included svg {
+      color: var(--accent-secondary);
+    }
+    
+    .pricing-features li.not-included {
+      opacity: 0.5;
+    }
+    
+    .pricing-features li.not-included svg {
+      color: var(--text-muted);
+    }
+    
+    .pricing-features svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    
+    .pricing-card .btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    /* === TESTIMONIALS SECTION === */
+    .testimonials {
+      background: var(--bg-secondary);
+    }
+    
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .testimonial-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      padding: var(--space-xl);
+      position: relative;
+    }
+    
+    .testimonial-card::before {
+      content: '"';
+      font-family: var(--font-serif);
+      font-size: 6rem;
+      color: var(--accent-primary);
+      opacity: 0.2;
+      position: absolute;
+      top: -10px;
+      left: var(--space-md);
+      line-height: 1;
+    }
+    
+    .testimonial-text {
+      font-size: 1.0625rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-lg);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .testimonial-info h4 {
+      font-family: var(--font-sans);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .testimonial-info p {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+    
+    /* === CTA SECTION === */
+    .cta {
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background: var(--accent-gradient);
+      opacity: 0.05;
+    }
+    
+    .cta-content {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .cta-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      margin-bottom: var(--space-md);
+    }
+    
+    .cta-text {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .cta-buttons {
+      display: flex;
+      gap: var(--space-md);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    /* === FOOTER === */
+    .footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      padding: var(--space-2xl) var(--space-xl) var(--space-xl);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-2xl);
+      max-width: 1200px;
+      margin: 0 auto var(--space-2xl);
+    }
+    
+    .footer-brand {
+      font-family: var(--font-serif);
+      font-size: 1.75rem;
+      font-weight: 700;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--space-md);
+    }
+    
+    .footer-desc {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .footer-social {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .footer-social a {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--duration-base) var(--ease-spring);
+    }
+    
+    .footer-social a:hover {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+    }
+    
+    .footer-social svg {
+      width: 18px;
+      height: 18px;
+      color: var(--text-secondary);
+      transition: color var(--duration-fast) var(--ease-smooth);
+    }
+    
+    .footer-social a:hover svg {
+      color: white;
+    }
+    
+    .footer-col h4 {
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-md);
+    }
+    
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .footer-links a {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      transition: color var(--duration-fast) var(--ease-smooth);
+    }
+    
+    .footer-links a:hover {
+      color: var(--accent-primary);
+    }
+    
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: var(--space-xl);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+    
+    .footer-copy {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    /* === SCROLL REVEAL ANIMATION === */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s var(--ease-spring), 
+                  transform 0.8s var(--ease-spring);
+    }
+    
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* === MOBILE RESPONSIVE === */
+    @media (max-width: 1024px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .showcase-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .showcase-frame {
+        transform: none;
+      }
+      
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+      }
+      
+      .pricing-card.featured {
+        transform: none;
+      }
+      
+      .pricing-card.featured:hover {
+        transform: translateY(-10px);
+      }
+      
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .hero {
+        padding: var(--space-xl) var(--space-md);
+      }
+      
+      .section {
+        padding: var(--space-2xl) var(--space-md);
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-md);
+      }
+      
+      .stat-number {
+        font-size: 2.5rem;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .hero-cta {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .hero-cta .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .cta-buttons {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .cta-buttons .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Particles Canvas -->
+  <canvas id="particles-canvas"></canvas>
+  
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="#" class="nav-logo">NebulaGrid</a>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#showcase" class="nav-link">Showcase</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="#testimonials" class="nav-link">Stories</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+    </div>
+    <button class="mobile-menu-btn" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="morph-shape morph-shape-1"></div>
+      <div class="morph-shape morph-shape-2"></div>
+      <div class="morph-shape morph-shape-3"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+        New: AI-Powered Connections
+      </div>
+      <h1 class="hero-title">Connect Your <span>Universe</span></h1>
+      <p class="hero-subtitle">NebulaGrid brings together the infinite possibilities of technology with the organic flow of natural systems. Experience harmony in every connection.</p>
+      <div class="hero-cta">
+        <a href="#pricing" class="btn btn-primary">
+          Start Free Trial
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+        <a href="#showcase" class="btn btn-secondary">
+          See How It Works
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="section">
+    <div class="stats-grid reveal">
+      <div class="stat-item">
+        <div class="stat-number" data-target="50000">0</div>
+        <div class="stat-label">Active Users</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="99.9">0</div>
+        <div class="stat-label">Uptime %</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="150">0</div>
+        <div class="stat-label">Countries</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="24">0</div>
+        <div class="stat-label">/7 Support</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section features" id="features">
+    <div class="section-header reveal">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything You Need</h2>
+      <p class="section-subtitle">Powerful tools designed with precision and care. Each feature crafted to enhance your workflow naturally.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card tilt-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        <h3 class="feature-title">Quantum Sync</h3>
+        <p class="feature-text">Real-time synchronization across all your devices. Your data travels at the speed of light, encrypted and secure.</p>
+      </div>
+      <div class="feature-card tilt-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v6l4 2"></path>
+          </svg>
+        </div>
+        <h3 class="feature-title">Neural Analytics</h3>
+        <p class="feature-text">AI-powered insights that learn from your patterns. Predictive analytics that feel like intuition.</p>
+      </div>
+      <div class="feature-card tilt-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <h3 class="feature-title">Infinite Scale</h3>
+        <p class="feature-text">From solo projects to enterprise deployments. Scale seamlessly without ever hitting a ceiling.</p>
+      </div>
+      <div class="feature-card tilt-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <h3 class="feature-title">Vault Security</h3>
+        <p class="feature-text">End-to-end encryption with zero-knowledge architecture. Your data belongs only to you.</p>
+      </div>
+      <div class="feature-card tilt-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <h3 class="feature-title">Team Harmony</h3>
+        <p class="feature-text">Collaborative workspaces that bring people together. Share, edit, and create as one.</p>
+      </div>
+      <div class="feature-card tilt-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <h3 class="feature-title">Pulse Monitoring</h3>
+        <p class="feature-text">Real-time health checks and performance metrics. Stay ahead of issues before they arise.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Showcase Section -->
+  <section class="section showcase" id="showcase">
+    <div class="showcase-grid">
+      <div class="showcase-visual reveal">
+        <div class="showcase-frame">
+          <div class="showcase-dots">
+            <div class="showcase-dot"></div>
+            <div class="showcase-dot"></div>
+            <div class="showcase-dot"></div>
+          </div>
+          <div class="showcase-frame-inner">
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" style="opacity: 0.8;">
+              <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:hsl(274,85%,58%);stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:hsl(201,95%,48%);stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <circle cx="60" cy="60" r="50" stroke="url(#grad1)" stroke-width="2" fill="none"/>
+              <circle cx="60" cy="60" r="35" stroke="url(#grad1)" stroke-width="2" fill="none" opacity="0.6"/>
+              <circle cx="60" cy="60" r="20" stroke="url(#grad1)" stroke-width="2" fill="none" opacity="0.4"/>
+              <line x1="60" y1="10" x2="60" y2="110" stroke="url(#grad1)" stroke-width="1" opacity="0.3"/>
+              <line x1="10" y1="60" x2="110" y2="60" stroke="url(#grad1)" stroke-width="1" opacity="0.3"/>
+              <circle cx="60" cy="60" r="5" fill="url(#grad1)"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-content reveal">
+        <div class="section-label">Showcase</div>
+        <h3>Beautiful Interfaces, Powerful Results</h3>
+        <p>Our platform combines stunning visual design with robust functionality. Every pixel is purposeful, every interaction meaningful. Experience the perfect balance of form and function.</p>
+        <ul class="feature-list">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Intuitive drag-and-drop interface
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Customizable dashboards and widgets
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Dark and light mode support
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Mobile-responsive on all devices
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="section" id="pricing">
+    <div class="section-header reveal">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Simple, Transparent</h2>
+      <p class="section-subtitle">Choose the plan that fits your needs. No hidden fees, no surprises.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card reveal">
+        <h3 class="pricing-name">Starter</h3>
+        <p class="pricing-desc">Perfect for individuals</p>
+        <div class="pricing-price">$0<span>/month</span></div>
+        <ul class="pricing-features">
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Up to 3 projects
+          </li>
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Basic analytics
+          </li>
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            24/7 support
+          </li>
+          <li class="not-included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            Custom domains
+          </li>
+          <li class="not-included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            Advanced integrations
+          </li>
+        </ul>
+        <a href="#" class="btn btn-secondary">Get Started</a>
+      </div>
+      <div class="pricing-card featured reveal">
+        <div class="pricing-badge">Popular</div>
+        <h3 class="pricing-name">Pro</h3>
+        <p class="pricing-desc">For growing teams</p>
+        <div class="pricing-price">$29<span>/month</span></div>
+        <ul class="pricing-features">
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Unlimited projects
+          </li>
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Advanced analytics
+          </li>
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Priority support
+          </li>
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Custom domains
+          </li>
+          <li class="not-included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            White-labeling
+          </li>
+        </ul>
+        <a href="#" class="btn btn-primary">Start Free Trial</a>
+      </div>
+      <div class="pricing-card reveal">
+        <h3 class="pricing-name">Enterprise</h3>
+        <p class="pricing-desc">For large organizations</p>
+        <div class="pricing-price">$99<span>/month</span></div>
+        <ul class="pricing-features">
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Everything in Pro
+          </li>
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            White-labeling
+          </li>
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Dedicated manager
+          </li>
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            SLA guarantee
+          </li>
+          <li class="included">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Custom contracts
+          </li>
+        </ul>
+        <a href="#" class="btn btn-secondary">Contact Sales</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="section testimonials" id="testimonials">
+    <div class="section-header reveal">
+      <div class="section-label">Testimonials</div>
+      <h2 class="section-title">Loved by Thousands</h2>
+      <p class="section-subtitle">See what our community has to say about their NebulaGrid experience.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <p class="testimonial-text">NebulaGrid transformed how our team collaborates. The seamless integration and intuitive interface made adoption effortless. It's not just a tool—it's an extension of our workflow.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">SM</div>
+          <div class="testimonial-info">
+            <h4>Sarah Mitchell</h4>
+            <p>CTO at TechVentures</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <p class="testimonial-text">The analytics capabilities are mind-blowing. We discovered insights about our data we never knew existed. NebulaGrid doesn't just store information—it illuminates it.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">JC</div>
+          <div class="testimonial-info">
+            <h4>James Chen</h4>
+            <p>Data Scientist at InnovateCo</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <p class="testimonial-text">Security was our top priority, and NebulaGrid exceeded every expectation. With end-to-end encryption and zero-knowledge architecture, we finally sleep soundly.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">EP</div>
+          <div class="testimonial-info">
+            <h4>Elena Petrova</h4>
+            <p>Security Lead at FinanceHub</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section cta">
+    <div class="cta-bg"></div>
+    <div class="cta-content reveal">
+      <h2 class="cta-title">Ready to Connect?</h2>
+      <p class="cta-text">Join thousands of teams already using NebulaGrid to power their workflows. Start your free trial today—no credit card required.</p>
+      <div class="cta-buttons">
+        <a href="#" class="btn btn-primary">
+          Get Started Free
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+        <a href="#" class="btn btn-secondary">Schedule a Demo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">NebulaGrid</div>
+        <p class="footer-desc">Connecting the infinite possibilities of technology with the organic flow of natural systems. Built for the future, available today.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Twitter">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+            </svg>
+          </a>
+          <a href="#" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+          </a>
+          <a href="#" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+              <rect x="2" y="9" width="4" height="12"></rect>
+              <circle cx="4" cy="4" r="2"></circle>
+            </svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul class="footer-links">
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Security</a></li>
+          <li><a href="#">Integrations</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul class="footer-links">
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul class="footer-links">
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">Licenses</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 NebulaGrid. All rights reserved.</p>
+      <p class="footer-copy">Template ID: 73073137</p>
+    </div>
+  </footer>
+
+  <script>
+    // === THEME TOGGLE ===
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    // === 3D TILT CARDS ===
+    const tiltCards = document.querySelectorAll('.tilt-card');
+    
+    tiltCards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 10;
+        const rotateY = (centerX - x) / 10;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+      });
+    });
+    
+    // === SCROLL REVEAL ANIMATION ===
+    const revealElements = document.querySelectorAll('.reveal');
+    
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('active');
+          }, index * 72); // 72ms stagger delay
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+    
+    revealElements.forEach(el => revealObserver.observe(el));
+    
+    // === ANIMATED COUNTERS ===
+    const statNumbers = document.querySelectorAll('.stat-number');
+    
+    const countObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const target = parseFloat(entry.target.getAttribute('data-target'));
+          const isDecimal = target % 1 !== 0;
+          const duration = 2000;
+          const start = 0;
+          const startTime = performance.now();
+          
+          function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Spring easing
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const current = start + (target - start) * easeProgress;
+            
+            if (isDecimal) {
+              entry.target.textContent = current.toFixed(1) + (target === 99.9 ? '%' : '');
+            } else {
+              entry.target.textContent = Math.floor(current).toLocaleString() + (target === 24 ? '/7' : '+');
+            }
+            
+            if (progress < 1) {
+              requestAnimationFrame(update);
+            }
+          }
+          
+          requestAnimationFrame(update);
+          countObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    statNumbers.forEach(stat => countObserver.observe(stat));
+    
+    // === PARTICLES SYSTEM ===
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let particles = [];
+    const particleCount = window.innerWidth < 768 ? 25 : 50;
+    const connectionDistance = 150;
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.radius = Math.random() * 2 + 1;
+      }
+      
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      
+      draw() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = isDark ? 'rgba(139, 92, 246, 0.5)' : 'rgba(139, 92, 246, 0.3)';
+        ctx.fill();
+      }
+    }
+    
+    // Initialize particles
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+    
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      
+      particles.forEach((particle, i) => {
+        particle.update();
+        particle.draw();
+        
+        // Draw connections
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[j].x - particle.x;
+          const dy = particles[j].y - particle.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < connectionDistance) {
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            const opacity = (1 - distance / connectionDistance) * (isDark ? 0.2 : 0.1);
+            ctx.strokeStyle = `rgba(139, 92, 246, ${opacity})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      });
+      
+      requestAnimationFrame(animateParticles);
+    }
+    
+    animateParticles();
+    
+    // === SMOOTH SCROLL FOR NAV LINKS ===
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+    
+    // === NAV BACKGROUND ON SCROLL ===
+    const nav = document.querySelector('.nav');
+    let lastScroll = 0;
+    
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      
+      if (currentScroll > 100) {
+        nav.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+      } else {
+        nav.style.boxShadow = 'none';
+      }
+      
+      lastScroll = currentScroll;
+    });
+  </script>
+</body>
+</html>

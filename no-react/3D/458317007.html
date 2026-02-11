@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRYSTAL LABS - Award-Winning Design Agency</title>
+    
+    <!-- 
+    ============================================================================
+    DESIGN SYSTEM NOTES - Template ID: 458317007
+    ============================================================================
+    
+    CHAOS LEVEL: 4/9 (Moderate Chaos)
+    - Asymmetric grid layouts with intentional visual tension
+    - Overlapping elements breaking traditional boundaries
+    - 15-degree rotation on key containers
+    - Unconventional navigation placement
+    
+    COLOR PALETTE: Cyberpunk Neon (5/5)
+    - Primary: Electric Purple (#a855f7)
+    - Secondary: Cyan (#06b6d4)
+    - Accent: Hot Pink (#ec4899)
+    - Dark: Deep Navy (#0a0a1a)
+    - Light: Soft White (#fafafa)
+    
+    3D EFFECT: Three.js Crystalline Geometry (1/4)
+    - Rotating low-poly crystal as hero centerpiece
+    - Dynamic lighting with point lights
+    - Mouse-interactive rotation
+    
+    TYPOGRAPHY: Space Grotesk + Inter (3/3)
+    - Headlines: Space Grotesk (geometric, bold)
+    - Body: Inter (clean, readable)
+    
+    LAYOUT: Diagonal Broken Grid (1/4)
+    - 15-degree rotation transforms
+    - Negative space used aggressively
+    - Elements break container boundaries
+    
+    PARTICLES: Node Network (2/3)
+    - Connecting lines forming constellations
+    - Mouse-repulsion effect
+    - 50 particles with dynamic connections
+    
+    HERO ANIMATION: Text Scramble + 3D (1/4)
+    - Matrix-style character randomization
+    - Staggered reveal with 3D transforms
+    
+    SCROLL EFFECTS: Parallax Depth Layers (1/3)
+    - Multiple z-depth planes
+    - Speed differential creates depth
+    
+    BUTTONS: Liquid Morphing (2/3)
+    - Organic blob shapes
+    - SVG filter displacement
+    - Hover morphing animation
+    ============================================================================
+    -->
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        /* CSS Custom Properties - Chaos Level 4 Design System */
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
+            --bg-tertiary: #1a1a3e;
+            --text-primary: #fafafa;
+            --text-secondary: #a0a0c0;
+            --accent-purple: #a855f7;
+            --accent-cyan: #06b6d4;
+            --accent-pink: #ec4899;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-glow: rgba(168, 85, 247, 0.3);
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --rotation-angle: 15deg;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #f0f0f5;
+            --bg-tertiary: #e8e8f0;
+            --text-primary: #1a1a2e;
+            --text-secondary: #5a5a7a;
+            --accent-purple: #7c3aed;
+            --accent-cyan: #0891b2;
+            --accent-pink: #db2777;
+            --glass-bg: rgba(0, 0, 0, 0.03);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --shadow-glow: rgba(124, 58, 237, 0.2);
+        }
+        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background 0.5s var(--ease-out-expo), color 0.5s var(--ease-out-expo);
+        }
+        
+        .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+        
+        .theme-toggle {
+            position: fixed; top: 2rem; right: 2rem; z-index: 1000;
+            width: 3.5rem; height: 3.5rem; border-radius: 50%;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s var(--ease-out-expo);
+            box-shadow: 0 0 30px var(--shadow-glow);
+        }
+        .theme-toggle:hover { transform: scale(1.1) rotate(180deg); box-shadow: 0 0 50px var(--shadow-glow); }
+        .theme-toggle svg { width: 1.5rem; height: 1.5rem; fill: var(--text-primary); }
+        [data-theme="light"] .theme-toggle .moon-icon, :root:not([data-theme]) .theme-toggle .sun-icon { display: none; }
+        
+        .main-nav {
+            position: fixed; top: 2rem; left: 2rem; z-index: 999;
+            display: flex; gap: 2rem; padding: 1rem 2rem;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px); border-radius: 100px;
+            transform: rotate(-2deg);
+            transition: all 0.5s var(--ease-out-expo);
+        }
+        .main-nav:hover { transform: rotate(0deg) scale(1.02); }
+        .nav-logo { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.3s; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan)); transition: width 0.3s; }
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a:hover::after { width: 100%; }
+        
+        .particle-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.6; }
+        
+        .hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 8rem 4rem; position: relative; z-index: 1; overflow: hidden; }
+        .hero-content { transform: rotate(-15deg); padding: 2rem; }
+        .hero-label { display: inline-block; padding: 0.5rem 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 100px; font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 2rem; backdrop-filter: blur(10px); transform: translateX(-20px); opacity: 0; }
+        .hero-headline { font-family: var(--font-display); font-size: clamp(3rem, 8vw, 6rem); font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 1.5rem; }
+        .hero-headline .scramble-text { display: block; opacity: 0; transform: translateY(50px); }
+        .hero-headline .accent { background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-subtext { font-size: 1.25rem; color: var(--text-secondary); max-width: 500px; margin-bottom: 3rem; opacity: 0; transform: translateY(30px); }
+        .hero-cta { display: inline-flex; align-items: center; gap: 1rem; padding: 1.25rem 2.5rem; background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); color: white; font-family: var(--font-display); font-weight: 600; font-size: 1rem; text-decoration: none; border-radius: 100px; position: relative; overflow: hidden; opacity: 0; transform: translateY(30px); }
+        .hero-cta::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.5s; }
+        .hero-cta:hover::before { left: 100%; }
+        .hero-3d-container { position: relative; width: 100%; height: 600px; transform: rotate(15deg); }
+        #crystal-canvas { width: 100%; height: 100%; border-radius: 2rem; }
+        
+        .features { padding: 10rem 4rem; position: relative; z-index: 1; }
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1400px; margin: 0 auto; }
+        .feature-card { background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(20px); border-radius: 2rem; padding: 3rem 2rem; transition: all 0.5s; position: relative; overflow: hidden; }
+        .feature-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%); opacity: 0; transition: opacity 0.5s; }
+        .feature-card:hover { transform: translateY(-10px) rotate(2deg); box-shadow: 0 30px 60px var(--shadow-glow); }
+        .feature-card:hover::before { opacity: 0.1; }
+        .feature-card:nth-child(2) { transform: translateY(3rem); }
+        .feature-card:nth-child(3) { transform: translateY(-2rem); }
+        .feature-icon { width: 4rem; height: 4rem; margin-bottom: 2rem; }
+        .feature-icon svg { width: 100%; height: 100%; fill: none; stroke: var(--accent-cyan); stroke-width: 1.5; }
+        .feature-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; }
+        .feature-text { color: var(--text-secondary); line-height: 1.8; }
+        
+        .showcase { padding: 10rem 4rem; position: relative; z-index: 1; }
+        .showcase-header { text-align: center; margin-bottom: 6rem; transform: rotate(-15deg); }
+        .showcase-title { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700; margin-bottom: 1rem; }
+        .showcase-subtitle { font-size: 1.25rem; color: var(--text-secondary); }
+        .showcase-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2rem; max-width: 1400px; margin: 0 auto; }
+        .showcase-item { position: relative; border-radius: 1.5rem; overflow: hidden; background: var(--bg-secondary); aspect-ratio: 4/3; transition: all 0.5s; }
+        .showcase-item:nth-child(1) { grid-column: 1 / 7; transform: rotate(-2deg) translateY(2rem); }
+        .showcase-item:nth-child(2) { grid-column: 7 / 13; transform: rotate(3deg) translateY(-3rem); }
+        .showcase-item:nth-child(3) { grid-column: 2 / 8; transform: rotate(1deg) translateY(4rem); }
+        .showcase-item:nth-child(4) { grid-column: 8 / 12; transform: rotate(-3deg) translateY(-1rem); }
+        .showcase-item:hover { transform: rotate(0deg) scale(1.02); z-index: 10; }
+        .showcase-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s; }
+        .showcase-item:hover .showcase-image { transform: scale(1.1); }
+        .showcase-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 2rem; background: linear-gradient(transparent, rgba(0,0,0,0.8)); transform: translateY(100%); transition: transform 0.5s; }
+        .showcase-item:hover .showcase-overlay { transform: translateY(0); }
+        .showcase-item-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; color: white; }
+        
+        .stats { padding: 10rem 4rem; position: relative; z-index: 1; }
+        .stats-container { display: flex; justify-content: space-around; max-width: 1200px; margin: 0 auto; gap: 4rem; }
+        .stat-item { text-align: center; }
+        .stat-number { font-family: var(--font-display); font-size: clamp(4rem, 10vw, 7rem); font-weight: 700; line-height: 1; background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan), var(--accent-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% 200%; animation: gradient-shift 4s ease infinite; }
+        @keyframes gradient-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .stat-label { font-size: 1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 1rem; }
+        
+        .cta-section { padding: 10rem 4rem; text-align: center; position: relative; z-index: 1; transform: rotate(-15deg); }
+        .cta-container { background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(20px); border-radius: 3rem; padding: 6rem 4rem; max-width: 900px; margin: 0 auto; position: relative; overflow: hidden; }
+        .cta-container::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, var(--accent-purple) 0%, transparent 50%); opacity: 0.1; animation: pulse-glow 4s ease-in-out infinite; }
+        @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 0.1; } 50% { transform: scale(1.1); opacity: 0.15; } }
+        .cta-title { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; margin-bottom: 1.5rem; }
+        .cta-text { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .cta-button { display: inline-flex; align-items: center; gap: 1rem; padding: 1.5rem 3rem; background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); color: white; font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; text-decoration: none; border-radius: 100px; transition: all 0.3s; }
+        .cta-button:hover { transform: scale(1.05); box-shadow: 0 20px 40px var(--shadow-glow); }
+        
+        .footer { padding: 4rem; border-top: 1px solid var(--glass-border); position: relative; z-index: 1; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
+        .footer-logo { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .footer-links { display: flex; gap: 2rem; list-style: none; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; transition: color 0.3s; }
+        .footer-links a:hover { color: var(--accent-cyan); }
+        .footer-copy { color: var(--text-secondary); font-size: 0.9rem; }
+        
+        .page-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s, visibility 0.5s; }
+        .page-loader.hidden { opacity: 0; visibility: hidden; }
+        .loader-crystal { width: 60px; height: 60px; animation: loader-spin 2s linear infinite; }
+        @keyframes loader-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        @media (max-width: 1024px) {
+            .hero { grid-template-columns: 1fr; padding: 6rem 2rem; text-align: center; }
+            .hero-content, .hero-3d-container { transform: none; }
+            .hero-3d-container { height: 400px; margin-bottom: 3rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .feature-card:nth-child(2), .feature-card:nth-child(3) { transform: none; }
+            .showcase-grid { grid-template-columns: 1fr; }
+            .showcase-item { grid-column: 1 / -1 !important; transform: none !important; }
+            .stats-container { flex-direction: column; gap: 3rem; }
+            .cta-section { transform: none; }
+            .main-nav { left: 1rem; right: 1rem; top: 1rem; transform: none; }
+            .nav-links { display: none; }
+            .theme-toggle { top: 1rem; right: 1rem; }
+            .footer-content { flex-direction: column; gap: 2rem; text-align: center; }
+        }
+        @media (max-width: 640px) {
+            .hero { padding: 5rem 1.5rem; }
+            .features, .showcase, .stats, .cta-section { padding: 5rem 1.5rem; }
+            .cta-container { padding: 3rem 1.5rem; }
+            .footer { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- SVG Filters -->
+    <svg class="visually-hidden">
+        <defs>
+            <filter id="liquid-filter">
+                <feTurbulence type="turbulence" baseFrequency="0.01" numOctaves="3" result="noise" seed="458317007"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5"/>
+            </filter>
+        </defs>
+    </svg>
+    
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <svg class="loader-crystal" viewBox="0 0 100 100">
+            <polygon points="50,10 90,35 90,75 50,95 10,75 10,35" fill="none" stroke="url(#gradient)" stroke-width="2"/>
+            <polygon points="50,10 90,35 50,55 10,35" fill="rgba(168,85,247,0.2)"/>
+            <polygon points="10,35 50,55 50,95 10,75" fill="rgba(6,182,212,0.2)"/>
+            <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#a855f7"/>
+                    <stop offset="50%" style="stop-color:#06b6d4"/>
+                    <stop offset="100%" style="stop-color:#ec4899"/>
+                </linearGradient>
+            </defs>
+        </svg>
+    </div>
+    
+    <!-- Particle Canvas -->
+    <canvas class="particle-canvas" id="particleCanvas"></canvas>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+    </button>
+    
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-logo">CRYSTAL LABS</div>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#showcase">Work</a></li>
+            <li><a href="#stats">Stats</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-label">Award-Winning Agency</span>
+            <h1 class="hero-headline">
+                <span class="scramble-text" data-text="We Craft">We Craft</span>
+                <span class="scramble-text accent" data-text="Digital">Digital</span>
+                <span class="scramble-text" data-text="Experiences">Experiences</span>
+            </h1>
+            <p class="hero-subtext">Pushing the boundaries of web design with cutting-edge 3D visuals, immersive animations, and bold creative direction that transforms brands into unforgettable digital destinations.</p>
+            <a href="#contact" class="hero-cta">
+                <span>Start Your Project</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+        <div class="hero-3d-container">
+            <canvas id="crystal-canvas"></canvas>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="features-grid">
+            <article class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 48 48">
+                        <path d="M24 4L4 14v20l20 10 20-10V14L24 4z"/>
+                        <path d="M4 14l20 10 20-10"/>
+                        <path d="M24 44V24"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">3D Visualization</h3>
+                <p class="feature-text">Immersive three-dimensional experiences that captivate audiences and elevate your brand presence with cutting-edge WebGL technology.</p>
+            </article>
+            <article class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 48 48">
+                        <circle cx="24" cy="24" r="18"/>
+                        <path d="M24 12v12l8 8"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Motion Design</h3>
+                <p class="feature-text">Fluid animations and micro-interactions that guide users through your digital ecosystem with purposeful, delightful motion.</p>
+            </article>
+            <article class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 48 48">
+                        <path d="M12 12h24v24H12z"/>
+                        <path d="M12 12l24 24M36 12L12 36"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Brand Strategy</h3>
+                <p class="feature-text">Comprehensive brand systems that communicate your unique value proposition through cohesive visual language and strategic positioning.</p>
+            </article>
+        </div>
+    </section>
+    
+    <!-- Showcase Section -->
+    <section class="showcase" id="showcase">
+        <div class="showcase-header">
+            <h2 class="showcase-title">Selected Work</h2>
+            <p class="showcase-subtitle">Breaking conventions, setting trends</p>
+        </div>
+        <div class="showcase-grid">
+            <div class="showcase-item">
+                <img class="showcase-image" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80" alt="Abstract 3D Art">
+                <div class="showcase-overlay"><h3 class="showcase-item-title">Nexus Platform</h3></div>
+            </div>
+            <div class="showcase-item">
+                <img class="showcase-image" src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80" alt="Cyberpunk City">
+                <div class="showcase-overlay"><h3 class="showcase-item-title">Quantum UI</h3></div>
+            </div>
+            <div class="showcase-item">
+                <img class="showcase-image" src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=800&q=80" alt="Geometric Design">
+                <div class="showcase-overlay"><h3 class="showcase-item-title">Prism Identity</h3></div>
+            </div>
+            <div class="showcase-item">
+                <img class="showcase-image" src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80" alt="Retro Tech">
+                <div class="showcase-overlay"><h3 class="showcase-item-title">Vaporwave Studios</h3></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="stats" id="stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-number" data-target="150">0</div>
+                <div class="stat-label">Projects Delivered</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="47">0</div>
+                <div class="stat-label">Awards Won</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="12">0</div>
+                <div class="stat-label">Years Experience</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="98">0</div>
+                <div class="stat-label">Client Satisfaction</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section" id="contact">
+        <div class="cta-container">
+            <h2 class="cta-title">Ready to Create Something Extraordinary?</h2>
+            <p class="cta-text">Let's collaborate on your next project. We're ready to push creative boundaries and deliver an experience that sets you apart from the competition.</p>
+            <a href="mailto:hello@crystallabs.com" class="cta-button">
+                <span>Get In Touch</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">CRYSTAL LABS</div>
+            <ul class="footer-links">
+                <li><a href="#">Twitter</a></li>
+                <li><a href="#">Instagram</a></li>
+                <li><a href="#">Dribbble</a></li>
+                <li><a href="#">LinkedIn</a></li>
+            </ul>
+            <p class="footer-copy">2026 Crystal Labs. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', savedTheme);
+        
+        // Text Scramble Effect
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\\\/[]{}—=+*^?#________';
+                this.update = this.update.bind(this);
+            }
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise((resolve) => this.resolve = resolve);
+                this.queue = [];
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end });
+                }
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+            update() {
+                let output = '';
+                let complete = 0;
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.chars[Math.floor(Math.random() * this.chars.length)];
+                            this.queue[i].char = char;
+                        }
+                        output += char;
+                    } else {
+                        output += from;
+                    }
+                }
+                this.el.innerHTML = output;
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+        }
+        
+        // Particle Network
+        class ParticleNetwork {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.mouse = { x: null, y: null };
+                this.particleCount = window.innerWidth < 768 ? 25 : 50;
+                this.connectionDistance = 150;
+                this.init();
+                this.bindEvents();
+                this.animate();
+            }
+            init() {
+                this.resize();
+                this.createParticles();
+            }
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            createParticles() {
+                this.particles = [];
+                for (let i = 0; i < this.particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        radius: Math.random() * 2 + 1
+                    });
+                }
+            }
+            bindEvents() {
+                window.addEventListener('resize', () => this.resize());
+                window.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.clientX;
+                    this.mouse.y = e.clientY;
+                });
+            }
+            drawConnections() {
+                const isDark = html.getAttribute('data-theme') !== 'light';
+                const color = isDark ? '255, 255, 255' : '100, 100, 150';
+                for (let i = 0; i < this.particles.length; i++) {
+                    for (let j = i + 1; j < this.particles.length; j++) {
+                        const dx = this.particles[i].x - this.particles[j].x;
+                        const dy = this.particles[i].y - this.particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < this.connectionDistance) {
+                            const opacity = (1 - distance / this.connectionDistance) * 0.3;
+                            this.ctx.beginPath();
+                            this.ctx.strokeStyle = `rgba(${color}, ${opacity})`;
+                            this.ctx.lineWidth = 0.5;
+                            this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
+                            this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
+                            this.ctx.stroke();
+                        }
+                    }
+                    if (this.mouse.x && this.mouse.y) {
+                        const dx = this.particles[i].x - this.mouse.x;
+                        const dy = this.particles[i].y - this.mouse.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < this.connectionDistance * 1.5) {
+                            const opacity = (1 - distance / (this.connectionDistance * 1.5)) * 0.5;
+                            this.ctx.beginPath();
+                            this.ctx.strokeStyle = `rgba(${isDark ? '168, 85, 247' : '124, 58, 237'}, ${opacity})`;
+                            this.ctx.lineWidth = 0.8;
+                            this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
+                            this.ctx.lineTo(this.mouse.x, this.mouse.y);
+                            this.ctx.stroke();
+                        }
+                    }
+                }
+            }
+            updateParticles() {
+                this.particles.forEach(particle => {
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    if (particle.x < 0 || particle.x > this.canvas.width) particle.vx *= -1;
+                    if (particle.y < 0 || particle.y > this.canvas.height) particle.vy *= -1;
+                    if (this.mouse.x && this.mouse.y) {
+                        const dx = particle.x - this.mouse.x;
+                        const dy = particle.y - this.mouse.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < 100) {
+                            const force = (100 - distance) / 100;
+                            particle.vx += (dx / distance) * force * 0.5;
+                            particle.vy += (dy / distance) * force * 0.5;
+                        }
+                    }
+                    const speed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+                    if (speed > 2) {
+                        particle.vx = (particle.vx / speed) * 2;
+                        particle.vy = (particle.vy / speed) * 2;
+                    }
+                });
+            }
+            drawParticles() {
+                const isDark = html.getAttribute('data-theme') !== 'light';
+                const color = isDark ? '255, 255, 255' : '100, 100, 150';
+                this.particles.forEach(particle => {
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                    this.ctx.fillStyle = `rgba(${color}, 0.8)`;
+                    this.ctx.fill();
+                });
+            }
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.updateParticles();
+                this.drawConnections();
+                this.drawParticles();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        
+        // Three.js Crystal
+        class Crystal3D {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.crystal = null;
+                this.lights = [];
+                this.mouse = { x: 0, y: 0 };
+                this.targetRotation = { x: 0, y: 0 };
+                this.init();
+                this.bindEvents();
+                this.animate();
+            }
+            init() {
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(45, this.canvas.offsetWidth / this.canvas.offsetHeight, 0.1, 1000);
+                this.camera.position.z = 5;
+                this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, alpha: true, antialias: true });
+                this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                const geometry = new THREE.IcosahedronGeometry(1.5, 0);
+                const material = new THREE.MeshPhysicalMaterial({
+                    color: 0xa855f7, metalness: 0.1, roughness: 0.1, transmission: 0.6,
+                    thickness: 0.5, clearcoat: 1, clearcoatRoughness: 0.1, transparent: true, opacity: 0.9
+                });
+                this.crystal = new THREE.Mesh(geometry, material);
+                this.scene.add(this.crystal);
+                const wireframeGeometry = new THREE.IcosahedronGeometry(1.52, 0);
+                const wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0x06b6d4, wireframe: true, transparent: true, opacity: 0.3 });
+                this.wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+                this.scene.add(this.wireframe);
+                const coreGeometry = new THREE.IcosahedronGeometry(0.8, 0);
+                const coreMaterial = new THREE.MeshBasicMaterial({ color: 0xec4899, transparent: true, opacity: 0.6 });
+                this.core = new THREE.Mesh(coreGeometry, coreMaterial);
+                this.scene.add(this.core);
+                const light1 = new THREE.PointLight(0xa855f7, 2, 10);
+                light1.position.set(3, 3, 3);
+                this.scene.add(light1);
+                this.lights.push(light1);
+                const light2 = new THREE.PointLight(0x06b6d4, 2, 10);
+                light2.position.set(-3, -3, 3);
+                this.scene.add(light2);
+                this.lights.push(light2);
+                const light3 = new THREE.PointLight(0xec4899, 1.5, 10);
+                light3.position.set(0, 3, -3);
+                this.scene.add(light3);
+                this.lights.push(light3);
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+                this.scene.add(ambientLight);
+            }
+            bindEvents() {
+                window.addEventListener('resize', () => this.onResize());
+                window.addEventListener('mousemove', (e) => this.onMouseMove(e));
+            }
+            onResize() {
+                if (!this.canvas.offsetWidth || !this.canvas.offsetHeight) return;
+                this.camera.aspect = this.canvas.offsetWidth / this.canvas.offsetHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
+            }
+            onMouseMove(e) {
+                this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                this.targetRotation.x = this.mouse.y * 0.5;
+                this.targetRotation.y = this.mouse.x * 0.5;
+            }
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                if (!this.crystal) return;
+                this.crystal.rotation.y += 0.005;
+                this.crystal.rotation.x += 0.003;
+                this.wireframe.rotation.y -= 0.003;
+                this.wireframe.rotation.x -= 0.002;
+                const time = Date.now() * 0.001;
+                this.core.scale.setScalar(1 + Math.sin(time * 2) * 0.1);
+                this.core.rotation.y += 0.01;
+                this.crystal.rotation.x += (this.targetRotation.x - this.crystal.rotation.x * 0.5) * 0.05;
+                this.crystal.rotation.y += (this.targetRotation.y - this.crystal.rotation.y * 0.5) * 0.05;
+                this.lights.forEach((light, i) => {
+                    const offset = i * Math.PI * 0.67;
+                    light.position.x = Math.sin(time + offset) * 4;
+                    light.position.z = Math.cos(time + offset) * 4;
+                });
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+        
+        // Initialize
+        gsap.registerPlugin(ScrollTrigger);
+        
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('pageLoader');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                const scrambleElements = document.querySelectorAll('.scramble-text');
+                scrambleElements.forEach((el, i) => {
+                    const fx = new TextScramble(el);
+                    setTimeout(() => {
+                        gsap.to(el, {
+                            opacity: 1, y: 0, duration: 0.8, ease: 'expo.out',
+                            onStart: () => { fx.setText(el.getAttribute('data-text')); }
+                        });
+                    }, i * 200);
+                });
+                gsap.to('.hero-label', { opacity: 1, x: 0, duration: 0.8, delay: 0.5, ease: 'expo.out' });
+                gsap.to('.hero-subtext', { opacity: 1, y: 0, duration: 0.8, delay: 0.8, ease: 'expo.out' });
+                gsap.to('.hero-cta', { opacity: 1, y: 0, duration: 0.8, delay: 1, ease: 'expo.out' });
+            }, 1000);
+        });
+        
+        new ParticleNetwork(document.getElementById('particleCanvas'));
+        new Crystal3D(document.getElementById('crystal-canvas'));
+        
+        gsap.utils.toArray('.feature-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: { trigger: card, start: 'top 80%', toggleActions: 'play none none reverse' },
+                opacity: 0, y: 100, rotation: i % 2 === 0 ? -10 : 10, duration: 1, delay: i * 0.1, ease: 'expo.out'
+            });
+        });
+        
+        gsap.utils.toArray('.showcase-item').forEach((item, i) => {
+            gsap.from(item, {
+                scrollTrigger: { trigger: item, start: 'top 85%', toggleActions: 'play none none reverse' },
+                opacity: 0, scale: 0.8, rotation: i % 2 === 0 ? -15 : 15, duration: 1, delay: i * 0.15, ease: 'expo.out'
+            });
+        });
+        
+        gsap.utils.toArray('.stat-item').forEach((item, i) => {
+            gsap.from(item, {
+                scrollTrigger: { trigger: item, start: 'top 85%', toggleActions: 'play none none reverse' },
+                opacity: 0, y: 50, duration: 0.8, delay: i * 0.1, ease: 'expo.out'
+            });
+            const numberEl = item.querySelector('.stat-number');
+            const target = parseInt(numberEl.getAttribute('data-target'));
+            gsap.to(numberEl, {
+                scrollTrigger: { trigger: item, start: 'top 85%', toggleActions: 'play none none reverse' },
+                innerText: target, duration: 2, delay: i * 0.1, ease: 'power2.out',
+                snap: { innerText: 1 },
+                onUpdate: function() {
+                    numberEl.innerText = Math.round(this.targets()[0].innerText);
+                }
+            });
+        });
+        
+        gsap.from('.cta-container', {
+            scrollTrigger: { trigger: '.cta-section', start: 'top 80%', toggleActions: 'play none none reverse' },
+            opacity: 0, y: 100, scale: 0.9, duration: 1, ease: 'expo.out'
+        });
+    </script>
+</body>
+</html>

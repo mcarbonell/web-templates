@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura & Loom | Curated Boutique & Gift Shop</title>
+    <meta name="description"
+        content="Aura & Loom - A unique boutique experience with handpicked gifts and organic aesthetics. Seed ID: 514443234">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- External Libraries (GSAP) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- 
+    DESIGN CHOICES (Seed: 514443234)
+    -----------------------------
+    1. Business: Boutique & Gift Shop (Retail)
+    2. Style: Fluid & Organic with Sharp Diagonal Accents
+    3. Hero: Asymmetric Floating Grid
+    4. Special Feature: SVG Morphing Blobs & Kinetic Background
+    5. Animation: Elastic Soft Spring Transitions (Speed: 0.60x)
+    6. Density: Minimalist (Large whitespace, curated impact)
+    7. Palette: HSL(342, 70%, 50%) - Vibrant Coral/Berry
+    8. Theme: Native Light/Dark Toggle with CSS Variables
+    -->
+
+    <style>
+        :root {
+            /* Palette: Vibrant Coral/Berry (Seed-based) */
+            --hue: 342;
+            --primary: hsl(var(--hue), 70%, 55%);
+            --primary-dark: hsl(var(--hue), 70%, 40%);
+            --accent: hsl(var(--hue), 90%, 70%);
+
+            /* Light Theme Defaults */
+            --bg: hsl(var(--hue), 20%, 98%);
+            --text: hsl(var(--hue), 20%, 10%);
+            --text-muted: hsl(var(--hue), 10%, 40%);
+            --surface: hsl(var(--hue), 20%, 94%);
+            --border: hsla(var(--hue), 20%, 10%, 0.1);
+            --glass: rgba(255, 255, 255, 0.7);
+
+            /* Shapes & Spacing */
+            --radius-main: 24px;
+            --gap-large: 80px;
+            --container: 1200px;
+
+            --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: hsl(var(--hue), 20%, 4%);
+            --text: hsl(var(--hue), 10%, 95%);
+            --text-muted: hsl(var(--hue), 10%, 70%);
+            --surface: hsl(var(--hue), 15%, 10%);
+            --border: hsla(var(--hue), 20%, 100%, 0.1);
+            --glass: rgba(10, 5, 7, 0.7);
+        }
+
+        /* Basic Resets & Accessibility */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            z-index: 9999;
+            text-decoration: none;
+            transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+            outline: 2px solid var(--text);
+        }
+
+        /* Interactive Elements Focus States */
+        a,
+        button,
+        [role="button"] {
+            outline: transparent solid 2px;
+            outline-offset: 4px;
+            transition: outline 0.2s, background 0.2s, transform 0.2s;
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline-color: var(--primary);
+        }
+
+        /* Layout Utilities */
+        main {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: var(--gap-large) 0;
+            position: relative;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: var(--glass);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Hero Section - Asymmetric Floating Grid */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            padding-top: 100px;
+        }
+
+        .hero-content {
+            z-index: 2;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-content h1 span {
+            color: var(--primary);
+            display: block;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 450px;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-visual {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            height: 600px;
+        }
+
+        .hero-image {
+            background: var(--surface);
+            border-radius: var(--radius-main);
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.6s var(--transition-bounce);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(20%);
+            transition: scale 0.8s var(--transition-smooth);
+        }
+
+        .hero-image:hover img {
+            scale: 1.1;
+        }
+
+        .img-1 {
+            grid-area: 1 / 1 / 5 / 5;
+        }
+
+        .img-2 {
+            grid-area: 3 / 4 / 7 / 7;
+            z-index: 1;
+            transform: translate(10%, 10%);
+        }
+
+        .blob-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            width: 150%;
+            height: 150%;
+            pointer-events: none;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 1.2rem 2.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-main);
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-bounce);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px hsla(var(--hue), 70%, 55%, 0.3);
+            background: var(--primary-dark);
+        }
+
+        /* Collections Section */
+        .section-tag {
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .grid-collections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-main);
+            padding: 1rem;
+            border: 1px solid var(--border);
+            transition: transform 0.6s var(--transition-bounce), box-shadow 0.6s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-15px) rotate(1deg);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-img {
+            height: 350px;
+            border-radius: calc(var(--radius-main) - 10px);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            background: #eee;
+        }
+
+        .card-img svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Diagonal Accents */
+        .diagonal-accent {
+            position: absolute;
+            width: 100%;
+            height: 200px;
+            background: var(--primary);
+            clip-path: polygon(0 40%, 100% 0, 100% 60%, 0 100%);
+            opacity: 0.05;
+            z-index: -1;
+        }
+
+        /* About / Process Section */
+        .process-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .process-list {
+            list-style: none;
+            counter-reset: process;
+        }
+
+        .process-item {
+            margin-bottom: 3rem;
+            position: relative;
+            padding-left: 4rem;
+        }
+
+        .process-item::before {
+            counter-increment: process;
+            content: counter(process);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            transform: rotate(-10deg);
+        }
+
+        /* Pricing / Subscriptions */
+        .pricing {
+            background: var(--surface);
+            border-radius: calc(var(--radius-main) * 2);
+            padding: 5rem 3rem;
+            text-align: center;
+        }
+
+        .pricing-grid {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 4rem;
+        }
+
+        .tier {
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+            background: var(--bg);
+            padding: 3rem 2rem;
+            border-radius: var(--radius-main);
+            border: 2px solid var(--border);
+            transition: border-color 0.3s;
+        }
+
+        .tier.popular {
+            border-color: var(--primary);
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            margin: 1.5rem 0;
+        }
+
+        .price span {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-socials {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .footer-socials a {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .footer-socials a:hover {
+            color: var(--primary);
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 968px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding-top: 120px;
+            }
+
+            .hero-content p {
+                margin: 0 auto 2.5rem;
+            }
+
+            .hero-visual {
+                height: 400px;
+                margin-top: 4rem;
+            }
+
+            .process-split {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header role="banner">
+        <a href="#" class="brand" aria-label="Aura and Loom Home">AURA & LOOM</a>
+        <nav role="navigation" aria-label="Main Navigation">
+            <ul role="list">
+                <li role="listitem"><a href="#collections">Collections</a></li>
+                <li role="listitem"><a href="#about">Our Essence</a></li>
+                <li role="listitem"><a href="#boxes">Gift Boxes</a></li>
+                <li role="listitem"><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <button class="theme-toggle" id="theme-toggle" aria-live="polite" aria-label="Toggle dark mode">
+            <span class="icon">🌙</span>
+            <span class="text">DARK</span>
+        </button>
+    </header>
+
+    <main id="main-content" role="main">
+
+        <!-- Hero Section -->
+        <section class="hero" role="region" aria-labelledby="hero-heading">
+            <div class="blob-bg">
+                <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <clipPath id="blob-clip">
+                            <path id="blob-path"
+                                d="M850,500Q800,750,550,800Q300,850,200,600Q100,350,300,200Q500,50,700,200Q900,250,850,500Z" />
+                        </clipPath>
+                    </defs>
+                    <path fill="var(--primary)" opacity="0.1"
+                        d="M850,500Q800,750,550,800Q300,850,200,600Q100,350,300,200Q500,50,700,200Q900,250,850,500Z">
+                        <animate attributeName="d" dur="10s" repeatCount="indefinite"
+                            values="M850,500Q800,750,550,800Q300,850,200,600Q100,350,300,200Q500,50,700,200Q900,250,850,500Z;
+                                    M820,530Q780,720,520,780Q260,840,180,580Q100,320,320,180Q540,40,740,180Q940,320,820,530Z;
+                                    M850,500Q800,750,550,800Q300,850,200,600Q100,350,300,200Q500,50,700,200Q900,250,850,500Z" />
+                    </path>
+                </svg>
+            </div>
+
+            <div class="hero-content">
+                <span class="section-tag" data-reveal>Est. 2024</span>
+                <h1 id="hero-heading" data-reveal>Curated <span>Elegance.</span></h1>
+                <p data-reveal>Discover handpicked treasures that tell a story. From artisanal ceramics to organic
+                    linens, we bring the soul of the craft to your home.</p>
+                <div class="hero-btns" data-reveal>
+                    <a href="#collections" class="btn">Explore Boutique</a>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-image img-1" data-parallax="0.1">
+                    <svg viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="500" fill="var(--surface)" />
+                        <circle cx="200" cy="200" r="120" stroke="var(--primary)" stroke-width="2" opacity="0.2" />
+                        <path d="M50 400 L350 100" stroke="var(--primary)" stroke-width="1" opacity="0.3" />
+                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="var(--text-muted)"
+                            font-family="Outfit" font-size="20">ARTISANAL</text>
+                    </svg>
+                </div>
+                <div class="hero-image img-2" data-parallax="0.2">
+                    <svg viewBox="0 0 300 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="300" height="400" fill="var(--primary)" opacity="0.1" />
+                        <rect x="50" y="50" width="200" height="300" stroke="var(--primary)" stroke-width="2" />
+                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="var(--primary)"
+                            font-family="Outfit" font-size="20">BOUTIQUE</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Collections / Work Section -->
+        <section id="collections" role="region" aria-labelledby="collections-heading">
+            <div class="diagonal-accent"></div>
+            <span class="section-tag">New Arrivals</span>
+            <h2 id="collections-heading">Seasonal Collections</h2>
+
+            <div class="grid-collections">
+                <article class="card" role="article">
+                    <div class="card-img">
+                        <svg width="100%" height="100%" viewBox="0 0 300 400">
+                            <rect width="300" height="400" fill="var(--primary)" opacity="0.05" />
+                            <path d="M50 350 Q150 50 250 350" stroke="var(--primary)" stroke-width="2" fill="none" />
+                            <circle cx="150" cy="150" r="30" fill="var(--primary)" opacity="0.2" />
+                        </svg>
+                    </div>
+                    <span class="section-tag" style="font-size: 0.6rem;">Handmade</span>
+                    <h3>The Clay Series</h3>
+                    <p>Wabi-sabi inspired ceramics for the modern minimalist home.</p>
+                </article>
+
+                <article class="card" role="article">
+                    <div class="card-img">
+                        <svg width="100%" height="100%" viewBox="0 0 300 400">
+                            <rect width="300" height="400" fill="var(--primary)" opacity="0.05" />
+                            <rect x="50" y="100" width="200" height="200" stroke="var(--primary)" stroke-width="1"
+                                stroke-dasharray="10 5" fill="none" />
+                            <path d="M100 150 L200 250 M100 250 L200 150" stroke="var(--primary)" stroke-width="1" />
+                        </svg>
+                    </div>
+                    <span class="section-tag" style="font-size: 0.6rem;">Soft Goods</span>
+                    <h3>Loom & Linen</h3>
+                    <p>Ethically sourced textiles that breathe life into any space.</p>
+                </article>
+
+                <article class="card" role="article">
+                    <div class="card-img">
+                        <svg width="100%" height="100%" viewBox="0 0 300 400">
+                            <rect width="300" height="400" fill="var(--primary)" opacity="0.05" />
+                            <path d="M150 100 L150 300 M100 200 L200 200" stroke="var(--primary)" stroke-width="2" />
+                            <circle cx="150" cy="200" r="80" stroke="var(--primary)" stroke-width="1" fill="none" />
+                        </svg>
+                    </div>
+                    <span class="section-tag" style="font-size: 0.6rem;">Limited</span>
+                    <h3>Found Objects</h3>
+                    <p>One-of-a-kind treasures unearthed from across the globe.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- About / Process Section -->
+        <section id="about" role="region" aria-labelledby="about-heading">
+            <div class="process-split">
+                <div class="process-text">
+                    <span class="section-tag">Our Philosophy</span>
+                    <h2 id="about-heading" style="margin-bottom: 2rem;">Beyond the Gift</h2>
+                    <ul class="process-list" role="list">
+                        <li class="process-item" role="listitem">
+                            <h3>Curated Intent</h3>
+                            <p>We don't sell products; we select experiences. Every item is chosen for its ability to
+                                spark joy and connection.</p>
+                        </li>
+                        <li class="process-item" role="listitem">
+                            <h3>Sustainable Roots</h3>
+                            <p>We partner with local artisans who respect the earth. 90% of our catalogue is
+                                plastic-free and recycled.</p>
+                        </li>
+                        <li class="process-item" role="listitem">
+                            <h3>Artisan Network</h3>
+                            <p>Direct support for makers. We ensure fair wages and celebrate the hands that build your
+                                home.</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="process-visual">
+                    <div
+                        style="background: var(--surface); height: 500px; border-radius: var(--radius-main); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                        <svg width="100%" height="100%" viewBox="0 0 400 500">
+                            <path d="M0 0 L400 500 M400 0 L0 500" stroke="var(--primary)" opacity="0.1"
+                                stroke-width="50" />
+                            <text x="50%" y="50%" text-anchor="middle" fill="var(--primary)" font-family="Outfit"
+                                font-size="120" opacity="0.05" font-weight="900">AURA</text>
+                        </svg>
+                        <div
+                            style="position: absolute; bottom: 40px; right: -20px; width: 300px; height: 300px; background: var(--accent); border-radius: 50%; opacity: 0.1; filter: blur(50px);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing / Gift Boxes -->
+        <section id="boxes" role="region" aria-labelledby="boxes-heading">
+            <div class="pricing">
+                <span class="section-tag">Gifting Made Easy</span>
+                <h2 id="boxes-heading">Curated Gift Boxes</h2>
+                <p style="color: var(--text-muted); max-width: 600px; margin: 1rem auto;">Surprise them with a themed
+                    selection of our finest boutique items.</p>
+
+                <div class="pricing-grid">
+                    <article class="tier" role="article">
+                        <h3>The Essential</h3>
+                        <p>3 Handpicked Items</p>
+                        <div class="price">$45<span> / box</span></div>
+                        <ul style="list-style: none; margin-bottom: 2rem; color: var(--text-muted);" role="list">
+                            <li role="listitem">Custom Greeting</li>
+                            <li role="listitem">Eco-friendly Box</li>
+                            <li role="listitem">Standard Shipping</li>
+                        </ul>
+                        <button class="btn" style="width: 100%; border-radius: 12px; height: 50px;">Order Now</button>
+                    </article>
+
+                    <article class="tier popular" role="article">
+                        <span class="section-tag"
+                            style="background: var(--primary); color: white; border-radius: 50px; padding: 0.2rem 1rem; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);">Most
+                            Loved</span>
+                        <h3>The Curator</h3>
+                        <p>6 Premium Items</p>
+                        <div class="price">$85<span> / box</span></div>
+                        <ul style="list-style: none; margin-bottom: 2rem; color: var(--text-muted);" role="list">
+                            <li role="listitem">Everything in Essential</li>
+                            <li role="listitem">Artisanal Candle</li>
+                            <li role="listitem">Priority Delivery</li>
+                        </ul>
+                        <button class="btn" style="width: 100%; border-radius: 12px; height: 50px;">Order Now</button>
+                    </article>
+
+                    <article class="tier" role="article">
+                        <h3>The Heirloom</h3>
+                        <p>10 Luxury Items</p>
+                        <div class="price">$150<span> / box</span></div>
+                        <ul style="list-style: none; margin-bottom: 2rem; color: var(--text-muted);" role="list">
+                            <li role="listitem">Custom Ceramics</li>
+                            <li role="listitem">Linen Tableware</li>
+                            <li role="listitem">Personal Gifting Concierge</li>
+                        </ul>
+                        <button class="btn" style="width: 100%; border-radius: 12px; height: 50px;">Order Now</button>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" role="region" aria-labelledby="contact-heading">
+            <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+                <span class="section-tag">Say Hello</span>
+                <h2 id="contact-heading">Visit Our Studio</h2>
+                <div
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; text-align: left;">
+                    <div>
+                        <h3 style="margin-bottom: 1rem;">Location</h3>
+                        <p>420 Artisanal Way<br>Bloom District, 90210</p>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 1rem;">Hours</h3>
+                        <ul style="list-style: none; color: var(--text-muted);" role="list">
+                            <li role="listitem">Mon-Fri: 10:00 - 18:00</li>
+                            <li role="listitem">Sat: 11:00 - 16:00</li>
+                        </ul>
+                    </div>
+                </div>
+                <form style="margin-top: 4rem; display: grid; gap: 1rem;" aria-label="Contact Form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <input type="text" placeholder="Name" aria-label="Your Name"
+                            style="padding: 1rem; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text);">
+                        <input type="email" placeholder="Email" aria-label="Your Email"
+                            style="padding: 1rem; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text);">
+                    </div>
+                    <textarea placeholder="How can we help?" aria-label="Your Message"
+                        style="padding: 1rem; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); min-height: 150px;"></textarea>
+                    <button type="submit" class="btn" style="justify-content: center;">Send Message</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <footer role="contentinfo">
+        <div class="brand">AURA & LOOM</div>
+        <p style="margin: 1rem 0; color: var(--text-muted);">Crafting meaningful surroundings since 2024.</p>
+        <div class="footer-socials">
+            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="Pinterest">PT</a>
+            <a href="#" aria-label="Facebook">FB</a>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+            &copy; 2024 Aura & Loom. Seed ID: 514443234. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const themeBtn = document.getElementById('theme-toggle');
+        const body = document.body;
+        const toggleIcon = themeBtn.querySelector('.icon');
+        const toggleText = themeBtn.querySelector('.text');
+
+        themeBtn.addEventListener('click', () => {
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            toggleIcon.textContent = isDark ? '🌙' : '☀️';
+            toggleText.textContent = isDark ? 'DARK' : 'LIGHT';
+
+            // Announce to screen readers
+            const message = `Theme changed to ${isDark ? 'light' : 'dark'} mode`;
+            const ariaLive = document.createElement('div');
+            ariaLive.setAttribute('aria-live', 'polite');
+            ariaLive.classList.add('sr-only');
+            ariaLive.textContent = message;
+            document.body.appendChild(ariaLive);
+            setTimeout(() => ariaLive.remove(), 1000);
+        });
+
+        // Animations with GSAP
+        document.addEventListener('DOMContentLoaded', () => {
+            // Register ScrollTrigger
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Hero reveals with Soft Spring (0.60x speed multiplier applied to durations)
+            const tl = gsap.timeline({ defaults: { ease: "elastic.out(1, 0.7)", duration: 1.2 * 0.6 } });
+
+            tl.from('[data-reveal]', {
+                y: 50,
+                opacity: 0,
+                stagger: 0.15,
+                delay: 0.5
+            });
+
+            tl.from('.hero-image', {
+                scale: 0.8,
+                opacity: 0,
+                stagger: 0.2,
+                duration: 1.5 * 0.6
+            }, "-=0.5");
+
+            // Parallax effect
+            document.querySelectorAll('[data-parallax]').forEach(el => {
+                const speed = el.getAttribute('data-parallax');
+                gsap.to(el, {
+                    yPercent: -20 * speed,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: true
+                    }
+                });
+            });
+
+            // Card reveals
+            gsap.from('.card', {
+                scrollTrigger: {
+                    trigger: '.grid-collections',
+                    start: "top 80%"
+                },
+                y: 60,
+                opacity: 0,
+                stagger: 0.1,
+                duration: 0.8 * 0.6,
+                ease: "power3.out"
+            });
+
+            // Blob animation speed
+            const blobPath = document.querySelector('#blob-path');
+            if (blobPath) {
+                // Inline SVG animation is already defined, but we could sync with JS if needed.
+            }
+        });
+    </script>
+</body>
+
+</html>

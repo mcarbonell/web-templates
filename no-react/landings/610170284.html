@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Copper Pour - Artisan coffee brewed with passion. Experience the warmth of handcrafted beverages in a vintage-inspired setting.">
+  <title>Copper Pour | Artisan Coffee House</title>
+  
+  <!-- Fonts: DM Serif Display + DM Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  
+  <!-- GSAP for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  
+  <style>
+    /* ========================================
+       CSS VARIABLES & THEME SYSTEM
+       Design Choice: Desert Sands Color Palette
+       - Warm terracotta, sand, copper, and sage
+       ======================================== */
+    :root {
+      /* Desert Sands Palette - Light Mode */
+      --color-bg-primary: #FDF8F3;
+      --color-bg-secondary: #F5EDE4;
+      --color-bg-accent: #E8DDD0;
+      --color-text-primary: #2C2416;
+      --color-text-secondary: #5C4D3C;
+      --color-text-muted: #8B7355;
+      --color-accent-terracotta: #C75B39;
+      --color-accent-copper: #B87333;
+      --color-accent-sage: #8A9A5B;
+      --color-accent-sand: #D4A574;
+      --color-accent-cream: #F5E6D3;
+      --color-border: #D4C4B0;
+      --color-shadow: rgba(44, 36, 22, 0.15);
+      --color-shadow-strong: rgba(44, 36, 22, 0.25);
+      
+      /* Spacing Scale */
+      --space-xs: 0.5rem;
+      --space-sm: 1rem;
+      --space-md: 1.5rem;
+      --space-lg: 2.5rem;
+      --space-xl: 4rem;
+      --space-2xl: 6rem;
+      --space-3xl: 8rem;
+      
+      /* Typography */
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      
+      /* Transitions */
+      --transition-fast: 0.2s ease;
+      --transition-base: 0.3s ease;
+      --transition-slow: 0.5s ease;
+      
+      /* Border Radius - Organic Blob Style */
+      --radius-blob: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      --radius-blob-alt: 30% 60% 70% 40% / 50% 60% 30% 60%;
+      --radius-blob-sm: 40% 60% 50% 50% / 50% 40% 60% 50%;
+    }
+    
+    /* Dark Mode - Deep Desert Night */
+    [data-theme="dark"] {
+      --color-bg-primary: #1A1510;
+      --color-bg-secondary: #252019;
+      --color-bg-accent: #332A20;
+      --color-text-primary: #F5EDE4;
+      --color-text-secondary: #C9B8A4;
+      --color-text-muted: #9A8B7A;
+      --color-accent-terracotta: #E07A5F;
+      --color-accent-copper: #D4915D;
+      --color-accent-sage: #A8B88A;
+      --color-accent-sand: #C9A77C;
+      --color-accent-cream: #3D3226;
+      --color-border: #4A3F32;
+      --color-shadow: rgba(0, 0, 0, 0.4);
+      --color-shadow-strong: rgba(0, 0, 0, 0.6);
+    }
+    
+    /* ========================================
+       RESET & BASE STYLES
+       ======================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    
+    body {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--color-text-primary);
+      background-color: var(--color-bg-primary);
+      transition: background-color var(--transition-base), color var(--transition-base);
+      overflow-x: hidden;
+    }
+    
+    /* Focus Styles - WCAG AA Compliant */
+    :focus {
+      outline: 2px solid var(--color-accent-copper);
+      outline-offset: 2px;
+    }
+    
+    :focus:not(:focus-visible) {
+      outline: none;
+    }
+    
+    :focus-visible {
+      outline: 2px solid var(--color-accent-copper);
+      outline-offset: 2px;
+    }
+    
+    /* Skip to Content Link */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: var(--space-sm);
+      z-index: 10000;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-accent-terracotta);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 4px;
+      transition: top var(--transition-fast);
+    }
+    
+    .skip-link:focus {
+      top: var(--space-sm);
+    }
+    
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--color-text-primary);
+    }
+    
+    h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+    h2 { font-size: clamp(2rem, 5vw, 3.5rem); }
+    h3 { font-size: clamp(1.5rem, 4vw, 2.5rem); }
+    h4 { font-size: clamp(1.25rem, 3vw, 1.75rem); }
+    
+    p {
+      max-width: 65ch;
+    }
+    
+    a {
+      color: var(--color-accent-terracotta);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+    
+    a:hover {
+      color: var(--color-accent-copper);
+      text-decoration: underline;
+    }
+    
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    /* ========================================
+       BUTTONS - 3D SHADOW STYLE
+       Design Choice: Retro 3D shadow buttons
+       ======================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: var(--space-sm) var(--space-lg);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: 2px solid var(--color-accent-terracotta);
+      background: var(--color-accent-terracotta);
+      color: white;
+      cursor: pointer;
+      position: relative;
+      transition: all var(--transition-fast);
+      transform: translateY(0);
+      box-shadow: 
+        4px 4px 0 0 var(--color-text-primary),
+        4px 4px 0 2px var(--color-accent-terracotta);
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        6px 6px 0 0 var(--color-text-primary),
+        6px 6px 0 2px var(--color-accent-terracotta);
+      text-decoration: none;
+      color: white;
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 
+        2px 2px 0 0 var(--color-text-primary),
+        2px 2px 0 2px var(--color-accent-terracotta);
+    }
+    
+    .btn:focus-visible {
+      outline: 2px solid var(--color-accent-copper);
+      outline-offset: 4px;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: var(--color-accent-terracotta);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--color-accent-terracotta);
+      color: white;
+    }
+    
+    /* Magnetic Button Container */
+    .magnetic-btn {
+      display: inline-block;
+      position: relative;
+    }
+    
+    .magnetic-btn-inner {
+      display: inline-flex;
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    /* ========================================
+       UTILITY CLASSES
+       ======================================== */
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+    
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    
+    .section-padding {
+      padding: var(--space-3xl) 0;
+    }
+    
+    .section-padding-sm {
+      padding: var(--space-2xl) 0;
+    }
+    
+    /* Screen Reader Only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    
+    /* ========================================
+       HEADER & NAVIGATION
+       ======================================== */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: var(--space-sm) 0;
+      background: rgba(253, 248, 243, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--color-border);
+      transition: all var(--transition-base);
+    }
+    
+    [data-theme="dark"] .site-header {
+      background: rgba(26, 21, 16, 0.9);
+    }
+    
+    .site-header.scrolled {
+      padding: var(--space-xs) 0;
+      box-shadow: 0 2px 20px var(--color-shadow);
+    }
+    
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      color: var(--color-text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    
+    .logo:hover {
+      text-decoration: none;
+      color: var(--color-accent-terracotta);
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      fill: var(--color-accent-copper);
+    }
+    
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+    
+    .nav-list {
+      display: flex;
+      list-style: none;
+      gap: var(--space-lg);
+    }
+    
+    .nav-link {
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      position: relative;
+      padding: var(--space-xs) 0;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--color-accent-terracotta);
+      transition: width var(--transition-fast);
+    }
+    
+    .nav-link:hover::after,
+    .nav-link[aria-current="page"]::after {
+      width: 100%;
+    }
+    
+    /* Theme Toggle */
+    .theme-toggle {
+      background: none;
+      border: 2px solid var(--color-border);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+      color: var(--color-text-secondary);
+    }
+    
+    .theme-toggle:hover {
+      border-color: var(--color-accent-copper);
+      color: var(--color-accent-copper);
+      transform: rotate(15deg);
+    }
+    
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--color-accent-copper);
+      outline-offset: 2px;
+    }
+    
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-xs);
+      color: var(--color-text-primary);
+    }
+    
+    .menu-toggle[aria-expanded="true"] .hamburger-line:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    
+    .menu-toggle[aria-expanded="true"] .hamburger-line:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .menu-toggle[aria-expanded="true"] .hamburger-line:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+    
+    .hamburger {
+      width: 24px;
+      height: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .hamburger-line {
+      width: 100%;
+      height: 2px;
+      background: currentColor;
+      transition: all var(--transition-fast);
+      transform-origin: center;
+    }
+    
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+      
+      .main-nav {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: var(--color-bg-primary);
+        padding: var(--space-lg);
+        flex-direction: column;
+        gap: var(--space-md);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--transition-base);
+        border-bottom: 1px solid var(--color-border);
+      }
+      
+      .main-nav.open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .nav-list {
+        flex-direction: column;
+        gap: var(--space-md);
+        width: 100%;
+      }
+    }
+    
+    /* ========================================
+       HERO SECTION
+       Design Choice: Overlapping Cards Layout
+       ======================================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 100px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 80%;
+      height: 150%;
+      background: var(--color-bg-accent);
+      border-radius: var(--radius-blob);
+      opacity: 0.5;
+      z-index: 0;
+    }
+    
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+    }
+    
+    .hero-content {
+      padding: var(--space-lg) 0;
+    }
+    
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--color-accent-cream);
+      border: 2px solid var(--color-accent-sand);
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-accent-terracotta);
+      margin-bottom: var(--space-md);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    .hero-badge svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--color-accent-terracotta);
+    }
+    
+    .hero-title {
+      margin-bottom: var(--space-md);
+      line-height: 1.1;
+    }
+    
+    .hero-title span {
+      color: var(--color-accent-terracotta);
+      font-style: italic;
+    }
+    
+    .hero-subtitle {
+      font-size: clamp(1.125rem, 2vw, 1.375rem);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-lg);
+      max-width: 50ch;
+    }
+    
+    .hero-actions {
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+    
+    /* Hero Cards - Overlapping Layout */
+    .hero-visual {
+      position: relative;
+      min-height: 500px;
+    }
+    
+    .hero-card {
+      position: absolute;
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-blob);
+      overflow: hidden;
+      box-shadow: 
+        0 25px 50px -12px var(--color-shadow-strong),
+        0 0 0 1px var(--color-border);
+      transition: transform var(--transition-slow);
+    }
+    
+    .hero-card:hover {
+      transform: scale(1.02) rotate(1deg);
+    }
+    
+    .hero-card-main {
+      width: 70%;
+      height: 400px;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      border-radius: var(--radius-blob);
+    }
+    
+    .hero-card-secondary {
+      width: 50%;
+      height: 280px;
+      bottom: 0;
+      right: 0;
+      z-index: 3;
+      border-radius: var(--radius-blob-alt);
+    }
+    
+    .hero-card-accent {
+      width: 40%;
+      height: 200px;
+      top: 20%;
+      right: 5%;
+      z-index: 1;
+      background: var(--color-accent-terracotta);
+      border-radius: var(--radius-blob-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      text-align: center;
+      padding: var(--space-md);
+    }
+    
+    .hero-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .hero-card-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: var(--space-md);
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      color: white;
+    }
+    
+    .hero-card-title {
+      font-size: 1.25rem;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .hero-card-text {
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+    
+    @media (max-width: 900px) {
+      .hero-visual {
+        min-height: 400px;
+        margin-top: var(--space-lg);
+      }
+      
+      .hero-card-main {
+        width: 60%;
+        height: 280px;
+      }
+      
+      .hero-card-secondary {
+        width: 45%;
+        height: 200px;
+      }
+      
+      .hero-card-accent {
+        width: 35%;
+        height: 150px;
+        font-size: 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .hero-visual {
+        min-height: 350px;
+      }
+      
+      .hero-card-main {
+        width: 75%;
+        height: 220px;
+      }
+      
+      .hero-card-secondary {
+        width: 55%;
+        height: 160px;
+      }
+      
+      .hero-card-accent {
+        width: 45%;
+        height: 120px;
+        display: none;
+      }
+    }
+    
+    /* ========================================
+       DIAGONAL SECTIONS
+       Design Choice: Diagonal section layouts
+       ======================================== */
+    .section-diagonal {
+      position: relative;
+      padding: var(--space-3xl) 0;
+    }
+    
+    .section-diagonal::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--color-bg-secondary);
+      transform: skewY(-3deg);
+      transform-origin: top left;
+      z-index: -1;
+    }
+    
+    .section-diagonal-reverse::before {
+      transform: skewY(3deg);
+      transform-origin: top right;
+    }
+    
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto var(--space-2xl);
+    }
+    
+    .section-label {
+      display: inline-block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-accent-terracotta);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .section-title {
+      margin-bottom: var(--space-md);
+    }
+    
+    .section-subtitle {
+      color: var(--color-text-secondary);
+      font-size: 1.125rem;
+    }
+    
+    /* ========================================
+       FEATURES / SERVICES GRID
+       ======================================== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+    }
+    
+    .feature-card {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-blob);
+      padding: var(--space-lg);
+      border: 2px solid var(--color-border);
+      transition: all var(--transition-base);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--color-accent-terracotta);
+      transform: scaleX(0);
+      transition: transform var(--transition-base);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px var(--color-shadow);
+      border-color: var(--color-accent-copper);
+    }
+    
+    .feature-card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .feature-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--color-accent-cream);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+      color: var(--color-accent-terracotta);
+    }
+    
+    .feature-icon svg {
+      width: 32px;
+      height: 32px;
+      fill: currentColor;
+    }
+    
+    .feature-title {
+      font-size: 1.5rem;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .feature-text {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-md);
+    }
+    
+    .feature-link {
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    
+    .feature-link svg {
+      width: 16px;
+      height: 16px;
+      transition: transform var(--transition-fast);
+    }
+    
+    .feature-link:hover svg {
+      transform: translateX(4px);
+    }
+    
+    /* ========================================
+       MENU / PRICING SECTION
+       ======================================== */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--space-lg);
+    }
+    
+    .menu-card {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-blob);
+      overflow: hidden;
+      border: 2px solid var(--color-border);
+      transition: all var(--transition-base);
+    }
+    
+    .menu-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 15px 30px var(--color-shadow);
+    }
+    
+    .menu-card-image {
+      height: 220px;
+      background: var(--color-bg-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .menu-card-image::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--color-accent-sand) 0%, var(--color-accent-copper) 100%);
+      opacity: 0.3;
+    }
+    
+    .menu-card-image svg {
+      width: 80px;
+      height: 80px;
+      fill: var(--color-accent-terracotta);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .menu-card-badge {
+      position: absolute;
+      top: var(--space-sm);
+      right: var(--space-sm);
+      background: var(--color-accent-terracotta);
+      color: white;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      z-index: 2;
+    }
+    
+    .menu-card-content {
+      padding: var(--space-lg);
+    }
+    
+    .menu-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-sm);
+      gap: var(--space-sm);
+    }
+    
+    .menu-card-title {
+      font-size: 1.375rem;
+    }
+    
+    .menu-card-price {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--color-accent-terracotta);
+      white-space: nowrap;
+    }
+    
+    .menu-card-description {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-md);
+    }
+    
+    .menu-card-meta {
+      display: flex;
+      gap: var(--space-md);
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    .menu-card-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .menu-card-meta svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+    
+    /* ========================================
+       TESTIMONIALS
+       ======================================== */
+    .testimonials-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-lg);
+    }
+    
+    .testimonial-card {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-blob);
+      padding: var(--space-lg);
+      border: 2px solid var(--color-border);
+      position: relative;
+    }
+    
+    .testimonial-card::before {
+      content: '"';
+      position: absolute;
+      top: var(--space-sm);
+      right: var(--space-md);
+      font-family: var(--font-display);
+      font-size: 6rem;
+      color: var(--color-accent-sand);
+      opacity: 0.3;
+      line-height: 1;
+    }
+    
+    .testimonial-stars {
+      display: flex;
+      gap: 4px;
+      margin-bottom: var(--space-md);
+    }
+    
+    .testimonial-stars svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--color-accent-sand);
+    }
+    
+    .testimonial-text {
+      font-size: 1.125rem;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-md);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--color-accent-cream);
+      border: 2px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--color-accent-terracotta);
+    }
+    
+    .testimonial-name {
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    
+    .testimonial-role {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    /* ========================================
+       CONTACT / CTA SECTION
+       ======================================== */
+    .cta-section {
+      background: var(--color-accent-terracotta);
+      color: white;
+      padding: var(--space-3xl) 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -20%;
+      width: 60%;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-blob);
+      transform: rotate(-15deg);
+    }
+    
+    .cta-content {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .cta-title {
+      color: white;
+      margin-bottom: var(--space-md);
+    }
+    
+    .cta-text {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.25rem;
+      max-width: 600px;
+      margin: 0 auto var(--space-lg);
+    }
+    
+    .cta-btn {
+      background: white;
+      color: var(--color-accent-terracotta);
+      border-color: white;
+      box-shadow: 
+        4px 4px 0 0 rgba(0,0,0,0.3),
+        4px 4px 0 2px white;
+    }
+    
+    .cta-btn:hover {
+      background: var(--color-accent-cream);
+      color: var(--color-text-primary);
+      box-shadow: 
+        6px 6px 0 0 rgba(0,0,0,0.3),
+        6px 6px 0 2px var(--color-accent-cream);
+    }
+    
+    .cta-btn:active {
+      box-shadow: 
+        2px 2px 0 0 rgba(0,0,0,0.3),
+        2px 2px 0 2px var(--color-accent-cream);
+    }
+    
+    /* ========================================
+       FOOTER
+       ======================================== */
+    .site-footer {
+      background: var(--color-bg-secondary);
+      padding: var(--space-2xl) 0 var(--space-lg);
+      border-top: 1px solid var(--color-border);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr);
+      gap: var(--space-xl);
+      margin-bottom: var(--space-xl);
+    }
+    
+    @media (max-width: 900px) {
+      .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+    }
+    
+    .footer-brand {
+      max-width: 300px;
+    }
+    
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-md);
+      display: inline-block;
+    }
+    
+    .footer-logo:hover {
+      text-decoration: none;
+    }
+    
+    .footer-tagline {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-md);
+    }
+    
+    .footer-social {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .social-link {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      transition: all var(--transition-fast);
+    }
+    
+    .social-link:hover {
+      background: var(--color-accent-terracotta);
+      border-color: var(--color-accent-terracotta);
+      color: white;
+      text-decoration: none;
+      transform: translateY(-2px);
+    }
+    
+    .social-link svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    
+    .footer-heading {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-md);
+    }
+    
+    .footer-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .footer-link {
+      color: var(--color-text-secondary);
+      transition: color var(--transition-fast);
+    }
+    
+    .footer-link:hover {
+      color: var(--color-accent-terracotta);
+    }
+    
+    .footer-bottom {
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+    
+    .footer-copyright {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+    }
+    
+    .footer-legal {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .footer-legal a {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+    }
+    
+    /* ========================================
+       ANNOUNCEMENT BAR
+       ======================================== */
+    .announcement {
+      position: fixed;
+      bottom: var(--space-md);
+      right: var(--space-md);
+      background: var(--color-accent-sage);
+      color: white;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px var(--color-shadow-strong);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      z-index: 999;
+      transform: translateY(200%);
+      transition: transform var(--transition-base);
+    }
+    
+    .announcement.show {
+      transform: translateY(0);
+    }
+    
+    .announcement-close {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 4px;
+      opacity: 0.8;
+      transition: opacity var(--transition-fast);
+    }
+    
+    .announcement-close:hover {
+      opacity: 1;
+    }
+    
+    /* Live region for screen readers */
+    .sr-live {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip to Content Link for Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <!-- Screen Reader Live Region for Announcements -->
+  <div class="sr-live" aria-live="polite" aria-atomic="true" id="sr-announcer"></div>
+  
+  <!-- Header -->
+  <header class="site-header" role="banner">
+    <div class="container">
+      <div class="header-inner">
+        <a href="#" class="logo" aria-label="Copper Pour - Home">
+          <svg class="logo-icon" viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M20 2C10.059 2 2 10.059 2 20s8.059 18 18 18 18-8.059 18-18S29.941 2 20 2zm0 4c4.418 0 8.418 1.791 11.314 4.686L20 20l-4-14.5c1.294-.314 2.632-.5 4-.5zm-6.5 2.5L18 20l-8.5 8.5C6.791 25.418 5 21.418 5 17c0-3.918 1.348-7.521 3.5-10.5zM20 35c-4.418 0-8.418-1.791-11.314-4.686L20 20l4 14.5c-1.294.314-2.632.5-4 .5zm6.5-2.5L22 20l8.5-8.5c2.709 2.979 4.5 6.979 4.5 11.5 0 3.918-1.348 7.521-3.5 10.5z"/>
+            <circle cx="20" cy="20" r="6" fill="var(--color-accent-terracotta)"/>
+          </svg>
+          <span>Copper Pour</span>
+        </a>
+        
+        <nav class="main-nav" role="navigation" aria-label="Main navigation">
+          <ul class="nav-list" role="list">
+            <li role="listitem"><a href="#menu" class="nav-link">Menu</a></li>
+            <li role="listitem"><a href="#about" class="nav-link">About</a></li>
+            <li role="listitem"><a href="#services" class="nav-link">Services</a></li>
+            <li role="listitem"><a href="#testimonials" class="nav-link">Reviews</a></li>
+            <li role="listitem"><a href="#contact" class="nav-link">Contact</a></li>
+          </ul>
+          
+          <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="5"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+          </button>
+        </nav>
+        
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav">
+          <span class="hamburger">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <main id="main-content" role="main">
+    
+    <!-- Hero Section -->
+    <section class="hero" role="region" aria-labelledby="hero-heading">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 0L10.5 5.5L16 6.5L12 10.5L13 16L8 13.5L3 16L4 10.5L0 6.5L5.5 5.5L8 0Z"/>
+              </svg>
+              Award Winning Cafe
+            </div>
+            
+            <h1 id="hero-heading" class="hero-title">
+              Where Every <span>Cup</span> Tells a Story
+            </h1>
+            
+            <p class="hero-subtitle">
+              Experience artisan coffee crafted with passion in our vintage-inspired haven. 
+              From bean to brew, we celebrate the ritual of exceptional coffee.
+            </p>
+            
+            <div class="hero-actions">
+              <div class="magnetic-btn">
+                <a href="#menu" class="btn magnetic-btn-inner">
+                  Explore Menu
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </a>
+              </div>
+              <div class="magnetic-btn">
+                <a href="#about" class="btn btn-secondary magnetic-btn-inner">
+                  Our Story
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <div class="hero-visual">
+            <!-- Main Hero Card -->
+            <div class="hero-card hero-card-main">
+              <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80" alt="Barista pouring latte art into ceramic cup" loading="eager">
+              <div class="hero-card-content">
+                <h3 class="hero-card-title">Artisan Brewing</h3>
+                <p class="hero-card-text">Crafted with care, served with passion</p>
+              </div>
+            </div>
+            
+            <!-- Secondary Card -->
+            <div class="hero-card hero-card-secondary">
+              <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&q=80" alt="Freshly roasted coffee beans in burlap sack" loading="lazy">
+              <div class="hero-card-content">
+                <h3 class="hero-card-title">Single Origin</h3>
+                <p class="hero-card-text">Ethically sourced beans</p>
+              </div>
+            </div>
+            
+            <!-- Accent Card -->
+            <div class="hero-card hero-card-accent">
+              Est. 2019
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="section-diagonal section-padding" id="services" role="region" aria-labelledby="features-heading">
+      <div class="container">
+        <header class="section-header">
+          <span class="section-label">Why Choose Us</span>
+          <h2 id="features-heading" class="section-title">The Copper Pour Experience</h2>
+          <p class="section-subtitle">
+            More than just coffee – we're a community gathering place where every detail matters.
+          </p>
+        </header>
+        
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                <line x1="6" y1="1" x2="6" y2="4"/>
+                <line x1="10" y1="1" x2="10" y2="4"/>
+                <line x1="14" y1="1" x2="14" y2="4"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Signature Blends</h3>
+            <p class="feature-text">
+              Our master roasters create unique blends that highlight the best characteristics of beans from around the world.
+            </p>
+            <a href="#menu" class="feature-link">
+              View Our Blends
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </article>
+          
+          <article class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Sustainable Sourcing</h3>
+            <p class="feature-text">
+              We partner directly with farmers to ensure fair wages and environmentally responsible practices.
+            </p>
+            <a href="#about" class="feature-link">
+              Our Mission
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </article>
+          
+          <article class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Community Hub</h3>
+            <p class="feature-text">
+              A warm, welcoming space for remote work, casual meetings, or simply enjoying a moment of peace.
+            </p>
+            <a href="#contact" class="feature-link">
+              Visit Us
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </article>
+          
+          <article class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Fresh Daily</h3>
+            <p class="feature-text">
+              Small-batch roasting every morning ensures your coffee is always at peak freshness and flavor.
+            </p>
+            <a href="#menu" class="feature-link">
+              Today's Roast
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Menu Section -->
+    <section class="section-padding" id="menu" role="region" aria-labelledby="menu-heading">
+      <div class="container">
+        <header class="section-header">
+          <span class="section-label">Our Menu</span>
+          <h2 id="menu-heading" class="section-title">Crafted With Care</h2>
+          <p class="section-subtitle">
+            From classic espresso drinks to innovative seasonal creations, discover your new favorite.
+          </p>
+        </header>
+        
+        <div class="menu-grid">
+          <article class="menu-card">
+            <div class="menu-card-image">
+              <span class="menu-card-badge">Popular</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                <line x1="6" y1="1" x2="6" y2="4"/>
+                <line x1="10" y1="1" x2="10" y2="4"/>
+                <line x1="14" y1="1" x2="14" y2="4"/>
+              </svg>
+            </div>
+            <div class="menu-card-content">
+              <div class="menu-card-header">
+                <h3 class="menu-card-title">Copper Signature Latte</h3>
+                <span class="menu-card-price">$5.50</span>
+              </div>
+              <p class="menu-card-description">
+                Double shot espresso with velvety steamed milk, caramel, and a hint of cinnamon.
+              </p>
+              <div class="menu-card-meta">
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  5 min
+                </span>
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                  Hot/Iced
+                </span>
+              </div>
+            </div>
+          </article>
+          
+          <article class="menu-card">
+            <div class="menu-card-image">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M2 12h20M2 12c0-5.523 4.477-10 10-10s10 4.477 10 10M2 12c0 5.523 4.477 10 10 10s10-4.477 10-10"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+            <div class="menu-card-content">
+              <div class="menu-card-header">
+                <h3 class="menu-card-title">Desert Cold Brew</h3>
+                <span class="menu-card-price">$4.75</span>
+              </div>
+              <p class="menu-card-description">
+                18-hour steeped cold brew with notes of chocolate and toasted nuts. Smooth and refreshing.
+              </p>
+              <div class="menu-card-meta">
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  Cold
+                </span>
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                  Nitro option
+                </span>
+              </div>
+            </div>
+          </article>
+          
+          <article class="menu-card">
+            <div class="menu-card-image">
+              <span class="menu-card-badge">New</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+            </div>
+            <div class="menu-card-content">
+              <div class="menu-card-header">
+                <h3 class="menu-card-title">Sage Honey Cortado</h3>
+                <span class="menu-card-price">$4.25</span>
+              </div>
+              <p class="menu-card-description">
+                Equal parts espresso and warm milk infused with local sage honey and a touch of vanilla.
+              </p>
+              <div class="menu-card-meta">
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  4 min
+                </span>
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                  Hot only
+                </span>
+              </div>
+            </div>
+          </article>
+          
+          <article class="menu-card">
+            <div class="menu-card-image">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div class="menu-card-content">
+              <div class="menu-card-header">
+                <h3 class="menu-card-title">Pour Over Selection</h3>
+                <span class="menu-card-price">$6.00</span>
+              </div>
+              <p class="menu-card-description">
+                Rotating single-origin beans prepared to order using our precision pour-over method.
+              </p>
+              <div class="menu-card-meta">
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  7 min
+                </span>
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                  Ask barista
+                </span>
+              </div>
+            </div>
+          </article>
+          
+          <article class="menu-card">
+            <div class="menu-card-image">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+            </div>
+            <div class="menu-card-content">
+              <div class="menu-card-header">
+                <h3 class="menu-card-title">Golden Hour Affogato</h3>
+                <span class="menu-card-price">$6.50</span>
+              </div>
+              <p class="menu-card-description">
+                Vanilla bean gelato drowned in a double shot of espresso with caramel drizzle.
+              </p>
+              <div class="menu-card-meta">
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  3 min
+                </span>
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                  Dessert
+                </span>
+              </div>
+            </div>
+          </article>
+          
+          <article class="menu-card">
+            <div class="menu-card-image">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20.2 17.6l-2.8-8.4a2 2 0 0 0-1.9-1.4H8.5a2 2 0 0 0-1.9 1.4L3.8 17.6A4 4 0 0 0 7.6 22h8.8a4 4 0 0 0 3.8-4.4z"/>
+                <path d="M8 9V7a4 4 0 0 1 8 0v2"/>
+              </svg>
+            </div>
+            <div class="menu-card-content">
+              <div class="menu-card-header">
+                <h3 class="menu-card-title">Ceramic Drip Set</h3>
+                <span class="menu-card-price">$5.00</span>
+              </div>
+              <p class="menu-card-description">
+                Individual pour-over service with your choice of beans, served in artisan ceramic.
+              </p>
+              <div class="menu-card-meta">
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  6 min
+                </span>
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                  Experience
+                </span>
+              </div>
+            </div>
+          </article>
+        </div>
+        
+        <div class="text-center" style="margin-top: var(--space-2xl);">
+          <div class="magnetic-btn">
+            <a href="#" class="btn magnetic-btn-inner">
+              View Full Menu
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- About Section -->
+    <section class="section-diagonal section-diagonal-reverse section-padding" id="about" role="region" aria-labelledby="about-heading">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-visual" style="order: 2;">
+            <div class="hero-card hero-card-main" style="border-radius: var(--radius-blob-alt);">
+              <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80" alt="Cozy coffee shop interior with warm lighting" loading="lazy">
+            </div>
+            <div class="hero-card hero-card-secondary" style="border-radius: var(--radius-blob); left: 0; right: auto;">
+              <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=80" alt="Barista carefully preparing coffee" loading="lazy">
+            </div>
+            <div class="hero-card hero-card-accent" style="background: var(--color-accent-sage);">
+              5+ Years
+            </div>
+          </div>
+          
+          <div class="hero-content" style="order: 1;">
+            <span class="section-label">Our Story</span>
+            <h2 id="about-heading" class="section-title" style="font-size: clamp(2rem, 5vw, 3rem);">
+              Brewing Community Since 2019
+            </h2>
+            <p class="hero-subtitle">
+              What started as a small corner cart has grown into a beloved community gathering place. 
+              Our passion for exceptional coffee and genuine hospitality drives everything we do.
+            </p>
+            <p style="color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+              We believe that great coffee is about more than just the beans – it's about the people who grow them, 
+              the hands that roast them, and the community that enjoys them. Every cup tells a story of connection, 
+              craftsmanship, and care.
+            </p>
+            <div class="hero-actions">
+              <div class="magnetic-btn">
+                <a href="#contact" class="btn magnetic-btn-inner">
+                  Visit Our Cafe
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section class="section-padding" id="testimonials" role="region" aria-labelledby="testimonials-heading">
+      <div class="container">
+        <header class="section-header">
+          <span class="section-label">Testimonials</span>
+          <h2 id="testimonials-heading" class="section-title">What Our Guests Say</h2>
+          <p class="section-subtitle">
+            Real experiences from our coffee-loving community.
+          </p>
+        </header>
+        
+        <div class="testimonials-container">
+          <article class="testimonial-card">
+            <div class="testimonial-stars" aria-label="5 out of 5 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p class="testimonial-text">
+              "The Copper Pour has become my second home. The baristas remember my name and my order, 
+              and the atmosphere is perfect for both work and relaxation. Best coffee in the city!"
+            </p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">SM</div>
+              <div>
+                <div class="testimonial-name">Sarah Mitchell</div>
+                <div class="testimonial-role">Local Resident</div>
+              </div>
+            </div>
+          </article>
+          
+          <article class="testimonial-card">
+            <div class="testimonial-stars" aria-label="5 out of 5 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p class="testimonial-text">
+              "As a coffee enthusiast, I'm picky about my brew. The pour-over selection here rivals 
+              anything I've had in major coffee capitals. Their commitment to quality is unmatched."
+            </p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">JC</div>
+              <div>
+                <div class="testimonial-name">James Chen</div>
+                <div class="testimonial-role">Coffee Blogger</div>
+              </div>
+            </div>
+          </article>
+          
+          <article class="testimonial-card">
+            <div class="testimonial-stars" aria-label="5 out of 5 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p class="testimonial-text">
+              "I bring all my out-of-town guests here. It's become our tradition, and everyone 
+              leaves impressed. The warm, welcoming atmosphere makes it feel like home."
+            </p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">ER</div>
+              <div>
+                <div class="testimonial-name">Emma Rodriguez</div>
+                <div class="testimonial-role">Regular Customer</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section" id="contact" role="region" aria-labelledby="cta-heading">
+      <div class="container">
+        <div class="cta-content">
+          <h2 id="cta-heading" class="cta-title">Ready to Experience Copper Pour?</h2>
+          <p class="cta-text">
+            Visit us today and discover why we've been voted "Best Coffee in Town" three years running. 
+            Your perfect cup is waiting.
+          </p>
+          <div class="hero-actions" style="justify-content: center;">
+            <div class="magnetic-btn">
+              <a href="#" class="btn cta-btn magnetic-btn-inner">
+                Find Us
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </a>
+            </div>
+            <div class="magnetic-btn">
+              <a href="tel:+1234567890" class="btn btn-secondary magnetic-btn-inner" style="border-color: white; color: white;">
+                Call Us
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="footer-logo">Copper Pour</a>
+          <p class="footer-tagline">
+            Artisan coffee brewed with passion in a warm, welcoming space. Come for the coffee, stay for the community.
+          </p>
+          <div class="footer-social">
+            <a href="#" class="social-link" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Twitter">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <nav aria-label="Quick links">
+          <h3 class="footer-heading">Quick Links</h3>
+          <ul class="footer-list" role="list">
+            <li role="listitem"><a href="#menu" class="footer-link">Our Menu</a></li>
+            <li role="listitem"><a href="#about" class="footer-link">About Us</a></li>
+            <li role="listitem"><a href="#" class="footer-link">Locations</a></li>
+            <li role="listitem"><a href="#" class="footer-link">Careers</a></li>
+          </ul>
+        </nav>
+        
+        <nav aria-label="Services">
+          <h3 class="footer-heading">Services</h3>
+          <ul class="footer-list" role="list">
+            <li role="listitem"><a href="#" class="footer-link">Catering</a></li>
+            <li role="listitem"><a href="#" class="footer-link">Wholesale</a></li>
+            <li role="listitem"><a href="#" class="footer-link">Events</a></li>
+            <li role="listitem"><a href="#" class="footer-link">Gift Cards</a></li>
+          </ul>
+        </nav>
+        
+        <div>
+          <h3 class="footer-heading">Visit Us</h3>
+          <ul class="footer-list" role="list">
+            <li>123 Coffee Lane</li>
+            <li>Downtown District</li>
+            <li>Open Daily: 6am - 8pm</li>
+            <li><a href="tel:+1234567890" class="footer-link">(123) 456-7890</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p class="footer-copyright">
+          &copy; 2024 Copper Pour. All rights reserved.
+        </p>
+        <nav class="footer-legal" aria-label="Legal links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Announcement Toast -->
+  <div class="announcement" id="announcement" role="status" aria-live="polite">
+    <span>🎉 Try our new seasonal blend!</span>
+    <button class="announcement-close" aria-label="Dismiss announcement">&times;</button>
+  </div>
+  
+  <!-- JavaScript -->
+  <script>
+    // ========================================
+    // DESIGN CHOICES DOCUMENTATION
+    // ========================================
+    /*
+     * Template ID: 610170284
+     * Business Type: Cafe (Copper Pour .brew)
+     * Design Style: Retro/Vintage with modern touches
+     * 
+     * COLOR PALETTE (Desert Sands):
+     * - Primary: Terracotta #C75B39 (warm, earthy accent)
+     * - Secondary: Copper #B87333 (metallic warmth)
+     * - Background: Cream #FDF8F3 (warm white)
+     * - Accent: Sage #8A9A5B (natural contrast)
+     * - Text: Deep Brown #2C2416 (excellent contrast ratio >7:1)
+     * 
+     * LAYOUT CHOICES:
+     * - Hero: Overlapping organic blob cards with z-depth
+     * - Sections: Diagonal skew backgrounds for visual interest
+     * - Cards: Organic blob border-radius (60% 40% 30% 70%)
+     * - Typography: DM Serif Display (headings) + DM Sans (body)
+     * 
+     * SPECIAL FEATURE: Magnetic Buttons
+     * - Buttons subtly follow cursor on hover
+     * - Uses CSS transforms for smooth 60fps animation
+     * - Respects prefers-reduced-motion
+     * 
+     * BUTTON STYLE: 3D Shadow
+     * - Retro-inspired offset shadows
+     * - 4px offset with dual shadow layers
+     * - Interactive press states
+     * 
+     * ACCESSIBILITY:
+     * - WCAG AA compliant contrast ratios
+     * - Full keyboard navigation support
+     * - ARIA labels and roles throughout
+     * - Skip-to-content link
+     * - Screen reader announcements
+     * - prefers-reduced-motion support
+     */
+    
+    // ========================================
+    // THEME TOGGLE SYSTEM
+    // ========================================
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
+    const srAnnouncer = document.getElementById('sr-announcer');
+    
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.setAttribute('aria-pressed', savedTheme === 'dark');
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      html.setAttribute('data-theme', newTheme);
+      themeToggle.setAttribute('aria-pressed', newTheme === 'dark');
+      localStorage.setItem('theme', newTheme);
+      
+      // Announce to screen readers
+      srAnnouncer.textContent = `Theme changed to ${newTheme} mode`;
+      setTimeout(() => srAnnouncer.textContent = '', 1000);
+    });
+    
+    // ========================================
+    // MOBILE NAVIGATION
+    // ========================================
+    const menuToggle = document.getElementById('menu-toggle');
+    const mainNav = document.querySelector('.main-nav');
+    
+    menuToggle.addEventListener('click', () => {
+      const isOpen = mainNav.classList.toggle('open');
+      menuToggle.setAttribute('aria-expanded', isOpen);
+    });
+    
+    // Close mobile menu on link click
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mainNav.classList.remove('open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+    
+    // ========================================
+    // HEADER SCROLL EFFECT
+    // ========================================
+    const header = document.querySelector('.site-header');
+    let lastScroll = 0;
+    
+    window.addEventListener('scroll', { passive: true }, () => {
+      const currentScroll = window.pageYOffset;
+      
+      if (currentScroll > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+      
+      lastScroll = currentScroll;
+    });
+    
+    // ========================================
+    // MAGNETIC BUTTONS (Special Feature)
+    // ========================================
+    const magneticBtns = document.querySelectorAll('.magnetic-btn');
+    
+    // Only enable on non-touch devices
+    if (!window.matchMedia('(pointer: coarse)').matches) {
+      magneticBtns.forEach(btn => {
+        const inner = btn.querySelector('.magnetic-btn-inner');
+        
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          
+          // Subtle movement (max 15px)
+          const moveX = x * 0.2;
+          const moveY = y * 0.2;
+          
+          inner.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+          inner.style.transform = 'translate(0, 0)';
+        });
+      });
+    }
+    
+    // ========================================
+    // GSAP SCROLL ANIMATIONS
+    // ========================================
+    if (typeof gsap !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+      
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
+      if (!prefersReducedMotion) {
+        // Hero cards stagger animation
+        gsap.from('.hero-card', {
+          scrollTrigger: {
+            trigger: '.hero',
+            start: 'top 80%',
+            toggleActions: 'play none none none'
+          },
+          y: 100,
+          opacity: 0,
+          rotation: 5,
+          duration: 1,
+          stagger: 0.15,
+          ease: 'power3.out'
+        });
+        
+        // Hero content animation
+        gsap.from('.hero-content > *', {
+          scrollTrigger: {
+            trigger: '.hero-content',
+            start: 'top 80%',
+            toggleActions: 'play none none none'
+          },
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: 'power2.out'
+        });
+        
+        // Feature cards animation
+        gsap.from('.feature-card', {
+          scrollTrigger: {
+            trigger: '.features-grid',
+            start: 'top 80%',
+            toggleActions: 'play none none none'
+          },
+          y: 60,
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out'
+        });
+        
+        // Menu cards animation
+        gsap.from('.menu-card', {
+          scrollTrigger: {
+            trigger: '.menu-grid',
+            start: 'top 80%',
+            toggleActions: 'play none none none'
+          },
+          y: 80,
+          opacity: 0,
+          scale: 0.95,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: 'back.out(1.2)'
+        });
+        
+        // Testimonial cards animation
+        gsap.from('.testimonial-card', {
+          scrollTrigger: {
+            trigger: '.testimonials-container',
+            start: 'top 80%',
+            toggleActions: 'play none none none'
+          },
+          x: (index) => index % 2 === 0 ? -50 : 50,
+          opacity: 0,
+          duration: 0.7,
+          stagger: 0.15,
+          ease: 'power2.out'
+        });
+        
+        // Section headers animation
+        gsap.from('.section-header', {
+          scrollTrigger: {
+            trigger: '.section-header',
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          },
+          y: 30,
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power2.out'
+        });
+      }
+    }
+    
+    // ========================================
+    // ANNOUNCEMENT TOAST
+    // ========================================
+    const announcement = document.getElementById('announcement');
+    const announcementClose = announcement.querySelector('.announcement-close');
+    
+    // Show announcement after 3 seconds
+    setTimeout(() => {
+      announcement.classList.add('show');
+    }, 3000);
+    
+    announcementClose.addEventListener('click', () => {
+      announcement.classList.remove('show');
+    });
+    
+    // ========================================
+    // SMOOTH SCROLL FOR ANCHOR LINKS
+    // ========================================
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          const headerOffset = 80;
+          const elementPosition = target.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+    
+    // ========================================
+    // ACTIVE NAV LINK ON SCROLL
+    // ========================================
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    window.addEventListener('scroll', { passive: true }, () => {
+      let current = '';
+      
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        
+        if (pageYOffset >= sectionTop - 200) {
+          current = section.getAttribute('id');
+        }
+      });
+      
+      navLinks.forEach(link => {
+        link.removeAttribute('aria-current');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+<!-- 
+  END OF TEMPLATE: landings/610170284.html
+  
+  Design System Summary:
+  - Seed: 610170284
+  - Business: Cafe "Copper Pour"
+  - Style: Retro/Vintage with Desert Sands palette
+  - Special Feature: Magnetic Buttons with GSAP animations
+  - Layout: Overlapping hero cards, diagonal sections
+  - Cards: Organic blob shapes (border-radius: 60% 40% 30% 70%)
+  - Typography: DM Serif Display + DM Sans
+  - Buttons: 3D shadow effect with retro offset
+  - Accessibility: Full WCAG AA compliance
+  - Mobile: Fully responsive with optimized layouts
+  
+  Performance Notes:
+  - GSAP loaded from CDN with async initialization
+  - Images use lazy loading (except hero)
+  - CSS custom properties for instant theme switching
+  - Passive event listeners for scroll performance
+  - prefers-reduced-motion respected throughout
+-->

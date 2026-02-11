@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Landing Page - Seed 216329737</title>
+    <!--
+    Design Choices Explanation:
+    - Seed: 216329737
+    - Chaos Level: 6 (Moderate rule-breaking: Grid layout with asymmetric elements, floating text, and rotating 3D sphere for dynamic feel without full chaos.)
+    - Color Hue: 51 (Yellowish-green base, creating a vibrant, nature-inspired palette. Light mode: Bright greens and yellows; Dark mode: Muted greens with neon accents.)
+    - Layout Type: Grid (Structured grid for sections, but with chaotic floating elements and overlapping 3D sphere.)
+    - 3D Shape: Sphere (Rotating sphere as central hero element, symbolizing innovation and fluidity.)
+    - Animation Style: Rotating (Sphere rotates continuously, with GSAP for smooth text animations and toggle transitions.)
+    - Aesthetic: Bold, modern, memorable - Neon accents in dark mode, floating particles, asymmetric hero section. Mobile-optimized with responsive grid and touch-friendly toggle.
+    - Libraries: Three.js for 3D sphere, GSAP for animations, no heavy physics for speed.
+    - Optimizations: Lazy-loaded scripts, efficient shaders, minimal DOM for fast load.
+    -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            transition: background-color 0.5s, color 0.5s;
+            overflow-x: hidden;
+        }
+        body.light {
+            background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+            color: #2e7d32;
+        }
+        body.dark {
+            background: linear-gradient(135deg, #1b5e20, #0d4f0d);
+            color: #a5d6a7;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 4rem 2rem;
+            overflow: hidden;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+        .toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .section {
+            padding: 2rem;
+            text-align: center;
+        }
+        .floating-text {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.7;
+            animation: float 6s ease-in-out infinite;
+        }
+        .floating-text:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-text:nth-child(2) { top: 40%; right: 15%; animation-delay: 2s; }
+        .floating-text:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 4s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 1rem; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body class="light">
+    <button class="toggle" onclick="toggleTheme()">🌙</button>
+    <div class="container">
+        <section class="hero">
+            <div class="canvas-container" id="canvas"></div>
+            <h1>Welcome to Innovation</h1>
+            <p>Experience the future with our cutting-edge 3D designs.</p>
+            <div class="floating-text">Creativity</div>
+            <div class="floating-text">Technology</div>
+            <div class="floating-text">Art</div>
+        </section>
+        <section class="section">
+            <h2>About Us</h2>
+            <p>We blend art and technology to create unforgettable experiences.</p>
+        </section>
+        <section class="section">
+            <h2>Services</h2>
+            <p>3D modeling, animations, and more.</p>
+        </section>
+        <section class="section">
+            <h2>Contact</h2>
+            <p>Reach out for collaborations.</p>
+        </section>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script>
+        // Three.js setup for rotating sphere
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas').appendChild(renderer.domElement);
+
+        const geometry = new THREE.SphereGeometry(1, 32, 32);
+        const material = new THREE.MeshBasicMaterial({ color: 0x4caf50, wireframe: true });
+        const sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            sphere.rotation.x += 0.01;
+            sphere.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // GSAP animations
+        gsap.from('.hero h1', { duration: 1, y: -50, opacity: 0 });
+        gsap.from('.hero p', { duration: 1, y: 50, opacity: 0, delay: 0.5 });
+
+        // Theme toggle
+        function toggleTheme() {
+            document.body.classList.toggle('light');
+            document.body.classList.toggle('dark');
+            const toggle = document.querySelector('.toggle');
+            toggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+        }
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

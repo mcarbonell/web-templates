@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEBULA // EX-397196993</title>
+    <!-- 
+        DESIGN CHOICES LOG (Seed: 397196993):
+        - Color Palette: Solar Flare (Digit 1 = 3). High contrast dark obsidian with molten orange accents.
+        - 3D Visual Language: Particle Constellation (Digit 2 = 9). A flux of interconnected 3D nodes.
+        - Typography: Cyber-Industrial (Digit 3 = 7). Condensed monospaced fonts with technical labels.
+        - Animation: Elastic Gravity (Digit 4 = 1). Spring-based kinetic interactions.
+        - Interaction: The Weaver (Digit 5 = 9). Cursor creates dynamic links between 3D particle points.
+        
+        Aesthetics: Award-winning digital agency style, minimal but high-impact, focusing on depth and motion.
+    -->
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #0a0a0a;
+            --primary: #ff4d00;
+            --secondary: #ff8c00;
+            --text: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.4);
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --ease: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* --- UI Components --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            letter-spacing: -1px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-box {
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        /* --- Sections --- */
+        section {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            width: 100%;
+            padding: 8vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero {
+            height: 100vh;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 12vw, 15rem);
+            font-weight: 900;
+            line-height: 0.85;
+            letter-spacing: -0.05em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title .word {
+            display: block;
+            overflow: hidden;
+        }
+
+        .hero-title .char {
+            display: inline-block;
+            transform: translateY(100%);
+        }
+
+        .hero-sub {
+            max-width: 600px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-dim);
+            margin-bottom: 3rem;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.4s var(--ease);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 77, 0, 0.3);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .tech-tags {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            display: flex;
+            gap: 2rem;
+        }
+
+        .tag-item span {
+            color: var(--primary);
+            margin-right: 5px;
+        }
+
+        /* --- Grid Section --- */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding-top: 5vh;
+        }
+
+        .feature-card {
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.5s var(--ease);
+            position: relative;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 77, 0, 0.05);
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .feature-num {
+            font-family: var(--font-mono);
+            color: var(--primary);
+            font-size: 0.8rem;
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        /* --- Scroll Progress --- */
+        .scroll-indicator {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 100px;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+
+        .scroll-bar {
+            width: 100%;
+            background: var(--primary);
+            height: 0%;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 10;
+            position: relative;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 18vw;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            section {
+                padding: 10vw 5vw;
+            }
+
+            .btn-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="webgl-container"></div>
+    <div class="overlay"></div>
+
+    <nav>
+        <div class="logo">
+            <div class="logo-box"></div>
+            NEBULA_OS
+        </div>
+        <div class="nav-links">
+            <div class="nav-link">System</div>
+            <div class="nav-link">Architecture</div>
+            <div class="nav-link">Nodes</div>
+            <div class="nav-link">Connect</div>
+        </div>
+    </nav>
+
+    <div class="scroll-indicator">
+        <div class="scroll-bar"></div>
+    </div>
+
+    <section class="hero">
+        <h1 class="hero-title">
+            <span class="word"><span class="char">BEYOND</span></span>
+            <span class="word"><span class="char">LIMITS</span></span>
+        </h1>
+        <p class="hero-sub">
+            The next generation of neural computation. An ecosystem built on the edge of the physical and the digital.
+            Sculpting the future of 3D data visualization.
+        </p>
+        <div class="btn-container">
+            <button class="btn">Initiate Sequence</button>
+            <button class="btn" style="background: transparent;">Learn Architecture</button>
+        </div>
+        <div class="tech-tags">
+            <div class="tag-item"><span>01</span> NODE_ALPHA</div>
+            <div class="tag-item"><span>02</span> FLUX_CAPACITOR</div>
+            <div class="tag-item"><span>03</span> PROTOCOL_397</div>
+        </div>
+    </section>
+
+    <section>
+        <div style="margin-bottom: 4rem;">
+            <p style="font-family: var(--font-mono); color: var(--primary); margin-bottom: 1rem;">// SYSTEM_CORES</p>
+            <h2 style="font-size: 4rem; font-weight: 700; line-height: 1;">THE ARCHITECTURE OF LIGHT</h2>
+        </div>
+        <div class="features">
+            <div class="feature-card">
+                <span class="feature-num">01/ QUANTUM_SYNC</span>
+                <h3>Real-time Synthesis</h3>
+                <p>Data streams transformed into living geometries. Experience latency-free interaction with
+                    multi-dimensional datasets.</p>
+            </div>
+            <div class="feature-card" style="margin-top: 4rem;">
+                <span class="feature-num">02/ NEURAL_WEAVE</span>
+                <h3>Predictive Motion</h3>
+                <p>Our Weaver engine anticipates your intent, creating organic connections between complex information
+                    nodes.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-num">03/ KINETIC_FLUX</span>
+                <h3>Fluid UI</h3>
+                <p>Interfaces that react to the laws of digital physics. Motion isn't just decoration; it's the language
+                    of the system.</p>
+            </div>
+        </div>
+    </section>
+
+    <section style="align-items: center; text-align: center;">
+        <h2 style="font-size: clamp(2rem, 8vw, 6rem); margin-bottom: 2rem;">PREPARE FOR<br><span
+                style="color: var(--primary)">ASCENSION</span></h2>
+        <p style="max-width: 600px; margin-bottom: 3rem; opacity: 0.6;">The horizon is no longer a limit. Join the elite
+            node network and redefine your perception of the digital workspace.</p>
+        <button class="btn"
+            style="background: var(--primary); border: none; padding: 1.5rem 4rem; font-size: 1rem;">Join the
+            Network</button>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 NEBULA CORP // SEED_ID: 397196993 // OPTIMIZED FOR WEBGRAPHICS</p>
+    </footer>
+
+    <script>
+        // --- THREE.JS ENGINE ---
+        let scene, camera, renderer, particles, lines;
+        const particleCount = 1500;
+        const mouse = new THREE.Vector2(0, 0);
+        const targetMouse = new THREE.Vector2(0, 0);
+
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 400;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.getElementById('webgl-container').appendChild(renderer.domElement);
+
+            // Particles
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const sizes = new Float32Array(particleCount);
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 800;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 800;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 800;
+                sizes[i] = Math.random() * 2;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            const material = new THREE.PointsMaterial({
+                color: 0xff4d00,
+                size: 2,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            // Lines (The Weaver Effect)
+            const lineGeometry = new THREE.BufferGeometry();
+            const linePositions = new Float32Array(particleCount * 2 * 3); // Max connections
+            lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0xff4d00,
+                transparent: true,
+                opacity: 0.1,
+                blending: THREE.AdditiveBlending
+            });
+
+            lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+            scene.add(lines);
+
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('mousemove', (e) => {
+                targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            animate();
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Smooth mouse follow
+            mouse.x += (targetMouse.x - mouse.x) * 0.05;
+            mouse.y += (targetMouse.y - mouse.y) * 0.05;
+
+            particles.rotation.y += 0.001;
+            particles.rotation.x += 0.0005;
+
+            // Parallax effect
+            particles.position.x = mouse.x * 50;
+            particles.position.y = mouse.y * 50;
+
+            const positions = particles.geometry.attributes.position.array;
+            const linePos = lines.geometry.attributes.position.array;
+            let lineIdx = 0;
+
+            // Simple "Weaver" logic: check proximity for a subset of particles
+            // To keep performance high, we only check a small window
+            for (let i = 0; i < 200; i++) {
+                const i3 = i * 3;
+                for (let j = i + 1; j < 250; j++) {
+                    const j3 = j * 3;
+                    const dx = positions[i3] - positions[j3];
+                    const dy = positions[i3 + 1] - positions[j3 + 1];
+                    const dz = positions[i3 + 2] - positions[j3 + 2];
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    if (dist < 60) {
+                        linePos[lineIdx++] = positions[i3];
+                        linePos[lineIdx++] = positions[i3 + 1];
+                        linePos[lineIdx++] = positions[i3 + 2];
+                        linePos[lineIdx++] = positions[j3];
+                        linePos[lineIdx++] = positions[j3 + 1];
+                        linePos[lineIdx++] = positions[j3 + 2];
+                    }
+                }
+            }
+            lines.geometry.setDrawRange(0, lineIdx / 3);
+            lines.geometry.attributes.position.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        }
+
+        // --- GSAP ANIMATIONS ---
+        function initGSAP() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Split text animation for hero
+            const chars = document.querySelectorAll('.char');
+            gsap.to(chars, {
+                y: 0,
+                stagger: 0.05,
+                delay: 0.5,
+                duration: 1.5,
+                ease: "expo.out"
+            });
+
+            gsap.from('.hero-sub', {
+                opacity: 0,
+                y: 30,
+                delay: 1,
+                duration: 1.2,
+                ease: "power3.out"
+            });
+
+            gsap.from('.btn-container', {
+                opacity: 0,
+                y: 20,
+                delay: 1.2,
+                duration: 1,
+                ease: "power3.out"
+            });
+
+            // Feature cards scroll animation
+            gsap.from('.feature-card', {
+                scrollTrigger: {
+                    trigger: '.features',
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                },
+                y: 100,
+                opacity: 0,
+                stagger: 0.2,
+                duration: 1,
+                ease: "power4.out"
+            });
+
+            // Scroll bar update
+            gsap.to('.scroll-bar', {
+                scrollTrigger: {
+                    trigger: 'body',
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: true
+                },
+                height: '100%'
+            });
+
+            // Parallax sections
+            gsap.to('#webgl-container', {
+                scrollTrigger: {
+                    trigger: 'body',
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: 1
+                },
+                y: -100
+            });
+        }
+
+        // --- BOOTSTRAP ---
+        window.onload = () => {
+            init3D();
+            initGSAP();
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="es" class="theme-light">
+<!--
+  Template ID: 657228985
+  Local business: Physiotherapy clinic (Physio)
+  Design choices (seed-based):
+  - Hero: split-right (text left, visual right) — seed % 6 = 1
+  - Palette: cool-ocean (blues/teals) — (seed>>4) % 6 = 1
+  - Special feature: morph-blobs (organic SVG blobs) — (seed>>8) % 6 = 2
+  - Animation: spring-like cubic-bezier — (seed>>12) % 5 = 1
+  - Typography: serif-modern for headings — (seed>>16) % 4 = 0
+  - Brand name: "Motion Co" from word indices 0, 6
+  - Accent colors derived from seed: #2c84b9, #1a5f8a (adjusted for WCAG AA)
+-->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motion Co — Fisioterapia y bienestar</title>
+  <meta name="description" content="Fisioterapia profesional. Recupera tu movimiento con tratamientos personalizados.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS custom properties: light (default) and dark ===== */
+    :root,
+    .theme-light {
+      --color-bg: #f0f7fc;
+      --color-bg-alt: #e2eef6;
+      --color-surface: #ffffff;
+      --color-text: #1a2d3d;
+      --color-text-muted: #4a6578;
+      --color-primary: #1a5f8a;
+      --color-primary-light: #2c84b9;
+      --color-accent: #0d7a6e;
+      --color-border: #c5d6e4;
+      --color-focus: #1a5f8a;
+      --shadow-sm: 0 2px 8px rgba(26, 45, 61, 0.06);
+      --shadow-md: 0 8px 24px rgba(26, 45, 61, 0.08);
+      --shadow-lg: 0 24px 48px rgba(26, 45, 61, 0.12);
+    }
+
+    .theme-dark {
+      --color-bg: #0f1923;
+      --color-bg-alt: #16202c;
+      --color-surface: #1a2836;
+      --color-text: #e8eef4;
+      --color-text-muted: #94a8b8;
+      --color-primary: #5eb8e0;
+      --color-primary-light: #7eccee;
+      --color-accent: #4dd4c4;
+      --color-border: #2d4154;
+      --color-focus: #7eccee;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ===== Reset & base ===== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Outfit', system-ui, sans-serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== Skip to content (first focusable) ===== */
+    .skip-link {
+      position: absolute;
+      top: -3.5rem;
+      left: 0.75rem;
+      z-index: 100;
+      padding: 0.6rem 1rem;
+      background: var(--color-primary);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 0.25rem;
+      transition: top 0.2s ease;
+    }
+    .skip-link:focus {
+      top: 0.75rem;
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    /* ===== Typography ===== */
+    .font-serif {
+      font-family: 'DM Serif Display', Georgia, serif;
+    }
+
+    h1, h2, h3 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+
+    h1 { font-size: clamp(2.25rem, 5vw, 3.5rem); }
+    h2 { font-size: clamp(1.75rem, 3vw, 2.5rem); }
+    h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); }
+
+    p {
+      margin: 0 0 1rem;
+      color: var(--color-text-muted);
+    }
+
+    a {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    a:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    /* ===== Layout ===== */
+    .wrap {
+      width: 100%;
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .hero .wrap {
+      display: contents; /* grid children remain hero-content and hero-visual */
+    }
+
+    /* ===== Header ===== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .site-header .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 4rem;
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.5rem;
+      color: var(--color-text);
+    }
+    .logo:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    .nav-main {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 1.25rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-list a {
+      font-weight: 500;
+      color: var(--color-text);
+      padding: 0.4rem 0;
+    }
+    .nav-list a:hover {
+      color: var(--color-primary);
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      padding: 0;
+      border: 1px solid var(--color-border);
+      border-radius: 0.375rem;
+      background: var(--color-bg-alt);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .theme-toggle:hover {
+      background: var(--color-border);
+    }
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+    .theme-toggle .icon-sun,
+    .theme-dark .theme-toggle .icon-moon {
+      display: none;
+    }
+    .theme-toggle .icon-moon,
+    .theme-dark .theme-toggle .icon-sun {
+      display: block;
+    }
+
+    .menu-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      padding: 0;
+      border: 1px solid var(--color-border);
+      border-radius: 0.375rem;
+      background: var(--color-bg-alt);
+      color: var(--color-text);
+      cursor: pointer;
+    }
+    .menu-toggle:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: flex;
+      }
+      .nav-main .nav-list {
+        display: none;
+      }
+      .nav-main.is-open .nav-list {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--color-surface);
+        padding: 1rem;
+        border-bottom: 1px solid var(--color-border);
+      }
+    }
+
+    /* ===== Hero: split-right layout ===== */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+      min-height: min(90vh, 640px);
+      padding: 3rem 0;
+    }
+
+    .hero-content {
+      order: 1;
+    }
+
+    .hero-visual {
+      order: 2;
+      position: relative;
+      min-height: 320px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      background: var(--color-primary-light);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 2rem;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .hero-title {
+      margin: 0 0 1rem;
+      opacity: 0;
+      animation: fadeUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
+    }
+
+    .hero-desc {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      max-width: 28ch;
+      opacity: 0;
+      animation: fadeUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      opacity: 0;
+      animation: fadeUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+    .btn-primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--color-primary);
+      border: 2px solid var(--color-primary);
+    }
+    .btn-secondary:hover {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    /* Morph blobs: hero visual ===== */
+    .hero-blobs {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      border-radius: 1.5rem;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.5;
+      animation: blobFloat 12s ease-in-out infinite;
+    }
+    .blob-1 {
+      width: 280px;
+      height: 280px;
+      background: var(--color-primary-light);
+      top: 10%;
+      right: 10%;
+      animation-delay: 0s;
+    }
+    .blob-2 {
+      width: 200px;
+      height: 200px;
+      background: var(--color-accent);
+      bottom: 20%;
+      left: 5%;
+      animation-delay: -4s;
+    }
+    .blob-3 {
+      width: 160px;
+      height: 160px;
+      background: var(--color-primary);
+      top: 50%;
+      left: 30%;
+      animation-delay: -8s;
+    }
+
+    @keyframes blobFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(15px, -20px) scale(1.05); }
+      66% { transform: translate(-10px, 10px) scale(0.95); }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-figure {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-figure svg {
+      width: 80%;
+      max-width: 320px;
+      height: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-content { order: 2; }
+      .hero-visual { order: 1; min-height: 260px; }
+      .hero-desc { margin-left: auto; margin-right: auto; }
+      .hero-actions { justify-content: center; }
+    }
+
+    /* ===== Sections common ===== */
+    section {
+      padding: 4rem 0;
+    }
+
+    .section-title {
+      margin: 0 0 0.5rem;
+      color: var(--color-text);
+    }
+    .section-intro {
+      font-size: 1.1rem;
+      max-width: 42rem;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* ===== Services region ===== */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .service-card {
+      background: var(--color-surface);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      border: 1px solid var(--color-border);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .service-card .icon-wrap {
+      width: 3rem;
+      height: 3rem;
+      margin-bottom: 1rem;
+      color: var(--color-primary);
+    }
+    .service-card .icon-wrap svg {
+      width: 100%;
+      height: 100%;
+    }
+    .service-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.2rem;
+    }
+    .service-card p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    /* ===== About / How it works ===== */
+    .about-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .about-content h2 {
+      margin-top: 0;
+    }
+    .about-steps {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .about-steps li {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .about-steps .step-num {
+      flex-shrink: 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-primary);
+      color: #fff;
+      font-weight: 700;
+      border-radius: 50%;
+    }
+    .about-steps h4 {
+      margin: 0 0 0.25rem;
+      font-size: 1.1rem;
+    }
+    .about-steps p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    .about-visual {
+      background: var(--color-bg-alt);
+      border-radius: 1rem;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .about-inner {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===== Testimonials ===== */
+    .testimonials-wrap {
+      background: var(--color-bg-alt);
+    }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .testimonial-card {
+      background: var(--color-surface);
+      padding: 1.5rem;
+      border-radius: 1rem;
+      border: 1px solid var(--color-border);
+    }
+    .testimonial-card blockquote {
+      margin: 0 0 1rem;
+      font-style: italic;
+      color: var(--color-text);
+    }
+    .testimonial-card cite {
+      font-style: normal;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    /* ===== Pricing / Plans ===== */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .pricing-card {
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .pricing-card.featured {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-md);
+    }
+    .pricing-card h3 {
+      margin: 0 0 0.5rem;
+    }
+    .pricing-card .price {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 2.5rem;
+      color: var(--color-primary);
+      margin: 0.5rem 0 1rem;
+    }
+    .pricing-card ul {
+      list-style: none;
+      margin: 0 0 1.5rem;
+      padding: 0;
+      text-align: left;
+    }
+    .pricing-card li {
+      padding: 0.35rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+    }
+    .pricing-card li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.6rem;
+      width: 0.5rem;
+      height: 0.5rem;
+      background: var(--color-accent);
+      border-radius: 50%;
+    }
+
+    /* ===== Contact ===== */
+    .contact-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    .contact-info {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .contact-info li {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .contact-info .icon {
+      flex-shrink: 0;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--color-primary);
+    }
+    .contact-form {
+      background: var(--color-surface);
+      padding: 2rem;
+      border-radius: 1rem;
+      border: 1px solid var(--color-border);
+    }
+    .contact-form label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+      color: var(--color-text);
+    }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      font-family: inherit;
+      font-size: 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: 0.375rem;
+      background: var(--color-bg);
+      color: var(--color-text);
+      margin-bottom: 1rem;
+    }
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 0;
+    }
+    .contact-form textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    @media (max-width: 768px) {
+      .contact-inner {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===== Footer ===== */
+    .site-footer {
+      background: var(--color-bg-alt);
+      padding: 2.5rem 0;
+      border-top: 1px solid var(--color-border);
+    }
+    .site-footer .wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+    .site-footer .logo {
+      font-size: 1.25rem;
+    }
+    .site-footer p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .footer-links a {
+      color: var(--color-text-muted);
+    }
+    .footer-links a:hover {
+      color: var(--color-primary);
+    }
+
+    /* ===== Announcer for theme (aria-live) ===== */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Ir al contenido</a>
+
+  <header class="site-header" role="banner">
+    <div class="wrap">
+      <a href="#" class="logo" aria-label="Motion Co — Inicio">Motion Co</a>
+      <nav class="nav-main" role="navigation" aria-label="Principal">
+        <button type="button" class="menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-list">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M3 6h18M3 12h18M3 18h18"/>
+          </svg>
+        </button>
+        <ul class="nav-list" id="nav-list" role="list">
+          <li role="listitem"><a href="#servicios">Servicios</a></li>
+          <li role="listitem"><a href="#como-funciona">Cómo funciona</a></li>
+          <li role="listitem"><a href="#opiniones">Opiniones</a></li>
+          <li role="listitem"><a href="#planes">Planes</a></li>
+          <li role="listitem"><a href="#contacto">Contacto</a></li>
+        </ul>
+        <button type="button" class="theme-toggle" aria-label="Cambiar a tema oscuro" title="Cambiar tema">
+          <span class="icon-sun" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          </span>
+          <span class="icon-moon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" role="main">
+    <!-- Hero: split-right. Text left, morph blobs + figure right. -->
+    <section class="hero" role="region" aria-labelledby="hero-heading">
+      <div class="wrap">
+        <div class="hero-content">
+          <span class="hero-badge">Fisioterapia profesional</span>
+          <h1 id="hero-heading" class="hero-title font-serif">Recupera tu movimiento, sin dolor</h1>
+          <p class="hero-desc">Tratamientos personalizados para que vuelvas a hacer lo que te gusta. Primera valoración sin compromiso.</p>
+          <div class="hero-actions">
+            <a href="#contacto" class="btn btn-primary">Pedir cita</a>
+            <a href="#servicios" class="btn btn-secondary">Ver servicios</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-blobs" aria-hidden="true">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+          </div>
+          <figure class="hero-figure">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="100" cy="100" r="80" stroke="var(--color-primary)" stroke-width="2" opacity="0.4"/>
+              <circle cx="100" cy="100" r="60" stroke="var(--color-primary-light)" stroke-width="2" opacity="0.6"/>
+              <path d="M100 50v30M100 120v30M70 100h30M130 100h30" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="100" cy="100" r="12" fill="var(--color-accent)"/>
+              <path d="M100 82c-8 0-18 6-18 18s10 18 18 18 18-6 18-18-10-18-18-18z" fill="var(--color-primary-light)" opacity="0.7"/>
+            </svg>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="servicios" class="services" role="region" aria-labelledby="servicios-heading">
+      <div class="wrap">
+        <h2 id="servicios-heading" class="section-title font-serif text-center">Servicios</h2>
+        <p class="section-intro text-center">Tratamientos adaptados a tu lesión y objetivos.</p>
+        <ul class="services-grid" role="list">
+          <li class="service-card" role="listitem">
+            <div class="icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            </div>
+            <h3>Rehabilitación deportiva</h3>
+            <p>Recuperación tras esguinces, contracturas y sobrecargas.</p>
+          </li>
+          <li class="service-card" role="listitem">
+            <div class="icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <h3>Fisioterapia traumatológica</h3>
+            <p>Postoperatorios y lesiones musculoesqueléticas.</p>
+          </li>
+          <li class="service-card" role="listitem">
+            <div class="icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <h3>Valoración y diagnóstico</h3>
+            <p>Exploración y plan de tratamiento a medida.</p>
+          </li>
+          <li class="service-card" role="listitem">
+            <div class="icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            </div>
+            <h3>Punción seca y terapia manual</h3>
+            <p>Técnicas para dolor y disfunción miofascial.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="como-funciona" class="about" role="region" aria-labelledby="como-heading">
+      <div class="wrap">
+        <h2 id="como-heading" class="section-title font-serif text-center">Cómo funciona</h2>
+        <p class="section-intro text-center">En tres pasos empezamos a trabajar contigo.</p>
+        <div class="about-inner">
+          <div class="about-content">
+            <ul class="about-steps" role="list">
+              <li role="listitem">
+                <span class="step-num" aria-hidden="true">1</span>
+                <div>
+                  <h4>Valoración</h4>
+                  <p>Historial y exploración para definir el origen del problema.</p>
+                </div>
+              </li>
+              <li role="listitem">
+                <span class="step-num" aria-hidden="true">2</span>
+                <div>
+                  <h4>Plan de tratamiento</h4>
+                  <p>Sesiones y objetivos adaptados a tu día a día.</p>
+                </div>
+              </li>
+              <li role="listitem">
+                <span class="step-num" aria-hidden="true">3</span>
+                <div>
+                  <h4>Seguimiento</h4>
+                  <p>Reevaluamos y te damos pautas para mantener los resultados.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="about-visual" aria-hidden="true">
+            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="opiniones" class="testimonials testimonials-wrap" role="region" aria-labelledby="opiniones-heading">
+      <div class="wrap">
+        <h2 id="opiniones-heading" class="section-title font-serif text-center">Qué dicen nuestros pacientes</h2>
+        <p class="section-intro text-center">Experiencias reales de personas que han recuperado su bienestar.</p>
+        <ul class="testimonials-grid" role="list">
+          <li class="testimonial-card" role="listitem">
+            <blockquote>En pocas sesiones noté mejoría. Profesionales y muy cercanos.</blockquote>
+            <cite>— María G.</cite>
+          </li>
+          <li class="testimonial-card" role="listitem">
+            <blockquote>Volví a correr sin molestias. Recomiendo Motion Co sin dudar.</blockquote>
+            <cite>— Carlos L.</cite>
+          </li>
+          <li class="testimonial-card" role="listitem">
+            <blockquote>La mejor decisión para mi cervical. Trato excelente.</blockquote>
+            <cite>— Ana R.</cite>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="planes" class="pricing" role="region" aria-labelledby="planes-heading">
+      <div class="wrap">
+        <h2 id="planes-heading" class="section-title font-serif text-center">Planes</h2>
+        <p class="section-intro text-center">Elige la opción que mejor se adapte a ti.</p>
+        <ul class="pricing-grid" role="list">
+          <li class="pricing-card" role="listitem">
+            <h3>Sesión suelta</h3>
+            <p class="price">45 €</p>
+            <ul role="list">
+              <li role="listitem">Valoración inicial</li>
+              <li role="listitem">Tratamiento 45–60 min</li>
+              <li role="listitem">Recomendaciones</li>
+            </ul>
+            <a href="#contacto" class="btn btn-secondary">Reservar</a>
+          </li>
+          <li class="pricing-card featured" role="listitem">
+            <h3>Bono 5 sesiones</h3>
+            <p class="price">200 €</p>
+            <ul role="list">
+              <li role="listitem">Todo lo anterior</li>
+              <li role="listitem">Precio por sesión 40 €</li>
+              <li role="listitem">Válido 3 meses</li>
+            </ul>
+            <a href="#contacto" class="btn btn-primary">Reservar</a>
+          </li>
+          <li class="pricing-card" role="listitem">
+            <h3>Bono 10 sesiones</h3>
+            <p class="price">380 €</p>
+            <ul role="list">
+              <li role="listitem">Todo lo anterior</li>
+              <li role="listitem">Precio por sesión 38 €</li>
+              <li role="listitem">Válido 6 meses</li>
+            </ul>
+            <a href="#contacto" class="btn btn-secondary">Reservar</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="contacto" class="contact" role="region" aria-labelledby="contacto-heading">
+      <div class="wrap">
+        <h2 id="contacto-heading" class="section-title font-serif text-center">Contacto</h2>
+        <p class="section-intro text-center">Pide cita o escríbenos para cualquier duda.</p>
+        <div class="contact-inner">
+          <div>
+            <ul class="contact-info" role="list">
+              <li role="listitem">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </span>
+                <span>912 345 678</span>
+              </li>
+              <li role="listitem">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="m22 6-10 7L2 6"/></svg>
+                </span>
+                <span>hola@motionco.es</span>
+              </li>
+              <li role="listitem">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <span>Calle Ejemplo 42, 28001 Madrid</span>
+              </li>
+            </ul>
+          </div>
+          <form class="contact-form" action="#" method="post" aria-label="Formulario de contacto">
+            <label for="name">Nombre</label>
+            <input type="text" id="name" name="name" required autocomplete="name">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required autocomplete="email">
+            <label for="message">Mensaje</label>
+            <textarea id="message" name="message" required></textarea>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="wrap">
+      <div>
+        <a href="#" class="logo">Motion Co</a>
+        <p>Fisioterapia y bienestar. Madrid.</p>
+      </div>
+      <ul class="footer-links" role="list">
+        <li role="listitem"><a href="#servicios">Servicios</a></li>
+        <li role="listitem"><a href="#contacto">Contacto</a></li>
+        <li role="listitem"><a href="#">Aviso legal</a></li>
+        <li role="listitem"><a href="#">Privacidad</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <div id="theme-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    (function() {
+      var themeKey = 'motionco-theme';
+      var root = document.documentElement;
+      var btn = document.querySelector('.theme-toggle');
+      var announcer = document.getElementById('theme-announcer');
+      var menuBtn = document.querySelector('.menu-toggle');
+      var nav = document.querySelector('.nav-main');
+
+      function getPreferred() {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      function setTheme(val) {
+        var next = val === 'dark' ? 'theme-dark' : 'theme-light';
+        root.classList.remove('theme-dark', 'theme-light');
+        root.classList.add(next);
+        try { localStorage.setItem(themeKey, val); } catch (e) {}
+        if (btn) {
+          btn.setAttribute('aria-label', val === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+        }
+        if (announcer) {
+          announcer.textContent = 'Tema ' + (val === 'dark' ? 'oscuro' : 'claro') + ' activado.';
+        }
+      }
+
+      function initTheme() {
+        var stored = null;
+        try { stored = localStorage.getItem(themeKey); } catch (e) {}
+        setTheme(stored === 'dark' || stored === 'light' ? stored : getPreferred());
+      }
+
+      if (btn) {
+        btn.addEventListener('click', function() {
+          var isDark = root.classList.contains('theme-dark');
+          setTheme(isDark ? 'light' : 'dark');
+        });
+      }
+
+      if (menuBtn && nav) {
+        menuBtn.addEventListener('click', function() {
+          var open = nav.classList.toggle('is-open');
+          menuBtn.setAttribute('aria-expanded', open);
+          menuBtn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+        });
+      }
+
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+        try {
+          if (!localStorage.getItem(themeKey)) setTheme(getPreferred());
+        } catch (e) {}
+      });
+
+      initTheme();
+    })();
+  </script>
+</body>
+</html>

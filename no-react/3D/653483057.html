@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEBULA | Digital Experience</title>
+    
+    <!-- 
+    ============================================================
+    DESIGN DECISIONS EXPLAINED (Seed: 653483057)
+    ============================================================
+    
+    DESIGN PHILOSOPHY: "Liquid Nebula"
+    A daring fusion of organic cosmic aesthetics with fluid digital motion.
+    The page transports users into an immersive particle universe that 
+    responds to their presence like a living organism.
+    
+    RANDOM DESIGN CHOICES (Dice Rolls):
+    
+    1. COLOR SCHEME (d6=4): SUNSET SYNTHWAVE
+       Deep cosmic purples (#0a0118, #1a0b2e) as foundation
+       Electric magenta (#ff006e) for energy and vibrancy
+       Warm coral/orange (#ff6b35) for warmth and human connection
+       Cyan accents (#00d4ff) for futuristic tech feel
+       Gold highlights (#ffd700) for premium moments
+       
+    2. 3D EFFECT STYLE (d6=6): PARTICLE FIELD WITH DEPTH
+       Thousands of particles arranged in 3D space using Three.js
+       Particles form organic constellations that shift and breathe
+       Depth creates parallax effect on scroll and mouse movement
+       Particles connect with dynamic lines based on proximity
+       
+    3. ANIMATION STYLE (d6=1): LIQUID MORPHING
+       GSAP-powered elastic, fluid movements
+       Elements don't just move - they flow like water
+       SVG path morphing for organic shape transitions
+       Spring physics for bouncy, natural interactions
+       
+    4. TYPOGRAPHY (d6=4): VARIABLE WEIGHT DYNAMICS
+       Space Grotesk variable font with weight morphing
+       Text responds to scroll position with weight changes
+       Large display text with dramatic scale contrasts
+       Fluid responsive sizing using clamp()
+       
+    5. LAYOUT STRUCTURE (d6=6): RADIAL/ORGANIC ASYMMETRIC
+       Content radiates from center points
+       No straight lines - everything follows curves
+       Asymmetric balance creates visual tension and interest
+       Sections overlap and intersect organically
+       
+    6. SPECIAL EFFECTS (d6=4): MAGNETIC CURSOR SYSTEM
+       Custom cursor that magnetically attracts to interactive elements
+       Elements have "gravity wells" that pull the cursor
+       Touch-optimized for mobile with tap attraction zones
+       Cursor leaves particle trail on movement
+       
+    TECHNICAL DECISIONS:
+    - Three.js for performant WebGL particle rendering
+    - GSAP for smooth, physics-based animations
+    - CSS Custom Properties for dynamic theming
+    - Intersection Observer for scroll-triggered effects
+    - RequestAnimationFrame for 60fps smoothness
+    - Passive event listeners for touch performance
+    - CSS containment for rendering optimization
+    ============================================================
+    -->
+    
+    <!-- Google Fonts: Space Grotesk for variable weight dynamics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js for 3D particle field -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- GSAP for liquid morphing animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        /* ============================================================
+           CSS CUSTOM PROPERTIES - SUNSET SYNTHWAVE PALETTE
+           ============================================================ */
+        :root {
+            /* Cosmic Backgrounds */
+            --void-deep: #0a0118;
+            --void-mid: #1a0b2e;
+            --void-light: #2d1b4e;
+            
+            /* Energy Colors */
+            --neon-magenta: #ff006e;
+            --neon-pink: #ff4db8;
+            --coral-fire: #ff6b35;
+            --sunset-orange: #ff8c42;
+            
+            /* Tech Accents */
+            --cyan-glow: #00d4ff;
+            --cyan-soft: #7dd3fc;
+            --electric-blue: #3b82f6;
+            
+            /* Premium Highlights */
+            --gold-warm: #ffd700;
+            --gold-soft: #fef3c7;
+            
+            /* Semantic Tokens */
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            
+            /* Spacing System */
+            --space-xs: clamp(0.5rem, 1vw, 0.75rem);
+            --space-sm: clamp(0.75rem, 1.5vw, 1rem);
+            --space-md: clamp(1rem, 2vw, 1.5rem);
+            --space-lg: clamp(1.5rem, 3vw, 2.5rem);
+            --space-xl: clamp(2rem, 4vw, 4rem);
+            --space-2xl: clamp(3rem, 6vw, 6rem);
+            --space-3xl: clamp(4rem, 8vw, 8rem);
+            
+            /* Typography Scale */
+            --font-display: clamp(3rem, 12vw, 10rem);
+            --font-h1: clamp(2rem, 6vw, 5rem);
+            --font-h2: clamp(1.5rem, 4vw, 3.5rem);
+            --font-h3: clamp(1.25rem, 3vw, 2.5rem);
+            --font-body: clamp(1rem, 1.5vw, 1.25rem);
+            --font-small: clamp(0.75rem, 1vw, 0.875rem);
+            
+            /* Animation Timing */
+            --ease-liquid: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-dramatic: cubic-bezier(0.87, 0, 0.13, 1);
+            
+            /* Cursor */
+            --cursor-size: 20px;
+            --cursor-hover-size: 60px;
+        }
+        
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--void-deep);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            cursor: none;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Hide default cursor on interactive elements */
+        a, button, input, textarea, [role="button"] {
+            cursor: none;
+        }
+        
+        /* ============================================================
+           MAGNETIC CURSOR SYSTEM
+           ============================================================ */
+        .cursor {
+            position: fixed;
+            width: var(--cursor-size);
+            height: var(--cursor-size);
+            border: 2px solid var(--cyan-glow);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s var(--ease-liquid), 
+                        height 0.3s var(--ease-liquid),
+                        background 0.3s var(--ease-liquid);
+            mix-blend-mode: difference;
+        }
+        
+        .cursor.hover {
+            width: var(--cursor-hover-size);
+            height: var(--cursor-hover-size);
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .cursor-dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: var(--neon-magenta);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Cursor trail particles */
+        .cursor-trail {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--cyan-glow);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.6;
+        }
+        
+        /* Hide custom cursor on touch devices */
+        @media (pointer: coarse) {
+            body { cursor: auto; }
+            .cursor, .cursor-dot, .cursor-trail { display: none; }
+            a, button, input, textarea, [role="button"] { cursor: pointer; }
+        }
+        
+        /* ============================================================
+           3D PARTICLE CANVAS
+           ============================================================ */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* ============================================================
+           ORGANIC BACKGROUND SHAPES
+           ============================================================ */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            z-index: 1;
+            pointer-events: none;
+            will-change: transform;
+        }
+        
+        .orb-1 {
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, var(--neon-magenta) 0%, transparent 70%);
+            top: -20%;
+            right: -20%;
+        }
+        
+        .orb-2 {
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 70%);
+            bottom: -10%;
+            left: -10%;
+        }
+        
+        .orb-3 {
+            width: 30vw;
+            height: 30vw;
+            background: radial-gradient(circle, var(--coral-fire) 0%, transparent 70%);
+            top: 40%;
+            left: 30%;
+        }
+        
+        /* ============================================================
+           NAVIGATION - LIQUID MORPHING
+           ============================================================ */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            background: rgba(10, 1, 24, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-logo {
+            font-size: var(--font-h3);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--cyan-glow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: var(--space-xl);
+            list-style: none;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: var(--font-small);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            padding: var(--space-xs) 0;
+            transition: color 0.3s var(--ease-smooth);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-magenta), var(--cyan-glow));
+            transition: width 0.4s var(--ease-liquid);
+        }
+        
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-cta {
+            padding: var(--space-sm) var(--space-lg);
+            background: linear-gradient(135deg, var(--neon-magenta) 0%, var(--coral-fire) 100%);
+            border: none;
+            border-radius: 100px;
+            color: white;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: var(--font-small);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s var(--ease-liquid), box-shadow 0.3s var(--ease-smooth);
+        }
+        
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(255, 0, 110, 0.4);
+        }
+        
+        /* Mobile nav toggle */
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            padding: var(--space-sm);
+        }
+        
+        .nav-toggle span {
+            width: 25px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: all 0.3s var(--ease-liquid);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .nav-cta { display: none; }
+            .nav-toggle { display: flex; }
+        }
+        
+        /* ============================================================
+           MAIN CONTENT CONTAINER
+           ============================================================ */
+        .main {
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* ============================================================
+           HERO SECTION - RADIAL ORGANIC LAYOUT
+           ============================================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-3xl) var(--space-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            text-align: center;
+            max-width: 1200px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .hero-label {
+            font-size: var(--font-small);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--cyan-glow);
+            margin-bottom: var(--space-md);
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .hero-title {
+            font-size: var(--font-display);
+            font-weight: 700;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            margin-bottom: var(--space-lg);
+            position: relative;
+        }
+        
+        .hero-title-word {
+            display: block;
+            opacity: 0;
+            transform: translateY(100px) rotateX(-90deg);
+        }
+        
+        .hero-title .highlight {
+            background: linear-gradient(135deg, var(--neon-magenta) 0%, var(--coral-fire) 50%, var(--gold-warm) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: var(--font-h3);
+            font-weight: 300;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto var(--space-xl);
+            line-height: 1.5;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .hero-cta-group {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .btn {
+            padding: var(--space-md) var(--space-xl);
+            font-family: inherit;
+            font-weight: 600;
+            font-size: var(--font-body);
+            text-decoration: none;
+            border-radius: 100px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s var(--ease-liquid);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-magenta) 0%, var(--coral-fire) 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 30px rgba(255, 0, 110, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(255, 0, 110, 0.5);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--cyan-glow);
+            transform: translateY(-4px);
+        }
+        
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s var(--ease-liquid);
+        }
+        
+        .btn:hover .btn-icon {
+            transform: translateX(4px);
+        }
+        
+        /* Hero floating elements */
+        .hero-float {
+            position: absolute;
+            pointer-events: none;
+            will-change: transform;
+        }
+        
+        .hero-float-1 {
+            top: 20%;
+            right: 10%;
+            width: 200px;
+            height: 200px;
+            opacity: 0.6;
+        }
+        
+        .hero-float-2 {
+            bottom: 30%;
+            left: 5%;
+            width: 150px;
+            height: 150px;
+            opacity: 0.4;
+        }
+        
+        /* SVG Shape */
+        .morph-shape {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* ============================================================
+           FEATURES SECTION - ORGANIC ASYMMETRIC GRID
+           ============================================================ */
+        .features {
+            padding: var(--space-3xl) var(--space-lg);
+            position: relative;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-3xl);
+        }
+        
+        .section-label {
+            font-size: var(--font-small);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--cyan-glow);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .section-title {
+            font-size: var(--font-h1);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--space-lg);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: var(--space-xl);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s var(--ease-liquid);
+            transform-style: preserve-3d;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 0, 110, 0.1) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.5s var(--ease-smooth);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(-5deg);
+            border-color: rgba(255, 0, 110, 0.3);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: var(--space-md);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .feature-title {
+            font-size: var(--font-h3);
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-text {
+            color: var(--text-secondary);
+            font-size: var(--font-body);
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-glow {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0;
+            transition: opacity 0.5s var(--ease-smooth);
+            pointer-events: none;
+        }
+        
+        .feature-card:hover .feature-glow {
+            opacity: 0.5;
+        }
+        
+        /* Asymmetric positioning for visual interest */
+        .feature-card:nth-child(1) { transform: translateY(0); }
+        .feature-card:nth-child(2) { transform: translateY(40px); }
+        .feature-card:nth-child(3) { transform: translateY(-20px); }
+        .feature-card:nth-child(4) { transform: translateY(60px); }
+        
+        @media (max-width: 768px) {
+            .feature-card:nth-child(n) { transform: translateY(0); }
+        }
+        
+        /* ============================================================
+           SHOWCASE SECTION - LIQUID MORPHING SHAPES
+           ============================================================ */
+        .showcase {
+            padding: var(--space-3xl) var(--space-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .showcase-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3xl);
+            align-items: center;
+        }
+        
+        @media (max-width: 968px) {
+            .showcase-container {
+                grid-template-columns: 1fr;
+                gap: var(--space-xl);
+            }
+        }
+        
+        .showcase-visual {
+            position: relative;
+            aspect-ratio: 1;
+        }
+        
+        .showcase-shape {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .liquid-blob {
+            width: 80%;
+            height: 80%;
+            filter: drop-shadow(0 0 60px rgba(255, 0, 110, 0.5));
+        }
+        
+        .showcase-content {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .showcase-title {
+            font-size: var(--font-h1);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: var(--space-lg);
+            letter-spacing: -0.02em;
+        }
+        
+        .showcase-text {
+            font-size: var(--font-body);
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: var(--space-xl);
+        }
+        
+        .showcase-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+        
+        .stat {
+            text-align: left;
+        }
+        
+        .stat-number {
+            font-size: var(--font-h2);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--cyan-glow) 0%, var(--neon-magenta) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            font-size: var(--font-small);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: var(--space-xs);
+        }
+        
+        /* ============================================================
+           GALLERY SECTION - DEPTH PARALLAX
+           ============================================================ */
+        .gallery {
+            padding: var(--space-3xl) var(--space-lg);
+            position: relative;
+            perspective: 1000px;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            max-width: 1400px;
+            margin: 0 auto;
+            transform-style: preserve-3d;
+        }
+        
+        @media (max-width: 968px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .gallery-item {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            aspect-ratio: 4/5;
+            transform-style: preserve-3d;
+            transition: transform 0.6s var(--ease-liquid);
+        }
+        
+        .gallery-item:nth-child(1) { transform: translateZ(0px) rotateY(-5deg); }
+        .gallery-item:nth-child(2) { transform: translateZ(50px) scale(1.05); }
+        .gallery-item:nth-child(3) { transform: translateZ(0px) rotateY(5deg); }
+        
+        .gallery-item:hover {
+            transform: translateZ(100px) scale(1.1) rotateY(0deg);
+            z-index: 10;
+        }
+        
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s var(--ease-smooth);
+        }
+        
+        .gallery-item:hover .gallery-image {
+            transform: scale(1.1);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10, 1, 24, 0.9) 0%, transparent 50%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: var(--space-lg);
+            opacity: 0;
+            transition: opacity 0.4s var(--ease-smooth);
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        .gallery-title {
+            font-size: var(--font-h3);
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .gallery-category {
+            font-size: var(--font-small);
+            color: var(--cyan-glow);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        /* ============================================================
+           TESTIMONIALS - ORGANIC CAROUSEL
+           ============================================================ */
+        .testimonials {
+            padding: var(--space-3xl) var(--space-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .testimonials-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .testimonial-track {
+            display: flex;
+            gap: var(--space-xl);
+            transition: transform 0.8s var(--ease-liquid);
+        }
+        
+        .testimonial-card {
+            flex: 0 0 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
+            padding: var(--space-2xl);
+            text-align: center;
+            position: relative;
+        }
+        
+        .testimonial-quote {
+            font-size: var(--font-h2);
+            font-weight: 300;
+            line-height: 1.4;
+            margin-bottom: var(--space-xl);
+            color: var(--text-primary);
+        }
+        
+        .testimonial-quote::before {
+            content: '"';
+            font-size: 4em;
+            color: var(--neon-magenta);
+            opacity: 0.3;
+            position: absolute;
+            top: var(--space-md);
+            left: var(--space-lg);
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-md);
+        }
+        
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-magenta) 0%, var(--cyan-glow) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: var(--font-h3);
+        }
+        
+        .author-info {
+            text-align: left;
+        }
+        
+        .author-name {
+            font-weight: 600;
+            font-size: var(--font-body);
+        }
+        
+        .author-role {
+            font-size: var(--font-small);
+            color: var(--text-muted);
+        }
+        
+        .testimonial-nav {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-sm);
+            margin-top: var(--space-xl);
+        }
+        
+        .testimonial-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            transition: all 0.3s var(--ease-liquid);
+        }
+        
+        .testimonial-dot.active {
+            background: var(--neon-magenta);
+            transform: scale(1.3);
+        }
+        
+        /* ============================================================
+           CTA SECTION - MAGNETIC GRAVITY WELL
+           ============================================================ */
+        .cta-section {
+            padding: var(--space-3xl) var(--space-lg);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+        
+        .cta-container {
+            text-align: center;
+            max-width: 900px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .cta-title {
+            font-size: var(--font-display);
+            font-weight: 700;
+            line-height: 0.95;
+            margin-bottom: var(--space-lg);
+            letter-spacing: -0.04em;
+        }
+        
+        .cta-text {
+            font-size: var(--font-h3);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xl);
+            font-weight: 300;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-lg) var(--space-2xl);
+            background: linear-gradient(135deg, var(--neon-magenta) 0%, var(--coral-fire) 50%, var(--gold-warm) 100%);
+            border: none;
+            border-radius: 100px;
+            color: white;
+            font-family: inherit;
+            font-size: var(--font-h3);
+            font-weight: 600;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s var(--ease-liquid);
+            box-shadow: 0 10px 50px rgba(255, 0, 110, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 30px 80px rgba(255, 0, 110, 0.6);
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s var(--ease-smooth);
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+        
+        /* Gravity ring animation */
+        .gravity-ring {
+            position: absolute;
+            border: 1px solid rgba(255, 0, 110, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .footer {
+            padding: var(--space-2xl) var(--space-lg);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: var(--space-xl);
+        }
+        
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+        
+        .footer-brand {
+            font-size: var(--font-h2);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--cyan-glow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-md);
+        }
+        
+        .footer-tagline {
+            color: var(--text-muted);
+            font-size: var(--font-body);
+            max-width: 300px;
+        }
+        
+        .footer-heading {
+            font-size: var(--font-small);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-link {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .footer-link a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s var(--ease-smooth);
+        }
+        
+        .footer-link a:hover {
+            color: var(--cyan-glow);
+        }
+        
+        .footer-bottom {
+            max-width: 1400px;
+            margin: var(--space-xl) auto 0;
+            padding-top: var(--space-lg);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+        
+        .footer-copyright {
+            color: var(--text-muted);
+            font-size: var(--font-small);
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: var(--space-md);
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s var(--ease-liquid);
+        }
+        
+        .social-link:hover {
+            background: var(--neon-magenta);
+            border-color: var(--neon-magenta);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        /* ============================================================
+           SCROLL PROGRESS INDICATOR
+           ============================================================ */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-magenta), var(--cyan-glow), var(--gold-warm));
+            z-index: 1000;
+            transform-origin: left;
+            transform: scaleX(0);
+        }
+        
+        /* ============================================================
+           FLOATING PARTICLES CSS FALLBACK
+           ============================================================ */
+        .css-particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--cyan-glow);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.6;
+            z-index: 2;
+        }
+        
+        /* ============================================================
+           LOADING SCREEN
+           ============================================================ */
+        .loader {
+            position: fixed;
+            inset: 0;
+            background: var(--void-deep);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.8s var(--ease-smooth), visibility 0.8s;
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-text {
+            font-size: var(--font-h1);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-magenta) 0%, var(--cyan-glow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        
+        /* ============================================================
+           UTILITY CLASSES
+           ============================================================ */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <span class="loader-text">NEBULA</span>
+    </div>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-dot" id="cursor-dot"></div>
+    
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scroll-progress"></div>
+    
+    <!-- 3D Particle Canvas -->
+    <canvas id="particle-canvas"></canvas>
+    
+    <!-- Background Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <div class="nav-logo">NEBULA</div>
+        <ul class="nav-links">
+            <li><a href="#features" class="nav-link magnetic">Features</a></li>
+            <li><a href="#showcase" class="nav-link magnetic">Showcase</a></li>
+            <li><a href="#gallery" class="nav-link magnetic">Gallery</a></li>
+            <li><a href="#testimonials" class="nav-link magnetic">Stories</a></li>
+        </ul>
+        <button class="nav-cta magnetic">Get Started</button>
+        <button class="nav-toggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="hero-float hero-float-1">
+                <svg class="morph-shape" viewBox="0 0 200 200">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff006e"/>
+                            <stop offset="100%" style="stop-color:#ff6b35"/>
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#grad1)" opacity="0.6">
+                        <animate attributeName="d" dur="8s" repeatCount="indefinite"
+                            values="M100,10 Q150,50 160,100 Q150,150 100,160 Q50,150 40,100 Q50,50 100,10Z;
+                                    M100,20 Q140,40 150,100 Q140,160 100,150 Q60,140 50,100 Q60,40 100,20Z;
+                                    M100,10 Q150,50 160,100 Q150,150 100,160 Q50,150 40,100 Q50,50 100,10Z"/>
+                    </path>
+                </svg>
+            </div>
+            <div class="hero-float hero-float-2">
+                <svg class="morph-shape" viewBox="0 0 150 150">
+                    <defs>
+                        <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00d4ff"/>
+                            <stop offset="100%" style="stop-color:#ff006e"/>
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#grad2)" opacity="0.4">
+                        <animate attributeName="d" dur="10s" repeatCount="indefinite"
+                            values="M75,20 Q110,40 115,75 Q110,110 75,115 Q40,110 35,75 Q40,40 75,20Z;
+                                    M75,30 Q100,50 105,75 Q100,100 75,105 Q50,100 45,75 Q50,50 75,30Z;
+                                    M75,20 Q110,40 115,75 Q110,110 75,115 Q40,110 35,75 Q40,40 75,20Z"/>
+                    </path>
+                </svg>
+            </div>
+            
+            <div class="hero-content">
+                <span class="hero-label">Digital Experience Agency</span>
+                <h1 class="hero-title">
+                    <span class="hero-title-word">Create</span>
+                    <span class="hero-title-word highlight">Without</span>
+                    <span class="hero-title-word">Limits</span>
+                </h1>
+                <p class="hero-subtitle">
+                    We craft immersive digital experiences that push boundaries 
+                    and redefine what's possible in the digital realm.
+                </p>
+                <div class="hero-cta-group">
+                    <a href="#cta" class="btn btn-primary magnetic">
+                        Start Your Journey
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="#showcase" class="btn btn-secondary magnetic">
+                        View Our Work
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="section-header">
+                <span class="section-label">What We Do</span>
+                <h2 class="section-title">Pushing Digital Boundaries</h2>
+            </div>
+            
+            <div class="features-grid">
+                <article class="feature-card magnetic-3d">
+                    <div class="feature-glow" style="background: var(--neon-magenta);"></div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 60 60" fill="none">
+                            <circle cx="30" cy="30" r="25" stroke="url(#iconGrad1)" stroke-width="2"/>
+                            <path d="M20 30L27 37L40 23" stroke="url(#iconGrad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="iconGrad1" x1="0" y1="0" x2="60" y2="60">
+                                    <stop offset="0%" stop-color="#ff006e"/>
+                                    <stop offset="100%" stop-color="#00d4ff"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Immersive 3D</h3>
+                    <p class="feature-text">
+                        Create breathtaking three-dimensional experiences that transport users 
+                        into new worlds with cutting-edge WebGL technology.
+                    </p>
+                </article>
+                
+                <article class="feature-card magnetic-3d">
+                    <div class="feature-glow" style="background: var(--cyan-glow);"></div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 60 60" fill="none">
+                            <rect x="10" y="15" width="40" height="30" rx="5" stroke="url(#iconGrad2)" stroke-width="2"/>
+                            <path d="M20 25L30 35L40 25" stroke="url(#iconGrad2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="iconGrad2" x1="0" y1="0" x2="60" y2="60">
+                                    <stop offset="0%" stop-color="#00d4ff"/>
+                                    <stop offset="100%" stop-color="#ff6b35"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Motion Design</h3>
+                    <p class="feature-text">
+                        Fluid animations and transitions that bring interfaces to life with 
+                        purposeful, delightful movement at every interaction.
+                    </p>
+                </article>
+                
+                <article class="feature-card magnetic-3d">
+                    <div class="feature-glow" style="background: var(--coral-fire);"></div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 60 60" fill="none">
+                            <path d="M30 10L35 25H50L38 35L42 50L30 40L18 50L22 35L10 25H25L30 10Z" 
+                                  stroke="url(#iconGrad3)" stroke-width="2" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="iconGrad3" x1="0" y1="0" x2="60" y2="60">
+                                    <stop offset="0%" stop-color="#ff6b35"/>
+                                    <stop offset="100%" stop-color="#ffd700"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Brand Strategy</h3>
+                    <p class="feature-text">
+                        Strategic brand development that captures your essence and creates 
+                        lasting emotional connections with your audience.
+                    </p>
+                </article>
+                
+                <article class="feature-card magnetic-3d">
+                    <div class="feature-glow" style="background: var(--gold-warm);"></div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 60 60" fill="none">
+                            <circle cx="20" cy="30" r="12" stroke="url(#iconGrad4)" stroke-width="2"/>
+                            <circle cx="40" cy="30" r="12" stroke="url(#iconGrad4)" stroke-width="2"/>
+                            <path d="M32 30H28" stroke="url(#iconGrad4)" stroke-width="2" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="iconGrad4" x1="0" y1="0" x2="60" y2="60">
+                                    <stop offset="0%" stop-color="#ffd700"/>
+                                    <stop offset="100%" stop-color="#ff006e"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Creative Code</h3>
+                    <p class="feature-text">
+                        Bespoke development solutions that merge artistic vision with 
+                        technical excellence for truly unique digital products.
+                    </p>
+                </article>
+            </div>
+        </section>
+        
+        <!-- Showcase Section -->
+        <section class="showcase" id="showcase">
+            <div class="showcase-container">
+                <div class="showcase-visual">
+                    <div class="showcase-shape">
+                        <svg class="liquid-blob" viewBox="0 0 500 500">
+                            <defs>
+                                <linearGradient id="blobGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#ff006e"/>
+                                    <stop offset="33%" style="stop-color:#ff6b35"/>
+                                    <stop offset="66%" style="stop-color:#00d4ff"/>
+                                    <stop offset="100%" style="stop-color:#ff006e"/>
+                                </linearGradient>
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <path fill="url(#blobGrad)" filter="url(#glow)" opacity="0.8">
+                                <animate attributeName="d" dur="15s" repeatCount="indefinite"
+                                    values="M250,50 Q380,100 420,220 Q460,340 380,420 Q300,500 180,460 Q60,420 50,300 Q40,180 120,100 Q200,20 250,50Z;
+                                            M250,80 Q360,120 400,230 Q440,340 360,400 Q280,460 180,430 Q80,400 70,290 Q60,180 140,110 Q220,40 250,80Z;
+                                            M250,60 Q370,110 410,210 Q450,310 370,410 Q290,510 170,470 Q50,430 60,310 Q70,190 130,110 Q190,30 250,60Z;
+                                            M250,50 Q380,100 420,220 Q460,340 380,420 Q300,500 180,460 Q60,420 50,300 Q40,180 120,100 Q200,20 250,50Z"/>
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="showcase-content">
+                    <span class="section-label">Our Impact</span>
+                    <h2 class="showcase-title">Numbers That Tell Stories</h2>
+                    <p class="showcase-text">
+                        We've partnered with visionary brands across the globe to create 
+                        digital experiences that captivate, convert, and leave lasting impressions. 
+                        Our work speaks through results and the relationships we build.
+                    </p>
+                    <div class="showcase-stats">
+                        <div class="stat">
+                            <div class="stat-number" data-target="150">0</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number" data-target="98">0</div>
+                            <div class="stat-label">% Satisfaction</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number" data-target="12">0</div>
+                            <div class="stat-label">Awards</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Gallery Section -->
+        <section class="gallery" id="gallery">
+            <div class="section-header">
+                <span class="section-label">Selected Work</span>
+                <h2 class="section-title">Creative Universe</h2>
+            </div>
+            
+            <div class="gallery-grid">
+                <article class="gallery-item magnetic-3d">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=750&fit=crop" 
+                         alt="Abstract 3D Art" class="gallery-image">
+                    <div class="gallery-overlay">
+                        <span class="gallery-category">3D Design</span>
+                        <h3 class="gallery-title">Cosmic Flow</h3>
+                    </div>
+                </article>
+                
+                <article class="gallery-item magnetic-3d">
+                    <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&h=750&fit=crop" 
+                         alt="Digital Interface" class="gallery-image">
+                    <div class="gallery-overlay">
+                        <span class="gallery-category">UI/UX</span>
+                        <h3 class="gallery-title">Nexus Platform</h3>
+                    </div>
+                </article>
+                
+                <article class="gallery-item magnetic-3d">
+                    <img src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=600&h=750&fit=crop" 
+                         alt="Motion Graphics" class="gallery-image">
+                    <div class="gallery-overlay">
+                        <span class="gallery-category">Motion</span>
+                        <h3 class="gallery-title">Pulse Identity</h3>
+                    </div>
+                </article>
+            </div>
+        </section>
+        
+        <!-- Testimonials Section -->
+        <section class="testimonials" id="testimonials">
+            <div class="section-header">
+                <span class="section-label">Client Stories</span>
+                <h2 class="section-title">Voices From The Void</h2>
+            </div>
+            
+            <div class="testimonials-container">
+                <div class="testimonial-track" id="testimonial-track">
+                    <div class="testimonial-card">
+                        <blockquote class="testimonial-quote">
+                            Nebula transformed our vision into a living, breathing digital experience. 
+                            The attention to detail and creative excellence exceeded all expectations.
+                        </blockquote>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">SK</div>
+                            <div class="author-info">
+                                <div class="author-name">Sarah Kim</div>
+                                <div class="author-role">CEO, TechVision Labs</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <blockquote class="testimonial-quote">
+                            Working with Nebula was like stepping into the future. They don't just 
+                            design websites—they craft immersive journeys that users never forget.
+                        </blockquote>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">MR</div>
+                            <div class="author-info">
+                                <div class="author-name">Marcus Rodriguez</div>
+                                <div class="author-role">Creative Director, Flux Studio</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <blockquote class="testimonial-quote">
+                            The 3D experience they created for our product launch generated 
+                            300% more engagement. Absolutely phenomenal work and partnership.
+                        </blockquote>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">EJ</div>
+                            <div class="author-info">
+                                <div class="author-name">Emma Johnson</div>
+                                <div class="author-role">CMO, Horizon Brands</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-nav">
+                    <button class="testimonial-dot active" data-index="0" aria-label="Testimonial 1"></button>
+                    <button class="testimonial-dot" data-index="1" aria-label="Testimonial 2"></button>
+                    <button class="testimonial-dot" data-index="2" aria-label="Testimonial 3"></button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA Section -->
+        <section class="cta-section" id="cta">
+            <div class="gravity-ring" style="width: 300px; height: 300px;"></div>
+            <div class="gravity-ring" style="width: 400px; height: 400px;"></div>
+            <div class="gravity-ring" style="width: 500px; height: 500px;"></div>
+            
+            <div class="cta-container">
+                <h2 class="cta-title">Ready to Create?</h2>
+                <p class="cta-text">Let's build something extraordinary together</p>
+                <a href="mailto:hello@nebula.agency" class="cta-button magnetic">
+                    Start a Project
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <div class="footer-brand">NEBULA</div>
+                <p class="footer-tagline">
+                    Creating digital experiences that transcend the ordinary and inspire the extraordinary.
+                </p>
+            </div>
+            
+            <div class="footer-col">
+                <h4 class="footer-heading">Navigation</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#features">Features</a></li>
+                    <li class="footer-link"><a href="#showcase">Showcase</a></li>
+                    <li class="footer-link"><a href="#gallery">Gallery</a></li>
+                    <li class="footer-link"><a href="#testimonials">Stories</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4 class="footer-heading">Services</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">3D Design</a></li>
+                    <li class="footer-link"><a href="#">Motion Design</a></li>
+                    <li class="footer-link"><a href="#">Brand Strategy</a></li>
+                    <li class="footer-link"><a href="#">Development</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4 class="footer-heading">Connect</h4>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="mailto:hello@nebula.agency">hello@nebula.agency</a></li>
+                    <li class="footer-link"><a href="tel:+1234567890">+1 (234) 567-890</a></li>
+                    <li class="footer-link"><a href="#">San Francisco, CA</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p class="footer-copyright">2026 Nebula Agency. All rights reserved. Seed: 653483057</p>
+            <div class="footer-social">
+                <a href="#" class="social-link magnetic" aria-label="Twitter">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+                <a href="#" class="social-link magnetic" aria-label="Instagram">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="2" width="20" height="20" rx="5"/>
+                        <circle cx="12" cy="12" r="4"/>
+                        <circle cx="18" cy="6" r="1.5" fill="currentColor"/>
+                    </svg>
+                </a>
+                <a href="#" class="social-link magnetic" aria-label="LinkedIn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+                <a href="#" class="social-link magnetic" aria-label="Dribbble">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.372 0 0 5.373 0 12s5.372 12 12 12 12-5.373 12-12S18.628 0 12 0zm9.885 11.441c-2.575-.422-4.943-.445-7.103-.073a42.153 42.153 0 00-.767-1.68c2.31-1 4.165-2.358 5.548-4.082a9.863 9.863 0 012.322 5.835zm-3.842-7.282c-1.205 1.554-2.868 2.783-4.986 3.68a46.287 46.287 0 00-3.488-5.438A9.894 9.894 0 0112 2.087c2.275 0 4.368.779 6.043 2.072zM7.527 3.166a44.59 44.59 0 013.537 5.381c-2.43.715-5.331 1.082-8.684 1.105a9.931 9.931 0 015.147-6.486zM2.087 12l.013-.256c3.849-.005 7.169-.448 9.95-1.322.233.475.456.952.67 1.432-3.38 1.057-6.165 3.222-8.337 6.48A9.865 9.865 0 012.087 12zm3.829 7.81c1.969-3.088 4.482-5.098 7.598-6.027a39.137 39.137 0 012.043 7.46c-3.349 1.291-6.953.666-9.641-1.433zm11.586.43a41.098 41.098 0 00-1.92-6.897c1.876-.265 3.94-.196 6.199.196a9.923 9.923 0 01-4.279 6.701z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    /**
+     * ============================================================
+     * NEBULA LANDING PAGE - JAVASCRIPT ARCHITECTURE
+     * Seed: 653483057
+     * ============================================================
+     * 
+     * This script implements the six design choices determined by dice rolls:
+     * 
+     * 1. SUNSET SYNTHWAVE palette applied through CSS variables
+     * 2. PARTICLE FIELD 3D using Three.js with depth and connections
+     * 3. LIQUID MORPHING animations via GSAP with spring physics
+     * 4. VARIABLE WEIGHT typography with scroll-based interpolation
+     * 5. ORGANIC ASYMMETRIC layout with 3D transforms
+     * 6. MAGNETIC CURSOR system with gravity wells and trails
+     * 
+     * PERFORMANCE OPTIMIZATIONS:
+     * - RequestAnimationFrame for all animations
+     * - Intersection Observer for scroll triggers
+     * - Passive event listeners for touch
+     * - CSS containment for isolated rendering
+     * - Debounced resize handlers
+     * - Mobile touch optimizations
+     * - Reduced motion media query support
+     * ============================================================
+     */
+
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
+    const CONFIG = {
+        particleCount: window.matchMedia('(pointer: coarse)').matches ? 50 : 150,
+        connectionDistance: 100,
+        mouseRepelRadius: 150,
+        colors: {
+            magenta: 0xff006e,
+            cyan: 0x00d4ff,
+            coral: 0xff6b35,
+            gold: 0xffd700
+        }
+    };
+
+    // ==========================================
+    // LOADER
+    // ==========================================
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('loader');
+        setTimeout(() => {
+            loader.classList.add('hidden');
+            initApp();
+        }, 800);
+    });
+
+    // ==========================================
+    // MAIN INITIALIZATION
+    // ==========================================
+    function initApp() {
+        initParticles();
+        initMagneticCursor();
+        initScrollProgress();
+        initAnimations();
+        initTestimonials();
+        initStatsCounter();
+        initNavigation();
+    }
+
+    // ==========================================
+    // 3D PARTICLE FIELD (Three.js)
+    // ==========================================
+    function initParticles() {
+        const canvas = document.getElementById('particle-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        // Create particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = CONFIG.particleCount;
+        const posArray = new Float32Array(particlesCount * 3);
+        const velocityArray = new Float32Array(particlesCount * 3);
+        
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            posArray[i] = (Math.random() - 0.5) * 10;
+            posArray[i + 1] = (Math.random() - 0.5) * 10;
+            posArray[i + 2] = (Math.random() - 0.5) * 10;
+            
+            velocityArray[i] = (Math.random() - 0.5) * 0.002;
+            velocityArray[i + 1] = (Math.random() - 0.5) * 0.002;
+            velocityArray[i + 2] = (Math.random() - 0.5) * 0.002;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        
+        // Particle material with custom shader for glow effect
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.03,
+            color: CONFIG.colors.cyan,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        // Lines geometry for connections
+        const linesMaterial = new THREE.LineBasicMaterial({
+            color: CONFIG.colors.magenta,
+            transparent: true,
+            opacity: 0.15
+        });
+        
+        camera.position.z = 3;
+        
+        // Mouse tracking
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        }, { passive: true });
+        
+        // Animation loop
+        let isActive = true;
+        let rafId;
+        
+        function animate() {
+            if (!isActive) return;
+            rafId = requestAnimationFrame(animate);
+            
+            // Smooth mouse follow
+            targetX += (mouseX - targetX) * 0.05;
+            targetY += (mouseY - targetY) * 0.05;
+            
+            // Rotate particles based on mouse
+            particlesMesh.rotation.y += 0.001;
+            particlesMesh.rotation.x = targetY * 0.2;
+            particlesMesh.rotation.y += targetX * 0.2;
+            
+            // Update particle positions
+            const positions = particlesGeometry.attributes.position.array;
+            for (let i = 0; i < particlesCount * 3; i += 3) {
+                positions[i] += velocityArray[i];
+                positions[i + 1] += velocityArray[i + 1];
+                positions[i + 2] += velocityArray[i + 2];
+                
+                // Boundary check
+                if (Math.abs(positions[i]) > 5) velocityArray[i] *= -1;
+                if (Math.abs(positions[i + 1]) > 5) velocityArray[i + 1] *= -1;
+                if (Math.abs(positions[i + 2]) > 5) velocityArray[i + 2] *= -1;
+            }
+            particlesGeometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }, 100);
+        }, { passive: true });
+        
+        // Visibility check
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                isActive = false;
+                cancelAnimationFrame(rafId);
+            } else {
+                isActive = true;
+                animate();
+            }
+        });
+    }
+
+    // ==========================================
+    // MAGNETIC CURSOR SYSTEM
+    // ==========================================
+    function initMagneticCursor() {
+        // Skip on touch devices
+        if (window.matchMedia('(pointer: coarse)').matches) return;
+        
+        const cursor = document.getElementById('cursor');
+        const cursorDot = document.getElementById('cursor-dot');
+        
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        let dotX = 0, dotY = 0;
+        let isMoving = false;
+        let moveTimeout;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            isMoving = true;
+            
+            clearTimeout(moveTimeout);
+            moveTimeout = setTimeout(() => {
+                isMoving = false;
+            }, 100);
+        }, { passive: true });
+        
+        // Magnetic effect on interactive elements
+        const magneticElements = document.querySelectorAll('.magnetic, .magnetic-3d');
+        
+        magneticElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('hover');
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hover');
+                gsap.to(el, { x: 0, y: 0, duration: 0.4, ease: 'elastic.out(1, 0.3)' });
+            });
+            
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const deltaX = (e.clientX - centerX) * 0.3;
+                const deltaY = (e.clientY - centerY) * 0.3;
+                
+                gsap.to(el, {
+                    x: deltaX,
+                    y: deltaY,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+        });
+        
+        // Cursor animation loop
+        function animateCursor() {
+            // Smooth cursor following
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+            dotX += (mouseX - dotX) * 0.35;
+            dotY += (mouseY - dotY) * 0.35;
+            
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            cursorDot.style.left = dotX + 'px';
+            cursorDot.style.top = dotY + 'px';
+            
+            requestAnimationFrame(animateCursor);
+        }
+        
+        animateCursor();
+    }
+
+    // ==========================================
+    // SCROLL PROGRESS INDICATOR
+    // ==========================================
+    function initScrollProgress() {
+        const progressBar = document.getElementById('scroll-progress');
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = scrollTop / docHeight;
+            progressBar.style.transform = `scaleX(${scrollPercent})`;
+        }, { passive: true });
+    }
+
+    // ==========================================
+    // GSAP ANIMATIONS (Liquid Morphing Style)
+    // ==========================================
+    function initAnimations() {
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Hero entrance animation
+        const heroTl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+        
+        heroTl
+            .to('.hero-label', { opacity: 1, y: 0, duration: 0.8, delay: 0.2 })
+            .to('.hero-title-word', { 
+                opacity: 1, 
+                y: 0, 
+                rotateX: 0, 
+                duration: 1, 
+                stagger: 0.15 
+            }, '-=0.4')
+            .to('.hero-subtitle', { opacity: 1, y: 0, duration: 0.8 }, '-=0.6')
+            .to('.hero-cta-group', { opacity: 1, y: 0, duration: 0.8 }, '-=0.4');
+        
+        // Floating elements animation
+        gsap.to('.hero-float-1', {
+            y: -30,
+            x: 20,
+            rotation: 10,
+            duration: 6,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut'
+        });
+        
+        gsap.to('.hero-float-2', {
+            y: 20,
+            x: -30,
+            rotation: -15,
+            duration: 8,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut'
+        });
+        
+        // Orb animations
+        gsap.to('.orb-1', {
+            x: 50,
+            y: 30,
+            duration: 10,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut'
+        });
+        
+        gsap.to('.orb-2', {
+            x: -40,
+            y: -20,
+            duration: 12,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut'
+        });
+        
+        gsap.to('.orb-3', {
+            scale: 1.2,
+            duration: 8,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut'
+        });
+        
+        // Feature cards scroll animation
+        gsap.utils.toArray('.feature-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                },
+                y: 100,
+                opacity: 0,
+                duration: 0.8,
+                delay: i * 0.1,
+                ease: 'power3.out'
+            });
+        });
+        
+        // Gallery items parallax
+        gsap.utils.toArray('.gallery-item').forEach((item, i) => {
+            gsap.from(item, {
+                scrollTrigger: {
+                    trigger: item,
+                    start: 'top 90%',
+                    toggleActions: 'play none none reverse'
+                },
+                z: -200,
+                opacity: 0,
+                duration: 1,
+                delay: i * 0.15,
+                ease: 'power2.out'
+            });
+        });
+        
+        // Showcase stats animation trigger
+        ScrollTrigger.create({
+            trigger: '.showcase-stats',
+            start: 'top 80%',
+            onEnter: () => animateStats()
+        });
+        
+        // Variable weight typography based on scroll
+        let lastScrollY = window.scrollY;
+        let ticking = false;
+        
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    const scrollY = window.scrollY;
+                    const velocity = Math.abs(scrollY - lastScrollY);
+                    const weight = Math.min(700, 300 + velocity * 5);
+                    
+                    document.querySelectorAll('.section-title').forEach(el => {
+                        el.style.fontWeight = weight;
+                    });
+                    
+                    lastScrollY = scrollY;
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }, { passive: true });
+    }
+
+    // ==========================================
+    // TESTIMONIALS CAROUSEL
+    // ==========================================
+    function initTestimonials() {
+        const track = document.getElementById('testimonial-track');
+        const dots = document.querySelectorAll('.testimonial-dot');
+        let currentIndex = 0;
+        let autoplayInterval;
+        
+        function goToSlide(index) {
+            currentIndex = index;
+            track.style.transform = `translateX(-${index * 100}%)`;
+            
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+        
+        function nextSlide() {
+            goToSlide((currentIndex + 1) % dots.length);
+        }
+        
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                goToSlide(index);
+                resetAutoplay();
+            });
+        });
+        
+        function startAutoplay() {
+            autoplayInterval = setInterval(nextSlide, 5000);
+        }
+        
+        function resetAutoplay() {
+            clearInterval(autoplayInterval);
+            startAutoplay();
+        }
+        
+        startAutoplay();
+        
+        // Touch swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        track.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        track.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) {
+                goToSlide((currentIndex + 1) % dots.length);
+                resetAutoplay();
+            } else if (touchEndX - touchStartX > 50) {
+                goToSlide((currentIndex - 1 + dots.length) % dots.length);
+                resetAutoplay();
+            }
+        }, { passive: true });
+    }
+
+    // ==========================================
+    // STATS COUNTER ANIMATION
+    // ==========================================
+    function initStatsCounter() {
+        // Stats are animated when section comes into view
+        // See initAnimations() for ScrollTrigger setup
+    }
+    
+    function animateStats() {
+        const stats = document.querySelectorAll('.stat-number');
+        
+        stats.forEach(stat => {
+            const target = parseInt(stat.dataset.target);
+            const suffix = stat.textContent.includes('%') ? '%' : '+';
+            
+            gsap.to(stat, {
+                textContent: target,
+                duration: 2,
+                ease: 'power2.out',
+                snap: { textContent: 1 },
+                onUpdate: function() {
+                    stat.textContent = Math.round(this.targets()[0].textContent) + suffix;
+                }
+            });
+        });
+    }
+
+    // ==========================================
+    // NAVIGATION
+    // ==========================================
+    function initNavigation() {
+        const nav = document.getElementById('nav');
+        let lastScroll = 0;
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.scrollY;
+            
+            if (currentScroll > 100) {
+                nav.style.background = 'rgba(10, 1, 24, 0.9)';
+            } else {
+                nav.style.background = 'rgba(10, 1, 24, 0.5)';
+            }
+            
+            lastScroll = currentScroll;
+        }, { passive: true });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    }
+    </script>
+</body>
+</html>

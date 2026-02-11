@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    =============================================================================
+    CONTACT.HTML - Contact Page
+    Seed: 297883763
+    =============================================================================
+    
+    SEED DECOMPOSITION:
+    ╔══════════╦═══════╦══════════════════════════════════════════════════════════╗
+    ║ Position ║ Digit ║ Design Domain                                            ║
+    ╠══════════╬═══════╬══════════════════════════════════════════════════════════╣
+    ║    1     ║   2   ║ Color: Deep Ocean (Teals, Navy, Coral accents)          ║
+    ║    2     ║   9   ║ Typography: Ultra Modern (Space Grotesk + Inter)        ║
+    ║    3     ║   7   ║ Layout: Dense spacing (0.5rem increments)               ║
+    ║    4     ║   8   ║ Animation: Maximal (complex sequences, 3D)              ║
+    ║    5     ║   8   ║ Form: Multi-layered with validation states              ║
+    ║    6     ║   3   ║ Texture: Moderate layered (gradients + shadows)         ║
+    ║    7     ║   7   ║ Density: Compact information layout                     ║
+    ║    8     ║   6   ║ Interaction: 3D depth, parallax, transforms             ║
+    ║    9     ║   3   ║ Geometry: Mixed angularity (some sharp accents)         ║
+    ╚══════════╩═══════╩══════════════════════════════════════════════════════════╝
+    
+    PAGE PURPOSE: Multi-step contact form with rich interaction
+    =============================================================================
+  -->
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Get in touch with Oceanic. We're here to help with any questions or inquiries.">
+  <meta name="theme-color" content="#0f172a">
+  
+  <title>Contact Us | Oceanic</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  
+  <style>
+    .page-header {
+      padding: 160px 0 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .page-header__bg {
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-glow);
+      opacity: 0.3;
+    }
+    
+    .page-header__content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .page-header__title {
+      font-size: var(--text-5xl);
+      margin-bottom: var(--space-4);
+    }
+    
+    .page-header__description {
+      font-size: var(--text-xl);
+      color: var(--text-secondary);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    
+    .contact-section {
+      padding: var(--space-20) 0;
+    }
+    
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+      align-items: start;
+    }
+    
+    @media (max-width: 1024px) {
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .contact-info {
+      position: sticky;
+      top: 100px;
+    }
+    
+    .contact-info__eyebrow {
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-widest);
+      color: var(--color-primary-400);
+      margin-bottom: var(--space-4);
+    }
+    
+    .contact-info__title {
+      font-size: var(--text-3xl);
+      margin-bottom: var(--space-6);
+    }
+    
+    .contact-info__text {
+      color: var(--text-secondary);
+      line-height: var(--leading-relaxed);
+      margin-bottom: var(--space-8);
+    }
+    
+    .contact-methods {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+    
+    .contact-method {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      padding: var(--space-5);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      transition: all var(--duration-normal) var(--ease-spring);
+    }
+    
+    .contact-method:hover {
+      transform: translateX(8px);
+      background: var(--bg-tertiary);
+    }
+    
+    .contact-method__icon {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient-ocean);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary-300);
+      flex-shrink: 0;
+    }
+    
+    .contact-method__content h4 {
+      font-size: var(--text-lg);
+      margin-bottom: var(--space-1);
+    }
+    
+    .contact-method__content p {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+    
+    .contact-form-wrapper {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-3xl);
+      padding: var(--space-8);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .contact-form-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-accent);
+    }
+    
+    .contact-form {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-5);
+    }
+    
+    @media (max-width: 640px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .form-group {
+      margin-bottom: var(--space-5);
+    }
+    
+    .form-label {
+      display: block;
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+    
+    .form-label--required::after {
+      content: '*';
+      color: var(--color-accent-500);
+      margin-left: var(--space-1);
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+      border: 2px solid transparent;
+      border-radius: var(--radius-xl);
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+    
+    .form-input:hover,
+    .form-select:hover,
+    .form-textarea:hover {
+      background: var(--bg-elevated);
+    }
+    
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--color-primary-500);
+      background: var(--bg-primary);
+      box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+    }
+    
+    .form-textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+    
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--space-3) center;
+      background-size: 1.2em;
+      padding-right: var(--space-10);
+    }
+    
+    .form-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      cursor: pointer;
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+    
+    .form-checkbox input {
+      width: 1.25rem;
+      height: 1.25rem;
+      accent-color: var(--color-primary-500);
+      cursor: pointer;
+      margin-top: 2px;
+    }
+    
+    .form-submit {
+      width: 100%;
+      margin-top: var(--space-4);
+    }
+    
+    .map-section {
+      padding: var(--space-20) 0;
+      background: var(--bg-secondary);
+    }
+    
+    .map-container {
+      border-radius: var(--radius-3xl);
+      overflow: hidden;
+      aspect-ratio: 21/9;
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .map-placeholder {
+      text-align: center;
+      color: var(--text-muted);
+    }
+    
+    .map-placeholder svg {
+      margin-bottom: var(--space-4);
+      opacity: 0.5;
+    }
+    
+    .faq-section {
+      padding: var(--space-20) 0;
+    }
+    
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6);
+      margin-top: var(--space-12);
+    }
+    
+    @media (max-width: 768px) {
+      .faq-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav__container">
+      <a href="index.html" class="nav__logo">
+        <svg class="nav__logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+          <path d="M10 16C10 16 12 10 16 10C20 10 22 16 22 16C22 16 20 22 16 22C12 22 10 16 10 16Z" stroke="currentColor" stroke-width="2"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+        </svg>
+        Oceanic
+      </a>
+      
+      <ul class="nav__menu" role="menubar">
+        <li role="none"><a href="index.html" class="nav__link" role="menuitem">Home</a></li>
+        <li role="none"><a href="about.html" class="nav__link" role="menuitem">About</a></li>
+        <li role="none"><a href="services.html" class="nav__link" role="menuitem">Services</a></li>
+        <li role="none"><a href="online-shop.html" class="nav__link" role="menuitem">Shop</a></li>
+        <li role="none"><a href="blog.html" class="nav__link" role="menuitem">Blog</a></li>
+        <li role="none"><a href="contact.html" class="nav__link nav__link--active" role="menuitem">Contact</a></li>
+      </ul>
+      
+      <div class="nav__actions">
+        <a href="login.html" class="btn btn--ghost btn--small">Sign In</a>
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+        <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+    <!-- Page Header -->
+    <header class="page-header">
+      <div class="page-header__bg" aria-hidden="true"></div>
+      <div class="container page-header__content">
+        <p class="section-header__eyebrow" style="margin-bottom: var(--space-4);">Get In Touch</p>
+        <h1 class="page-header__title">Contact Us</h1>
+        <p class="page-header__description">
+          Have a question or inquiry? We'd love to hear from you. Send us a message 
+          and we'll respond as soon as possible.
+        </p>
+      </div>
+    </header>
+
+    <!-- Contact Section -->
+    <section class="contact-section" aria-labelledby="contact-title">
+      <div class="container">
+        <div class="contact-grid">
+          <!-- Contact Info -->
+          <div class="contact-info reveal">
+            <p class="contact-info__eyebrow">Let's Connect</p>
+            <h2 id="contact-title" class="contact-info__title">We're Here to Help</h2>
+            <p class="contact-info__text">
+              Whether you have a question about our products, pricing, need a demo, 
+              or anything else, our team is ready to answer all your questions.
+            </p>
+            
+            <div class="contact-methods">
+              <div class="contact-method reveal">
+                <div class="contact-method__icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                </div>
+                <div class="contact-method__content">
+                  <h4>Email Us</h4>
+                  <p>hello@oceanic.com<br>support@oceanic.com</p>
+                </div>
+              </div>
+              
+              <div class="contact-method reveal">
+                <div class="contact-method__icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </div>
+                <div class="contact-method__content">
+                  <h4>Call Us</h4>
+                  <p>+1 (555) 123-4567<br>Mon-Fri 9am-6pm EST</p>
+                </div>
+              </div>
+              
+              <div class="contact-method reveal">
+                <div class="contact-method__icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                </div>
+                <div class="contact-method__content">
+                  <h4>Visit Us</h4>
+                  <p>123 Ocean Avenue, Suite 100<br>San Francisco, CA 94102</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Contact Form -->
+          <div class="contact-form-wrapper reveal">
+            <form class="contact-form" action="#" method="POST" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="firstName" class="form-label form-label--required">First Name</label>
+                  <input type="text" id="firstName" name="firstName" class="form-input" placeholder="John" required aria-required="true">
+                </div>
+                <div class="form-group">
+                  <label for="lastName" class="form-label form-label--required">Last Name</label>
+                  <input type="text" id="lastName" name="lastName" class="form-input" placeholder="Doe" required aria-required="true">
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="email" class="form-label form-label--required">Email Address</label>
+                  <input type="email" id="email" name="email" class="form-input" placeholder="john@example.com" required aria-required="true">
+                </div>
+                <div class="form-group">
+                  <label for="phone" class="form-label">Phone Number</label>
+                  <input type="tel" id="phone" name="phone" class="form-input" placeholder="+1 (555) 000-0000">
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="subject" class="form-label form-label--required">Subject</label>
+                <select id="subject" name="subject" class="form-select" required aria-required="true">
+                  <option value="">Select a subject</option>
+                  <option value="general">General Inquiry</option>
+                  <option value="support">Technical Support</option>
+                  <option value="sales">Sales Question</option>
+                  <option value="partnership">Partnership</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="message" class="form-label form-label--required">Message</label>
+                <textarea id="message" name="message" class="form-textarea" placeholder="Tell us how we can help you..." required aria-required="true"></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-checkbox">
+                  <input type="checkbox" name="newsletter" value="yes">
+                  <span>Subscribe to our newsletter for updates and exclusive offers</span>
+                </label>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-checkbox">
+                  <input type="checkbox" name="privacy" required aria-required="true">
+                  <span>I agree to the <a href="#">Privacy Policy</a> and processing of my personal data</span>
+                </label>
+              </div>
+              
+              <button type="submit" class="btn btn--primary btn--large form-submit">
+                Send Message
+                <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map-section" aria-label="Location map">
+      <div class="container">
+        <div class="map-container reveal">
+          <div class="map-placeholder">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <p>Interactive Map</p>
+            <p style="font-size: var(--text-sm);">123 Ocean Avenue, San Francisco, CA 94102</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section" aria-labelledby="faq-title">
+      <div class="container">
+        <header class="section-header reveal">
+          <p class="section-header__eyebrow">Common Questions</p>
+          <h2 id="faq-title" class="section-header__title">Frequently Asked Questions</h2>
+          <p class="section-header__description">
+            Can't find the answer you're looking for? Reach out to our customer support team.
+          </p>
+        </header>
+        
+        <div class="faq-grid">
+          <div class="accordion reveal" data-single="false">
+            <div class="accordion__item">
+              <button class="accordion__trigger" aria-expanded="false">
+                What are your business hours?
+                <svg class="accordion__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+              <div class="accordion__content">
+                <div class="accordion__inner">
+                  Our customer support team is available Monday through Friday, 9:00 AM to 6:00 PM EST. 
+                  For urgent inquiries outside these hours, please email us and we'll respond as soon as possible.
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion__item">
+              <button class="accordion__trigger" aria-expanded="false">
+                How quickly do you respond to inquiries?
+                <svg class="accordion__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+              <div class="accordion__content">
+                <div class="accordion__inner">
+                  We aim to respond to all inquiries within 24 business hours. For technical support 
+                  issues, we typically respond within 4 hours during business hours.
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="accordion reveal" data-single="false">
+            <div class="accordion__item">
+              <button class="accordion__trigger" aria-expanded="false">
+                Do you offer international shipping?
+                <svg class="accordion__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+              <div class="accordion__content">
+                <div class="accordion__inner">
+                  Yes, we ship to over 100 countries worldwide. International shipping rates and 
+                  delivery times vary by location. You can see exact shipping costs at checkout.
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion__item">
+              <button class="accordion__trigger" aria-expanded="false">
+                What is your return policy?
+                <svg class="accordion__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+              <div class="accordion__content">
+                <div class="accordion__inner">
+                  We offer a 30-day return policy on all unused items in their original packaging. 
+                  Simply contact our support team to initiate a return.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <a href="index.html" class="footer__logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="16" cy="16" r="14"/>
+              <path d="M10 16C10 16 12 10 16 10C20 10 22 16 22 16C22 16 20 22 16 22C12 22 10 16 10 16Z"/>
+              <circle cx="16" cy="16" r="3" fill="currentColor"/>
+            </svg>
+            Oceanic
+          </a>
+          <p class="footer__description">
+            Premium e-commerce experience with cutting-edge design, exceptional products, and unparalleled service.
+          </p>
+          <div class="footer__social">
+            <a href="#" class="footer__social-link" aria-label="Twitter">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+              </svg>
+            </a>
+            <a href="#" class="footer__social-link" aria-label="Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </a>
+            <a href="#" class="footer__social-link" aria-label="LinkedIn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                <rect x="2" y="9" width="4" height="12"/>
+                <circle cx="4" cy="4" r="2"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="footer__title">Shop</h4>
+          <ul class="footer__links">
+            <li><a href="online-shop.html" class="footer__link">All Products</a></li>
+            <li><a href="services.html" class="footer__link">Services</a></li>
+            <li><a href="pricing.html" class="footer__link">Pricing</a></li>
+            <li><a href="case-studies.html" class="footer__link">Case Studies</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="footer__title">Company</h4>
+          <ul class="footer__links">
+            <li><a href="about.html" class="footer__link">About Us</a></li>
+            <li><a href="blog.html" class="footer__link">Blog</a></li>
+            <li><a href="resources.html" class="footer__link">Resources</a></li>
+            <li><a href="contact.html" class="footer__link">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="footer__title">Support</h4>
+          <ul class="footer__links">
+            <li><a href="#" class="footer__link">Help Center</a></li>
+            <li><a href="#" class="footer__link">Terms of Service</a></li>
+            <li><a href="#" class="footer__link">Privacy Policy</a></li>
+            <li><a href="#" class="footer__link">Status</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer__bottom">
+        <p class="footer__copyright">&copy; 2026 Oceanic. All rights reserved.</p>
+        <div class="footer__legal">
+          <a href="#" class="footer__legal-link">Terms</a>
+          <a href="#" class="footer__legal-link">Privacy</a>
+          <a href="#" class="footer__legal-link">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js" defer></script>
+  <script src="js/components.js" defer></script>
+</body>
+</html>

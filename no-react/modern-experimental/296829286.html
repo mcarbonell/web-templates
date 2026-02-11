@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS | Future-Forward Design Studio</title>
+  
+  <!-- 
+    DESIGN SYSTEM - Seed: 296829286
+    =================================
+    Decomposed from seed digits: 2-9-6-8-2-9-2-8-6
+    
+    [2] Color Mode: Dual mode (Light/Dark toggle)
+    [9] Primary Effect: Scroll-driven animations
+    [6] Typography: Stroke text with gradient fill
+    [8] Shader: WebGL noise/dithering fluid simulation
+    [2] Cards: Glassmorphism with backdrop blur
+    [9] Ambient: Aurora gradient blobs
+    [2] Interaction: Magnetic buttons
+    [8] Depth: Multi-layer parallax
+    [6] Texture: Bayer dithering overlay
+    
+    Palette:
+    - Dark: #0a0a0f (deep void), #1a1a2e (midnight), #16213e (navy)
+    - Light: #fafafa (pure light), #f0f0f5 (soft gray), #e8e8f0 (mist)
+    - Accent: #ff006e (hot pink), #fb5607 (orange), #ffbe0b (gold), #8338ec (violet)
+    
+    Typography:
+    - Display: System font stack with tight tracking
+    - Body: System-ui for optimal readability
+    
+    Performance Targets:
+    - 60fps on mid-range mobile via GPU acceleration
+    - requestAnimationFrame for all animations
+    - Passive event listeners
+    - will-change hints for transformed elements
+    - WebGL context with powerPreference: low-power
+  -->
+  
+  <style>
+    /* ========================================
+       CSS VARIABLES & THEME SYSTEM
+       ======================================== */
+    :root {
+      /* Dark mode (default) */
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-tertiary: #1a1a2e;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0b0;
+      --text-muted: #606070;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      
+      /* Accents */
+      --accent-pink: #ff006e;
+      --accent-orange: #fb5607;
+      --accent-gold: #ffbe0b;
+      --accent-violet: #8338ec;
+      --accent-cyan: #3a86ff;
+      
+      /* Animation timing */
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+      
+      /* Spacing */
+      --section-padding: clamp(4rem, 10vh, 8rem);
+    }
+    
+    [data-theme="light"] {
+      --bg-primary: #fafafa;
+      --bg-secondary: #f5f5fa;
+      --bg-tertiary: #e8e8f0;
+      --text-primary: #0a0a0f;
+      --text-secondary: #505060;
+      --text-muted: #9090a0;
+      --border-color: rgba(0, 0, 0, 0.1);
+      --glass-bg: rgba(255, 255, 255, 0.6);
+      --glass-border: rgba(0, 0, 0, 0.05);
+    }
+    
+    /* ========================================
+       RESET & BASE
+       ======================================== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color 0.5s var(--ease-out-expo), color 0.5s var(--ease-out-expo);
+    }
+    
+    /* ========================================
+       WEBGL CANVAS BACKGROUND
+       ======================================== */
+    #shader-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      opacity: 0.6;
+    }
+    
+    /* ========================================
+       AURORA BLOBS
+       ======================================== */
+    .aurora-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    
+    .aurora-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      will-change: transform;
+    }
+    
+    .blob-1 {
+      width: 600px;
+      height: 600px;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-violet));
+      top: -200px;
+      right: -200px;
+      animation: float-blob-1 20s ease-in-out infinite;
+    }
+    
+    .blob-2 {
+      width: 500px;
+      height: 500px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+      bottom: -150px;
+      left: -150px;
+      animation: float-blob-2 25s ease-in-out infinite;
+    }
+    
+    .blob-3 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink));
+      top: 50%;
+      left: 50%;
+      animation: float-blob-3 18s ease-in-out infinite;
+    }
+    
+    @keyframes float-blob-1 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      33% { transform: translate(-50px, 30px) rotate(120deg) scale(1.1); }
+      66% { transform: translate(30px, -50px) rotate(240deg) scale(0.9); }
+    }
+    
+    @keyframes float-blob-2 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      50% { transform: translate(60px, -40px) rotate(180deg) scale(1.15); }
+    }
+    
+    @keyframes float-blob-3 {
+      0%, 100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+      25% { transform: translate(-40%, -60%) rotate(90deg) scale(1.05); }
+      50% { transform: translate(-60%, -40%) rotate(180deg) scale(0.95); }
+      75% { transform: translate(-45%, -55%) rotate(270deg) scale(1.02); }
+    }
+    
+    /* ========================================
+       DITHERING OVERLAY
+       ======================================== */
+    .dither-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h1v1H0zM2 0h1v1H2zM1 1h1v1H1zM3 1h1v1H3zM0 2h1v1H0zM2 2h1v1H2zM1 3h1v1H1zM3 3h1v1H3z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-size: 4px 4px;
+    }
+    
+    [data-theme="light"] .dither-overlay {
+      opacity: 0.02;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h1v1H0zM2 0h1v1H2zM1 1h1v1H1zM3 1h1v1H3zM0 2h1v1H0zM2 2h1v1H2zM1 3h1v1H1zM3 3h1v1H3z' fill='%23000000'/%3E%3C/svg%3E");
+    }
+    
+    /* ========================================
+       NAVIGATION
+       ======================================== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.5rem clamp(1rem, 5vw, 3rem);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to bottom, var(--bg-primary), transparent);
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      text-decoration: none;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .logo-mark {
+      width: 2rem;
+      height: 2rem;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-violet));
+      border-radius: 0.5rem;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+    
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-pink), var(--accent-violet));
+      transition: width 0.3s var(--ease-out-expo);
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    /* Theme Toggle */
+    .theme-toggle {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: transform 0.3s var(--ease-out-expo), background 0.3s ease;
+      color: var(--text-primary);
+      font-size: 1.25rem;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1) rotate(15deg);
+    }
+    
+    /* Mobile menu */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+    }
+    
+    /* ========================================
+       HERO SECTION
+       ======================================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--section-padding) clamp(1rem, 5vw, 3rem);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      animation: fade-in-up 1s var(--ease-out-expo) forwards;
+      opacity: 0;
+    }
+    
+    .hero-label::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent-pink);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+    
+    /* Stroke Text Effect */
+    .hero-title {
+      font-size: clamp(3rem, 12vw, 10rem);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.5rem;
+    }
+    
+    .stroke-text {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--text-primary);
+      position: relative;
+      animation: stroke-reveal 1.5s var(--ease-out-expo) forwards;
+      animation-delay: 0.2s;
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    
+    .stroke-text::before {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-orange), var(--accent-gold), var(--accent-violet));
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-stroke: 0;
+      animation: gradient-shift 8s ease infinite;
+      clip-path: inset(0 100% 0 0);
+      transition: clip-path 1.5s var(--ease-out-expo);
+    }
+    
+    .stroke-text.revealed::before {
+      clip-path: inset(0 0 0 0);
+    }
+    
+    @keyframes stroke-reveal {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .hero-subtitle {
+      font-size: clamp(1.125rem, 2vw, 1.5rem);
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin-bottom: 3rem;
+      animation: fade-in-up 1s var(--ease-out-expo) forwards;
+      animation-delay: 0.4s;
+      opacity: 0;
+    }
+    
+    @keyframes fade-in-up {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+    }
+    
+    /* Magnetic Button */
+    .cta-container {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      animation: fade-in-up 1s var(--ease-out-expo) forwards;
+      animation-delay: 0.6s;
+      opacity: 0;
+    }
+    
+    .magnetic-btn {
+      position: relative;
+      padding: 1rem 2.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 3rem;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.3s var(--ease-out-expo);
+      will-change: transform;
+    }
+    
+    .magnetic-btn-primary {
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-violet));
+      color: white;
+    }
+    
+    .magnetic-btn-secondary {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+    }
+    
+    .magnetic-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .magnetic-btn:hover::before {
+      opacity: 1;
+    }
+    
+    .magnetic-btn span {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      animation: bounce 2s ease-in-out infinite;
+    }
+    
+    .scroll-line {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, var(--text-muted), transparent);
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(10px); }
+    }
+    
+    /* ========================================
+       BENTO GRID SECTION
+       ======================================== */
+    .bento-section {
+      padding: var(--section-padding) clamp(1rem, 5vw, 3rem);
+      position: relative;
+    }
+    
+    .section-header {
+      max-width: 1400px;
+      margin: 0 auto 4rem;
+    }
+    
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent-pink);
+      margin-bottom: 1rem;
+    }
+    
+    .section-title {
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+    
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    @media (max-width: 1024px) {
+      .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .bento-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.5s var(--ease-out-expo), box-shadow 0.5s var(--ease-out-expo);
+      will-change: transform;
+    }
+    
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 0, 110, 0.1), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .bento-card:hover::before {
+      opacity: 1;
+    }
+    
+    .bento-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .bento-card-featured {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+    
+    @media (max-width: 1024px) {
+      .bento-card-featured {
+        grid-column: span 2;
+        grid-row: span 1;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .bento-card-featured {
+        grid-column: span 1;
+      }
+    }
+    
+    .card-icon {
+      width: 3rem;
+      height: 3rem;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-violet));
+      border-radius: 1rem;
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+    
+    .card-description {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+    }
+    
+    .card-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--glass-border);
+    }
+    
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-violet));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    /* Large card content */
+    .card-visual {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 60%;
+      height: 60%;
+      opacity: 0.1;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-violet));
+      border-radius: 2rem 0 0 0;
+    }
+    
+    /* ========================================
+       PARALLAX SHOWCASE
+       ======================================== */
+    .showcase-section {
+      padding: var(--section-padding) 0;
+      overflow: hidden;
+    }
+    
+    .parallax-container {
+      position: relative;
+      height: 80vh;
+      min-height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .parallax-layer {
+      position: absolute;
+      will-change: transform;
+    }
+    
+    .parallax-text-back {
+      font-size: clamp(4rem, 15vw, 12rem);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      color: var(--bg-tertiary);
+      opacity: 0.5;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    
+    .parallax-image {
+      width: min(80vw, 600px);
+      height: min(60vw, 450px);
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-violet));
+      border-radius: 2rem;
+      z-index: 2;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .parallax-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(0,0,0,0.3));
+    }
+    
+    .parallax-text-front {
+      font-size: clamp(2rem, 8vw, 6rem);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      z-index: 3;
+      text-align: center;
+      color: var(--text-primary);
+      text-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    
+    .parallax-highlight {
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-gold));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* ========================================
+       FEATURES WITH SCROLL ANIMATIONS
+       ======================================== */
+    .features-section {
+      padding: var(--section-padding) clamp(1rem, 5vw, 3rem);
+    }
+    
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto 8rem;
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    
+    .feature-row.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
+    }
+    
+    .feature-row:nth-child(even) {
+      direction: rtl;
+    }
+    
+    .feature-row:nth-child(even) > * {
+      direction: ltr;
+    }
+    
+    @media (max-width: 768px) {
+      .feature-row {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      
+      .feature-row:nth-child(even) {
+        direction: ltr;
+      }
+    }
+    
+    .feature-content h3 {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+    
+    .feature-content p {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+    
+    .feature-visual {
+      aspect-ratio: 4/3;
+      background: var(--bg-secondary);
+      border-radius: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+    }
+    
+    .feature-visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-violet));
+      opacity: 0.1;
+    }
+    
+    .feature-ascii {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-family: 'Courier New', monospace;
+      font-size: 0.5rem;
+      line-height: 1;
+      color: var(--text-muted);
+      opacity: 0.3;
+      white-space: pre;
+      letter-spacing: 0.1em;
+    }
+    
+    /* ========================================
+       FOOTER
+       ======================================== */
+    .footer {
+      padding: 4rem clamp(1rem, 5vw, 3rem);
+      border-top: 1px solid var(--glass-border);
+    }
+    
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    
+    .footer-text {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .footer-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+    }
+    
+    .footer-link:hover {
+      color: var(--accent-pink);
+    }
+    
+    /* ========================================
+       SCROLL SNAP CONTAINER
+       ======================================== */
+    .snap-section {
+      scroll-snap-align: start;
+    }
+    
+    html {
+      scroll-snap-type: y proximity;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-snap-type: none;
+      }
+      
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Dithering Overlay -->
+  <div class="dither-overlay"></div>
+  
+  <!-- WebGL Canvas for fluid shader -->
+  <canvas id="shader-canvas"></canvas>
+  
+  <!-- Aurora Gradient Blobs -->
+  <div class="aurora-container">
+    <div class="aurora-blob blob-1"></div>
+    <div class="aurora-blob blob-2"></div>
+    <div class="aurora-blob blob-3"></div>
+  </div>
+  
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="#" class="logo">
+      <span class="logo-mark">N</span>
+      <span>NEXUS</span>
+    </a>
+    
+    <div class="nav-links">
+      <a href="#work" class="nav-link">Work</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#about" class="nav-link">About</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span id="themeIcon">◐</span>
+      </button>
+    </div>
+    
+    <button class="menu-toggle" aria-label="Menu">☰</button>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section class="hero snap-section" id="hero">
+    <div class="hero-content">
+      <div class="hero-label">
+        <span>Available for projects</span>
+      </div>
+      
+      <h1 class="hero-title">
+        <span class="stroke-text" data-text="DIGITAL">DIGITAL</span>
+        <span class="stroke-text" data-text="ALCHEMY">ALCHEMY</span>
+      </h1>
+      
+      <p class="hero-subtitle">
+        We transform bold ideas into immersive digital experiences. 
+        Award-winning design meets cutting-edge technology.
+      </p>
+      
+      <div class="cta-container">
+        <button class="magnetic-btn magnetic-btn-primary" data-magnetic>
+          <span>Start a Project →</span>
+        </button>
+        <button class="magnetic-btn magnetic-btn-secondary" data-magnetic>
+          <span>View Our Work</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+  
+  <!-- Bento Grid Section -->
+  <section class="bento-section snap-section" id="services">
+    <div class="section-header">
+      <p class="section-label">What We Do</p>
+      <h2 class="section-title">Crafting digital<br>excellence</h2>
+    </div>
+    
+    <div class="bento-grid">
+      <div class="bento-card bento-card-featured" data-tilt>
+        <div class="card-icon">◈</div>
+        <h3 class="card-title">Brand Strategy & Identity</h3>
+        <p class="card-description">
+          We build memorable brands that resonate with your audience. From visual identity 
+          systems to comprehensive brand guidelines, we create cohesive experiences that 
+          tell your story and differentiate you in the market.
+        </p>
+        <div class="card-stats">
+          <div class="stat">
+            <span class="stat-value">150+</span>
+            <span class="stat-label">Brands Created</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">98%</span>
+            <span class="stat-label">Client Satisfaction</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">12</span>
+            <span class="stat-label">Design Awards</span>
+          </div>
+        </div>
+        <div class="card-visual"></div>
+      </div>
+      
+      <div class="bento-card" data-tilt>
+        <div class="card-icon">◉</div>
+        <h3 class="card-title">Web Experiences</h3>
+        <p class="card-description">
+          Immersive websites that push the boundaries of what's possible on the web.
+        </p>
+      </div>
+      
+      <div class="bento-card" data-tilt>
+        <div class="card-icon">◆</div>
+        <h3 class="card-title">Motion Design</h3>
+        <p class="card-description">
+          Kinetic typography and fluid animations that bring interfaces to life.
+        </p>
+      </div>
+      
+      <div class="bento-card" data-tilt>
+        <div class="card-icon">◎</div>
+        <h3 class="card-title">3D & WebGL</h3>
+        <p class="card-description">
+          Interactive 3D experiences and custom shaders for next-level engagement.
+        </p>
+      </div>
+      
+      <div class="bento-card" data-tilt>
+        <div class="card-icon">◇</div>
+        <h3 class="card-title">Design Systems</h3>
+        <p class="card-description">
+          Scalable component libraries that ensure consistency across all touchpoints.
+        </p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Parallax Showcase -->
+  <section class="showcase-section snap-section" id="work">
+    <div class="parallax-container" id="parallaxContainer">
+      <div class="parallax-layer parallax-text-back" data-speed="0.2">
+        IMMERSION
+      </div>
+      
+      <div class="parallax-layer parallax-image" data-speed="0.5" id="parallaxImage">
+        <!-- Gradient background with subtle animation -->
+      </div>
+      
+      <div class="parallax-layer parallax-text-front" data-speed="0.8">
+        Create<br>
+        <span class="parallax-highlight">Without</span><br>
+        Limits
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features-section snap-section" id="about">
+    <div class="feature-row" data-scroll-reveal>
+      <div class="feature-content">
+        <p class="section-label">Our Approach</p>
+        <h3>Strategy First, Design Second</h3>
+        <p>
+          We begin every project with deep research and strategic thinking. 
+          Understanding your goals, audience, and market allows us to create 
+          designs that don't just look beautiful—they drive results.
+        </p>
+      </div>
+      <div class="feature-visual">
+        <div class="feature-ascii">    ╱╲
+   ╱  ╲
+  ╱ ◆  ╲
+ ╱______╲
+ ╲      ╱
+  ╲    ╱
+   ╲  ╱
+    ╲╱</div>
+      </div>
+    </div>
+    
+    <div class="feature-row" data-scroll-reveal>
+      <div class="feature-content">
+        <p class="section-label">Technology</p>
+        <h3>Built for Performance</h3>
+        <p>
+          Speed is a feature. We optimize every interaction for 60fps performance, 
+          ensuring your experience feels as good as it looks—even on mobile devices.
+        </p>
+      </div>
+      <div class="feature-visual">
+        <div class="feature-ascii">┌─────────┐
+│  60 FPS │
+│  ┌───┐  │
+│  │ ◆ │  │
+│  └───┘  │
+└─────────┘</div>
+      </div>
+    </div>
+    
+    <div class="feature-row" data-scroll-reveal>
+      <div class="feature-content">
+        <p class="section-label">Collaboration</p>
+        <h3>Partners, Not Vendors</h3>
+        <p>
+          We embed ourselves in your team. Through transparent communication and 
+          iterative feedback loops, we ensure the final product exceeds expectations.
+        </p>
+      </div>
+      <div class="feature-visual">
+        <div class="feature-ascii">   ◆
+  ╱ ╲
+ ◆   ◆
+  ╲ ╱
+   ◆</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-text">© 2025 NEXUS Studio. Crafted with precision.</p>
+      <div class="footer-links">
+        <a href="#" class="footer-link">Twitter</a>
+        <a href="#" class="footer-link">Instagram</a>
+        <a href="#" class="footer-link">LinkedIn</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- WebGL Shader Script -->
+  <script>
+    // ========================================
+    // WEBGL FLUID NOISE SHADER
+    // ========================================
+    const canvas = document.getElementById('shader-canvas');
+    const gl = canvas.getContext('webgl', { 
+      powerPreference: 'low-power',
+      antialias: false 
+    }) || canvas.getContext('experimental-webgl');
+    
+    if (gl) {
+      // Vertex shader
+      const vertexShaderSource = `
+        attribute vec2 position;
+        void main() {
+          gl_Position = vec4(position, 0.0, 1.0);
+        }
+      `;
+      
+      // Fragment shader - Fluid noise with dithering
+      const fragmentShaderSource = `
+        precision mediump float;
+        uniform float time;
+        uniform vec2 resolution;
+        uniform vec2 mouse;
+        
+        // Simplex noise functions
+        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+        
+        float snoise(vec2 v) {
+          const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                             -0.577350269189626, 0.024390243902439);
+          vec2 i  = floor(v + dot(v, C.yy));
+          vec2 x0 = v -   i + dot(i, C.xx);
+          vec2 i1;
+          i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+          vec4 x12 = x0.xyxy + C.xxzz;
+          x12.xy -= i1;
+          i = mod289(i);
+          vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
+                          + i.x + vec3(0.0, i1.x, 1.0));
+          vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+                                  dot(x12.zw,x12.zw)), 0.0);
+          m = m*m;
+          m = m*m;
+          vec3 x = 2.0 * fract(p * C.www) - 1.0;
+          vec3 h = abs(x) - 0.5;
+          vec3 ox = floor(x + 0.5);
+          vec3 a0 = x - ox;
+          m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+          vec3 g;
+          g.x  = a0.x  * x0.x  + h.x  * x0.y;
+          g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+          return 130.0 * dot(m, g);
+        }
+        
+        // Bayer dither matrix - WebGL 1.0 compatible
+        float bayer(vec2 uv) {
+          vec2 coord = mod(floor(uv), 4.0);
+          float x = coord.x;
+          float y = coord.y;
+          
+          // Bayer 4x4 matrix values normalized
+          float val = 0.0;
+          if (x < 1.0) {
+            if (y < 1.0) val = 0.0;
+            else if (y < 2.0) val = 8.0;
+            else if (y < 3.0) val = 2.0;
+            else val = 10.0;
+          } else if (x < 2.0) {
+            if (y < 1.0) val = 12.0;
+            else if (y < 2.0) val = 4.0;
+            else if (y < 3.0) val = 14.0;
+            else val = 6.0;
+          } else if (x < 3.0) {
+            if (y < 1.0) val = 3.0;
+            else if (y < 2.0) val = 11.0;
+            else if (y < 3.0) val = 1.0;
+            else val = 9.0;
+          } else {
+            if (y < 1.0) val = 15.0;
+            else if (y < 2.0) val = 7.0;
+            else if (y < 3.0) val = 13.0;
+            else val = 5.0;
+          }
+          return val / 16.0 - 0.5;
+        }
+        
+        void main() {
+          vec2 uv = gl_FragCoord.xy / resolution.xy;
+          vec2 aspect = vec2(resolution.x / resolution.y, 1.0);
+          
+          // Animated noise layers
+          float noise1 = snoise(uv * 3.0 + time * 0.1);
+          float noise2 = snoise(uv * 6.0 - time * 0.15);
+          float noise3 = snoise(uv * 12.0 + time * 0.2);
+          
+          // Combine noise layers
+          float combined = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
+          
+          // Mouse interaction
+          vec2 mouseUV = mouse / resolution;
+          float mouseInfluence = 1.0 - smoothstep(0.0, 0.4, distance(uv, mouseUV));
+          combined += mouseInfluence * 0.3 * sin(time * 2.0);
+          
+          // Color palette
+          vec3 color1 = vec3(0.04, 0.04, 0.06); // Dark background
+          vec3 color2 = vec3(1.0, 0.0, 0.43);   // Pink accent
+          vec3 color3 = vec3(0.51, 0.22, 0.93); // Violet accent
+          vec3 color4 = vec3(1.0, 0.75, 0.04);  // Gold accent
+          
+          // Mix colors based on noise
+          vec3 color = mix(color1, color2, smoothstep(-0.3, 0.3, combined));
+          color = mix(color, color3, smoothstep(0.2, 0.5, combined + mouseInfluence * 0.2));
+          color = mix(color, color4, smoothstep(0.4, 0.7, noise3) * 0.3);
+          
+          // Apply dithering
+          float dither = bayer(gl_FragCoord.xy) * 0.02;
+          color += dither;
+          
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `;
+      
+      // Compile shaders
+      function compileShader(source, type) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+          gl.deleteShader(shader);
+          return null;
+        }
+        return shader;
+      }
+      
+      const vertexShader = compileShader(vertexShaderSource, gl.VERTEX_SHADER);
+      const fragmentShader = compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+      
+      // Create program
+      const program = gl.createProgram();
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+      
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error('Program link error:', gl.getProgramInfoLog(program));
+      }
+      
+      gl.useProgram(program);
+      
+      // Set up geometry (full-screen quad)
+      const positions = new Float32Array([
+        -1, -1,
+         1, -1,
+        -1,  1,
+         1,  1
+      ]);
+      
+      const positionBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+      
+      const positionLocation = gl.getAttribLocation(program, 'position');
+      gl.enableVertexAttribArray(positionLocation);
+      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+      
+      // Get uniform locations
+      const timeLocation = gl.getUniformLocation(program, 'time');
+      const resolutionLocation = gl.getUniformLocation(program, 'resolution');
+      const mouseLocation = gl.getUniformLocation(program, 'mouse');
+      
+      // Resize canvas
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio, 1.5);
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+      
+      resize();
+      window.addEventListener('resize', resize, { passive: true });
+      
+      // Mouse tracking
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+      
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = window.innerHeight - e.clientY;
+      }, { passive: true });
+      
+      // Animation loop
+      let startTime = Date.now();
+      let frameCount = 0;
+      
+      function render() {
+        // Skip every other frame on mobile for performance
+        frameCount++;
+        const isMobile = window.innerWidth < 768;
+        if (isMobile && frameCount % 2 !== 0) {
+          requestAnimationFrame(render);
+          return;
+        }
+        
+        const time = (Date.now() - startTime) * 0.001;
+        
+        gl.uniform1f(timeLocation, time);
+        gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+        gl.uniform2f(mouseLocation, mouseX * (canvas.width / window.innerWidth), 
+                                   mouseY * (canvas.height / window.innerHeight));
+        
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        
+        requestAnimationFrame(render);
+      }
+      
+      render();
+    }
+    
+    // ========================================
+    // THEME TOGGLE
+    // ========================================
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+    
+    // Check for saved theme or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
+      html.setAttribute('data-theme', 'light');
+      themeIcon.textContent = '◑';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      html.setAttribute('data-theme', newTheme);
+      themeIcon.textContent = newTheme === 'light' ? '◑' : '◐';
+      localStorage.setItem('theme', newTheme);
+    });
+    
+    // ========================================
+    // MAGNETIC BUTTONS
+    // ========================================
+    const magneticBtns = document.querySelectorAll('[data-magnetic]');
+    
+    // Disable on touch devices
+    if (!window.matchMedia('(pointer: coarse)').matches) {
+      magneticBtns.forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          
+          btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+        }, { passive: true });
+        
+        btn.addEventListener('mouseleave', () => {
+          btn.style.transform = 'translate(0, 0)';
+        }, { passive: true });
+      });
+    }
+    
+    // ========================================
+    // SCROLL-DRIVEN ANIMATIONS
+    // ========================================
+    // Reveal stroke text on load
+    setTimeout(() => {
+      document.querySelectorAll('.stroke-text').forEach(el => {
+        el.classList.add('revealed');
+      });
+    }, 100);
+    
+    // Scroll reveal for feature rows
+    const scrollRevealElements = document.querySelectorAll('[data-scroll-reveal]');
+    
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.2,
+      rootMargin: '0px 0px -50px 0px'
+    });
+    
+    scrollRevealElements.forEach(el => revealObserver.observe(el));
+    
+    // ========================================
+    // PARALLAX EFFECTS
+    // ========================================
+    const parallaxContainer = document.getElementById('parallaxContainer');
+    const parallaxLayers = document.querySelectorAll('.parallax-layer');
+    
+    // Disable parallax on mobile for performance
+    const isMobileDevice = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+    if (!isMobileDevice && parallaxContainer) {
+      let ticking = false;
+      
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            const rect = parallaxContainer.getBoundingClientRect();
+            const scrollProgress = -rect.top / window.innerHeight;
+            
+            parallaxLayers.forEach(layer => {
+              const speed = parseFloat(layer.dataset.speed) || 0.5;
+              const yPos = scrollProgress * 100 * speed;
+              layer.style.transform = `translateY(${yPos}px)`;
+            });
+            
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+    }
+    
+    // ========================================
+    // BENTO CARD SPOTLIGHT EFFECT
+    // ========================================
+    const bentoCards = document.querySelectorAll('.bento-card');
+    
+    bentoCards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        
+        card.style.setProperty('--mouse-x', `${x}%`);
+        card.style.setProperty('--mouse-y', `${y}%`);
+      }, { passive: true });
+    });
+    
+    // ========================================
+    // TILT EFFECT FOR CARDS (desktop only)
+    // ========================================
+    const tiltCards = document.querySelectorAll('[data-tilt]');
+    
+    if (!window.matchMedia('(pointer: coarse)').matches) {
+      tiltCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          
+          const rotateX = (y - centerY) / 20;
+          const rotateY = (centerX - x) / 20;
+          
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
+        }, { passive: true });
+        
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+        }, { passive: true });
+      });
+    }
+    
+    // ========================================
+    // SMOOTH SCROLL FOR NAV LINKS
+    // ========================================
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURUM - Chaos Studio | 20639317</title>
+    <!-- 
+        ID Template: 20639317
+        Chaos Level: 8/9
+        Design Choices:
+        - Theme: Royal Gold & Onyx (Palette 4)
+        - Element: Liquid Gold Morphing Blob (Element 1)
+        - Layout: High Distortion. Broken grids, overlapping text, and rotated containers to reflect Chaos Level 8.
+        - Tech: Three.js for Shaders, GSAP for fluid choreography.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Inter:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --bg: #fdfaf0;
+            --text: #1a1a1a;
+            --accent: #d4af37;
+            --surface: #ffffff;
+            --chaos-tilt: -2deg;
+            --transition: 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --text: #f0f0f0;
+            --accent: #ffcc33;
+            --surface: #151515;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            transition: background-color var(--transition), color var(--transition);
+            line-height: 1.6;
+        }
+
+        h1,
+        h2,
+        .display-font {
+            font-family: 'Cinzel', serif;
+            text-transform: uppercase;
+        }
+
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        /* UI Overlays */
+        .ui-layer {
+            position: relative;
+            z-index: 10;
+        }
+
+        nav {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 0.8rem 2rem;
+            background: var(--surface);
+            border: 1px solid var(--accent);
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            border: none;
+            background: var(--accent);
+            color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Chaos Layout Sections */
+        section {
+            min-height: 100vh;
+            padding: 4rem 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero {
+            position: relative;
+            height: 120vh;
+        }
+
+        .hero-title {
+            font-size: clamp(4rem, 15vw, 12rem);
+            line-height: 0.8;
+            margin-bottom: 2rem;
+            transform: rotate(var(--chaos-tilt));
+            position: relative;
+        }
+
+        .hero-title span {
+            display: block;
+            margin-left: -2rem;
+        }
+
+        .hero-title span:nth-child(2) {
+            margin-left: 4rem;
+            color: var(--accent);
+        }
+
+        .chaos-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+            margin-top: -10vh;
+        }
+
+        .floating-card {
+            grid-column: span 5;
+            padding: 3rem;
+            background: var(--surface);
+            border: 1px solid var(--accent);
+            transform: rotate(2deg) translateY(50px);
+            box-shadow: 20px 20px 0px var(--accent);
+            transition: var(--transition);
+        }
+
+        .floating-card:nth-child(even) {
+            grid-column: 8 / span 4;
+            transform: rotate(-3deg) translateY(-20px);
+            background: var(--accent);
+            color: #000;
+            box-shadow: -20px 20px 0px var(--text);
+        }
+
+        .content-break {
+            font-size: 5vw;
+            white-space: nowrap;
+            overflow: hidden;
+            background: var(--accent);
+            color: #000;
+            padding: 1rem 0;
+            width: 150vw;
+            margin-left: -25vw;
+            transform: rotate(5deg);
+            z-index: 5;
+            margin-top: 10rem;
+            margin-bottom: 10rem;
+        }
+
+        .marquee-inner {
+            display: flex;
+            gap: 2rem;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Chaos elements: Scattered info */
+        .scatter-box {
+            position: relative;
+            height: 80vh;
+        }
+
+        .scatter-text {
+            position: absolute;
+            max-width: 300px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .pos-1 {
+            top: 10%;
+            left: 15%;
+            transform: rotate(10deg);
+        }
+
+        .pos-2 {
+            top: 60%;
+            right: 10%;
+            transform: rotate(-5deg);
+        }
+
+        .pos-3 {
+            bottom: 5%;
+            left: 30%;
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        footer {
+            padding: 4rem 10%;
+            background: var(--surface);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-top: 10px solid var(--accent);
+        }
+
+        .footer-logo {
+            font-size: 5rem;
+            margin-bottom: -1.5rem;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 18vw;
+            }
+
+            .chaos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .floating-card {
+                grid-column: span 1 !important;
+                transform: none !important;
+                margin-bottom: 2rem;
+            }
+
+            .content-break {
+                width: 200vw;
+                transform: rotate(3deg);
+            }
+
+            nav {
+                width: 90%;
+                top: 1rem;
+                justify-content: space-between;
+                font-size: 0.7rem;
+                padding: 0.6rem 1.5rem;
+            }
+
+            .pos-1,
+            .pos-2,
+            .pos-3 {
+                position: relative;
+                top: 0;
+                left: 0;
+                right: 0;
+                margin-bottom: 2rem;
+            }
+
+            .scatter-box {
+                height: auto;
+            }
+        }
+
+        /* Dark mode visual fixes */
+        [data-theme="dark"] .floating-card {
+            box-shadow: 20px 20px 0px rgba(255, 204, 51, 0.2);
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+
+    <canvas id="three-canvas"></canvas>
+
+    <nav>
+        <div class="logo">A-20639317</div>
+        <button class="theme-toggle" onclick="toggleTheme()">Dark / Light</button>
+    </nav>
+
+    <main class="ui-layer">
+        <section class="hero">
+            <h1 class="hero-title">
+                <span>RE-CODE</span>
+                <span>REALITY</span>
+            </h1>
+            <p style="max-width: 400px; margin-left: auto;">
+                Chaos Level 8 Engineering. We break the grid to build the future.
+                Static design is the enemy of progress.
+            </p>
+        </section>
+
+        <section class="chaos-grid">
+            <div class="floating-card">
+                <h3>01. VISION</h3>
+                <p>Architecture that breathes, moves, and defies the traditional browser box model.</p>
+            </div>
+            <div class="floating-card">
+                <h3>02. MOTION</h3>
+                <p>Pure mathematical elegance translated into liquid interfaces.</p>
+            </div>
+        </section>
+
+        <div class="content-break">
+            <div class="marquee-inner">
+                <span>EXPERIMENT // DISRUPT // EVOLVE // GOLDEN // RATIO // CHAOS // EXPERIMENT // DISRUPT // EVOLVE //
+                    GOLDEN // RATIO // CHAOS //</span>
+                <span>EXPERIMENT // DISRUPT // EVOLVE // GOLDEN // RATIO // CHAOS // EXPERIMENT // DISRUPT // EVOLVE //
+                    GOLDEN // RATIO // CHAOS //</span>
+            </div>
+        </div>
+
+        <section class="scatter-box">
+            <div class="scatter-text pos-1">
+                The seed 20639317 dictates our flow. Every vertex of the background liquid is calculated based on this
+                unique identifier.
+            </div>
+            <div class="scatter-text pos-2">
+                SHADERS // THREE.JS // WEBGL
+                Optimized for mobile. High-end visual fidelity on any device.
+            </div>
+            <div class="display-font pos-3">
+                FUTURE <br> NOISE
+            </div>
+        </section>
+
+        <section style="height: 50vh; text-align: center;">
+            <h2 style="font-size: 10vw; opacity: 0.1;">CHAOS</h2>
+        </section>
+    </main>
+
+    <footer>
+        <div>
+            <p>© 2026 AURUM STUDIO</p>
+            <p>SEED: 20639317</p>
+        </div>
+        <div class="footer-logo display-font">AURUM</div>
+    </footer>
+
+    <script id="vertexShader" type="x-shader/x-vertex">
+        varying vec2 vUv;
+        varying float vDistortion;
+        uniform float uTime;
+
+        // Simplex 3D Noise 
+        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+        vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+        float snoise(vec3 v) {
+            const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+            const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+            vec3 i  = floor(v + dot(v, C.yyy) );
+            vec3 x0 =   v - i + dot(i, C.xxx) ;
+            vec3 g = step(x0.yzx, x0.xyz);
+            vec3 l = 1.0 - g;
+            vec3 i1 = min( g.xyz, l.zxy );
+            vec3 i2 = max( g.xyz, l.zxy );
+            vec3 x1 = x0 - i1 + C.xxx;
+            vec3 x2 = x0 - i2 + C.yyy;
+            vec3 x3 = x0 - D.yyy;
+            i = mod289(i);
+            vec4 p = permute( permute( permute(
+                        i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+                    + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
+                    + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+            float n_ = 0.142857142857;
+            vec3  ns = n_ * D.wyz - D.xzx;
+            vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+            vec4 x_ = floor(j * ns.z);
+            vec4 y_ = floor(j - 7.0 * x_ );
+            vec4 x = x_ *ns.x + ns.yyyy;
+            vec4 y = y_ *ns.x + ns.yyyy;
+            vec4 h = 1.0 - abs(x) - abs(y);
+            vec4 b0 = vec4( x.xy, y.xy );
+            vec4 b1 = vec4( x.zw, y.zw );
+            vec4 s0 = floor(b0)*2.0 + 1.0;
+            vec4 s1 = floor(b1)*2.0 + 1.0;
+            vec4 sh = -step(h, vec4(0.0));
+            vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+            vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+            vec3 p0 = vec3(a0.xy,h.x);
+            vec3 p1 = vec3(a0.zw,h.y);
+            vec3 p2 = vec3(a1.xy,h.z);
+            vec3 p3 = vec3(a1.zw,h.w);
+            vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+            p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+            vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+            m = m * m;
+            return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+        }
+
+        void main() {
+            vUv = uv;
+            vDistortion = snoise(vec3(position.x * 0.5, position.y * 0.5, uTime * 0.2));
+            vec3 newPosition = position + normal * vDistortion * 1.5;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+        }
+    </script>
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        varying vec2 vUv;
+        varying float vDistortion;
+        uniform vec3 uColor;
+
+        void main() {
+            vec3 color = uColor + (vDistortion * 0.2);
+            gl_FragColor = vec4(color, 1.0);
+        }
+    </script>
+
+    <script>
+        // Theme Management
+        function toggleTheme() {
+            const body = document.body;
+            const current = body.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', next);
+
+            // Update 3D color
+            if (window.blobMaterial) {
+                const color = next === 'light' ? new THREE.Color('#d4af37') : new THREE.Color('#ffcc33');
+                gsap.to(window.blobMaterial.uniforms.uColor.value, {
+                    r: color.r,
+                    g: color.g,
+                    b: color.b,
+                    duration: 1
+                });
+            }
+        }
+
+        // Three.js Scene Setup
+        let scene, camera, renderer, blob;
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({
+                canvas: document.getElementById('three-canvas'),
+                alpha: true,
+                antialias: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            const geometry = new THREE.IcosahedronGeometry(4, 30);
+            window.blobMaterial = new THREE.ShaderMaterial({
+                vertexShader: document.getElementById('vertexShader').textContent,
+                fragmentShader: document.getElementById('fragmentShader').textContent,
+                uniforms: {
+                    uTime: { value: 0 },
+                    uColor: { value: new THREE.Color('#d4af37') }
+                },
+                wireframe: true
+            });
+
+            blob = new THREE.Mesh(geometry, window.blobMaterial);
+            scene.add(blob);
+
+            camera.position.z = 10;
+
+            function animate(time) {
+                window.blobMaterial.uniforms.uTime.value = time * 0.001;
+                blob.rotation.y += 0.005;
+                blob.rotation.x += 0.003;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            animate(0);
+        }
+
+        // GSAP Animations
+        function initAnimations() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            gsap.from('.hero-title span', {
+                y: 100,
+                opacity: 0,
+                duration: 1.5,
+                stagger: 0.2,
+                ease: "power4.out"
+            });
+
+            gsap.from('.floating-card', {
+                scrollTrigger: {
+                    trigger: '.chaos-grid',
+                    start: 'top 80%',
+                },
+                y: 100,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.3,
+                ease: "power3.out"
+            });
+
+            // Parallax effect on blob
+            window.addEventListener('scroll', () => {
+                const scroll = window.scrollY;
+                if (blob) {
+                    blob.position.y = scroll * -0.005;
+                    blob.rotation.z = scroll * 0.001;
+                }
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Initialize
+        init3D();
+        initAnimations();
+    </script>
+</body>
+
+</html>

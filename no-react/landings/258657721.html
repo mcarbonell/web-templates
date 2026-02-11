@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmberRoast.cafe - Artisan Coffee Experience</title>
+    <meta name="description" content="Premium artisan coffee roasted daily. Experience the perfect blend of tradition and innovation at EmberRoast.">
+    
+    <!-- Design Choices:
+    - Business: Café/Coffee Shop (seed % 40 = 1)
+    - Hero: Split-screen diagonal with overlapping elements (roll: 3)
+    - Colors: Deep espresso browns, warm cream, burnt orange (roll: 8)
+    - Typography: Modern serif + clean sans-serif (roll: 3)
+    - Animation: Scroll-triggered reveals with stagger (roll: 4)
+    - Special Feature: Interactive coffee bean particles (roll: 6)
+    - Layout: Spacious, premium feel (roll: 1)
+    - Brand: EmberRoast.cafe
+    -->
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== CSS RESET & BASE ===== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            /* Color Scheme: Deep espresso with warm accents */
+            --color-espresso: #2C1810;
+            --color-coffee: #4A2C1A;
+            --color-cream: #F5EFE7;
+            --color-burnt-orange: #D97642;
+            --color-gold: #C9A961;
+            --color-white: #FFFFFF;
+            
+            /* Dark mode colors */
+            --color-dark-bg: #1A0F0A;
+            --color-dark-surface: #2C1810;
+            --color-dark-text: #F5EFE7;
+            
+            /* Typography */
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            
+            /* Spacing (spacious layout) */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 2rem;
+            --space-lg: 4rem;
+            --space-xl: 6rem;
+            --space-2xl: 8rem;
+            
+            /* Transitions */
+            --transition-smooth: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            html {
+                scroll-behavior: auto;
+            }
+        }
+        
+        body {
+            font-family: var(--font-sans);
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--color-espresso);
+            background-color: var(--color-cream);
+            overflow-x: hidden;
+            transition: background-color var(--transition-smooth), color var(--transition-smooth);
+        }
+        
+        body.dark-mode {
+            background-color: var(--color-dark-bg);
+            color: var(--color-dark-text);
+        }
+        
+        /* ===== SKIP LINK (ACCESSIBILITY) ===== */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--color-burnt-orange);
+            color: var(--color-white);
+            padding: var(--space-sm);
+            text-decoration: none;
+            z-index: 10000;
+            font-weight: 600;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+            outline: 2px solid var(--color-gold);
+            outline-offset: 2px;
+        }
+        
+        /* ===== HEADER & NAVIGATION ===== */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: var(--space-md) var(--space-lg);
+            background: rgba(245, 239, 231, 0.95);
+            backdrop-filter: blur(10px);
+            transition: all var(--transition-smooth);
+        }
+        
+        body.dark-mode .site-header {
+            background: rgba(26, 15, 10, 0.95);
+        }
+        
+        .site-header.scrolled {
+            padding: var(--space-sm) var(--space-lg);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-espresso);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: color var(--transition-smooth);
+        }
+        
+        body.dark-mode .logo {
+            color: var(--color-dark-text);
+        }
+        
+        .logo:focus {
+            outline: 2px solid var(--color-burnt-orange);
+            outline-offset: 4px;
+        }
+        
+        .nav-main {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+        
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: var(--space-md);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-link {
+            color: var(--color-coffee);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+            transition: color var(--transition-smooth);
+            position: relative;
+        }
+        
+        body.dark-mode .nav-link {
+            color: var(--color-cream);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--color-burnt-orange);
+            transition: width var(--transition-smooth);
+        }
+        
+        .nav-link:hover::after,
+        .nav-link:focus::after {
+            width: 100%;
+        }
+        
+        .nav-link:focus {
+            outline: 2px solid var(--color-burnt-orange);
+            outline-offset: 4px;
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--color-coffee);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-smooth);
+            color: var(--color-coffee);
+        }
+        
+        body.dark-mode .theme-toggle {
+            border-color: var(--color-cream);
+            color: var(--color-cream);
+        }
+        
+        .theme-toggle:hover {
+            background: var(--color-burnt-orange);
+            border-color: var(--color-burnt-orange);
+            color: var(--color-white);
+            transform: rotate(180deg);
+        }
+        
+        .theme-toggle:focus {
+            outline: 2px solid var(--color-burnt-orange);
+            outline-offset: 4px;
+        }
+        
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .mobile-menu-toggle span {
+            display: block;
+            width: 28px;
+            height: 3px;
+            background: var(--color-coffee);
+            transition: all var(--transition-smooth);
+        }
+        
+        body.dark-mode .mobile-menu-toggle span {
+            background: var(--color-cream);
+        }
+        
+        .mobile-menu-toggle[aria-expanded="true"] span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+        
+        .mobile-menu-toggle[aria-expanded="true"] span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .mobile-menu-toggle[aria-expanded="true"] span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+        
+        /* ===== HERO SECTION (Split-screen diagonal) ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+        
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-lg);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-content {
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: slideInLeft 1s var(--transition-smooth) forwards;
+        }
+        
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .hero-eyebrow {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--color-burnt-orange);
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: var(--space-md);
+            color: var(--color-espresso);
+        }
+        
+        body.dark-mode .hero-title {
+            color: var(--color-dark-text);
+        }
+        
+        .hero-title .highlight {
+            color: var(--color-burnt-orange);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .hero-description {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: var(--color-coffee);
+            margin-bottom: var(--space-lg);
+            max-width: 540px;
+        }
+        
+        body.dark-mode .hero-description {
+            color: var(--color-cream);
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all var(--transition-smooth);
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-family: var(--font-sans);
+        }
+        
+        .btn:focus {
+            outline: 2px solid var(--color-burnt-orange);
+            outline-offset: 4px;
+        }
+        
+        .btn-primary {
+            background: var(--color-burnt-orange);
+            color: var(--color-white);
+        }
+        
+        .btn-primary:hover {
+            background: var(--color-espresso);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(217, 118, 66, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-coffee);
+            border-color: var(--color-coffee);
+        }
+        
+        body.dark-mode .btn-secondary {
+            color: var(--color-cream);
+            border-color: var(--color-cream);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--color-coffee);
+            color: var(--color-white);
+        }
+        
+        body.dark-mode .btn-secondary:hover {
+            background: var(--color-cream);
+            color: var(--color-espresso);
+        }
+        
+        /* Hero Visual (with diagonal split) */
+        .hero-visual {
+            position: relative;
+            height: 600px;
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideInRight 1s var(--transition-smooth) 0.2s forwards;
+        }
+        
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .hero-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(10% 0, 100% 0, 100% 100%, 0 100%);
+            overflow: hidden;
+            border-radius: 20px;
+        }
+        
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 8s ease-out;
+        }
+        
+        .hero-image-wrapper:hover .hero-image {
+            transform: scale(1.1);
+        }
+        
+        /* Coffee Bean Particles (Special Feature) */
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+        
+        /* ===== FEATURES SECTION ===== */
+        .features {
+            padding: var(--space-2xl) var(--space-lg);
+            background: var(--color-white);
+            position: relative;
+        }
+        
+        body.dark-mode .features {
+            background: var(--color-dark-surface);
+        }
+        
+        .features-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all var(--transition-smooth);
+        }
+        
+        .section-header.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .section-eyebrow {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--color-burnt-orange);
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--color-espresso);
+            margin-bottom: var(--space-md);
+        }
+        
+        body.dark-mode .section-title {
+            color: var(--color-dark-text);
+        }
+        
+        .section-description {
+            font-size: 1.125rem;
+            color: var(--color-coffee);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+        
+        body.dark-mode .section-description {
+            color: var(--color-cream);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
+            margin-top: var(--space-xl);
+        }
+        
+        .feature-card {
+            padding: var(--space-lg);
+            background: var(--color-cream);
+            border-radius: 20px;
+            transition: all var(--transition-smooth);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        body.dark-mode .feature-card {
+            background: var(--color-dark-bg);
+        }
+        
+        .feature-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--color-burnt-orange);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-md);
+            color: var(--color-white);
+        }
+        
+        .feature-title {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            color: var(--color-espresso);
+        }
+        
+        body.dark-mode .feature-title {
+            color: var(--color-dark-text);
+        }
+        
+        .feature-description {
+            color: var(--color-coffee);
+            line-height: 1.7;
+        }
+        
+        body.dark-mode .feature-description {
+            color: var(--color-cream);
+        }
+        
+        /* ===== MENU SHOWCASE ===== */
+        .menu-showcase {
+            padding: var(--space-2xl) var(--space-lg);
+            background: var(--color-cream);
+            overflow: hidden;
+        }
+        
+        body.dark-mode .menu-showcase {
+            background: var(--color-dark-bg);
+        }
+        
+        .menu-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+        }
+        
+        .menu-item {
+            background: var(--color-white);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all var(--transition-smooth);
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        
+        body.dark-mode .menu-item {
+            background: var(--color-dark-surface);
+        }
+        
+        .menu-item.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .menu-item-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .menu-item-content {
+            padding: var(--space-md);
+        }
+        
+        .menu-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .menu-item-title {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-espresso);
+        }
+        
+        body.dark-mode .menu-item-title {
+            color: var(--color-dark-text);
+        }
+        
+        .menu-item-price {
+            font-weight: 600;
+            color: var(--color-burnt-orange);
+            font-size: 1.125rem;
+        }
+        
+        .menu-item-description {
+            color: var(--color-coffee);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        body.dark-mode .menu-item-description {
+            color: var(--color-cream);
+        }
+        
+        /* ===== ABOUT SECTION ===== */
+        .about {
+            padding: var(--space-2xl) var(--space-lg);
+            background: var(--color-white);
+        }
+        
+        body.dark-mode .about {
+            background: var(--color-dark-surface);
+        }
+        
+        .about-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            align-items: center;
+        }
+        
+        .about-image-wrapper {
+            position: relative;
+            height: 500px;
+            border-radius: 20px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all var(--transition-smooth);
+        }
+        
+        .about-image-wrapper.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .about-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .about-content {
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all var(--transition-smooth);
+        }
+        
+        .about-content.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: var(--space-md);
+            background: var(--color-cream);
+            border-radius: 16px;
+        }
+        
+        body.dark-mode .stat-item {
+            background: var(--color-dark-bg);
+        }
+        
+        .stat-number {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-burnt-orange);
+            display: block;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-coffee);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        body.dark-mode .stat-label {
+            color: var(--color-cream);
+        }
+        
+        /* ===== TESTIMONIALS ===== */
+        .testimonials {
+            padding: var(--space-2xl) var(--space-lg);
+            background: var(--color-cream);
+            position: relative;
+        }
+        
+        body.dark-mode .testimonials {
+            background: var(--color-dark-bg);
+        }
+        
+        .testimonials-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-lg);
+            margin-top: var(--space-xl);
+        }
+        
+        .testimonial-card {
+            background: var(--color-white);
+            padding: var(--space-lg);
+            border-radius: 20px;
+            position: relative;
+            transition: all var(--transition-smooth);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        body.dark-mode .testimonial-card {
+            background: var(--color-dark-surface);
+        }
+        
+        .testimonial-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .testimonial-quote {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--color-coffee);
+            margin-bottom: var(--space-md);
+            font-style: italic;
+        }
+        
+        body.dark-mode .testimonial-quote {
+            color: var(--color-cream);
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--color-burnt-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-white);
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .testimonial-info {
+            flex: 1;
+        }
+        
+        .testimonial-name {
+            font-weight: 600;
+            color: var(--color-espresso);
+            margin-bottom: 2px;
+        }
+        
+        body.dark-mode .testimonial-name {
+            color: var(--color-dark-text);
+        }
+        
+        .testimonial-role {
+            font-size: 0.9rem;
+            color: var(--color-coffee);
+        }
+        
+        body.dark-mode .testimonial-role {
+            color: var(--color-cream);
+        }
+        
+        .testimonial-stars {
+            color: var(--color-gold);
+            font-size: 1.125rem;
+            margin-bottom: var(--space-sm);
+        }
+        
+        /* ===== LOCATION SECTION ===== */
+        .location {
+            padding: var(--space-2xl) var(--space-lg);
+            background: var(--color-white);
+        }
+        
+        body.dark-mode .location {
+            background: var(--color-dark-surface);
+        }
+        
+        .location-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+        
+        .location-info {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all var(--transition-smooth);
+        }
+        
+        .location-info.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .info-group {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .info-title {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-espresso);
+            margin-bottom: var(--space-sm);
+        }
+        
+        body.dark-mode .info-title {
+            color: var(--color-dark-text);
+        }
+        
+        .info-content {
+            color: var(--color-coffee);
+            line-height: 1.8;
+        }
+        
+        body.dark-mode .info-content {
+            color: var(--color-cream);
+        }
+        
+        .hours-list {
+            list-style: none;
+        }
+        
+        .hours-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-xs) 0;
+            border-bottom: 1px solid rgba(74, 44, 26, 0.1);
+        }
+        
+        body.dark-mode .hours-item {
+            border-bottom-color: rgba(245, 239, 231, 0.1);
+        }
+        
+        .location-map {
+            height: 500px;
+            background: var(--color-cream);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-coffee);
+            font-size: 1.125rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all var(--transition-smooth);
+        }
+        
+        body.dark-mode .location-map {
+            background: var(--color-dark-bg);
+            color: var(--color-cream);
+        }
+        
+        .location-map.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* ===== CTA SECTION ===== */
+        .cta {
+            padding: var(--space-2xl) var(--space-lg);
+            background: linear-gradient(135deg, var(--color-burnt-orange) 0%, var(--color-coffee) 100%);
+            color: var(--color-white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cta-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: var(--space-md);
+        }
+        
+        .cta-description {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-lg);
+            opacity: 0.95;
+        }
+        
+        .cta .btn-primary {
+            background: var(--color-white);
+            color: var(--color-burnt-orange);
+        }
+        
+        .cta .btn-primary:hover {
+            background: var(--color-cream);
+            transform: translateY(-2px) scale(1.05);
+        }
+        
+        /* ===== FOOTER ===== */
+        .site-footer {
+            background: var(--color-espresso);
+            color: var(--color-cream);
+            padding: var(--space-xl) var(--space-lg) var(--space-md);
+        }
+        
+        body.dark-mode .site-footer {
+            background: var(--color-dark-bg);
+        }
+        
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .footer-main {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-xl);
+            border-bottom: 1px solid rgba(245, 239, 231, 0.2);
+        }
+        
+        .footer-brand {
+            max-width: 350px;
+        }
+        
+        .footer-logo {
+            font-family: var(--font-serif);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-cream);
+            margin-bottom: var(--space-md);
+            display: block;
+        }
+        
+        .footer-description {
+            line-height: 1.7;
+            opacity: 0.9;
+            margin-bottom: var(--space-md);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: var(--space-sm);
+            list-style: none;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(245, 239, 231, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-cream);
+            text-decoration: none;
+            transition: all var(--transition-smooth);
+        }
+        
+        .social-link:hover {
+            background: var(--color-burnt-orange);
+            transform: translateY(-3px);
+        }
+        
+        .social-link:focus {
+            outline: 2px solid var(--color-burnt-orange);
+            outline-offset: 4px;
+        }
+        
+        .footer-column {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .footer-title {
+            font-family: var(--font-serif);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+        }
+        
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        .footer-link {
+            color: var(--color-cream);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: all var(--transition-smooth);
+        }
+        
+        .footer-link:hover {
+            opacity: 1;
+            color: var(--color-burnt-orange);
+            padding-left: 5px;
+        }
+        
+        .footer-link:focus {
+            outline: 2px solid var(--color-burnt-orange);
+            outline-offset: 2px;
+        }
+        
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .footer-legal {
+            display: flex;
+            gap: var(--space-md);
+            list-style: none;
+        }
+        
+        /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 968px) {
+            :root {
+                --space-lg: 2rem;
+                --space-xl: 3rem;
+                --space-2xl: 4rem;
+            }
+            
+            .nav-list {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--color-cream);
+                flex-direction: column;
+                padding: var(--space-md);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+            
+            body.dark-mode .nav-list {
+                background: var(--color-dark-surface);
+            }
+            
+            .nav-list.active {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+                padding: var(--space-lg) var(--space-md);
+            }
+            
+            .hero-visual {
+                height: 400px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-image-wrapper {
+                height: 350px;
+            }
+            
+            .about-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .location-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-main {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                gap: var(--space-md);
+                text-align: center;
+            }
+        }
+        
+        /* ===== THEME ANNOUNCEMENT (ACCESSIBILITY) ===== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Theme announcement for screen readers -->
+    <div aria-live="polite" aria-atomic="true" class="sr-only" id="theme-announcement"></div>
+    
+    <!-- Header -->
+    <header class="site-header" role="banner">
+        <div class="header-container">
+            <a href="#" class="logo" aria-label="EmberRoast Cafe Home">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M16 4C16 4 8 8 8 16C8 20.4183 11.5817 24 16 24C20.4183 24 24 20.4183 24 16C24 8 16 4 16 4Z" fill="currentColor"/>
+                    <path d="M16 26C16 26 12 27 12 28C12 29.1046 13.7909 30 16 30C18.2091 30 20 29.1046 20 28C20 27 16 26 16 26Z" fill="currentColor"/>
+                </svg>
+                EmberRoast
+            </a>
+            
+            <nav class="nav-main" role="navigation" aria-label="Main navigation">
+                <ul class="nav-list" role="list">
+                    <li role="listitem"><a href="#features" class="nav-link">Features</a></li>
+                    <li role="listitem"><a href="#menu" class="nav-link">Menu</a></li>
+                    <li role="listitem"><a href="#about" class="nav-link">About</a></li>
+                    <li role="listitem"><a href="#location" class="nav-link">Location</a></li>
+                </ul>
+                
+                <button class="theme-toggle" aria-label="Toggle dark mode" id="theme-toggle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                </button>
+                
+                <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" id="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <!-- Hero Section -->
+        <section class="hero" role="region" aria-labelledby="hero-title">
+            <canvas id="particles-canvas" aria-hidden="true"></canvas>
+            
+            <div class="hero-container">
+                <div class="hero-content">
+                    <p class="hero-eyebrow">Artisan Coffee Experience</p>
+                    <h1 class="hero-title" id="hero-title">
+                        Where Every Cup Tells a <span class="highlight">Story</span>
+                    </h1>
+                    <p class="hero-description">
+                        Discover the perfect blend of tradition and innovation. Our expertly roasted beans 
+                        and handcrafted beverages create moments worth savoring.
+                    </p>
+                    <div class="hero-cta">
+                        <a href="#menu" class="btn btn-primary">Explore Menu</a>
+                        <a href="#location" class="btn btn-secondary">Visit Us</a>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="hero-image-wrapper">
+                        <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=1000&fit=crop" 
+                             alt="Barista preparing artisan coffee" 
+                             class="hero-image"
+                             loading="eager">
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="features" id="features" role="region" aria-labelledby="features-title">
+            <div class="features-container">
+                <div class="section-header">
+                    <p class="section-eyebrow">Why Choose Us</p>
+                    <h2 class="section-title" id="features-title">Crafted with Passion</h2>
+                    <p class="section-description">
+                        Every detail matters in creating the perfect coffee experience. 
+                        From bean selection to the final pour, we're committed to excellence.
+                    </p>
+                </div>
+                
+                <div class="features-grid" role="list">
+                    <article class="feature-card" role="listitem">
+                        <div class="feature-icon" aria-hidden="true">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 4L20 12H28L22 18L24 28L16 22L8 28L10 18L4 12H12L16 4Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Premium Beans</h3>
+                        <p class="feature-description">
+                            Sourced from the finest coffee regions worldwide, our beans are 
+                            carefully selected for their unique flavor profiles and quality.
+                        </p>
+                    </article>
+                    
+                    <article class="feature-card" role="listitem">
+                        <div class="feature-icon" aria-hidden="true">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="16" cy="16" r="12"/>
+                                <path d="M16 8V16L20 20"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Fresh Daily Roasting</h3>
+                        <p class="feature-description">
+                            We roast our beans in small batches every day to ensure maximum 
+                            freshness and flavor in every cup you enjoy.
+                        </p>
+                    </article>
+                    
+                    <article class="feature-card" role="listitem">
+                        <div class="feature-icon" aria-hidden="true">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L12 6M20 2L20 6M8 10L24 10M6 6L26 6C27.1046 6 28 6.89543 28 8L28 26C28 27.1046 27.1046 28 26 28L6 28C4.89543 28 4 27.1046 4 26L4 8C4 6.89543 4.89543 6 6 6Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Expert Baristas</h3>
+                        <p class="feature-description">
+                            Our trained baristas bring years of experience and passion to craft 
+                            each beverage with precision and care.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Menu Showcase -->
+        <section class="menu-showcase" id="menu" role="region" aria-labelledby="menu-title">
+            <div class="menu-container">
+                <div class="section-header">
+                    <p class="section-eyebrow">Our Signature Drinks</p>
+                    <h2 class="section-title" id="menu-title">Explore Our Menu</h2>
+                    <p class="section-description">
+                        From classic espresso to innovative seasonal creations, discover your new favorite drink.
+                    </p>
+                </div>
+                
+                <div class="menu-grid" role="list">
+                    <article class="menu-item" role="listitem">
+                        <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&h=400&fit=crop" 
+                             alt="Classic Espresso" 
+                             class="menu-item-image"
+                             loading="lazy">
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3 class="menu-item-title">Classic Espresso</h3>
+                                <span class="menu-item-price">$3.50</span>
+                            </div>
+                            <p class="menu-item-description">
+                                Rich, bold, and perfectly extracted. Our signature espresso blend.
+                            </p>
+                        </div>
+                    </article>
+                    
+                    <article class="menu-item" role="listitem">
+                        <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=400&fit=crop" 
+                             alt="Caramel Macchiato" 
+                             class="menu-item-image"
+                             loading="lazy">
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3 class="menu-item-title">Caramel Macchiato</h3>
+                                <span class="menu-item-price">$5.50</span>
+                            </div>
+                            <p class="menu-item-description">
+                                Velvety steamed milk with espresso and sweet caramel drizzle.
+                            </p>
+                        </div>
+                    </article>
+                    
+                    <article class="menu-item" role="listitem">
+                        <img src="https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=600&h=400&fit=crop" 
+                             alt="Cold Brew" 
+                             class="menu-item-image"
+                             loading="lazy">
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3 class="menu-item-title">Cold Brew</h3>
+                                <span class="menu-item-price">$4.50</span>
+                            </div>
+                            <p class="menu-item-description">
+                                Smooth and refreshing, steeped for 16 hours for maximum flavor.
+                            </p>
+                        </div>
+                    </article>
+                    
+                    <article class="menu-item" role="listitem">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&h=400&fit=crop" 
+                             alt="Vanilla Latte" 
+                             class="menu-item-image"
+                             loading="lazy">
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3 class="menu-item-title">Vanilla Latte</h3>
+                                <span class="menu-item-price">$5.00</span>
+                            </div>
+                            <p class="menu-item-description">
+                                Creamy espresso with premium vanilla and perfectly frothed milk.
+                            </p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section class="about" id="about" role="region" aria-labelledby="about-title">
+            <div class="about-container">
+                <div class="about-image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&h=1000&fit=crop" 
+                         alt="Coffee roasting process" 
+                         class="about-image"
+                         loading="lazy">
+                </div>
+                
+                <div class="about-content">
+                    <p class="section-eyebrow">Our Story</p>
+                    <h2 class="section-title" id="about-title">Roasting Excellence Since 2015</h2>
+                    <p class="section-description">
+                        What started as a passion project in a small garage has grown into a beloved 
+                        community gathering place. We're dedicated to bringing you the finest coffee 
+                        experience, one cup at a time.
+                    </p>
+                    <p class="section-description">
+                        Our commitment to quality extends beyond the cup. We work directly with farmers, 
+                        ensuring fair trade practices and sustainable sourcing that benefits everyone 
+                        in the coffee supply chain.
+                    </p>
+                    
+                    <div class="about-stats" role="list">
+                        <div class="stat-item" role="listitem">
+                            <span class="stat-number">10K+</span>
+                            <span class="stat-label">Happy Customers</span>
+                        </div>
+                        <div class="stat-item" role="listitem">
+                            <span class="stat-number">50+</span>
+                            <span class="stat-label">Coffee Varieties</span>
+                        </div>
+                        <div class="stat-item" role="listitem">
+                            <span class="stat-number">9</span>
+                            <span class="stat-label">Years Experience</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Testimonials -->
+        <section class="testimonials" role="region" aria-labelledby="testimonials-title">
+            <div class="testimonials-container">
+                <div class="section-header">
+                    <p class="section-eyebrow">Customer Reviews</p>
+                    <h2 class="section-title" id="testimonials-title">What People Say</h2>
+                    <p class="section-description">
+                        Don't just take our word for it. Here's what our community has to say.
+                    </p>
+                </div>
+                
+                <div class="testimonials-grid" role="list">
+                    <article class="testimonial-card" role="listitem">
+                        <div class="testimonial-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                        <p class="testimonial-quote">
+                            "The best coffee in town, hands down. The atmosphere is cozy and the 
+                            baristas really know their craft. My morning routine isn't complete without it!"
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar" aria-hidden="true">SM</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Sarah Mitchell</div>
+                                <div class="testimonial-role">Regular Customer</div>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="testimonial-card" role="listitem">
+                        <div class="testimonial-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                        <p class="testimonial-quote">
+                            "I've tried coffee shops all over the city, but EmberRoast is something special. 
+                            The quality is consistent and the staff makes you feel like family."
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar" aria-hidden="true">JD</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">James Davidson</div>
+                                <div class="testimonial-role">Coffee Enthusiast</div>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article class="testimonial-card" role="listitem">
+                        <div class="testimonial-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                        <p class="testimonial-quote">
+                            "Perfect spot for remote work. Great WiFi, comfortable seating, and of course, 
+                            amazing coffee. I practically live here now!"
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar" aria-hidden="true">EC</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Emily Chen</div>
+                                <div class="testimonial-role">Freelance Designer</div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Location -->
+        <section class="location" id="location" role="region" aria-labelledby="location-title">
+            <div class="location-container">
+                <div class="location-info">
+                    <p class="section-eyebrow">Visit Us</p>
+                    <h2 class="section-title" id="location-title">Find Us Here</h2>
+                    
+                    <div class="info-group">
+                        <h3 class="info-title">Address</h3>
+                        <p class="info-content">
+                            123 Coffee Street<br>
+                            Downtown District<br>
+                            City, State 12345
+                        </p>
+                    </div>
+                    
+                    <div class="info-group">
+                        <h3 class="info-title">Hours</h3>
+                        <ul class="hours-list" role="list">
+                            <li class="hours-item" role="listitem">
+                                <span>Monday - Friday</span>
+                                <span>7:00 AM - 8:00 PM</span>
+                            </li>
+                            <li class="hours-item" role="listitem">
+                                <span>Saturday</span>
+                                <span>8:00 AM - 9:00 PM</span>
+                            </li>
+                            <li class="hours-item" role="listitem">
+                                <span>Sunday</span>
+                                <span>8:00 AM - 7:00 PM</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-group">
+                        <h3 class="info-title">Contact</h3>
+                        <p class="info-content">
+                            Phone: (555) 123-4567<br>
+                            Email: hello@emberroast.cafe
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="location-map" role="img" aria-label="Map showing EmberRoast location">
+                    <p>📍 Interactive Map Placeholder</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA Section -->
+        <section class="cta" role="region" aria-labelledby="cta-title">
+            <div class="cta-container">
+                <h2 class="cta-title" id="cta-title">Ready for Your Perfect Cup?</h2>
+                <p class="cta-description">
+                    Join our community of coffee lovers. Visit us today and experience the difference.
+                </p>
+                <a href="#location" class="btn btn-primary">Get Directions</a>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-container">
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <span class="footer-logo">EmberRoast</span>
+                    <p class="footer-description">
+                        Crafting exceptional coffee experiences since 2015. Every cup tells a story.
+                    </p>
+                    <ul class="social-links" role="list">
+                        <li role="listitem">
+                            <a href="#" class="social-link" aria-label="Facebook">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                </svg>
+                            </a>
+                        </li>
+                        <li role="listitem">
+                            <a href="#" class="social-link" aria-label="Instagram">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                </svg>
+                            </a>
+                        </li>
+                        <li role="listitem">
+                            <a href="#" class="social-link" aria-label="Twitter">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                                </svg>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <ul class="footer-links" role="list">
+                        <li role="listitem"><a href="#features" class="footer-link">Features</a></li>
+                        <li role="listitem"><a href="#menu" class="footer-link">Menu</a></li>
+                        <li role="listitem"><a href="#about" class="footer-link">About</a></li>
+                        <li role="listitem"><a href="#location" class="footer-link">Location</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3 class="footer-title">Services</h3>
+                    <ul class="footer-links" role="list">
+                        <li role="listitem"><a href="#" class="footer-link">Catering</a></li>
+                        <li role="listitem"><a href="#" class="footer-link">Events</a></li>
+                        <li role="listitem"><a href="#" class="footer-link">Wholesale</a></li>
+                        <li role="listitem"><a href="#" class="footer-link">Gift Cards</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3 class="footer-title">Contact</h3>
+                    <ul class="footer-links" role="list">
+                        <li role="listitem"><a href="tel:5551234567" class="footer-link">(555) 123-4567</a></li>
+                        <li role="listitem"><a href="mailto:hello@emberroast.cafe" class="footer-link">hello@emberroast.cafe</a></li>
+                        <li role="listitem"><a href="#" class="footer-link">Careers</a></li>
+                        <li role="listitem"><a href="#" class="footer-link">Press</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 EmberRoast.cafe. All rights reserved.</p>
+                <ul class="footer-legal" role="list">
+                    <li role="listitem"><a href="#" class="footer-link">Privacy Policy</a></li>
+                    <li role="listitem"><a href="#" class="footer-link">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeAnnouncement = document.getElementById('theme-announcement');
+        const body = document.body;
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            
+            // Announce theme change to screen readers
+            themeAnnouncement.textContent = isDark ? 'Dark mode enabled' : 'Light mode enabled';
+        });
+        
+        // Mobile Menu Toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const navList = document.querySelector('.nav-list');
+        
+        mobileMenuToggle.addEventListener('click', () => {
+            const isExpanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
+            mobileMenuToggle.setAttribute('aria-expanded', !isExpanded);
+            navList.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navList.classList.remove('active');
+                mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+        
+        // Header scroll effect
+        const header = document.querySelector('.site-header');
+        let lastScroll = 0;
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            
+            lastScroll = currentScroll;
+        });
+        
+        // Scroll-triggered animations (Intersection Observer)
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all animated elements
+        document.querySelectorAll('.section-header, .feature-card, .menu-item, .testimonial-card, .about-image-wrapper, .about-content, .location-info, .location-map').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Stagger animation for feature cards
+        const featureCards = document.querySelectorAll('.feature-card');
+        featureCards.forEach((card, index) => {
+            card.style.transitionDelay = `${index * 0.1}s`;
+        });
+        
+        // Stagger animation for menu items
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach((item, index) => {
+            item.style.transitionDelay = `${index * 0.1}s`;
+        });
+        
+        // Stagger animation for testimonials
+        const testimonialCards = document.querySelectorAll('.testimonial-card');
+        testimonialCards.forEach((card, index) => {
+            card.style.transitionDelay = `${index * 0.1}s`;
+        });
+        
+        // Coffee Bean Particle System (Special Feature)
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Particle class
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                // Wrap around screen
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            
+            draw() {
+                ctx.fillStyle = `rgba(217, 118, 66, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // Create particles
+        const particleCount = 50;
+        const particles = [];
+        
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+        
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Only animate if user hasn't requested reduced motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!prefersReducedMotion) {
+            animate();
+        }
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+                
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

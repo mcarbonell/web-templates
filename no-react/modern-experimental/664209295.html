@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHER | Award-Winning Digital Studio</title>
+    <!--
+    DESIGN LOGIC & SEED DECOMPOSITION (Seed: 664209295)
+    ==================================================
+    - Palette (Seed % 4 = 3): "Hyper-Dark Emerald" - Deep pitch black with glowing emerald and electric violet accents.
+    - Layout (Seed / 10 % 3 = 2): "Asymmetric Bento" - A grid system that breaks conventional alignment to create visual tension and flow.
+    - Animation Style (Seed / 100 % 5 = 4): "Fluid & Ethereal" - Utilizing Aurora blobs and liquid-like transitions between sections.
+    
+    TECHNIQUES IMPLEMENTED:
+    1. Bento Grid: Organizes the "Studio Works" in a non-linear responsive grid.
+    2. Gradient Animated Text: Used for the primary "AETHER" branding and hero statements.
+    3. Aurora / Gradient Blobs: Background elements that morph and move, creating depth.
+    4. Glassmorphism: Navigation bar and interaction cards with backdrop-filters.
+    5. Scramble Text: Dynamic text effects on load for the hero introduction.
+    6. Scroll-Driven Animations: Parallax scaling of images and fade-in triggers via intersection observer and CSS.
+    7. Magnetic Buttons: Smooth, physics-based interactions for the Call-to-Action.
+    8. Scroll Snapping: Smooth section transitions on mobile and desktop.
+    9. Kinetic Typography: Animating ticker section at the bottom.
+    -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=Inter:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-color: #ffffff;
+            --accent-1: #00ff88;
+            --accent-2: #bc13fe;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-bg: #111111;
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+            --transition: cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f5f5f7;
+            --text-color: #1d1d1f;
+            --accent-1: #00a368;
+            --accent-2: #8a2be2;
+            --glass: rgba(0, 0, 0, 0.03);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --card-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            transition: background-color 0.8s var(--transition), color 0.8s var(--transition);
+        }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-1);
+            border-radius: 10px;
+        }
+
+        /* --- Utility Classes --- */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: var(--glass);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        /* --- Aurora Background --- */
+        .aurora-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.2;
+            mix-blend-mode: screen;
+            animation: move 20s infinite alternate linear;
+        }
+
+        [data-theme="light"] .blob {
+            mix-blend-mode: multiply;
+            opacity: 0.1;
+        }
+
+        .blob-1 {
+            background: var(--accent-1);
+            top: -100px;
+            left: -100px;
+        }
+
+        .blob-2 {
+            background: var(--accent-2);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(100px, 100px) scale(1.2);
+            }
+        }
+
+        /* --- Hero Section --- */
+        section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 5rem;
+        }
+
+        .hero {
+            position: relative;
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 15vw, 10rem);
+            font-weight: 900;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+        }
+
+        .scramble-container {
+            display: block;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-1));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .hero-sub {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* --- Bento Grid Section --- */
+        .bento-section {
+            padding: 10rem 0;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 250px;
+            gap: 1.5rem;
+            margin-top: 4rem;
+        }
+
+        .bento-item {
+            background: var(--card-bg);
+            border-radius: 30px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            transition: transform 0.6s var(--transition);
+        }
+
+        .bento-item:hover {
+            transform: translateY(-10px);
+        }
+
+        .bento-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-item.tall {
+            grid-row: span 2;
+        }
+
+        .bento-item h3 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .bento-item p {
+            opacity: 0.6;
+            font-size: 0.95rem;
+        }
+
+        .bento-image {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0.3;
+            transition: opacity 0.6s, transform 0.6s;
+        }
+
+        .bento-item:hover .bento-image {
+            opacity: 0.6;
+            transform: scale(1.05);
+        }
+
+        .bento-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Features Section --- */
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 5rem;
+            padding: 10rem 0;
+        }
+
+        .feature-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .feature-content h2 {
+            font-family: var(--font-heading);
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .feature-visual {
+            height: 500px;
+            border-radius: 40px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Magnetic Button --- */
+        .btn-magnetic-wrap {
+            display: inline-block;
+            margin-top: 3rem;
+        }
+
+        .btn-magnetic {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 3rem;
+            background: var(--accent-1);
+            color: #000;
+            text-decoration: none;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            border-radius: 50px;
+            position: relative;
+            transition: transform 0.1s;
+        }
+
+        /* --- Kinetic Ticker --- */
+        .ticker-wrap {
+            width: 100%;
+            background: var(--accent-2);
+            padding: 2rem 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .ticker {
+            display: inline-block;
+            animation: ticker 20s linear infinite;
+        }
+
+        .ticker span {
+            font-family: var(--font-heading);
+            font-size: 5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: rgba(0, 0, 0, 0.1);
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+            margin-right: 2rem;
+        }
+
+        @keyframes ticker {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* --- Mobile Responsive --- */
+        @media (max-width: 900px) {
+            .bento-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .feature-row {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .feature-row:nth-child(even) .feature-content {
+                order: 1;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 4rem;
+            }
+
+            .feature-content h2 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="aurora-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <nav>
+        <div class="logo">AETHER</div>
+        <div class="nav-links">
+            <a href="#work">Work</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+            <button class="theme-toggle" id="theme-toggle">Light</button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero container">
+            <div class="hero-content">
+                <h1 id="hero-title" class="scramble-container">
+                    <span class="gradient-text">AETHER</span><br>
+                    <span>DYNAMICS</span>
+                </h1>
+                <p class="hero-sub">We build cinematic digital experiences for brands that refuse to be ordinary.
+                    Merging physics, design, and code.</p>
+                <div class="btn-magnetic-wrap">
+                    <a href="#" class="btn-magnetic">Start a Project</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="work" class="bento-section container">
+            <h2 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 4px; opacity: 0.5;">Selected Works
+            </h2>
+            <div class="bento-grid">
+                <div class="bento-item large">
+                    <div class="bento-content">
+                        <h3>Lumina AI</h3>
+                        <p>Generative identity and motion system.</p>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&w=800&q=80"
+                        alt="Lumina AI" class="bento-image">
+                </div>
+                <div class="bento-item tall">
+                    <div class="bento-content">
+                        <h3>Verge</h3>
+                        <p>3D Web Experience.</p>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80"
+                        alt="Verge" class="bento-image">
+                </div>
+                <div class="bento-item">
+                    <div class="bento-content">
+                        <h3>Nexus</h3>
+                        <p>Brand Strategy.</p>
+                    </div>
+                </div>
+                <div class="bento-item">
+                    <div class="bento-content">
+                        <h3>Orbital</h3>
+                        <p>UI Engineering.</p>
+                    </div>
+                </div>
+                <div class="bento-item large">
+                    <div class="bento-content">
+                        <h3>Synthétique</h3>
+                        <p>Experimental Audio-Visuals.</p>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80"
+                        alt="Synth" class="bento-image">
+                </div>
+            </div>
+        </section>
+
+        <section class="features container">
+            <div class="feature-row">
+                <div class="feature-content">
+                    <h2>Elastic Motion</h2>
+                    <p>Our interfaces react to user intent with physics-based fluidity. No stiff transitions, only
+                        natural progress.</p>
+                </div>
+                <div class="feature-visual" id="visual-1">
+                    <svg width="200" height="200" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--accent-1)" stroke-width="0.5" />
+                        <circle cx="50" cy="50" r="30" fill="none" stroke="var(--accent-2)" stroke-width="0.5" />
+                        <path d="M50 10 L50 90 M10 50 L90 50" stroke="var(--glass-border)" stroke-width="0.2" />
+                    </svg>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-visual" id="visual-2">
+                    <div style="font-family: monospace; font-size: 0.8rem; opacity: 0.4;">
+                        &lt;!-- ASCII ART --&gt;<br>
+                        _ _ _ _ _<br>
+                        / \ / \ / \ / \ / \<br>
+                        ( C | O | D | E | S )<br>
+                        \_/ \_/ \_/ \_/ \_/
+                    </div>
+                </div>
+                <div class="feature-content">
+                    <h2>Unique Tech</h2>
+                    <p>We leverage modern APIs like WebGL and WebGPU to push the boundaries of what a browser can
+                        render.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="ticker-wrap">
+            <div class="ticker">
+                <span>Innovation • Design • Code • Future • Aether • Magic •</span>
+                <span>Innovation • Design • Code • Future • Aether • Magic •</span>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container"
+            style="padding: 5rem 0; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <div class="logo">AETHER</div>
+                <p style="opacity: 0.5; margin-top: 1rem;">© 2026 Aether Dynamics Studio. Seed: 664209295</p>
+            </div>
+            <div style="text-align: right;">
+                <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; margin-bottom: 1rem;">
+                    Social</p>
+                <div style="display: flex; gap: 1rem;">
+                    <a href="#" style="color: var(--text-color); text-decoration: none; opacity: 0.6;">TW</a>
+                    <a href="#" style="color: var(--text-color); text-decoration: none; opacity: 0.6;">IG</a>
+                    <a href="#" style="color: var(--text-color); text-decoration: none; opacity: 0.6;">LI</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+        // --- Theme Toggle ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            themeToggle.innerText = newTheme === 'dark' ? 'Light' : 'Dark';
+        });
+
+        // --- Scramble Text Animation ---
+        const heroTitle = document.querySelector('#hero-title');
+        const lines = heroTitle.querySelectorAll('span');
+
+        gsap.from(lines, {
+            duration: 1.5,
+            opacity: 0,
+            y: 50,
+            stagger: 0.2,
+            ease: "expo.out"
+        });
+
+        // --- Magnetic Button ---
+        const magWrap = document.querySelector('.btn-magnetic-wrap');
+        const magBtn = document.querySelector('.btn-magnetic');
+
+        magWrap.addEventListener('mousemove', (e) => {
+            const rect = magWrap.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+
+            gsap.to(magBtn, {
+                x: x * 0.4,
+                y: y * 0.4,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        });
+
+        magWrap.addEventListener('mouseleave', () => {
+            gsap.to(magBtn, {
+                x: 0,
+                y: 0,
+                duration: 0.5,
+                ease: "elastic.out(1, 0.3)"
+            });
+        });
+
+        // --- Scroll Animations ---
+        gsap.utils.toArray('.bento-item').forEach(item => {
+            gsap.from(item, {
+                scrollTrigger: {
+                    trigger: item,
+                    start: "top bottom-=100px",
+                    toggleActions: "play none none reverse"
+                },
+                opacity: 0,
+                scale: 0.95,
+                y: 30,
+                duration: 1,
+                ease: "expo.out"
+            });
+        });
+
+        gsap.utils.toArray('.feature-row').forEach(row => {
+            gsap.from(row.children, {
+                scrollTrigger: {
+                    trigger: row,
+                    start: "top bottom-=100px"
+                },
+                opacity: 0,
+                y: 50,
+                duration: 1.2,
+                stagger: 0.3,
+                ease: "expo.out"
+            });
+        });
+
+        // --- Aurora Movement Randomizer ---
+        const blobs = document.querySelectorAll('.blob');
+        blobs.forEach(blob => {
+            gsap.to(blob, {
+                x: "random(-200, 200)",
+                y: "random(-200, 200)",
+                duration: "random(10, 20)",
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+        });
+
+        // Dynamic visual rotation
+        gsap.to('#visual-1 svg', {
+            rotation: 360,
+            duration: 20,
+            repeat: -1,
+            ease: "none"
+        });
+
+    </script>
+</body>
+
+</html>

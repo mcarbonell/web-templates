@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pulse Nest • Vacation Rentals & Property Management</title>
+  <!--
+    Seed: 508271364
+    Local business: Vacation rentals and property managers (Pulse Nest)
+    Design plan (summary):
+    - Hero layout chosen: split layout with visual on left and copy on right
+    - Special feature: subtle particle background for depth
+    - Theme: light/dark toggle with accessible color contrast
+    - Brand: Pulse Nest (generated from seed)
+    - Animations: compact, performant, prefers-reduced-motion respected
+  -->
+  <style>
+    :root {
+      --bg: #f7f7f7;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #2b6cb0;
+      --outline: rgba(0,0,0,.15);
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+    }
+    [data-theme="dark"] {
+      --bg: #0b1020;
+      --surface: #141a2b;
+      --text: #e5edff;
+      --muted: #a0b4d6;
+      --primary: #7bd1ff;
+      --outline: rgba(255,255,255,.15);
+      --shadow: 0 8px 24px rgba(0,0,0,.5);
+    }
+    * { box-sizing: border-box; }
+    /* Screen-reader only utility */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+    a { color: inherit; text-decoration: none; }
+    a.btn { text-decoration: none; }
+    /* Accessibility: skip link */
+    .skip-link { position: absolute; top: 0; left: 0; transform: translateY(-100%); background: #111; color: #fff; padding: .5rem 1rem; z-index: 1000; }
+    .skip-link:focus { transform: translateY(0); }
+    /* Layout & components */
+  header.site-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; position: sticky; top: 0; backdrop-filter: saturate(1.1) blur(6px); background: var(--surface); z-index: 50; }
+    .brand { display: flex; align-items: center; gap: .75rem; font-weight: 700; letter-spacing: .5px; }
+    .brand svg { display: block; }
+    .brand-name { font-size: 1.05rem; }
+    .menu-toggle { display: none; background: var(--surface); border: 1px solid var(--outline); padding: .5rem .75rem; border-radius: 8px; cursor: pointer; }
+    nav.main-nav { display: block; }
+    ul.nav-list { list-style: none; display: flex; gap: 1rem; padding: 0; margin: 0; }
+    li[role="listitem"] { display: inline-block; }
+    .btn { display: inline-block; padding: .9rem 1.25rem; border-radius: 10px; border: 1px solid var(--outline); background: var(--surface); color: var(--text); font-weight: 600; }
+    .btn-primary { background: linear-gradient(135deg, #2b6cb0 0%, #3b82f6 100%); color: white; border: none; }
+    .btn-ghost { background: transparent; border: 1px solid var(--outline); color: var(--text); }
+    /* Hero */
+    section.hero { position: relative; overflow: hidden; padding: 4rem 1rem 3rem; }
+    .hero-inner { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; align-items: center; max-width: 1200px; margin: 0 auto; }
+    .hero-visual { display: grid; place-items: center; }
+    .hero-title { font-size: clamp(2rem, 4vw, 3.75rem); line-height: 1.05; margin: 0 0 .5rem; letter-spacing: .5px; }
+    .hero-subtitle { font-size: 1.05rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: .75rem; }
+    canvas#particles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .6; mix-blend-mode: screen; }
+    /* Cards grid */
+    section.section { padding: 3rem 1rem; }
+    .section-title { font-size: 1.75rem; margin: 0 0 1rem; text-align: center; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; list-style: none; padding: 0; margin: 0 auto; max-width: 1100px; }
+    .card { background: var(--surface); border: 1px solid var(--outline); border-radius: 12px; padding: 1.25rem; box-shadow: var(--shadow); }
+    .card h3 { margin: .25rem 0 .5rem; font-size: 1.15rem; }
+    .icon { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; margin-bottom: .5rem; }
+    .work-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .thumb { background: linear-gradient(135deg, #93c5fd 0%, #d1fae5 100%); height: 140px; border-radius: 10px; }
+    /* About & Pricing */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    /* Contact form */
+    .contact-form { display: grid; gap: 1rem; max-width: 540px; margin: 0 auto; }
+    .form-row { display: grid; gap: .25rem; }
+    input, textarea { padding: .75rem; border-radius: 6px; border: 1px solid var(--outline); background: #fff; color: var(--text); font: inherit; }
+    textarea { resize: vertical; }
+    /* Footer */
+    footer.site-footer { text-align: center; padding: 1.5rem 1rem; color: var(--muted); }
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: left; }
+      .hero-visual { order: -1; }
+    }
+    @media (max-width: 700px) {
+      .nav-list { display: none; }
+      .menu-toggle { display: inline-block; }
+      canvas#particles { height: 60vh; }
+    }
+    /* Motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Accessibility: skip to content -->
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <header id="site-header" role="banner" class="site-header" aria-label="Site header">
+    <div class="brand" aria-label="Site brand">
+      <!-- Simple inline logo -->
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-label="Pulse Nest logo" role="img">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+            <stop stop-color="#1e3a8a" offset="0"/>
+            <stop stop-color="#6ee7b7" offset="1"/>
+          </linearGradient>
+        </defs>
+        <circle cx="20" cy="20" r="12" fill="url(#g)" fill-opacity=".9" />
+        <path d="M12 28 Q20 12 28 28" fill="none" stroke="#0f1020" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      <span class="brand-name">Pulse Nest</span>
+    </div>
+    <button id="menuToggle" class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mainNav">Menu</button>
+    <nav id="mainNav" role="navigation" aria-label="Main navigation" class="main-nav">
+      <ul role="list" class="nav-list" aria-label="Main navigation list">
+        <li role="listitem"><a href="#hero" aria-label="Go to Home">Home</a></li>
+        <li role="listitem"><a href="#services" aria-label="Go to Services">Services</a></li>
+        <li role="listitem"><a href="#work" aria-label="Go to Work">Work</a></li>
+        <li role="listitem"><a href="#about" aria-label="Go to About">About</a></li>
+        <li role="listitem"><a href="#contact" aria-label="Go to Contact">Contact</a></li>
+      </ul>
+    </nav>
+    <button id="themeToggle" class="btn" aria-label="Toggle light and dark theme" aria-live="polite">Theme</button>
+  </header>
+
+  <!-- Live region for theme/announcements -->
+  <div id="themeLive" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <main id="main" role="main" aria-label="Main content" class="site-main">
+    <!-- HERO -->
+    <section id="hero" class="hero" role="region" aria-label="Hero" aria-labelledby="hero-title" data-layout="split">
+      <canvas id="particles" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <div class="hero-text">
+          <h1 id="hero-title" class="hero-title">Pulse Nest</h1>
+          <p class="hero-subtitle">Vacation rentals and property management that feel like home. Thoughtful service, modern design, and a touch of wonder.</p>
+          <div class="cta-row" aria-label="Primary actions">
+            <a href="#services" class="btn btn-primary" aria-label="Explore our services">Explore Services</a>
+            <a href="#contact" class="btn btn-ghost" aria-label="Contact us">Contact Us</a>
+          </div>
+        </div>
+        <div class="hero-visual" aria-label="Hero visual illustration">
+          <!-- SVG illustration as a placeholder photo/scene -->
+          <svg width="520" height="360" viewBox="0 0 520 360" role="img" aria-label="Stylized landscape and property">
+            <defs>
+              <linearGradient id="grad" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0" stop-color="#60a5fa"/>
+                <stop offset="1" stop-color="#34d399"/>
+              </linearGradient>
+            </defs>
+            <rect width="520" height="360" fill="url(#grad)" opacity=".25"/>
+            <circle cx="420" cy="100" r="60" fill="#93c5fd" opacity=".5"/>
+            <rect x="60" y="180" width="290" height="100" rx="12" fill="#fff" opacity=".85"/>
+            <path d="M120 170 L180 120 L260 170" fill="none" stroke="#1f2e3d" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" role="region" aria-label="Services" aria-labelledby="services-title" class="section">
+      <h2 id="services-title" class="section-title">Services</h2>
+      <ul role="list" class="card-grid" aria-label="Our services">
+        <li role="listitem" class="card">
+          <div class="icon" aria-label="Property management icon" style="background: #e2e8f0">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-label="home icon" role="img"><path fill="#111" d="M12 3l9 6v12h-6v-6H9v6H3V9l9-6z"></path></svg>
+          </div>
+          <h3>Property & Vacation Rental Management</h3>
+          <p>End-to-end management for hosts and property owners with guest-ready onboarding.</p>
+        </li>
+        <li role="listitem" class="card">
+          <div class="icon" aria-label="Concierge icon" style="background: #e2e8f0">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-label="service icon" role="img"><path fill="#111" d="M12 3a5 5 0 0 0-5 5v2H5a3 3 0 0 0-3 3v7h22v-7a3 3 0 0 0-3-3h-2V8a5 5 0 0 0-5-5zM7 11V8a5 5 0 1 1 10 0v3H7z"/></svg>
+          </div>
+          <h3>Guest Services & Guest Experience</h3>
+          <p>Personalized stays, 24/7 support, and hospitality-led outcomes for guests.</p>
+        </li>
+        <li role="listitem" class="card">
+          <div class="icon" aria-label="Analytics icon" style="background: #e2e8f0">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-label="analytics icon" role="img"><path fill="#111" d="M3 17h2v4H3v-4zm6-6h2v10H9V11zm6-4h2v14h-2V7z"/></svg>
+          </div>
+          <h3>Performance Reporting</h3>
+          <p>Clear dashboards with insights to optimize occupancy and revenue.</p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- WORK (sample projects) -->
+    <section id="work" role="region" aria-label="Selected Work" aria-labelledby="work-title" class="section">
+      <h2 id="work-title" class="section-title">Selected Work</h2>
+      <div class="work-grid" role="list" aria-label="Sample projects">
+        <article role="listitem" class="card work-item">
+          <div class="thumb" aria-label="Project thumbnail"></div>
+          <h3>Coastal Retreat - Brand & Booking UI</h3>
+          <p>Polished design for a boutique rental listing with WCAG accessibility focus.</p>
+        </article>
+        <article role="listitem" class="card work-item">
+          <div class="thumb" style="background: linear-gradient(135deg,#fca5a5,#93c5fd);" aria-label="Project thumbnail"></div>
+          <h3>Urban Loft - Web Experience</h3>
+          <p>Responsive site with fast metrics and accessible components.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" role="region" aria-label="About" aria-labelledby="about-title" class="section">
+      <h2 id="about-title" class="section-title">About Pulse Nest</h2>
+      <p style="max-width: 780px; margin: 0 auto; text-align: center; color: var(--muted);">We blend hospitality-grade service with digital product thinking to empower local businesses. This template demonstrates a bold, modern landing page with strong accessibility and mobile-first design.</p>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" role="region" aria-label="Pricing" aria-labelledby="pricing-title" class="section">
+      <h2 id="pricing-title" class="section-title">Pricing</h2>
+      <div class="pricing-grid" role="list" aria-label="Pricing options">
+        <div role="listitem" class="card">
+          <h3>Starter</h3>
+          <p>Basic listing and management features for new hosts.</p>
+        </div>
+        <div role="listitem" class="card">
+          <h3>Growth</h3>
+          <p>Advanced tools and analytics for growing portfolios.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" role="region" aria-label="Contact" aria-labelledby="contact-title" class="section">
+      <h2 id="contact-title" class="section-title">Get In Touch</h2>
+      <form class="contact-form" aria-label="Contact form">
+        <div class="form-row">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" required aria-required="true" />
+        </div>
+        <div class="form-row">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required aria-required="true" />
+        </div>
+        <div class="form-row">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="4" required aria-required="true"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" aria-label="Send message">Send Message</button>
+      </form>
+    </section>
+  </main>
+
+  <footer role="contentinfo" aria-label="Site footer" class="site-footer">
+    <p>© Pulse Nest • All rights reserved</p>
+  </footer>
+
+  <!-- Desktop/phone friendly scripts -->
+  <script>
+    // Theme persistence and toggle
+    (function(){
+      const themeToggle = document.getElementById('themeToggle');
+      const main = document.documentElement;
+      const live = document.getElementById('themeLive');
+      const current = localStorage.getItem('theme') || 'light';
+      function applyTheme(t){
+        main.setAttribute('data-theme', t);
+        themeToggle.textContent = t === 'dark' ? '🌙' : '☀️';
+        localStorage.setItem('theme', t);
+        if (live) live.textContent = 'Theme switched to ' + t;
+      }
+      applyTheme(current);
+      themeToggle.addEventListener('click', ()=>{
+        const ct = main.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        applyTheme(ct);
+      });
+    })();
+
+    // Simple mobile nav toggle with ARIA state
+    (function(){
+      const btn = document.getElementById('menuToggle');
+      const nav = document.getElementById('mainNav');
+      btn.addEventListener('click', ()=>{
+        const open = nav.style.display && nav.style.display !== 'none';
+        nav.style.display = open ? 'none' : 'block';
+        btn.setAttribute('aria-expanded', String(!open));
+      });
+      // Ensure nav is hidden on small screens by default
+      const mq = window.matchMedia('(max-width: 700px)');
+      function handle(mq){ if (mq.matches) nav.style.display = 'none'; else nav.style.display = 'block'; }
+      mq.addEventListener ? mq.addEventListener('change', handle) : mq.addListener(handle);
+      handle(mq);
+    })();
+
+    // Particle background for hero (lightweight)
+    (function(){
+      const canvas = document.getElementById('particles');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w = canvas.clientWidth, h = canvas.clientHeight || 360;
+      canvas.width = window.innerWidth; canvas.height = Math.max(320, h);
+      const dots = [];
+      const DOTS = 60;
+      for (let i=0; i<DOTS; i++){
+        dots.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*2+1, vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4, hue: Math.random()*360});
+      }
+      let active = true;
+      function draw(){ if (!active) return; ctx.clearRect(0,0,canvas.width,canvas.height); for (let d of dots){ d.x+=d.vx; d.y+=d.vy; if (d.x<0) d.x=canvas.width; if (d.x>canvas.width) d.x=0; if (d.y<0) d.y=canvas.height; if (d.y>canvas.height) d.y=0; ctx.fillStyle = 'hsla('+d.hue+', 90%, 60%, 0.8)'; ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fill(); }
+        requestAnimationFrame(draw);
+      }
+      // Respect prefers-reduced-motion
+      const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (!media || media.matches) { active = false; ctx.clearRect(0,0,canvas.width,canvas.height); } else { draw(); }
+      window.addEventListener('resize', ()=>{ canvas.width = window.innerWidth; });
+    })();
+  </script>
+</body>
+</html>

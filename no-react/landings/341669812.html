@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="BaseProfit.pro - Premium Accounting and CPA services for high-growth businesses. Scalable financial solutions with modern precision.">
+    <title>BaseProfit.pro | Premium CPA & Financial Strategy</title>
+
+    <!-- SEO & Metadata -->
+    <meta property="og:title" content="BaseProfit.pro | Premium CPA & Financial Strategy">
+    <meta property="og:description"
+        content="Elevate your business finances with BaseProfit's high-precision accounting.">
+    <meta name="theme-color" content="#0a0f1e">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* 
+        DESIGN CHOICES (Seed: 341669812)
+        - Business: Accountants and CPAs (BaseProfit.pro)
+        - Palette: High-Contrast Bold (Deep Navy, Electric Cyan, Neon Teal)
+        - Style: Floating 3D/GSAP elements + Sharp Brutalist Borders
+        - Special: Interactive Canvas Particles
+        - Motion: Elastic / Overshooting transitions
+        - Density: Information-Dense (Stat grids, Detailed Service cards)
+        */
+
+        :root {
+            --bg-primary: #0a0f1e;
+            --bg-secondary: #141b2d;
+            --accent-primary: #00f2ff;
+            --accent-secondary: #4ade80;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --card-glass: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(0, 242, 255, 0.3);
+            --transition-main: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+            --font-main: 'Outfit', sans-serif;
+            --font-heading: 'Space Grotesk', sans-serif;
+        }
+
+        .light-mode {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --accent-primary: #0f172a;
+            --accent-secondary: #0ea5e9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --card-glass: rgba(0, 0, 0, 0.03);
+            --border-color: rgba(15, 23, 42, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline-offset: 4px;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* Accessibility: Skip to Content */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            padding: 1rem;
+            z-index: 1000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Focus State */
+        :focus-visible {
+            outline: 2px solid var(--accent-primary);
+        }
+
+        /* Layout */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(var(--bg-primary), 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-main);
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-primary);
+            transition: var(--transition-main);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-main);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent-primary);
+            transform: scale(1.1);
+        }
+
+        /* Hero Section */
+        #hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .hero-label {
+            display: inline-block;
+            background: var(--card-glass);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            letter-spacing: -3px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            transition: var(--transition-main);
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-heading);
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: #000;
+            border: 1px solid var(--accent-primary);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 30px var(--accent-primary);
+            transform: translateY(-5px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-primary);
+            background: var(--card-glass);
+        }
+
+        /* Stats Section */
+        #stats {
+            padding: 5rem 10%;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+        }
+
+        .stat-item h3 {
+            font-size: 3rem;
+            font-family: var(--font-heading);
+            color: var(--accent-primary);
+        }
+
+        .stat-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Services Section */
+        #services {
+            padding: 8rem 10%;
+        }
+
+        .section-header {
+            margin-bottom: 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .section-title h2 {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: var(--card-glass);
+            border: 1px solid var(--border-color);
+            padding: 3rem;
+            transition: var(--transition-main);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-primary);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-secondary);
+        }
+
+        .service-card h4 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Content Specific: Detailed cards for "Information Dense" */
+        .service-features {
+            list-style: none;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+
+        .service-features li {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .service-features li::before {
+            content: '→';
+            color: var(--accent-primary);
+        }
+
+        /* CTA Section */
+        #contact {
+            padding: 10rem 10%;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
+        }
+
+        .cta-box {
+            background: var(--bg-secondary);
+            padding: 5rem;
+            border: 4px solid var(--accent-primary);
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .cta-box::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px solid var(--accent-secondary);
+            z-index: -1;
+        }
+
+        /* Footer */
+        footer {
+            padding: 5rem 10% 2rem;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: var(--card-glass);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition-main);
+        }
+
+        .social-link:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .copyright {
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Floating Elements Styling */
+        .float-wrap {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .float-element {
+            position: absolute;
+            background: var(--card-glass);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--accent-primary);
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem 5%;
+            }
+
+            nav {
+                display: none;
+            }
+
+            #hero {
+                padding: 0 5%;
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 3.5rem;
+            }
+
+            .hero-cta {
+                justify-content: center;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .section-title h2 {
+                font-size: 2.5rem;
+            }
+
+            .cta-box {
+                padding: 2rem;
+            }
+        }
+
+        /* Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        /* Dark/Light mode helper */
+        #theme-status {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div id="theme-status" aria-live="polite">Theme: Dark mode</div>
+
+    <header role="banner">
+        <div class="logo">
+            <div class="logo-icon" aria-hidden="true"></div>
+            <span>BASEPROFIT</span>
+        </div>
+        <nav role="navigation" aria-label="Main Navigation">
+            <ul role="list">
+                <li role="listitem"><a href="#hero">Home</a></li>
+                <li role="listitem"><a href="#services">Services</a></li>
+                <li role="listitem"><a href="#stats">Performance</a></li>
+                <li role="listitem"><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="controls">
+            <button class="theme-toggle" id="mode-toggle" aria-label="Toggle light and dark mode">
+                <svg id="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg id="sun-icon" style="display:none;" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+            <a href="#contact" class="btn btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.8rem;">Start Free
+                Audit</a>
+        </div>
+    </header>
+
+    <main id="main-content" role="main">
+        <!-- Hero Section -->
+        <section id="hero" role="region" aria-label="Hero Section">
+            <canvas id="particle-canvas"></canvas>
+
+            <div class="float-wrap">
+                <!-- Floating geometric elements controlled by GSAP -->
+                <div class="float-element"
+                    style="top: 20%; right: 15%; width: 120px; height: 120px; transform: rotate(15deg);">TAX 2026</div>
+                <div class="float-element"
+                    style="bottom: 15%; right: 25%; width: 100px; height: 100px; transform: rotate(-10deg);">CPA</div>
+                <div class="float-element"
+                    style="top: 40%; right: 35%; width: 80px; height: 80px; transform: rotate(45deg); opacity: 0.5;">$$$
+                </div>
+            </div>
+
+            <div class="hero-content">
+                <span class="hero-label">High-Growth Strategic Accounting</span>
+                <h1>FINANCIAL PRECISION AT SCALE.</h1>
+                <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2.5rem; max-width: 600px;">
+                    We don't just count beans. We architect fiscal success for tech startups and modern enterprises
+                    using AI-driven auditing and data-first strategy.
+                </p>
+                <div class="hero-cta">
+                    <a href="#services" class="btn btn-primary">Our Solutions</a>
+                    <a href="#stats" class="btn btn-secondary">Impact Metrics</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section id="stats" role="region" aria-label="Company Statistics">
+            <div class="stats-grid">
+                <div class="stat-item reveal">
+                    <h3 aria-label="98 percent precision">98%</h3>
+                    <p>Audit Precision</p>
+                </div>
+                <div class="stat-item reveal">
+                    <h3 aria-label="1.2 billion dollars managed">$1.2B</h3>
+                    <p>Assets Under Oversight</p>
+                </div>
+                <div class="stat-item reveal">
+                    <h3 aria-label="24 hour response time">24h</h3>
+                    <p>Strategic Response</p>
+                </div>
+                <div class="stat-item reveal">
+                    <h3 aria-label="400 plus active clients">400+</h3>
+                    <p>Global Enterprises</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" role="region" aria-labelledby="services-heading">
+            <div class="section-header">
+                <div class="section-title">
+                    <h2 id="services-heading">Core Fiscal Services</h2>
+                    <p style="color: var(--text-secondary);">Enterprise-grade solutions tailored for the digital
+                        economy.</p>
+                </div>
+                <div class="section-badge"
+                    style="background: var(--accent-secondary); color: #000; padding: 0.5rem 1rem; font-weight: 700;">
+                    AUDIT READY</div>
+            </div>
+
+            <div class="services-grid">
+                <!-- Service 1 -->
+                <article class="service-card reveal" role="listitem">
+                    <div class="service-icon">📊</div>
+                    <h4>AI-Powered Auditing</h4>
+                    <p>Real-time transaction analysis powered by proprietary machine learning models.</p>
+                    <ul class="service-features" role="list">
+                        <li role="listitem">Automated reconciliation</li>
+                        <li role="listitem">Anomaly detection</li>
+                        <li role="listitem">Sub-second reporting</li>
+                    </ul>
+                </article>
+
+                <!-- Service 2 -->
+                <article class="service-card reveal" role="listitem">
+                    <div class="service-icon">⚛️</div>
+                    <h4>Tax Strategy 2.0</h4>
+                    <p>Aggressive yet compliant strategies for modern R&D and digital assets.</p>
+                    <ul class="service-features" role="list">
+                        <li role="listitem">R&D Tax Credits</li>
+                        <li role="listitem">Crypto Compliance</li>
+                        <li role="listitem">Multi-state filing</li>
+                    </ul>
+                </article>
+
+                <!-- Service 3 -->
+                <article class="service-card reveal" role="listitem">
+                    <div class="service-icon">🛰️</div>
+                    <h4>Fractional CFO</h4>
+                    <p>High-level financial leadership without the enterprise overhead.</p>
+                    <ul class="service-features" role="list">
+                        <li role="listitem">Fundraising prep</li>
+                        <li role="listitem">M&A Strategy</li>
+                        <li role="listitem">Equity management</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <!-- Contact / CTA -->
+        <section id="contact" role="region" aria-labelledby="contact-heading">
+            <div class="cta-box reveal">
+                <h2 id="contact-heading"
+                    style="font-family: var(--font-heading); font-size: 3rem; margin-bottom: 2rem;">Ready for absolute
+                    clarity?</h2>
+                <p style="margin-bottom: 3rem; color: var(--text-secondary); max-width: 600px; margin-inline: auto;">
+                    We are currently accepting a limited number of new high-growth partners. Apply for a fiscal audit
+                    today.
+                </p>
+                <form
+                    onsubmit="event.preventDefault(); alert('Request sent! Our lead strategist will reach out in 24 hours.');"
+                    style="display: flex; flex-direction: column; gap: 1rem; max-width: 500px; margin: 0 auto;">
+                    <label for="email" class="sr-only"
+                        style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">Email
+                        Address</label>
+                    <input type="email" id="email" placeholder="ENTER YOUR CORPORATE EMAIL" required
+                        style="padding: 1.5rem; background: var(--bg-primary); border: 2px solid var(--border-color); color: var(--text-primary); font-family: var(--font-heading); font-weight: 700;">
+                    <button type="submit" class="btn btn-primary">Request Invitation</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo" style="margin-bottom: 1.5rem;">
+                    <div class="logo-icon" aria-hidden="true"></div>
+                    <span>BASEPROFIT</span>
+                </div>
+                <p style="color: var(--text-secondary); max-width: 300px;">
+                    Defined by precision. Driven by results. The future of accounting is here.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link" aria-label="LinkedIn">LN</a>
+                    <a href="#" class="social-link" aria-label="Twitter/X">TW</a>
+                    <a href="#" class="social-link" aria-label="Github">GH</a>
+                </div>
+            </div>
+            <div>
+                <h5 style="margin-bottom: 1.5rem; font-family: var(--font-heading);">Solutions</h5>
+                <ul role="list" style="list-style: none; color: var(--text-secondary); line-height: 2;">
+                    <li role="listitem">Audit Systems</li>
+                    <li role="listitem">Tax Strategy</li>
+                    <li role="listitem">CFO Services</li>
+                    <li role="listitem">Startup Pack</li>
+                </ul>
+            </div>
+            <div>
+                <h5 style="margin-bottom: 1.5rem; font-family: var(--font-heading);">Company</h5>
+                <ul role="list" style="list-style: none; color: var(--text-secondary); line-height: 2;">
+                    <li role="listitem">Our Team</li>
+                    <li role="listitem">Methodology</li>
+                    <li role="listitem">Careers</li>
+                    <li role="listitem">Contact</li>
+                </ul>
+            </div>
+            <div>
+                <h5 style="margin-bottom: 1.5rem; font-family: var(--font-heading);">Resource</h5>
+                <ul role="list" style="list-style: none; color: var(--text-secondary); line-height: 2;">
+                    <li role="listitem">Whitepapers</li>
+                    <li role="listitem">Case Studies</li>
+                    <li role="listitem">API Docs</li>
+                    <li role="listitem">Support</li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2026 BaseProfit Strategy Group. All rights reserved.</p>
+            <div style="display: flex; gap: 2rem;">
+                <a href="#" style="color: var(--text-secondary); text-decoration: none;">Privacy Policy</a>
+                <a href="#" style="color: var(--text-secondary); text-decoration: none;">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Init GSAP ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Theme Toggle Logic
+        const modeToggle = document.getElementById('mode-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const themeStatus = document.getElementById('theme-status');
+
+        modeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+
+            sunIcon.style.display = isLight ? 'block' : 'none';
+            moonIcon.style.display = isLight ? 'none' : 'block';
+
+            const modeText = isLight ? 'Light mode' : 'Dark mode';
+            themeStatus.textContent = `Theme changed to ${modeText}`;
+
+            // Re-draw particles with new colors if needed, but for now just clear/reset
+            initParticles();
+        });
+
+        // Interactive Canvas Particles
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        function initParticles() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            const count = window.innerWidth < 768 ? 40 : 100;
+
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speedX: (Math.random() - 0.5) * 1.5,
+                    speedY: (Math.random() - 0.5) * 1.5,
+                    color: getComputedStyle(document.documentElement).getPropertyValue('--accent-primary').trim()
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const accent = getComputedStyle(document.body).classList.contains('light-mode') ? '#0f172a' : '#00f2ff';
+
+            particles.forEach(p => {
+                p.x += p.speedX;
+                p.y += p.speedY;
+
+                if (p.x > canvas.width) p.x = 0;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.y > canvas.height) p.y = 0;
+                if (p.y < 0) p.y = canvas.height;
+
+                // Mouse interaction
+                let dx = mouse.x - p.x;
+                let dy = mouse.y - p.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 150) {
+                    p.x -= dx / 20;
+                    p.y -= dy / 20;
+                }
+
+                ctx.fillStyle = accent;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+        window.addEventListener('resize', initParticles);
+
+        // GSAP Animations
+        // Hero Entrance
+        const tl = gsap.timeline({ defaults: { ease: "elastic.out(1, 0.75)", duration: 1.5 } });
+
+        tl.from(".logo", { y: -50, opacity: 0 })
+            .from("nav li", { y: -20, opacity: 0, stagger: 0.1 }, "-=1")
+            .from(".hero-label", { x: -30, opacity: 0 }, "-=1.2")
+            .from("h1", { x: -100, opacity: 0 }, "-=1.3")
+            .from(".hero-content p", { y: 30, opacity: 0 }, "-=1.4")
+            .from(".hero-cta .btn", { scale: 0, opacity: 0, stagger: 0.2 }, "-=1.2");
+
+        // Floating elements animation
+        gsap.to(".float-element", {
+            y: "random(-40, 40)",
+            x: "random(-20, 20)",
+            rotation: "random(-10, 10)",
+            duration: "random(3, 5)",
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        // Scroll Reveal
+        gsap.utils.toArray(".reveal").forEach(el => {
+            gsap.to(el, {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: "power4.out",
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 85%",
+                }
+            });
+        });
+
+        // Accessibility announcement for menu toggle (optional)
+        modeToggle.addEventListener('focus', () => {
+            // Screen reader enhancement
+        });
+    </script>
+</body>
+
+</html>

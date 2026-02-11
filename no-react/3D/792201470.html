@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexaFlow - Next Generation Digital Experience</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        /* 
+        DESIGN CHOICES - Seed: 792201470
+        - Chaos Level 4: Diagonal layouts, asymmetric grid, offset positioning
+        - Color Scheme 9: Neon cyberpunk (electric blue → hot pink → purple)
+        - 3D Effect 7: Three.js particle system + floating geometric shapes
+        - Animation Style 3: Elastic easing with magnetic cursor interactions
+        - Typography 4: Ultra-bold headlines vs thin body text
+        */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-neon: #00f0ff;
+            --secondary-pink: #ff006e;
+            --accent-purple: #8b5cf6;
+            --dark-bg: #0a0a0f;
+            --light-bg: #f8f9fa;
+            --dark-text: #ffffff;
+            --light-text: #1a1a1a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--dark-bg);
+            color: var(--dark-text);
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+        
+        body.light-mode {
+            background: var(--light-bg);
+            color: var(--light-text);
+            --glass-bg: rgba(0, 0, 0, 0.03);
+            --glass-border: rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Three.js Canvas Background */
+        .canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: var(--glass-bg);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.05em;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 300;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-neon), var(--secondary-pink));
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            width: 50px;
+            height: 26px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-pink));
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        
+        body.light-mode .theme-toggle-slider {
+            transform: translateX(24px);
+        }
+        
+        /* Hero Section - Diagonal Chaos Level 4 */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 6rem 2rem 2rem;
+            overflow: hidden;
+            transform: skewY(-2deg);
+            margin-top: -5rem;
+            padding-top: 10rem;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            transform: skewY(2deg);
+        }
+        
+        .hero-title {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 900;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            letter-spacing: -0.05em;
+        }
+        
+        .hero-title-line {
+            display: block;
+            overflow: hidden;
+        }
+        
+        .hero-title-line span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-pink), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            font-weight: 300;
+            max-width: 600px;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        
+        .cta-group {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Magnetic Button */
+        .btn {
+            padding: 1.2rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-pink));
+            color: white;
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: inherit;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(0, 240, 255, 0.4);
+        }
+        
+        /* Features Section - Asymmetric Grid */
+        .features {
+            position: relative;
+            z-index: 10;
+            padding: 8rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
+            margin-bottom: 4rem;
+            text-align: center;
+            letter-spacing: -0.03em;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+        
+        .feature-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .feature-card:nth-child(2) {
+            transform: translateY(3rem);
+        }
+        
+        .feature-card:nth-child(3) {
+            transform: translateY(-2rem);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-neon), var(--secondary-pink));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 240, 255, 0.2);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-pink));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-description {
+            font-weight: 300;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+        
+        /* Stats Section */
+        .stats {
+            position: relative;
+            z-index: 10;
+            padding: 6rem 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            font-weight: 300;
+            opacity: 0.7;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            position: relative;
+            z-index: 10;
+            padding: 8rem 2rem;
+            text-align: center;
+        }
+        
+        .cta-title {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 900;
+            margin-bottom: 2rem;
+            letter-spacing: -0.03em;
+        }
+        
+        .cta-subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+        }
+        
+        /* Footer */
+        .footer {
+            position: relative;
+            z-index: 10;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            font-weight: 300;
+            opacity: 0.6;
+        }
+        
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+        
+        .menu-toggle span {
+            width: 25px;
+            height: 2px;
+            background: currentColor;
+            transition: all 0.3s ease;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid var(--glass-border);
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .hero {
+                transform: skewY(-1deg);
+            }
+            
+            .cta-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .feature-card:nth-child(2),
+            .feature-card:nth-child(3) {
+                transform: translateY(0);
+            }
+        }
+        
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+        
+        .scroll-indicator svg {
+            width: 30px;
+            height: 30px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Three.js Canvas -->
+    <div class="canvas-container" id="canvas-container"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">NexaFlow</div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li>
+                <div class="theme-toggle" id="theme-toggle">
+                    <div class="theme-toggle-slider"></div>
+                </div>
+            </li>
+        </ul>
+        <div class="menu-toggle" id="menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="hero-title-line"><span>Experience</span></span>
+                <span class="hero-title-line"><span class="gradient-text">The Future</span></span>
+                <span class="hero-title-line"><span>Of Digital</span></span>
+            </h1>
+            <p class="hero-subtitle">
+                Immerse yourself in a revolutionary platform that transforms how you interact with technology. 
+                Built for creators, dreamers, and innovators.
+            </p>
+            <div class="cta-group">
+                <a href="#" class="btn btn-primary magnetic-btn">Get Started</a>
+                <a href="#" class="btn btn-secondary magnetic-btn">Learn More</a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M19 12l-7 7-7-7"/>
+            </svg>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2 class="section-title">Powerful <span class="gradient-text">Features</span></h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Lightning Fast</h3>
+                <p class="feature-description">
+                    Experience blazing-fast performance with our optimized architecture. 
+                    Built for speed from the ground up.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title">Beautiful Design</h3>
+                <p class="feature-description">
+                    Stunning visuals that captivate and engage. Every pixel crafted with 
+                    attention to detail and purpose.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Secure & Private</h3>
+                <p class="feature-description">
+                    Your data is protected with enterprise-grade security. Privacy is not 
+                    just a feature, it's our foundation.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3 class="feature-title">Scalable</h3>
+                <p class="feature-description">
+                    Grow without limits. Our infrastructure scales seamlessly with your 
+                    needs, from startup to enterprise.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3 class="feature-title">Global Reach</h3>
+                <p class="feature-description">
+                    Connect with users worldwide. Multi-language support and global CDN 
+                    ensure fast access everywhere.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <h3 class="feature-title">Innovative</h3>
+                <p class="feature-description">
+                    Stay ahead with cutting-edge technology. We're constantly pushing 
+                    boundaries to deliver the future today.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-target="10000">0</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="99">0</div>
+                <div class="stat-label">Uptime %</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="150">0</div>
+                <div class="stat-label">Countries</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="24">0</div>
+                <div class="stat-label">Support 24/7</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2 class="cta-title">Ready to <span class="gradient-text">Transform</span>?</h2>
+        <p class="cta-subtitle">Join thousands of innovators already using NexaFlow</p>
+        <a href="#" class="btn btn-primary magnetic-btn">Start Your Journey</a>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 NexaFlow. Crafted with passion and code.</p>
+    </footer>
+    
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+        });
+        
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const navLinks = document.getElementById('nav-links');
+        
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+        // Three.js Scene Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        
+        camera.position.z = 5;
+        
+        // Particle System
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 1000;
+        const posArray = new Float32Array(particlesCount * 3);
+        
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 10;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.02,
+            color: 0x00f0ff,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        // Floating Geometric Shapes
+        const geometries = [
+            new THREE.TorusGeometry(0.5, 0.2, 16, 100),
+            new THREE.OctahedronGeometry(0.5),
+            new THREE.IcosahedronGeometry(0.5)
+        ];
+        
+        const material = new THREE.MeshBasicMaterial({
+            color: 0xff006e,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+        
+        const shapes = [];
+        for(let i = 0; i < 3; i++) {
+            const mesh = new THREE.Mesh(geometries[i], material.clone());
+            mesh.position.set(
+                (Math.random() - 0.5) * 8,
+                (Math.random() - 0.5) * 8,
+                (Math.random() - 0.5) * 5
+            );
+            shapes.push(mesh);
+            scene.add(mesh);
+        }
+        
+        // Mouse Movement
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+        
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate particles
+            particlesMesh.rotation.y += 0.001;
+            particlesMesh.rotation.x += 0.0005;
+            
+            // Animate shapes
+            shapes.forEach((shape, index) => {
+                shape.rotation.x += 0.01 * (index + 1);
+                shape.rotation.y += 0.01 * (index + 1);
+                shape.position.y += Math.sin(Date.now() * 0.001 + index) * 0.001;
+            });
+            
+            // Camera follows mouse
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Hero Title Animation
+        gsap.to('.hero-title-line span', {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.2,
+            ease: 'power4.out',
+            delay: 0.5
+        });
+        
+        // Feature Cards Animation
+        gsap.utils.toArray('.feature-card').forEach((card, index) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 80%',
+                    end: 'top 50%',
+                    scrub: 1
+                },
+                y: 100,
+                opacity: 0,
+                duration: 1
+            });
+        });
+        
+        // Stats Counter Animation
+        const statNumbers = document.querySelectorAll('.stat-number');
+        
+        statNumbers.forEach(stat => {
+            const target = parseInt(stat.getAttribute('data-target'));
+            
+            ScrollTrigger.create({
+                trigger: stat,
+                start: 'top 80%',
+                onEnter: () => {
+                    gsap.to(stat, {
+                        innerHTML: target,
+                        duration: 2,
+                        snap: { innerHTML: 1 },
+                        ease: 'power2.out'
+                    });
+                }
+            });
+        });
+        
+        // Magnetic Button Effect
+        const magneticButtons = document.querySelectorAll('.magnetic-btn');
+        
+        magneticButtons.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                gsap.to(btn, {
+                    x: x * 0.3,
+                    y: y * 0.3,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                gsap.to(btn, {
+                    x: 0,
+                    y: 0,
+                    duration: 0.5,
+                    ease: 'elastic.out(1, 0.5)'
+                });
+            });
+        });
+        
+        // Parallax Effect
+        gsap.to('.hero-content', {
+            scrollTrigger: {
+                trigger: '.hero',
+                start: 'top top',
+                end: 'bottom top',
+                scrub: 1
+            },
+            y: 200,
+            opacity: 0.5
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VEIL // Seed 142035745</title>
+
+    <!-- 
+    DESIGN DECOMPOSITION (Seed: 142035745)
+    --------------------------------------
+    142 : HUE -> Primary accent color based on HSL 142° (Emerald/Forest Green).
+    03  : GRID -> A core 0-3-0 structural modular system for layout alignment.
+    57  : SCALE -> 5.7rem as the base rhythm for section spacing and hero typography height.
+    45  : RADIUS -> 45px / 10 = 4.5px border radius. Sharp, modern, slightly softened technical look.
+    
+    Style Direction: "Neo-Technic Minimalist"
+    Features a high contrast light/dark mode, asymmetric typography, and technical grid overlays.
+    -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=Space+Grotesk:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            /* Seed derived constants */
+            --hue: 142;
+            --primary: hsl(var(--hue), 76%, 45%);
+            --primary-light: hsl(var(--hue), 76%, 65%);
+            --primary-dark: hsl(var(--hue), 76%, 25%);
+            --radius: 4.5px;
+            --section-gap: 5.7rem;
+
+            /* Theme - Light */
+            --bg: #f8f9fa;
+            --surface: #ffffff;
+            --text: #0a0a0a;
+            --text-muted: #666666;
+            --border: rgba(0, 0, 0, 0.1);
+            --grid-color: rgba(0, 0, 0, 0.03);
+
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --text: #f8f9fa;
+            --text-muted: #999999;
+            --border: rgba(255, 255, 255, 0.1);
+            --grid-color: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        .brand {
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        /* Utility */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--text);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        /* Layout Grid Background */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(var(--bg), 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 0;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding-top: 12rem;
+            padding-bottom: var(--section-gap);
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero-tag {
+            color: var(--primary);
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 1;
+            margin-bottom: 2rem;
+            max-width: 900px;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 4rem;
+            align-items: flex-end;
+        }
+
+        .hero-desc {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 500px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+        }
+
+        .stat-item h4 {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .stat-item p {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.6;
+        }
+
+        /* Features Section */
+        .features {
+            padding: var(--section-gap) 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-header {
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 3rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: var(--transition);
+            background: var(--bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            clip-path: polygon(100% 0, 100% 100%, 0 100%);
+            opacity: 0.1;
+        }
+
+        /* Showreel Section */
+        .showreel {
+            padding: var(--section-gap) 0;
+        }
+
+        .reel-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            height: 600px;
+        }
+
+        .reel-item {
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .reel-1 {
+            grid-column: 1 / 7;
+            grid-row: 1 / 3;
+        }
+
+        .reel-2 {
+            grid-column: 7 / 13;
+            grid-row: 1 / 2;
+        }
+
+        .reel-3 {
+            grid-column: 7 / 10;
+            grid-row: 2 / 3;
+        }
+
+        .reel-4 {
+            grid-column: 10 / 13;
+            grid-row: 2 / 3;
+        }
+
+        .reel-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            opacity: 0;
+            transition: var(--transition);
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+            color: white;
+        }
+
+        .reel-item:hover .reel-overlay {
+            opacity: 1;
+        }
+
+        /* Services / Info Section */
+        .info-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 80vh;
+            border-top: 1px solid var(--border);
+        }
+
+        .info-visual {
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-visual .shape {
+            width: 400px;
+            height: 400px;
+            background: var(--bg);
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 10s infinite alternate;
+        }
+
+        .info-content {
+            padding: 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: var(--surface);
+        }
+
+        @keyframes float {
+            from {
+                transform: translate(-50px, -50px);
+            }
+
+            to {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: var(--section-gap) 0;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 0;
+        }
+
+        .faq-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .faq-header h3 {
+            font-size: 1.25rem;
+            text-transform: none;
+        }
+
+        .faq-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            color: var(--text-muted);
+        }
+
+        .faq-item.active .faq-body {
+            max-height: 200px;
+            margin-top: 1rem;
+        }
+
+        .faq-item.active i {
+            transform: rotate(45deg);
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: var(--section-gap) 0;
+            text-align: center;
+            background: var(--primary);
+            color: white;
+        }
+
+        .cta h2 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 2rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .footer-col h5 {
+            margin-bottom: 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-col ul li a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .info-split {
+                grid-template-columns: 1fr;
+            }
+
+            .info-visual {
+                height: 300px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+
+            .reel-container {
+                display: flex;
+                flex-direction: column;
+                height: auto;
+            }
+
+            .reel-item {
+                height: 300px;
+            }
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-follower {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="grid-overlay"></div>
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <nav>
+        <div class="container">
+            <div class="brand">VEIL<span>.</span></div>
+            <div class="nav-links">
+                <a href="#work">Work</a>
+                <a href="#about">About</a>
+                <a href="#process">Process</a>
+                <a href="#faq">Faq</a>
+                <a href="#contact" class="btn btn-outline">Contact</a>
+                <button class="theme-toggle" id="theme-toggle">
+                    <i data-lucide="moon"></i>
+                </button>
+            </div>
+            <!-- Mobile Menu Toggle (simplified for single file) -->
+            <button class="theme-toggle" id="mobile-toggle" style="display: none;">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <span class="hero-tag">SEED 142035745</span>
+            <h1>CRAFTING DIGITAL<br>SYMPHONIES.</h1>
+
+            <div class="hero-content">
+                <div>
+                    <p class="hero-desc">
+                        A maximum quality landing page generator. We push the boundaries of modern aesthetics using
+                        procedural design principles and neo-technic brutalism.
+                    </p>
+                    <div class="hero-btns">
+                        <a href="#" class="btn btn-primary">Start Exploration <i data-lucide="arrow-right"></i></a>
+                        <a href="#" class="btn btn-outline">Our Philosophy</a>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <h4>142</h4>
+                        <p>Projects</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>035</h4>
+                        <p>Awards</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>745</h4>
+                        <p>Hours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="features" id="process">
+        <div class="container">
+            <div class="section-header">
+                <span class="hero-tag">Core Assets</span>
+                <h2>TECHNICAL EXCELLENCE</h2>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i data-lucide="Zap"></i>
+                    <h3>Seed Velocity</h3>
+                    <p>Powered by the 142035745 algorithm for instant visual coherence across all modules.</p>
+                </div>
+                <div class="feature-card">
+                    <i data-lucide="Layers"></i>
+                    <h3>Modular Grid</h3>
+                    <p>A structural 0-3-0 layout system ensuring pixel-perfect alignment on any device screen.</p>
+                </div>
+                <div class="feature-card">
+                    <i data-lucide="Cpu"></i>
+                    <h3>Neural Design</h3>
+                    <p>Optimized for performance through lightweight vanilla constructs and procedural logic.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="showreel" id="work">
+        <div class="container">
+            <div class="section-header">
+                <span class="hero-tag">Showcase</span>
+                <h2>VISUAL FRONTIER</h2>
+            </div>
+
+            <div class="reel-container">
+                <div class="reel-item reel-1"
+                    style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80')">
+                    <div class="reel-overlay">
+                        <div>
+                            <h4>Abstract Motion</h4>
+                            <p>Experimental 3D Studies</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="reel-item reel-2"
+                    style="background-image: url('https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop&w=800&q=80')">
+                    <div class="reel-overlay">
+                        <div>
+                            <h4>Static Flow</h4>
+                            <p>Minimalist Branding</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="reel-item reel-3"
+                    style="background-image: url('https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=500&q=80')">
+                    <div class="reel-overlay">
+                        <div>
+                            <h4>Glow Arc</h4>
+                            <p>Product Design</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="reel-item reel-4"
+                    style="background-image: url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&w=500&q=80')">
+                    <div class="reel-overlay">
+                        <div>
+                            <h4>Vector Depth</h4>
+                            <p>Architecture</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-split" id="about">
+        <div class="info-visual">
+            <div class="shape"></div>
+            <h2 style="color: white; font-size: 5rem; z-index: 1;">THE CORE</h2>
+        </div>
+        <div class="info-content">
+            <span class="hero-tag">Mission</span>
+            <h3>WE DONT JUST BUILD WEBSITES, WE ENGINEER EXPERIENCES.</h3>
+            <p style="margin: 2rem 0; color: var(--text-muted);">
+                Our methodology relies on the decomposition of complex data into simple, striking visual components.
+                Every pixel is a result of a recursive design choice, starting from the seed and growing into a complete
+                digital ecosystem.
+            </p>
+            <ul style="list-style: none;">
+                <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
+                    <i data-lucide="check-circle" style="color: var(--primary);"></i> Procedural Layout Generation
+                </li>
+                <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
+                    <i data-lucide="check-circle" style="color: var(--primary);"></i> Dynamic Color Interpolation
+                </li>
+                <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
+                    <i data-lucide="check-circle" style="color: var(--primary);"></i> Optimal Load Sequencing
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-header">
+                <span class="hero-tag">Inquiry</span>
+                <h2>COMMON QUESTIONS</h2>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-header">
+                        <h3>What is the 142035745 seed?</h3>
+                        <i data-lucide="plus"></i>
+                    </div>
+                    <div class="faq-body">
+                        <p>The seed is a unique identifier used to generate the visual DNA of this specific landing
+                            page, controlling everything from hue rotation to structural spacing units.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-header">
+                        <h3>Is this project mobile friendly?</h3>
+                        <i data-lucide="plus"></i>
+                    </div>
+                    <div class="faq-body">
+                        <p>Absolutely. The layout adapts fluently across all viewports using a flexible grid system and
+                            clamped typography values.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-header">
+                        <h3>Can I customize the primary accent?</h3>
+                        <i data-lucide="plus"></i>
+                    </div>
+                    <div class="faq-body">
+                        <p>Yes, the CSS variables are built to be easily overridden. The primary hue is mapped to a
+                            single HSL variable for global updates.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta" id="contact">
+        <div class="container">
+            <h2>READY TO DEPLOY?</h2>
+            <p style="margin-bottom: 3rem; opacity: 0.8; font-size: 1.2rem;">Join the elite factory of high-end digital
+                templates.</p>
+            <a href="#" class="btn btn-outline" style="border-color: white; color: white;">Get Started Today</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="brand">VEIL<span>.</span></div>
+                    <p style="margin-top: 1.5rem; color: var(--text-muted); max-width: 300px;">
+                        The ultimate procedural landing page engine.
+                        Modern. Rapid. Irresistible.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h5>Navigation</h5>
+                    <ul>
+                        <li><a href="#">Work</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Process</a></li>
+                        <li><a href="#">Archive</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>Company</h5>
+                    <ul>
+                        <li><a href="#">Team</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Manifesto</a></li>
+                        <li><a href="#">Twitter</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>Contact</h5>
+                    <ul>
+                        <li><a href="#">hello@veil.factory</a></li>
+                        <li><a href="#">+1 142 035 745</a></li>
+                        <li><a href="#">Discord Interface</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-size: 0.8rem;">
+                <p>&copy; 2026 VEIL FACTORY. ALL RIGHTS RESERVED.</p>
+                <div style="display: flex; gap: 2rem;">
+                    <a href="#" style="color: inherit; text-decoration: none;">Privacy</a>
+                    <a href="#" style="color: inherit; text-decoration: none;">Terms</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Init Lucide Icons
+        lucide.createIcons();
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+
+            // Update icon
+            if (newTheme === 'dark') {
+                themeIcon.setAttribute('data-lucide', 'sun');
+            } else {
+                themeIcon.setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+
+            // GSAP Theme Switch Animation
+            gsap.fromTo("body", { backgroundColor: currentTheme === 'light' ? '#f8f9fa' : '#0a0a0a' },
+                { backgroundColor: newTheme === 'light' ? '#f8f9fa' : '#0a0a0a', duration: 0.5 });
+        });
+
+        // FAQ Toggle
+        document.querySelectorAll('.faq-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                const isActive = item.classList.contains('active');
+
+                // Close others
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Custom Cursor Logic
+        const cursor = document.querySelector('.cursor');
+        const follower = document.querySelector('.cursor-follower');
+
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, {
+                x: e.clientX - 10,
+                y: e.clientY - 10,
+                duration: 0.1
+            });
+            gsap.to(follower, {
+                x: e.clientX - 4,
+                y: e.clientY - 4,
+                duration: 0.3
+            });
+        });
+
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hero Animation
+        gsap.from(".hero h1", {
+            y: 100,
+            opacity: 0,
+            duration: 1.2,
+            ease: "power4.out",
+            delay: 0.5
+        });
+
+        gsap.from(".hero-desc, .hero-btns", {
+            y: 50,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out",
+            delay: 0.8
+        });
+
+        gsap.from(".stat-item", {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: "power3.out",
+            delay: 1.1
+        });
+
+        // Features Animation
+        gsap.from(".feature-card", {
+            scrollTrigger: {
+                trigger: ".features",
+                start: "top 80%"
+            },
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "power3.out"
+        });
+
+        // Reel Animation
+        gsap.from(".reel-item", {
+            scrollTrigger: {
+                trigger: ".showreel",
+                start: "top 80%"
+            },
+            scale: 0.9,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.1,
+            ease: "expo.out"
+        });
+
+        // Info split animation
+        gsap.from(".info-visual", {
+            scrollTrigger: {
+                trigger: ".info-split",
+                start: "top 70%"
+            },
+            x: -100,
+            opacity: 0,
+            duration: 1.2,
+            ease: "power4.out"
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Landing — 506609183</title>
+  <meta name="description" content="Bold, modern landing with lightweight 3D — seed 506609183" />
+
+  <!--
+    Template ID / Seed: 506609183
+
+    Design Plan and Dice (explained BEFORE rolling):
+    - We'll use a small collection of design decisions driven by random rolls:
+      1) Color palette family (soft pastel / neon duotone / mono minimal)
+      2) 3D style (particle field / soft-cloth deform / geometric cluster)
+      3) Hero layout (split / centered / image-left)
+      4) Animation tempo (calm / energetic / hyper)
+      5) Particle density (low / medium / high)
+      6) Accent motif (organic blob / crystalline shards / line grid)
+
+    Dice results (rolled after plan): [62,39,1,52,16,32]
+    Mapped decisions (using ranges 0-33 / 34-66 / 67-99):
+      - 62 => neon duotone palette (vivid purple + electric teal)
+      - 39 => soft cloth-like 3D shape (deforming sphere with soft noise)
+      - 1  => split hero layout (copy left, 3D canvas right on wide screens)
+      - 52 => energetic animation speed (bouncy but smooth)
+      - 16 => low particle density (few particles for lightness on mobile)
+      - 32 => organic blob accent (SVG blob shapes & soft masks)
+
+    Design notes:
+    - Goal: striking, modern, mobile-first. Light and Dark theme toggle.
+    - Use modern browser features, keep geometry and textures small.
+    - Use three.js (CDN) for 3D, GSAP for smooth UI timing. Keep everything lazy & performant.
+
+    Implementation details & performance
+    - Using a low-poly sphere with vertex displacement in JS for the "soft cloth" feel.
+    - Particles are simple Points with small size; density is intentionally low.
+    - All CSS in the head using semantic class names (no inline styles).
+    - Single-file template, comments included. Filename: 3D/506609183.html
+  -->
+
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
+  <style>
+    :root{
+      --bg: #0f0f12;
+      --panel: #ffffff;
+      --muted: #9aa0ab;
+      --accent1: #9b59ff; /* neon purple */
+      --accent2: #00f5d4; /* electric teal */
+      --glass: rgba(255,255,255,0.06);
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(2,6,23,0.6);
+      --max-width: 1100px;
+      --ff-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --ease: cubic-bezier(.2,.9,.3,1);
+      color-scheme: dark light;
+    }
+
+    /* Light theme overrides */
+    .theme-light{
+      --bg: #f7f9fc;
+      --panel: #111218;
+      --muted: #5b6a77;
+      --glass: rgba(0,0,0,0.06);
+      --shadow: 0 12px 30px rgba(12,20,35,0.06);
+    }
+
+    html,body{height:100%;margin:0;font-family:var(--ff-sans);background:linear-gradient(180deg,var(--bg) 0%, color-mix(in srgb, var(--bg) 6% , transparent) 100%);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+    .page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
+    .shell{width:100%;max-width:var(--max-width);display:grid;grid-template-columns:1fr 520px;gap:28px;align-items:center}
+
+    /* On small screens collapse to single column with canvas first for impact */
+    @media (max-width:900px){
+      .shell{grid-template-columns:1fr;gap:18px}
+      .hero-visual{order:-1;height:54vw;min-height:320px;border-radius:12px}
+    }
+
+    .card{background:linear-gradient(180deg, transparent, transparent);padding:28px;border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:18px}
+
+    .hero-copy{padding:24px}
+    .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);font-weight:600}
+    .eyebrow svg{width:18px;height:18px;opacity:0.95}
+    h1{font-size:clamp(26px,6vw,44px);line-height:1.02;margin:0;color:var(--panel)}
+    p.lead{margin:0;color:var(--muted);font-size:15px}
+
+    .cta-row{display:flex;gap:12px;align-items:center;margin-top:16px}
+    .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white;padding:12px 18px;border-radius:12px;font-weight:700;border:0;cursor:pointer;box-shadow:0 6px 20px rgba(55,0,115,0.18);transition:transform .22s var(--ease);font-size:15px}
+    .btn:active{transform:translateY(1px) scale(.996)}
+
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--panel);padding:10px 14px;border-radius:10px}
+
+    /* Visual area */
+    .hero-visual{position:relative;height:420px;border-radius:18px;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04));display:flex;align-items:center;justify-content:center}
+
+    /* SVG blob accent */
+    .blob{position:absolute;inset:auto -10% -20% auto;width:55%;height:200%;opacity:.18;filter:blur(40px);transform:translateX(8%)}
+
+    /* Footer / credits */
+    .meta{font-size:13px;color:var(--muted);display:flex;gap:12px;align-items:center}
+
+    /* Toggle */
+    .toggle{display:inline-flex;align-items:center;padding:6px;border-radius:999px;background:var(--glass);gap:8px}
+    .switch{width:46px;height:28px;border-radius:999px;background:linear-gradient(180deg,#111, #0c0c0d);display:inline-grid;place-items:center;cursor:pointer;padding:4px}
+    .dot{width:18px;height:18px;border-radius:50%;background:white}
+
+    .small{font-size:13px}
+
+    /* Small neat responsive adjustments */
+    @media (max-width:560px){.hero-copy{padding:18px}} 
+
+    /* Utilities */
+    .visually-hidden{position:absolute;border:0;padding:0;margin:-1px;height:1px;width:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+  </style>
+
+</head>
+<body class="theme-dark">
+  <main class="page">
+    <section class="shell" aria-labelledby="hero-title">
+
+      <div class="card hero-copy" style="--flow:24px">
+        <div class="eyebrow"> 
+          <!-- Playful star icon -->
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden focusable="false"><path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5L12 16.9 6.1 17.9l.9-5.5-4-3.9 5.5-.8L12 2z" fill="currentColor" /></svg>
+          <span>Designed with seed <strong>506609183</strong></span>
+        </div>
+
+        <h1 id="hero-title">A bold, modern landing with lightweight 3D motion</h1>
+        <p class="lead">Striking duotone accents, soft geometric motion and a tactile, responsive layout crafted to feel fast on mobile and delightful on desktop.</p>
+
+        <div class="cta-row">
+          <button class="btn" id="primary-cta">Explore the experience</button>
+          <button class="ghost">See features</button>
+        </div>
+
+        <div class="meta">
+          <div class="small">Mobile-first · Light & Dark · Optimized 3D</div>
+          <div style="flex:1"></div>
+          <div class="toggle" id="theme-toggle" role="switch" aria-checked="false" tabindex="0">
+            <span class="small">Light</span>
+            <div class="switch" aria-hidden><div class="dot" id="switch-dot"></div></div>
+            <span class="small">Dark</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card hero-visual" aria-hidden="false">
+        <!-- SVG organic blob accent -->
+        <svg class="blob" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="gA" x1="0" x2="1">
+              <stop offset="0%" stop-color="#9b59ff" />
+              <stop offset="100%" stop-color="#00f5d4" />
+            </linearGradient>
+          </defs>
+          <g fill="url(#gA)">
+            <path d="M421.6,329.2Q378,408,297.2,438.7Q216.4,469.4,150.6,416.5Q84.8,363.7,61,293.7Q37.2,223.7,82.9,162.1Q128.6,100.5,195.3,78.2Q262,55.9,324.8,80.6Q387.6,105.3,429.1,166.1Q470.6,227,421.6,329.2Z" opacity="0.95"></path>
+          </g>
+        </svg>
+
+        <!-- 3D canvas (Three.js) -->
+        <canvas id="glcanvas" width="1200" height="800" style="width:100%;height:100%;display:block"></canvas>
+
+        <!-- small overlay for captions on mobile -->
+        <div style="position:absolute;left:18px;bottom:18px;color:var(--panel);font-weight:700;font-size:13px">Soft 3D · Energetic motion</div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Minimal accessible attribution and preload hints -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+
+  <!-- Load external libs as ES modules for modern browsers. Module scripts are deferred by default. -->
+  <script type="module">
+    // Seed and decisions replicated in runtime (useful for debugging & analytics)
+    const SEED = 506609183;
+    const dice = [62,39,1,52,16,32];
+
+    // Lazy-load Three.js and GSAP only when needed.
+    const [{default:THREE}, {gsap}] = await Promise.all([
+      import('https://unpkg.com/three@0.158.0/build/three.module.js'),
+      import('https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js')
+    ]);
+
+    // Scene setup
+    const canvas = document.getElementById('glcanvas');
+    const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(35, canvas.clientWidth/canvas.clientHeight, 0.1, 100);
+    camera.position.set(0,0,6);
+
+    // Soft ambient and directional light
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const dir = new THREE.DirectionalLight(0xffffff, 0.4);
+    dir.position.set(5,5,5);
+    scene.add(dir);
+
+    // Low poly sphere with vertex displacement for "soft cloth" effect
+    const geom = new THREE.IcosahedronGeometry(1.6, 5); // mid-resolution
+    const posAttr = geom.attributes.position;
+    const vertexCount = posAttr.count;
+
+    // Create initial displacement data to keep CPU work light: per-vertex offsets
+    const basePositions = new Float32Array(posAttr.array);
+    const offsets = new Float32Array(vertexCount);
+    for(let i=0;i<vertexCount;i++){ offsets[i] = Math.random()*0.6 - 0.3 }
+
+    // Shader-like material using standard MeshPhysicalMaterial tuned for duotone
+    const mat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#9b59ff'),
+      metalness:0.12, roughness:0.45, clearcoat:0.14, emissiveIntensity:0.08
+    });
+
+    const sphere = new THREE.Mesh(geom, mat);
+    sphere.position.set(0.5, -0.08, 0);
+    sphere.scale.set(1.05,1.05,1.05);
+    scene.add(sphere);
+
+    // Simple particles (Points)
+    const pCount = 55 * 0.16 | 0; // low density (dice result 16 -> low)
+    const pGeom = new THREE.BufferGeometry();
+    const pPositions = new Float32Array(pCount*3);
+    for(let i=0;i<pCount;i++){
+      const r = 1.8 + Math.random()*2.2;
+      const theta = Math.random()*Math.PI*2;
+      const phi = (Math.random()* Math.PI) - (Math.PI/2);
+      pPositions[i*3+0] = Math.cos(theta)*Math.cos(phi)*r;
+      pPositions[i*3+1] = Math.sin(phi)*r*0.45;
+      pPositions[i*3+2] = Math.sin(theta)*Math.cos(phi)*r;
+    }
+    pGeom.setAttribute('position', new THREE.BufferAttribute(pPositions,3));
+    const pMat = new THREE.PointsMaterial({size:3.6, sizeAttenuation: true, color: new THREE.Color('#00f5d4'), opacity: 0.95, transparent:true});
+    const points = new THREE.Points(pGeom, pMat);
+    scene.add(points);
+
+    // Subtle camera float using GSAP for "energetic" feel but smooth
+    gsap.to(camera.position, {duration:6, x:0.2, y:0.15, ease:'sine.inOut', repeat:-1, yoyo:true});
+
+    // Animation loop: CPU-driven vertex displacement using sine + offsets
+    const timeStart = performance.now();
+    function animate(now){
+      const t = (now - timeStart)/1000;
+
+      // Update sphere vertices (small displacement)
+      for(let i=0;i<vertexCount;i++){
+        const ix = i*3, iy = ix+1, iz = ix+2;
+        // Waves tuned for "energetic" tempo (dice 52)
+        const wave = Math.sin(t*2.4 + offsets[i]*5.0)*0.08 + Math.cos(t*1.6 + offsets[i]*3.2)*0.05;
+        geom.attributes.position.array[ix] = basePositions[ix] * (1 + wave);
+        geom.attributes.position.array[iy] = basePositions[iy] * (1 + wave);
+        geom.attributes.position.array[iz] = basePositions[iz] * (1 + wave);
+      }
+      geom.attributes.position.needsUpdate = true;
+      geom.computeVertexNormals();
+
+      // Rotate a bit
+      sphere.rotation.y += 0.005 * 1.8; // faster for "energetic"
+      points.rotation.y += 0.0012;
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    // Handle resize gracefully
+    function resize(){
+      const w = canvas.clientWidth || canvas.offsetWidth;
+      const h = canvas.clientHeight || canvas.offsetHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w/h;
+      camera.updateProjectionMatrix();
+    }
+    new ResizeObserver(resize).observe(canvas);
+
+    requestAnimationFrame(animate);
+
+    // Theme toggle logic
+    const body = document.body;
+    const toggle = document.getElementById('theme-toggle');
+    const switchDot = document.getElementById('switch-dot');
+    function setTheme(theme){
+      if(theme === 'light'){
+        body.classList.remove('theme-dark');
+        body.classList.add('theme-light');
+        toggle.setAttribute('aria-checked','true');
+        gsap.to(switchDot, {x:18, background:'#111', duration:0.28});
+      } else {
+        body.classList.remove('theme-light');
+        body.classList.add('theme-dark');
+        toggle.setAttribute('aria-checked','false');
+        gsap.to(switchDot, {x:0, background:'#fff', duration:0.28});
+      }
+      localStorage.setItem('template-theme', theme);
+    }
+    toggle.addEventListener('click', ()=>{
+      const active = toggle.getAttribute('aria-checked') === 'true';
+      setTheme(active ? 'dark' : 'light');
+    });
+    toggle.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { toggle.click(); e.preventDefault(); }});
+
+    // Initialize theme from localStorage or system
+    const stored = localStorage.getItem('template-theme');
+    if(stored) setTheme(stored);
+    else setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
+
+    // Micro-interactions
+    document.getElementById('primary-cta').addEventListener('pointerenter', ()=>{
+      gsap.to(sphere.scale, {x:1.12,y:1.12,z:1.12,duration:0.42,ease:'elastic.out(1,0.6)'});
+    });
+    document.getElementById('primary-cta').addEventListener('pointerleave', ()=>{
+      gsap.to(sphere.scale, {x:1.05,y:1.05,z:1.05,duration:0.6,ease:'elastic.out(1,0.7)'});
+    });
+
+    // Performance tip: stop animating when canvas not visible
+    const io = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting) requestAnimationFrame(animate);
+      })
+    }, {threshold:0.1});
+    io.observe(canvas);
+
+    // Accessibility: expose some runtime info
+    const ariaLive = document.createElement('div');
+    ariaLive.className = 'visually-hidden';
+    ariaLive.setAttribute('aria-live','polite');
+    ariaLive.textContent = `Loaded 3D demo, seed ${SEED}`;
+    document.body.appendChild(ariaLive);
+
+    // Minor visual polish on load
+    gsap.from('.card', {opacity:0, y:10, duration:0.8, stagger:0.06, ease:'power3.out'});
+
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEO-STRATOS | 3D Experience 109330182</title>
+    <!-- 
+        DESIGN LOG (Seed: 109330182)
+        - Chroma Spectrum: Hyper-Cyan & Obsidian (Digit 1-2: 10)
+        - Architectural Geometry: Kinetic Typography 3D (Digit 3-4: 93)
+        - Animation Soul: Atmospheric Drift (Digit 5-6: 30)
+        - Layout Philosophy: Anti-Grid (Digit 7-8: 18)
+        
+        Aesthetics: Brutalist-Futurism meets Depth-Mapping.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=Outfit:wght@300;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-color: #ffffff;
+            --accent-color: #00f2ff;
+            --secondary-accent: #0066ff;
+            --glass: rgba(255, 255, 255, 0.05);
+            --transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f0f4f5;
+            --text-color: #050505;
+            --accent-color: #0055ff;
+            --secondary-accent: #00ccff;
+            --glass: rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color var(--transition), color var(--transition);
+        }
+
+        /* 3D Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            color: var(--accent-color);
+        }
+
+        .controls {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--glass);
+            border: 1px solid var(--glass);
+            width: 50px;
+            height: 26px;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .toggle-dot {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        [data-theme="light"] .toggle-dot {
+            transform: translateX(24px);
+        }
+
+        /* Global UI Elements */
+        .vertical-text {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+            font-size: 0.7rem;
+            letter-spacing: 0.5rem;
+            text-transform: uppercase;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Sections */
+        section {
+            min-height: 100vh;
+            padding: 6rem 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero {
+            align-items: flex-start;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 800;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            mix-blend-mode: difference;
+        }
+
+        .accent-text {
+            color: var(--accent-color);
+        }
+
+        .hero-sub {
+            max-width: 500px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-left: 20px;
+            border-left: 2px solid var(--accent-color);
+            padding-left: 2rem;
+            opacity: 0.8;
+        }
+
+        .cta-container {
+            margin-top: 3rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-color);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn:hover::after {
+            left: 0;
+        }
+
+        /* Features Section - Anti-Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border: 1px solid var(--glass);
+            transition: transform 0.5s ease;
+        }
+
+        .card-1 {
+            grid-column: 2 / 7;
+            transform: translateY(100px);
+        }
+
+        .card-2 {
+            grid-column: 7 / 12;
+            transform: translateY(-50px);
+        }
+
+        .card-3 {
+            grid-column: 4 / 9;
+            transform: translateY(50px);
+        }
+
+        .feature-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .feature-card p {
+            opacity: 0.7;
+            line-height: 1.7;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem;
+            }
+
+            section {
+                padding: 4rem 5%;
+            }
+
+            h1 {
+                font-size: 4rem;
+            }
+
+            .hero-sub {
+                margin-left: 0;
+                border-left: 4px solid var(--accent-color);
+            }
+
+            .features {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .feature-card {
+                transform: none !important;
+                width: 100%;
+            }
+
+            .vertical-text {
+                display: none;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body data-theme="dark">
+
+    <div id="canvas-container"></div>
+
+    <nav>
+        <div class="logo">NEO-STRATOS</div>
+        <div class="controls">
+            <div class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+                <div class="toggle-dot"></div>
+            </div>
+            <div class="menu-label" style="font-weight: 700; letter-spacing: 2px; font-size: 0.8rem;">INDEX</div>
+        </div>
+    </nav>
+
+    <div class="vertical-text">ESTABLISHED 2026 // AD-0182</div>
+
+    <main>
+        <section class="hero">
+            <div class="reveal">
+                <h1>NEO<br><span class="accent-text">STRATOS</span></h1>
+            </div>
+            <p class="hero-sub">
+                A digital monolith emerging from the intersection of kinetic geometry and atmospheric drift.
+                Breaking the grid to redefine the spatial medium.
+            </p>
+            <div class="cta-container">
+                <button class="btn">Explore Void</button>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature-card card-1">
+                <div class="num" style="opacity: 0.3; font-weight: 900; margin-bottom: 1rem;">// 01</div>
+                <h3>KINETIC</h3>
+                <p>Dynamics powered by 3D vertex manipulation, providing a responsive layer that breathes with user
+                    interaction.</p>
+            </div>
+            <div class="feature-card card-2">
+                <div class="num" style="opacity: 0.3; font-weight: 900; margin-bottom: 1rem;">// 02</div>
+                <h3>SPATIAL</h3>
+                <p>An anti-grid philosophy that rejects the standard box layout in favor of tiered depth and overlapping
+                    narratives.</p>
+            </div>
+            <div class="feature-card card-3">
+                <div class="num" style="opacity: 0.3; font-weight: 900; margin-bottom: 1rem;">// 03</div>
+                <h3>LUMINAL</h3>
+                <p>Adaptive light systems that transition between hyper-cyan neon and soft ivory depending on your
+                    environmental preference.</p>
+            </div>
+        </section>
+
+        <section class="hero" style="min-height: 60vh;">
+            <h2 style="font-family: 'Outfit'; font-size: clamp(2rem, 8vw, 6rem); text-transform: uppercase;">
+                The future is <span class="accent-text">Unstructured</span>.
+            </h2>
+            <div class="cta-container">
+                <button class="btn">Protocol Start</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Theme Logic
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+
+            // Update 3D colors
+            if (scene) {
+                const color = newTheme === 'light' ? 0x0055ff : 0x00f2ff;
+                particleMaterial.color.setHex(color);
+                meshMaterial.color.setHex(color);
+                scene.background = new THREE.Color(newTheme === 'light' ? 0xf0f4f5 : 0x050505);
+            }
+        }
+
+        // --- Three.js Logic ---
+        let scene, camera, renderer, particles, mesh;
+        let particleMaterial, meshMaterial;
+        let mouseX = 0, mouseY = 0;
+
+        function init3D() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050505);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Create Floating Particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 2000;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 15;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            particleMaterial = new THREE.PointsMaterial({
+                size: 0.005,
+                color: 0x00f2ff,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            particles = new THREE.Points(particlesGeometry, particleMaterial);
+            scene.add(particles);
+
+            // Create Kinetic Central Mesh (Wireframe Sphere)
+            const geometry = new THREE.IcosahedronGeometry(2, 1);
+            meshMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00f2ff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.1
+            });
+            mesh = new THREE.Mesh(geometry, meshMaterial);
+            scene.add(mesh);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            particles.rotation.y += 0.001;
+            particles.rotation.x += 0.0005;
+
+            mesh.rotation.y += 0.002;
+            mesh.rotation.x += 0.001;
+
+            // Mouse interaction
+            particles.position.x += (mouseX * 0.5 - particles.position.x) * 0.05;
+            particles.position.y += (-mouseY * 0.5 - particles.position.y) * 0.05;
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) - 0.5;
+            mouseY = (e.clientY / window.innerHeight) - 0.5;
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- GSAP Animations ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        function initAnimations() {
+            // Hero Reveal
+            gsap.from('h1', {
+                y: 100,
+                opacity: 0,
+                duration: 1.5,
+                ease: "power4.out",
+                delay: 0.5
+            });
+
+            gsap.from('.hero-sub', {
+                x: -50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out",
+                delay: 1
+            });
+
+            // Feature Scroll Entrance
+            gsap.utils.toArray('.feature-card').forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top bottom-=100",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 100,
+                    opacity: 0,
+                    duration: 1.2,
+                    ease: "expo.out",
+                    delay: i * 0.2
+                });
+            });
+
+            // Parallax Section Titles
+            gsap.to('.vertical-text', {
+                scrollTrigger: {
+                    trigger: 'body',
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1
+                },
+                y: 300
+            });
+        }
+
+        // Initialize
+        window.onload = () => {
+            init3D();
+            initAnimations();
+        };
+
+    </script>
+</body>
+
+</html>

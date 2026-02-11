@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Voyage | Scrollytelling 3D Experience</title>
+    <meta name="description"
+        content="Una experiencia inmersiva 3D con Three.js siguiendo un camino de cámara controlado por el scroll.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030305;
+            --accent: #00f2ff;
+            --accent-two: #7000ff;
+            --text: #ffffff;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            height: 500vh;
+            /* Espacio para scrollear */
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            outline: none;
+        }
+
+        /* Capas de Contenido */
+        .content-layer {
+            position: relative;
+            z-index: 10;
+        }
+
+        section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+            pointer-events: none;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 3rem;
+            border-radius: 24px;
+            max-width: 500px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
+            pointer-events: auto;
+        }
+
+        .glass-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2rem;
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: var(--accent);
+            opacity: 0.7;
+        }
+
+        .mouse {
+            width: 25px;
+            height: 40px;
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .wheel {
+            width: 3px;
+            height: 6px;
+            background-color: var(--accent);
+            border-radius: 2px;
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scroll-anim 2s infinite;
+        }
+
+        @keyframes scroll-anim {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translate(-50%, 8px);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, 16px);
+            }
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-two));
+            z-index: 100;
+        }
+
+        /* UI de Control */
+        .ui-controls {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .btn-voyage {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-voyage:hover {
+            background: var(--accent);
+            color: var(--bg);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            section {
+                padding: 0 5%;
+            }
+
+            .glass-card {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="scroll-indicator" id="scroller">
+        <div class="mouse">
+            <div class="wheel"></div>
+        </div>
+        <span>Desliza para Explorar</span>
+    </div>
+
+    <div class="ui-controls">
+        <button class="btn-voyage"
+            onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})">Destino Final</button>
+    </div>
+
+    <main class="content-layer">
+        <section id="sec-1">
+            <div class="glass-card visible">
+                <h1>EL COMIENZO</h1>
+                <p>Bienvenido a una odisea visual. La cámara sigue un camino matemático fluido, sincronizado con tu
+                    desplazamiento. Descubre lo que el vacío tiene que ofrecer.</p>
+            </div>
+        </section>
+
+        <section id="sec-2">
+            <div class="glass-card">
+                <h1>EL NÚCLEO</h1>
+                <p>Siente la profundidad del espacio mientras navegamos entre monolitos geométricos. Cada píxel está
+                    renderizado en tiempo real usando Three.js.</p>
+            </div>
+        </section>
+
+        <section id="sec-3">
+            <div class="glass-card">
+                <h1>CAMINO DE LUZ</h1>
+                <p>Curvas de Bezier y Splines de Catmull-Rom definen nuestra trayectoria por este laberinto digital
+                    hiper-realista.</p>
+            </div>
+        </section>
+
+        <section id="sec-4">
+            <div class="glass-card">
+                <h1>DIMENSIÓN X</h1>
+                <p>La integración del scroll permite un control narrativo total. Tú marcas el ritmo del viaje a través
+                    del tiempo y el espacio.</p>
+            </div>
+        </section>
+
+        <section id="sec-5">
+            <div class="glass-card">
+                <h1>EL FINAL</h1>
+                <p>Has llegado al final de la demo. El movimiento suave y la atmósfera dinámica son solo el principio de
+                    lo que es posible.</p>
+                <button class="btn-voyage" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Reiniciar
+                    Viaje</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Essential Scripts -->
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+          }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+
+        // --- Configuración Base ---
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x030305, 0.05);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x030305);
+        document.body.appendChild(renderer.domElement);
+
+        // --- Post-Procesado (Glow) ---
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0.2;
+        bloomPass.strength = 1.2;
+        bloomPass.radius = 0.5;
+
+        const composer = new EffectComposer(renderer);
+        composer.addPass(renderScene);
+        composer.addPass(bloomPass);
+
+        // --- Creación del Camino (Spline) ---
+        // Definimos puntos clave por los que pasará la cámara
+        const points = [
+            new THREE.Vector3(0, 0, 10),
+            new THREE.Vector3(5, 2, 5),
+            new THREE.Vector3(-8, -3, -5),
+            new THREE.Vector3(10, 5, -15),
+            new THREE.Vector3(0, 0, -30),
+            new THREE.Vector3(-15, 8, -45),
+            new THREE.Vector3(0, -5, -60)
+        ];
+
+        const curve = new THREE.CatmullRomCurve3(points);
+
+        // Debug: Visualizar el camino (opcional, lo dejamos invisible)
+        /*
+        const curvePoints = curve.getPoints(100);
+        const curveGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+        const curveMaterial = new THREE.LineBasicMaterial({ color: 0x00f2ff });
+        const curveLine = new THREE.Line(curveGeometry, curveMaterial);
+        scene.add(curveLine);
+        */
+
+        // --- Objetos en la Escena ---
+        // Partículas (un mar de estrellas)
+        const particlesCount = 8000;
+        const positions = new Float32Array(particlesCount * 3);
+        for (let i = 0; i < particlesCount * 3; i++) {
+            positions[i] = (Math.random() - 0.5) * 150;
+        }
+        const particlesGeom = new THREE.BufferGeometry();
+        particlesGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const particlesMat = new THREE.PointsMaterial({
+            size: 0.1,
+            color: 0x00f2ff,
+            transparent: true,
+            opacity: 0.5,
+            blending: THREE.AdditiveBlending
+        });
+        const particleSystem = new THREE.Points(particlesGeom, particlesMat);
+        scene.add(particleSystem);
+
+        // Monolitos y geometrías
+        const objects = [];
+        const createMonolith = (pos, size, color) => {
+            const geo = new THREE.BoxGeometry(size[0], size[1], size[2]);
+            const mat = new THREE.MeshStandardMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.5,
+                metalness: 0.9,
+                roughness: 0.1
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.copy(pos);
+            mesh.rotation.x = Math.random() * Math.PI;
+            mesh.rotation.y = Math.random() * Math.PI;
+            scene.add(mesh);
+            objects.push(mesh);
+        };
+
+        // Esparcimos algunos objetos cerca de los puntos del camino
+        points.forEach((p, i) => {
+            if (i === 0) return;
+            createMonolith(
+                p.clone().add(new THREE.Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, -5)),
+                [Math.random() * 4, Math.random() * 8, Math.random() * 4],
+                i % 2 === 0 ? 0x00f2ff : 0x7000ff
+            );
+        });
+
+        // Luces
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0x00f2ff, 2, 50);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        // --- Gestión del Scroll ---
+        let scrollProgress = 0;
+        let targetScrollProgress = 0;
+        const cards = document.querySelectorAll('.glass-card');
+
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement;
+            const b = document.body;
+            const st = 'scrollTop';
+            const sh = 'scrollHeight';
+
+            targetScrollProgress = (h[st] || b[st]) / ((h[sh] || b[sh]) - h.clientHeight);
+
+            // UI Progress bar
+            document.getElementById('progressBar').style.width = (targetScrollProgress * 100) + '%';
+
+            // Animación de las cartas de texto
+            cards.forEach((card, index) => {
+                const sectionHeight = 1 / (cards.length - 1);
+                const start = index * sectionHeight - 0.1;
+                const end = (index + 0.5) * sectionHeight;
+
+                if (targetScrollProgress >= start && targetScrollProgress <= end) {
+                    card.classList.add('visible');
+                } else {
+                    card.classList.remove('visible');
+                }
+            });
+
+            // Ocultar scroller inicial
+            if (targetScrollProgress > 0.05) {
+                document.getElementById('scroller').style.opacity = '0';
+            } else {
+                document.getElementById('scroller').style.opacity = '0.7';
+            }
+        });
+
+        // --- Loop de Animación ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+
+            // Suavizado del scroll (LERP)
+            scrollProgress += (targetScrollProgress - scrollProgress) * 0.05;
+
+            // Mover cámara a lo largo de la curva
+            const camPos = curve.getPointAt(scrollProgress);
+            camera.position.copy(camPos);
+
+            // Hacer que la cámara mire un poco por delante del camino
+            const lookAtPos = curve.getPointAt(Math.min(scrollProgress + 0.01, 1));
+            camera.lookAt(lookAtPos);
+
+            // Animación sutil de objetos
+            objects.forEach((obj, i) => {
+                obj.rotation.y += delta * 0.2 * (i % 2 === 0 ? 1 : -1);
+                obj.position.y += Math.sin(Date.now() * 0.001 + i) * 0.005;
+            });
+
+            particleSystem.rotation.y += delta * 0.05;
+
+            // Sync point light with camera
+            pointLight.position.copy(camera.position);
+
+            composer.render();
+        }
+
+        // --- Manejo Respiración (Resize) ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura - Digital Experience</title>
+
+    <!-- 
+    SEED 91201652 DESIGN DECOMPOSITION:
+    ================================
+    Digits: 9, 1, 2, 0, 1, 6, 5, 2
+    
+    9 % 5 = 4 → COLOR PALETTE: Sunset/Warm (coral #FF6B6B, amber #FFB347, peach #FFDAB9)
+    1 % 3 = 1 → LAYOUT: Asymmetric split with 60/40 ratio
+    2 % 4 = 2 → TYPOGRAPHY: Geometric sans-serif (Space Grotesk aesthetic)
+    0 % 3 = 0 → HERO STYLE: Full-bleed with floating organic elements
+    1 % 2 = 1 → SHAPES: Organic blobs and fluid curves (morphing)
+    6 % 5 = 1 → SPACING: Generous luxury whitespace (6rem+ sections)
+    5 % 4 = 1 → EFFECTS: Glassmorphism with backdrop blur (12px)
+    2 % 3 = 2 → ANIMATION: Smooth morphing blobs and gentle float
+    
+    DESIGN PHILOSOPHY: "Warm Organic Modernism"
+    - Combines warm sunset tones with cool glassmorphism
+    - Asymmetric layouts create visual tension
+    - Organic shapes soften the geometric typography
+    - Generous spacing conveys premium quality
+    -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* CSS VARIABLES - THEME SYSTEM */
+        :root {
+            /* Light Theme - Warm Sunset Base */
+            --bg-primary: #FFF8F5;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #FFEEE8;
+            --text-primary: #1A1A2E;
+            --text-secondary: #4A4A68;
+            --text-muted: #8A8AA3;
+            --accent-coral: #FF6B6B;
+            --accent-amber: #FFB347;
+            --accent-peach: #FFDAB9;
+            --accent-warm: #FF8E53;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --shadow-soft: 0 8px 32px rgba(255, 107, 107, 0.15);
+            --shadow-glass: 0 4px 24px rgba(0, 0, 0, 0.08);
+            --gradient-hero: linear-gradient(135deg, #FF6B6B 0%, #FFB347 50%, #FFDAB9 100%);
+            --gradient-subtle: linear-gradient(180deg, rgba(255, 238, 232, 0) 0%, rgba(255, 238, 232, 1) 100%);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme - Deep Sunset */
+            --bg-primary: #0F0F1A;
+            --bg-secondary: #1A1A2E;
+            --bg-tertiary: #252542;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B8B8D1;
+            --text-muted: #6B6B8A;
+            --accent-coral: #FF8585;
+            --accent-amber: #FFC875;
+            --accent-peach: #FFE4C4;
+            --accent-warm: #FFA570;
+            --glass-bg: rgba(26, 26, 46, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-soft: 0 8px 32px rgba(255, 107, 107, 0.25);
+            --shadow-glass: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --gradient-hero: linear-gradient(135deg, #FF8585 0%, #FFC875 50%, #2A2A4A 100%);
+            --gradient-subtle: linear-gradient(180deg, rgba(15, 15, 26, 0) 0%, rgba(37, 37, 66, 1) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            line-height: 1.1;
+        }
+
+        /* THEME TOGGLE */
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 0.75rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-glass);
+            transition: all 0.3s ease;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .theme-toggle svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--accent-coral);
+            transition: transform 0.5s ease;
+        }
+
+        [data-theme="dark"] .theme-toggle svg {
+            transform: rotate(180deg);
+        }
+
+        /* ORGANIC BLOB SHAPES - Based on seed digit 1 (organic shapes) */
+        .blob {
+            position: absolute;
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            filter: blur(40px);
+            opacity: 0.6;
+            animation: morph 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-coral);
+            top: -10%;
+            right: -10%;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-amber);
+            bottom: 10%;
+            left: -5%;
+            animation-delay: -5s;
+            animation-duration: 18s;
+        }
+
+        .blob-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-peach);
+            top: 40%;
+            right: 20%;
+            animation-delay: -10s;
+            animation-duration: 20s;
+        }
+
+        @keyframes morph {
+
+            0%,
+            100% {
+                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+                transform: rotate(0deg) translate(0, 0);
+            }
+
+            25% {
+                border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+                transform: rotate(90deg) translate(20px, -20px);
+            }
+
+            50% {
+                border-radius: 50% 60% 30% 60% / 30% 40% 70% 60%;
+                transform: rotate(180deg) translate(-20px, 20px);
+            }
+
+            75% {
+                border-radius: 60% 40% 60% 30% / 60% 50% 40% 50%;
+                transform: rotate(270deg) translate(10px, 10px);
+            }
+        }
+
+        /* FLOATING ANIMATION - Based on seed digit 2 (smooth float) */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(2deg);
+            }
+        }
+
+        .float-element {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* HERO SECTION - Asymmetric 60/40 split based on seed digit 1 */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+            overflow: hidden;
+            padding: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .hero {
+                grid-template-columns: 60% 40%;
+                padding: 0;
+            }
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (min-width: 1024px) {
+            .hero-content {
+                padding: 6rem 4rem 6rem 8rem;
+            }
+        }
+
+        .hero-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 2rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--accent-coral);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-glass);
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent-coral);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: clamp(1.125rem, 2vw, 1.5rem);
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin-bottom: 3rem;
+            line-height: 1.7;
+        }
+
+        .hero-cta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient-hero);
+            color: white;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-3px);
+        }
+
+        /* HERO VISUAL - Glassmorphism Cards */
+        .visual-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 500px;
+        }
+
+        .glass-card {
+            position: absolute;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow-glass);
+            transition: all 0.4s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .card-main {
+            width: 280px;
+            height: 320px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-float-1 {
+            width: 180px;
+            height: 140px;
+            top: 10%;
+            left: 0;
+            animation: float 7s ease-in-out infinite;
+            z-index: 5;
+        }
+
+        .card-float-2 {
+            width: 160px;
+            height: 120px;
+            bottom: 15%;
+            right: 0;
+            animation: float 8s ease-in-out infinite;
+            animation-delay: -3s;
+            z-index: 5;
+        }
+
+        .card-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .card-stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-coral);
+        }
+
+        .card-stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-hero);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        /* SECTIONS - Generous spacing based on seed digit 6 */
+        section {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        @media (min-width: 1024px) {
+            section {
+                padding: 8rem 4rem;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .section-header p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+        }
+
+        /* FEATURES SECTION - Asymmetric Grid */
+        .features {
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: var(--gradient-subtle);
+            pointer-events: none;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (min-width: 768px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: 1.2fr 0.8fr 1fr;
+                gap: 2.5rem;
+            }
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-hero);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card.featured {
+            background: var(--gradient-hero);
+            color: white;
+        }
+
+        .feature-card.featured .feature-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .feature-card.featured h3,
+        .feature-card.featured p {
+            color: white;
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-coral);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* SHOWCASE SECTION - Organic Layout */
+        .showcase {
+            background: var(--bg-primary);
+            overflow: hidden;
+        }
+
+        .showcase-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        @media (min-width: 1024px) {
+            .showcase-content {
+                grid-template-columns: 45% 55%;
+                gap: 6rem;
+            }
+        }
+
+        .showcase-text h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .showcase-text p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .showcase-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-coral);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .showcase-visual {
+            position: relative;
+            height: 500px;
+        }
+
+        .showcase-blob {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-hero);
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            opacity: 0.2;
+            filter: blur(60px);
+            animation: morph 20s ease-in-out infinite;
+        }
+
+        .showcase-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow-glass);
+            z-index: 10;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 300px;
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 4rem;
+        }
+
+        /* TESTIMONIALS - Glass Cards */
+        .testimonials {
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .testimonials-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .testimonial-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .testimonial-card.featured {
+            grid-column: span 1;
+        }
+
+        @media (min-width: 1024px) {
+            .testimonial-card.featured {
+                grid-column: span 1;
+                grid-row: span 2;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+        }
+
+        .testimonial-quote {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--gradient-hero);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .author-info h4 {
+            font-size: 1.125rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .author-info p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .testimonial-rating {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-amber);
+            font-size: 1.25rem;
+        }
+
+        /* CTA SECTION */
+        .cta {
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-container {
+            background: var(--gradient-hero);
+            border-radius: 48px;
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .cta-container {
+                padding: 6rem 4rem;
+            }
+        }
+
+        .cta-blob {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            filter: blur(40px);
+            animation: morph 15s ease-in-out infinite;
+        }
+
+        .cta-blob-1 {
+            top: -50%;
+            left: -10%;
+        }
+
+        .cta-blob-2 {
+            bottom: -50%;
+            right: -10%;
+            animation-delay: -7s;
+        }
+
+        .cta h2 {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            color: white;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 500px;
+            margin: 0 auto 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--accent-coral);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--bg-secondary);
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (min-width: 768px) {
+            .footer-content {
+                grid-template-columns: 2fr 1fr 1fr 1fr;
+            }
+        }
+
+        .footer-brand h3 {
+            font-size: 1.75rem;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            color: var(--text-secondary);
+            max-width: 300px;
+        }
+
+        .footer-links h4 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-coral);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .footer-bottom {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        .footer-bottom p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            width: 44px;
+            height: 44px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--accent-coral);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* SCROLL REVEAL ANIMATION */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* MOBILE OPTIMIZATIONS */
+        @media (max-width: 768px) {
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+                width: 50px;
+                height: 50px;
+            }
+
+            .blob {
+                opacity: 0.3;
+                filter: blur(20px);
+            }
+
+            .blob-1 {
+                width: 300px;
+                height: 300px;
+            }
+
+            .blob-2 {
+                width: 250px;
+                height: 250px;
+            }
+
+            .blob-3 {
+                width: 200px;
+                height: 200px;
+            }
+
+            .visual-container {
+                height: 400px;
+            }
+
+            .card-main {
+                width: 240px;
+                height: 280px;
+            }
+
+            .card-float-1,
+            .card-float-2 {
+                display: none;
+            }
+
+            .glass-card {
+                padding: 1.5rem;
+            }
+
+            .showcase-visual {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.166 5.106a.75.75 0 001.06 1.06l1.591-1.591a.75.75 0 00-1.061-1.06l-1.59 1.591z" />
+        </svg>
+    </button>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <!-- Organic Blob Background Elements -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span>Now in Beta</span>
+            </div>
+            <h1>Craft Digital Experiences That Flow</h1>
+            <p>Design without boundaries. Create with intuition. Launch with confidence. The next generation of digital
+                creation is here.</p>
+            <div class="hero-cta">
+                <a href="#" class="btn btn-primary">Start Creating →</a>
+                <a href="#" class="btn btn-secondary">Watch Demo</a>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="visual-container">
+                <div class="glass-card card-float-1">
+                    <div class="card-stat">
+                        <span class="card-stat-value">2.4x</span>
+                        <span class="card-stat-label">Faster Workflow</span>
+                    </div>
+                </div>
+                <div class="glass-card card-main">
+                    <div class="card-icon">◆</div>
+                    <div class="card-stat">
+                        <span class="card-stat-value">98%</span>
+                        <span class="card-stat-label">Satisfaction Rate</span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <div style="width: 8px; height: 8px; background: var(--accent-coral); border-radius: 50%;">
+                        </div>
+                        <div style="width: 8px; height: 8px; background: var(--accent-amber); border-radius: 50%;">
+                        </div>
+                        <div style="width: 8px; height: 8px; background: var(--accent-peach); border-radius: 50%;">
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card card-float-2">
+                    <div class="card-stat">
+                        <span class="card-stat-value">50K+</span>
+                        <span class="card-stat-label">Active Users</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Everything You Need to Create</h2>
+                <p>Powerful tools designed for modern creators. No compromises, no limitations.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card reveal">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Optimized performance that keeps up with your creative flow. Real-time collaboration without lag.
+                    </p>
+                </div>
+
+                <div class="feature-card featured reveal">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Intuitive Design</h3>
+                    <p>Tools that feel like an extension of your mind. Design naturally, iterate quickly.</p>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Enterprise Security</h3>
+                    <p>Bank-grade encryption and compliance. Your work stays yours, always protected.</p>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Instant Deploy</h3>
+                    <p>From concept to live in seconds. One-click publishing to global CDN.</p>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">📊</div>
+                    <h3>Smart Analytics</h3>
+                    <p>Understand your audience with AI-powered insights. Make data-driven decisions.</p>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Global Scale</h3>
+                    <p>Automatic scaling across 200+ edge locations. Performance everywhere.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SHOWCASE SECTION -->
+    <section class="showcase">
+        <div class="container">
+            <div class="showcase-content">
+                <div class="showcase-text reveal">
+                    <h2>Trusted by Industry Leaders</h2>
+                    <p>Join thousands of teams who have transformed their digital presence with our platform. From
+                        startups to Fortune 500s, we power the future of digital creation.</p>
+                    <p>Our unique approach combines cutting-edge technology with human-centered design, resulting in
+                        experiences that truly resonate with your audience.</p>
+
+                    <div class="showcase-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">10M+</span>
+                            <span class="stat-label">Projects Created</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">150+</span>
+                            <span class="stat-label">Countries Served</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">99.9%</span>
+                            <span class="stat-label">Uptime Guaranteed</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">24/7</span>
+                            <span class="stat-label">Expert Support</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="showcase-visual reveal">
+                    <div class="showcase-blob"></div>
+                    <div class="showcase-image">
+                        <div class="image-placeholder">◈</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS SECTION -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Loved by Creators</h2>
+                <p>See what our community has to say about their experience.</p>
+            </div>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-quote">"This platform completely transformed how we approach digital design.
+                        The speed and flexibility are unmatched."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SK</div>
+                        <div class="author-info">
+                            <h4>Sarah Kim</h4>
+                            <p>Design Director, Stripe</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card featured reveal">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-quote">"I've tried every tool on the market. This is the first one that
+                        actually feels like it was designed for humans. The organic workflow matches how my brain
+                        works."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MR</div>
+                        <div class="author-info">
+                            <h4>Marcus Rivera</h4>
+                            <p>Lead Designer, Airbnb</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-quote">"The glassmorphism effects and warm color palette make every project
+                        feel premium. Our clients are always impressed."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">EL</div>
+                        <div class="author-info">
+                            <h4>Elena Lopez</h4>
+                            <p>Creative Director, Spotify</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-quote">"From concept to deployment in hours, not weeks. This is the future of
+                        digital creation."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">JC</div>
+                        <div class="author-info">
+                            <h4>James Chen</h4>
+                            <p>CTO, Notion</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-quote">"The asymmetric layouts and organic shapes give our brand a unique
+                        personality that stands out in a sea of sameness."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AW</div>
+                        <div class="author-info">
+                            <h4>Amanda Wright</h4>
+                            <p>Brand Strategist, Figma</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-container reveal">
+                <div class="cta-blob cta-blob-1"></div>
+                <div class="cta-blob cta-blob-2"></div>
+                <h2>Ready to Create Something Beautiful?</h2>
+                <p>Join the next generation of digital creators. Start your journey today with our free tier.</p>
+                <a href="#" class="btn btn-white">Get Started Free →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>Aura</h3>
+                <p>Crafting digital experiences that flow. The next generation of creative tools for modern teams.</p>
+            </div>
+
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Integrations</a></li>
+                    <li><a href="#">Changelog</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li><a href="#">Support</a></li>
+                    <li><a href="#">API</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2024 Aura. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#">𝕏</a>
+                <a href="#">in</a>
+                <a href="#">📷</a>
+                <a href="#">🐙</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Initialize Theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        // Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

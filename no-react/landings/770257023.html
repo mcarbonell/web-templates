@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iron Heart Rituals | Elite Tattoo &amp; Piercing Studio</title>
+    <meta name="description"
+        content="Premium tattoo and piercing services in a unique, neo-brutalist inspired studio. Experience the ritual of art.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- 
+        DESIGN LOGIC (Seed: 770257023)
+        -----------------------------
+        Business: Tattoo & Piercing Studio (Iron Heart Rituals) -> Based on seed % 11 and % 6 refinement.
+        Overall Style: Neo-Brutalist (Bold borders, vibrant highlights, card shadows)
+        Layout: Masonry Grid + Centered Hero
+        Corners: Pill (Roll: pill)
+        Animations: Spring-based transitions (Roll: spring)
+        Feature: Parallax Floating Blobs
+        Palette: Analogous (Deep Violets to Cyan)
+    -->
+
+    <style>
+        :root {
+            /* Light Theme */
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --accent: #d946ef;
+            /* Fuchsia */
+            --accent-secondary: #06b6d4;
+            /* Cyan */
+            --border: #0f172a;
+            --shadow: #0f172a;
+            --pill-radius: 9999px;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* Spring-like */
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --accent: #f472b6;
+            --accent-secondary: #22d3ee;
+            --border: #f8fafc;
+            --shadow: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1,
+        h2,
+        h3,
+        .heading-font {
+            font-family: 'Unbounded', cursive;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        /* Utilities */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border: 4px solid var(--border);
+            background: var(--accent);
+            color: white;
+            font-weight: 900;
+            text-decoration: none;
+            border-radius: var(--pill-radius);
+            box-shadow: 6px 6px 0px var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            font-family: 'Unbounded', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0px var(--shadow);
+        }
+
+        .btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .flex-gap-1 {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .text-accent {
+            color: var(--accent);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1100px;
+            background: rgba(var(--surface), 0.8);
+            backdrop-filter: blur(12px);
+            border: 3px solid var(--border);
+            border-radius: var(--pill-radius);
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 4px 4px 0px var(--shadow);
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        #theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        #theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding-top: 6rem;
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 10vw, 7rem);
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin-bottom: 3rem;
+            font-weight: 500;
+            z-index: 2;
+        }
+
+        .floating-blob {
+            position: absolute;
+            z-index: 1;
+            filter: blur(40px);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .blob-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            top: 20%;
+            left: 10%;
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            animation: move 20s infinite alternate;
+        }
+
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-secondary);
+            bottom: 15%;
+            right: 5%;
+            border-radius: 60% 40% 30% 70% / 50% 30% 70% 40%;
+            animation: move 25s infinite alternate-reverse;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            to {
+                transform: translate(50px, 100px) rotate(360deg);
+            }
+        }
+
+        /* Sections */
+        .section {
+            padding: 8rem 0;
+        }
+
+        .section-title {
+            margin-bottom: 4rem;
+            text-align: left;
+        }
+
+        .section-title h2 {
+            font-size: 3rem;
+            background: var(--accent);
+            display: inline-block;
+            padding: 0.5rem 2rem;
+            color: white;
+            border: 4px solid var(--border);
+            border-radius: var(--pill-radius);
+            box-shadow: 8px 8px 0px var(--shadow);
+            transform: rotate(-2deg);
+        }
+
+        /* Masonry Grid */
+        .masonry-grid {
+            columns: 1;
+            column-gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .masonry-grid {
+                columns: 2;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .masonry-grid {
+                columns: 3;
+            }
+        }
+
+        .card {
+            break-inside: avoid;
+            margin-bottom: 2rem;
+            background: var(--surface);
+            border: 4px solid var(--border);
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 8px 8px 0px var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card-img-only {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .card:hover {
+            transform: scale(1.02) rotate(1deg);
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 1.5rem;
+            border: 3px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-img-only img {
+            margin-bottom: 0;
+            border-radius: 0;
+            border: none;
+            border-bottom: 3px solid var(--border);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        /* Features */
+        .features {
+            background: var(--accent-secondary);
+            color: var(--shadow);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .feature-item {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .feature-item svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        /* Parallax Divider */
+        .parallax-divider {
+            height: 400px;
+            background-image: url('https://images.unsplash.com/photo-1590247813693-5541d1c609fd?auto=format=0&fit=crop&q=80&w=2000');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            border-top: 6px solid var(--border);
+            border-bottom: 6px solid var(--border);
+        }
+
+        /* Contact Section */
+        .contact-box {
+            background: var(--surface);
+            border: 6px solid var(--border);
+            border-radius: 3rem;
+            padding: 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            box-shadow: 15px 15px 0px var(--accent);
+        }
+
+        .contact-info h2 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-info p {
+            margin-bottom: 2rem;
+        }
+
+        .contact-details {
+            font-weight: 800;
+        }
+
+        @media (max-width: 768px) {
+            .contact-box {
+                grid-template-columns: 1fr;
+                padding: 2rem;
+            }
+
+            nav {
+                padding: 0.5rem 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 3px solid var(--border);
+            border-radius: 1rem;
+            background: var(--bg);
+            font-family: inherit;
+            color: inherit;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0;
+            border-top: 4px solid var(--border);
+            text-align: center;
+        }
+
+        /* Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: var(--transition);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+
+    <nav>
+        <a href="#" class="logo heading-font">IRON <span class="text-accent">HEART</span></a>
+        <ul class="nav-links">
+            <li><a href="#services">Services</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#about">The Ritual</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button id="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+            <svg id="moon-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+        </button>
+    </nav>
+
+    <header class="hero">
+        <div class="blob-1 floating-blob"></div>
+        <div class="blob-2 floating-blob"></div>
+        <div class="container">
+            <h1 class="reveal">ETERNAL ART FOR BOLD SOULS</h1>
+            <p class="reveal">More than just ink. A sacred geometry of the self. Located in the heart of the urban
+                underground.</p>
+            <div class="reveal flex-gap-1">
+                <a href="#contact" class="btn">BOOK A RITUAL</a>
+                <a href="#services" class="btn btn-secondary">VIEW STYLES</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="services" class="section">
+        <div class="container">
+            <div class="section-title reveal">
+                <h2>THE CRAFT</h2>
+            </div>
+            <div class="masonry-grid">
+                <div class="card card-img-only reveal">
+                    <img src="https://images.unsplash.com/photo-1560707303-4e980ce876ad?auto=format&amp;fit=crop&amp;q=80&amp;w=800"
+                        alt="Blackwork Tattoo">
+                    <div class="card-content">
+                        <h3>Neo-Blackwork</h3>
+                        <p>High contrast, solid blacks, and illustrative storytelling that lasts forever.</p>
+                    </div>
+                </div>
+                <div class="card card-img-only reveal">
+                    <img src="https://images.unsplash.com/photo-1598135753163-6167c1a1ad65?auto=format&amp;fit=crop&amp;q=80&amp;w=800"
+                        alt="Piercing">
+                    <div class="card-content">
+                        <h3>Precision Piercing</h3>
+                        <p>Medical-grade sterilization with high-end titanium and gold jewelry.</p>
+                    </div>
+                </div>
+                <div class="card card-img-only reveal">
+                    <img src="https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?auto=format&amp;fit=crop&amp;q=80&amp;w=800"
+                        alt="Sketch Style">
+                    <div class="card-content">
+                        <h3>Cybernetic Sketch</h3>
+                        <p>Modern glitch aesthetics and fine-line geometry for the digital age.</p>
+                    </div>
+                </div>
+                <div class="card card-img-only reveal">
+                    <img src="https://images.unsplash.com/photo-1542332213-31f87aa6ee8f?auto=format&amp;fit=crop&amp;q=80&amp;w=800"
+                        alt="Traditional">
+                    <div class="card-content">
+                        <h3>Neo-Traditional</h3>
+                        <p>Honoring the roots with vibrant palettes and reinforced line weights.</p>
+                    </div>
+                </div>
+                <div class="card card-img-only reveal">
+                    <img src="https://images.unsplash.com/photo-1562967916-eb82221dfb92?auto=format&amp;fit=crop&amp;q=80&amp;w=800"
+                        alt="Minimalist">
+                    <div class="card-content">
+                        <h3>Minimalist Sigils</h3>
+                        <p>Tiny marks, massive meaning. Precision-engineered micro-tattoos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="parallax-divider"></div>
+
+    <section id="about" class="section features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-item reveal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <h3>STERILE ENVIRONMENT</h3>
+                    <p>Hosptial-grade protocols. Your safety is our primary ritual requirement.</p>
+                </div>
+                <div class="feature-item reveal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3>ETERNAL QUALITY</h3>
+                    <p>We use the highest quality vegan inks that won't fade into the void.</p>
+                </div>
+                <div class="feature-item reveal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <h3>CUSTOM DESIGN</h3>
+                    <p>Every piece is unique. We never replicate, we only innovate.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="contact-box reveal">
+                <div class="contact-info">
+                    <h2 class="heading-font">START THE <span class="text-accent">PROCESS</span></h2>
+                    <p>Ready to commit? Fill out the form or drop by the studio. Our consultation is the first step of
+                        the ritual.</p>
+                    <div class="contact-details">
+                        <p>123 VANGUARD STREET</p>
+                        <p>DOWNTOWN NEON DISTRICT</p>
+                        <p>MON - SAT: 11:00 - 20:00</p>
+                    </div>
+                </div>
+                <form onsubmit="event.preventDefault(); alert('Ritual Initiated!');">
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" placeholder="GHOST IN THE SHELL" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="SOUL@ETHER.COM" required>
+                    </div>
+                    <div class="form-group">
+                        <label>The Vision</label>
+                        <textarea rows="4" placeholder="Describe your masterpiece..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-full">SEND SIGNAL</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p class="heading-font">&copy; 2026 IRON HEART RITUALS. <span class="text-accent">STAY BOLD.</span></p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const body = document.body;
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            sunIcon.style.display = isDark ? 'block' : 'none';
+            moonIcon.style.display = isDark ? 'none' : 'block';
+        });
+
+        // Scroll Reveal Logic
+        const reveals = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            for (let i = 0; i < reveals.length; i++) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveals[i].getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add('active');
+                }
+            }
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll(); // Initial check
+
+        // Parallax Floating Blobs
+        window.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            const blobs = document.querySelectorAll('.floating-blob');
+            blobs.forEach((blob, index) => {
+                const speed = (index + 1) * 20;
+                blob.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+            });
+        });
+
+        // Mobile Nav Improvement (Close on link click)
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                // Logic if there was a mobile menu toggle, but we're simplified here.
+            });
+        });
+    </script>
+</body>
+
+</html>

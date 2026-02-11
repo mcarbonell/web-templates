@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOVA — Digital Experience Studio</title>
+  <meta name="description" content="Award-winning digital experiences that defy expectations">
+  
+  <!-- 
+    ╔══════════════════════════════════════════════════════════════════════════════╗
+    ║                         DESIGN SYSTEM DOCUMENTATION                          ║
+    ║                              Seed: 751666565                                 ║
+    ╠══════════════════════════════════════════════════════════════════════════════╣
+    ║                                                                              ║
+    ║  SEED DECOMPOSITION (751666565):                                             ║
+    ║  ─────────────────────────────                                               ║
+    ║  [7] Color scheme: Vibrant Purple/Pink → Electric Cyan gradient              ║
+    ║  [5] Typography: Space Mono headings + extreme tracking                      ║
+    ║  [1] Layout: Asymmetric Bento Grid with intentional misalignment             ║
+    ║  [6] Animation: High-intensity scroll-driven reveals                         ║
+    ║  [6] WebGL: Fluid/Smoke simulation background                                ║
+    ║  [6] Scroll: Scroll snapping + parallax depth layers                         ║
+    ║  [5] Effects: Magnetic buttons + glassmorphism cards                         ║
+    ║  [6] Radius: Sharp 0px edges (neo-brutalist contrast)                        ║
+    ║  [5] Spacing: Large generous gaps (clamp-based)                              ║
+    ║                                                                              ║
+    ║  TECHNIQUES IMPLEMENTED:                                                     ║
+    ║  ───────────────────────                                                     ║
+    ║  ✓ WebGL Custom Shaders (Three.js fluid simulation)                          ║
+    ║  ✓ Kinetic Typography (scroll-driven text reveals)                           ║
+    ║  ✓ Bento Grids (asymmetric layout)                                           ║
+    ║  ✓ Gradient Animated Text                                                    ║
+    ║  ✓ Stroke Text (outlined headings)                                           ║
+    ║  ✓ Aurora/Gradient Blobs                                                     ║
+    ║  ✓ Scroll-Driven Animations                                                  ║
+    ║  ✓ Scroll Snapping                                                           ║
+    ║  ✓ Glassmorphism                                                             ║
+    ║  ✓ Magnetic Buttons                                                          ║
+    ║                                                                              ║
+    ║  AESTHETIC VISION:                                                           ║
+    ║  ─────────────────                                                           ║
+    ║  A daring fusion of neo-brutalism and fluid digital art. Sharp geometric     ║
+    ║  containers contrast against organic, ever-moving shader backgrounds.        ║
+    ║  The design breaks conventions with intentional asymmetry while maintaining  ║
+    ║  impeccable visual hierarchy. Light and dark modes offer completely          ║
+    ║  different emotional experiences—dark mode is mysterious and futuristic,     ║
+    ║  light mode is airy and editorial.                                           ║
+    ║                                                                              ║
+    ╚══════════════════════════════════════════════════════════════════════════════╝
+  -->
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CSS CUSTOM PROPERTIES
+       ═══════════════════════════════════════════════════════════════════════════ */
+    :root {
+      /* Seed 751666565 → Color System */
+      --color-deep: #1a0a2e;
+      --color-mid: #432c7a;
+      --color-bright: #ff006e;
+      --color-accent: #00f5ff;
+      --color-warm: #ffbe0b;
+      --color-surface: #0d0418;
+      --color-text: #faf8f5;
+      --color-text-muted: rgba(250, 248, 245, 0.6);
+      --color-glass: rgba(255, 255, 255, 0.05);
+      --color-glass-border: rgba(255, 255, 255, 0.1);
+      
+      /* Typography Scale */
+      --font-mono: 'Space Mono', monospace;
+      --font-sans: 'Inter', sans-serif;
+      
+      /* Spacing (seed [5] → generous gaps) */
+      --space-xs: clamp(0.5rem, 1vw, 1rem);
+      --space-sm: clamp(1rem, 2vw, 2rem);
+      --space-md: clamp(2rem, 4vw, 4rem);
+      --space-lg: clamp(4rem, 8vw, 8rem);
+      --space-xl: clamp(6rem, 12vw, 12rem);
+      
+      /* Border Radius (seed [6] → sharp edges) */
+      --radius: 0px;
+      
+      /* Transitions */
+      --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-snap: cubic-bezier(0.87, 0, 0.13, 1);
+      
+      /* Shadows */
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Light Mode Variables */
+    [data-theme="light"] {
+      --color-deep: #faf8f5;
+      --color-mid: #e8e0f0;
+      --color-bright: #d4005a;
+      --color-accent: #008a8f;
+      --color-warm: #cc8800;
+      --color-surface: #ffffff;
+      --color-text: #1a0a2e;
+      --color-text-muted: rgba(26, 10, 46, 0.6);
+      --color-glass: rgba(26, 10, 46, 0.03);
+      --color-glass-border: rgba(26, 10, 46, 0.08);
+      --shadow-sm: 0 4px 20px rgba(26, 10, 46, 0.08);
+      --shadow-lg: 0 25px 50px rgba(26, 10, 46, 0.15);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       RESET & BASE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+      overflow-x: hidden;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color 0.5s var(--transition-smooth);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       WEBGL CANVAS BACKGROUND
+       ═══════════════════════════════════════════════════════════════════════════ */
+    #webgl-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       THEME TOGGLE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .theme-toggle {
+      position: fixed;
+      top: var(--space-sm);
+      right: var(--space-sm);
+      z-index: 1000;
+      width: 60px;
+      height: 32px;
+      background: var(--color-glass);
+      border: 1px solid var(--color-glass-border);
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s var(--transition-smooth);
+    }
+    
+    .theme-toggle:hover {
+      border-color: var(--color-accent);
+    }
+    
+    .theme-toggle-knob {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--color-bright), var(--color-accent));
+      border-radius: 50%;
+      transition: transform 0.4s var(--transition-snap);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    [data-theme="light"] .theme-toggle-knob {
+      transform: translateX(28px);
+    }
+    
+    .theme-toggle-knob svg {
+      width: 14px;
+      height: 14px;
+      fill: white;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       NAVIGATION
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 999;
+      padding: var(--space-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      mix-blend-mode: difference;
+    }
+    
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: white;
+      text-decoration: none;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: var(--space-sm);
+      list-style: none;
+    }
+    
+    .nav-link {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: white;
+      text-decoration: none;
+      position: relative;
+      padding: 0.5rem 0;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: white;
+      transition: width 0.3s var(--transition-smooth);
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       SECTIONS BASE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    section {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: var(--space-lg) var(--space-sm);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       HERO SECTION
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+      align-items: center;
+      width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    @media (min-width: 1024px) {
+      .hero {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+    }
+    
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      overflow: hidden;
+    }
+    
+    .hero-eyebrow span {
+      display: inline-block;
+    }
+    
+    .hero-title {
+      font-family: var(--font-mono);
+      font-size: clamp(2.5rem, 8vw, 7rem);
+      font-weight: 700;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+    }
+    
+    /* Stroke text effect */
+    .hero-title-stroke {
+      -webkit-text-stroke: 2px var(--color-text);
+      color: transparent;
+      display: block;
+    }
+    
+    .hero-title-fill {
+      background: linear-gradient(135deg, var(--color-bright), var(--color-accent), var(--color-warm));
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradientShift 8s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .hero-description {
+      font-size: clamp(1rem, 1.5vw, 1.25rem);
+      color: var(--color-text-muted);
+      max-width: 500px;
+      margin-top: var(--space-xs);
+    }
+    
+    .hero-cta {
+      display: flex;
+      gap: var(--space-xs);
+      margin-top: var(--space-sm);
+      flex-wrap: wrap;
+    }
+    
+    /* Magnetic Button */
+    .magnetic-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.3s var(--transition-smooth);
+    }
+    
+    .magnetic-btn-primary {
+      background: var(--color-bright);
+      color: white;
+    }
+    
+    .magnetic-btn-secondary {
+      background: transparent;
+      color: var(--color-text);
+      border: 1px solid var(--color-glass-border);
+    }
+    
+    .magnetic-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-bright));
+      opacity: 0;
+      transition: opacity 0.3s var(--transition-smooth);
+    }
+    
+    .magnetic-btn:hover::before {
+      opacity: 1;
+    }
+    
+    .magnetic-btn span {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .hero-visual {
+      position: relative;
+      height: 100%;
+      min-height: 400px;
+    }
+    
+    /* Aurora blobs */
+    .aurora-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    
+    .aurora-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.6;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    .aurora-blob-1 {
+      width: 400px;
+      height: 400px;
+      background: var(--color-bright);
+      top: -100px;
+      right: -100px;
+      animation-delay: 0s;
+    }
+    
+    .aurora-blob-2 {
+      width: 300px;
+      height: 300px;
+      background: var(--color-accent);
+      bottom: 0;
+      left: -50px;
+      animation-delay: -7s;
+    }
+    
+    .aurora-blob-3 {
+      width: 250px;
+      height: 250px;
+      background: var(--color-warm);
+      top: 50%;
+      left: 50%;
+      animation-delay: -14s;
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      25% {
+        transform: translate(50px, -50px) scale(1.1);
+      }
+      50% {
+        transform: translate(0, 50px) scale(0.9);
+      }
+      75% {
+        transform: translate(-50px, -25px) scale(1.05);
+      }
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       BENTO GRID SECTION
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .bento-section {
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--space-md);
+    }
+    
+    .section-header {
+      text-align: center;
+      max-width: 800px;
+    }
+    
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: minmax(200px, auto);
+      gap: var(--space-xs);
+      width: 100%;
+      max-width: 1400px;
+    }
+    
+    /* Asymmetric bento layout (seed [1]) */
+    .bento-item {
+      background: var(--color-glass);
+      border: 1px solid var(--color-glass-border);
+      backdrop-filter: blur(20px);
+      padding: var(--space-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.5s var(--transition-smooth);
+    }
+    
+    .bento-item:hover {
+      border-color: var(--color-accent);
+      transform: translateY(-4px);
+    }
+    
+    .bento-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.05) 100%);
+      pointer-events: none;
+    }
+    
+    /* Bento item sizes (asymmetric) */
+    .bento-large {
+      grid-column: span 12;
+      grid-row: span 2;
+    }
+    
+    @media (min-width: 768px) {
+      .bento-large {
+        grid-column: span 7;
+      }
+    }
+    
+    .bento-medium {
+      grid-column: span 12;
+    }
+    
+    @media (min-width: 768px) {
+      .bento-medium {
+        grid-column: span 5;
+      }
+    }
+    
+    .bento-small {
+      grid-column: span 6;
+    }
+    
+    @media (min-width: 768px) {
+      .bento-small {
+        grid-column: span 3;
+      }
+    }
+    
+    .bento-tall {
+      grid-column: span 12;
+      grid-row: span 2;
+    }
+    
+    @media (min-width: 768px) {
+      .bento-tall {
+        grid-column: span 5;
+      }
+    }
+    
+    .bento-wide {
+      grid-column: span 12;
+    }
+    
+    @media (min-width: 768px) {
+      .bento-wide {
+        grid-column: span 7;
+      }
+    }
+    
+    .bento-number {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-accent);
+      letter-spacing: 0.2em;
+    }
+    
+    .bento-title {
+      font-family: var(--font-mono);
+      font-size: clamp(1.25rem, 2vw, 1.75rem);
+      font-weight: 700;
+      margin-top: auto;
+      padding-top: var(--space-sm);
+    }
+    
+    .bento-description {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      margin-top: 0.5rem;
+    }
+    
+    .bento-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--color-bright), var(--color-accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .bento-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: white;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       FEATURES SECTION
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .features-section {
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(180deg, transparent 0%, var(--color-deep) 50%, transparent 100%);
+    }
+    
+    .features-container {
+      width: 100%;
+      max-width: 1200px;
+    }
+    
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+      align-items: center;
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--color-glass-border);
+    }
+    
+    @media (min-width: 768px) {
+      .feature-row {
+        grid-template-columns: 1fr 2fr;
+      }
+    }
+    
+    .feature-row:last-child {
+      border-bottom: none;
+    }
+    
+    .feature-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+    }
+    
+    .feature-content h3 {
+      font-family: var(--font-mono);
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .feature-content p {
+      color: var(--color-text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       SHOWCASE SECTION
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .showcase-section {
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+    
+    .showcase-track {
+      display: flex;
+      gap: var(--space-sm);
+      width: max-content;
+      padding: var(--space-sm);
+    }
+    
+    .showcase-card {
+      width: 350px;
+      height: 450px;
+      background: var(--color-glass);
+      border: 1px solid var(--color-glass-border);
+      backdrop-filter: blur(10px);
+      padding: var(--space-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .showcase-card-image {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--color-mid), var(--color-deep));
+      opacity: 0.5;
+    }
+    
+    .showcase-card-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .showcase-card-category {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    
+    .showcase-card-title {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       STATS SECTION
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .stats-section {
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+      width: 100%;
+      max-width: 1000px;
+      margin-top: var(--space-md);
+    }
+    
+    @media (min-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    
+    .stat-item {
+      padding: var(--space-sm);
+    }
+    
+    .stat-number {
+      font-family: var(--font-mono);
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--color-bright), var(--color-accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-top: 0.5rem;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CTA SECTION
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .cta-section {
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+    
+    .cta-title {
+      font-family: var(--font-mono);
+      font-size: clamp(2rem, 6vw, 5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      max-width: 900px;
+    }
+    
+    .cta-title .stroke {
+      -webkit-text-stroke: 2px var(--color-text);
+      color: transparent;
+    }
+    
+    .cta-description {
+      font-size: 1.25rem;
+      color: var(--color-text-muted);
+      max-width: 600px;
+      margin: var(--space-sm) auto;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .footer {
+      min-height: auto;
+      padding: var(--space-lg) var(--space-sm);
+      scroll-snap-align: end;
+      border-top: 1px solid var(--color-glass-border);
+    }
+    
+    .footer-content {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+    }
+    
+    @media (min-width: 768px) {
+      .footer-content {
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+      }
+    }
+    
+    .footer-brand {
+      font-family: var(--font-mono);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .footer-tagline {
+      color: var(--color-text-muted);
+      max-width: 300px;
+    }
+    
+    .footer-column h4 {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .footer-links {
+      list-style: none;
+    }
+    
+    .footer-links li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: color 0.3s var(--transition-smooth);
+    }
+    
+    .footer-links a:hover {
+      color: var(--color-accent);
+    }
+    
+    .footer-bottom {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--color-glass-border);
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       KINETIC TEXT ANIMATIONS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .kinetic-char {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    
+    .kinetic-word {
+      display: inline-block;
+      overflow: hidden;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       SCROLL REVEAL ANIMATIONS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.8s var(--transition-smooth);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       MOBILE RESPONSIVE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 767px) {
+      .nav-links {
+        display: none;
+      }
+      
+      html {
+        scroll-snap-type: none;
+      }
+      
+      section {
+        scroll-snap-align: none;
+        min-height: auto;
+        padding: var(--space-md) var(--space-sm);
+      }
+      
+      .hero-title-stroke {
+        -webkit-text-stroke: 1px var(--color-text);
+      }
+      
+      .bento-item {
+        grid-column: span 12 !important;
+      }
+      
+      .cta-title .stroke {
+        -webkit-text-stroke: 1px var(--color-text);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- WebGL Canvas for Fluid Simulation -->
+  <canvas id="webgl-canvas"></canvas>
+  
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <div class="theme-toggle-knob">
+      <svg viewBox="0 0 24 24" id="themeIcon">
+        <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+      </svg>
+    </div>
+  </button>
+  
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="#" class="nav-logo">NOVA</a>
+    <ul class="nav-links">
+      <li><a href="#work" class="nav-link">Work</a></li>
+      <li><a href="#services" class="nav-link">Services</a></li>
+      <li><a href="#about" class="nav-link">About</a></li>
+      <li><a href="#contact" class="nav-link">Contact</a></li>
+    </ul>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">
+        <span>Digital Experience Studio</span>
+      </p>
+      <h1 class="hero-title">
+        <span class="hero-title-stroke kinetic-text">CRAFTING</span>
+        <span class="hero-title-fill kinetic-text">DIGITAL</span>
+        <span class="hero-title-fill kinetic-text">REALITIES</span>
+      </h1>
+      <p class="hero-description reveal">
+        We design and build immersive digital experiences that push the boundaries 
+        of creativity and technology. Where vision meets execution.
+      </p>
+      <div class="hero-cta">
+        <a href="#work" class="magnetic-btn magnetic-btn-primary" data-magnetic>
+          <span>View Our Work</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0L6.59 1.41L12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8z"/>
+          </svg>
+        </a>
+        <a href="#contact" class="magnetic-btn magnetic-btn-secondary" data-magnetic>
+          <span>Get in Touch</span>
+        </a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="aurora-container">
+        <div class="aurora-blob aurora-blob-1"></div>
+        <div class="aurora-blob aurora-blob-2"></div>
+        <div class="aurora-blob aurora-blob-3"></div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Bento Grid Section -->
+  <section class="bento-section" id="services">
+    <header class="section-header reveal">
+      <p class="section-eyebrow">What We Do</p>
+      <h2 class="section-title">Services That<br>Transform</h2>
+    </header>
+    
+    <div class="bento-grid">
+      <article class="bento-item bento-large reveal">
+        <div>
+          <span class="bento-number">01</span>
+          <div class="bento-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+        </div>
+        <div>
+          <h3 class="bento-title">Strategy & Consulting</h3>
+          <p class="bento-description">
+            We dive deep into your business challenges, crafting digital strategies 
+            that align with your goals and resonate with your audience.
+          </p>
+        </div>
+      </article>
+      
+      <article class="bento-item bento-tall reveal">
+        <div>
+          <span class="bento-number">02</span>
+          <div class="bento-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3zm0 0L5 12l-3 3 7 7 3-3zM12 5l7 7 3-3-7-7-3 3zm0 0L5 12l-3-3 7-7 3 3z"/></svg>
+          </div>
+        </div>
+        <div>
+          <h3 class="bento-title">Digital Product Design</h3>
+          <p class="bento-description">
+            From concept to pixel-perfect prototypes, we create intuitive interfaces 
+            that users love and businesses rely on.
+          </p>
+        </div>
+      </article>
+      
+      <article class="bento-item bento-small reveal">
+        <span class="bento-number">03</span>
+        <h3 class="bento-title">Brand Identity</h3>
+      </article>
+      
+      <article class="bento-item bento-small reveal">
+        <span class="bento-number">04</span>
+        <h3 class="bento-title">Motion Design</h3>
+      </article>
+      
+      <article class="bento-item bento-small reveal">
+        <span class="bento-number">05</span>
+        <h3 class="bento-title">WebGL & 3D</h3>
+      </article>
+      
+      <article class="bento-item bento-small reveal">
+        <span class="bento-number">06</span>
+        <h3 class="bento-title">Development</h3>
+      </article>
+      
+      <article class="bento-item bento-wide reveal">
+        <div>
+          <span class="bento-number">07</span>
+          <div class="bento-icon">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+        </div>
+        <div>
+          <h3 class="bento-title">Immersive Experiences</h3>
+          <p class="bento-description">
+            AR, VR, and experimental web experiences that transport users into 
+            entirely new dimensions of interaction.
+          </p>
+        </div>
+      </article>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features-section" id="about">
+    <header class="section-header reveal">
+      <p class="section-eyebrow">Our Approach</p>
+      <h2 class="section-title">Why We're Different</h2>
+    </header>
+    
+    <div class="features-container">
+      <article class="feature-row reveal">
+        <span class="feature-label">Process</span>
+        <div class="feature-content">
+          <h3>Collaborative by Design</h3>
+          <p>We embed ourselves in your team, working as an extension of your vision. 
+             No handoffs, no silos—just seamless creative partnership from day one.</p>
+        </div>
+      </article>
+      
+      <article class="feature-row reveal">
+        <span class="feature-label">Technology</span>
+        <div class="feature-content">
+          <h3>Future-Forward Stack</h3>
+          <p>WebGL, WebGPU, real-time 3D—we leverage cutting-edge tech to create 
+             experiences that feel like they're from tomorrow.</p>
+        </div>
+      </article>
+      
+      <article class="feature-row reveal">
+        <span class="feature-label">Results</span>
+        <div class="feature-content">
+          <h3>Performance Obsessed</h3>
+          <p>Beautiful means nothing if it's slow. Every animation, every interaction, 
+             every pixel is optimized for 60fps and beyond.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+  
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <header class="section-header reveal">
+      <p class="section-eyebrow">Impact</p>
+      <h2 class="section-title">Numbers That Matter</h2>
+    </header>
+    
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-number" data-count="150">0</div>
+        <div class="stat-label">Projects Delivered</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-count="98">0</div>
+        <div class="stat-label">Client Satisfaction %</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-count="12">0</div>
+        <div class="stat-label">Years Experience</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-count="24">0</div>
+        <div class="stat-label">Awards Won</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="cta-section" id="contact">
+    <p class="section-eyebrow reveal">Start a Project</p>
+    <h2 class="cta-title reveal">
+      LET'S CREATE<br>
+      <span class="stroke">SOMETHING</span><br>
+      EXTRAORDINARY
+    </h2>
+    <p class="cta-description reveal">
+      Ready to push boundaries? We're always looking for ambitious partners 
+      who want to make an impact.
+    </p>
+    <div class="hero-cta reveal">
+      <a href="mailto:hello@nova.studio" class="magnetic-btn magnetic-btn-primary" data-magnetic>
+        <span>Start a Conversation</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M0 3v10h16V3H0zm8 6L2 5h12L8 9z"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div>
+        <div class="footer-brand">NOVA</div>
+        <p class="footer-tagline">Crafting digital realities since 2012. Based in San Francisco, working globally.</p>
+      </div>
+      
+      <div class="footer-column">
+        <h4>Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="#work">Work</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column">
+        <h4>Social</h4>
+        <ul class="footer-links">
+          <li><a href="#">Twitter</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Dribbble</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column">
+        <h4>Legal</h4>
+        <ul class="footer-links">
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-bottom">
+        <span>© 2024 NOVA Studio. All rights reserved.</span>
+        <span>Design Seed: 751666565</span>
+      </div>
+    </div>
+  </footer>
+  
+  <script>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       THEME TOGGLE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+    
+    // Moon icon path
+    const moonPath = 'M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z';
+    // Sun icon path
+    const sunPath = 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z';
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      html.setAttribute('data-theme', newTheme);
+      themeIcon.querySelector('path').setAttribute('d', newTheme === 'light' ? moonPath : sunPath);
+    });
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       WEBGL FLUID SIMULATION (Three.js)
+       Seed [6] → Fluid/Smoke simulation shader
+       ═══════════════════════════════════════════════════════════════════════════ */
+    const canvas = document.getElementById('webgl-canvas');
+    const isMobile = window.matchMedia('(pointer: coarse)').matches;
+    
+    // Reduce complexity on mobile
+    const config = {
+      particleCount: isMobile ? 15 : 25,
+      particleSize: isMobile ? 150 : 200,
+      speed: 0.0003,
+      colors: [
+        new THREE.Color('#ff006e'),
+        new THREE.Color('#00f5ff'),
+        new THREE.Color('#ffbe0b'),
+        new THREE.Color('#432c7a')
+      ]
+    };
+    
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    
+    const renderer = new THREE.WebGLRenderer({ 
+      canvas: canvas, 
+      alpha: true,
+      antialias: false,
+      powerPreference: 'high-performance'
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    
+    // Fluid shader material
+    const fluidShader = {
+      uniforms: {
+        uTime: { value: 0 },
+        uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+        uColor1: { value: config.colors[0] },
+        uColor2: { value: config.colors[1] },
+        uColor3: { value: config.colors[2] },
+        uColor4: { value: config.colors[3] }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec2 uResolution;
+        uniform vec2 uMouse;
+        uniform vec3 uColor1;
+        uniform vec3 uColor2;
+        uniform vec3 uColor3;
+        uniform vec3 uColor4;
+        varying vec2 vUv;
+        
+        // Simplex noise function
+        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+        
+        float snoise(vec2 v) {
+          const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+          vec2 i  = floor(v + dot(v, C.yy));
+          vec2 x0 = v - i + dot(i, C.xx);
+          vec2 i1;
+          i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+          vec4 x12 = x0.xyxy + C.xxzz;
+          x12.xy -= i1;
+          i = mod289(i);
+          vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+          vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+          m = m*m;
+          m = m*m;
+          vec3 x = 2.0 * fract(p * C.www) - 1.0;
+          vec3 h = abs(x) - 0.5;
+          vec3 ox = floor(x + 0.5);
+          vec3 a0 = x - ox;
+          m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+          vec3 g;
+          g.x = a0.x * x0.x + h.x * x0.y;
+          g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+          return 130.0 * dot(m, g);
+        }
+        
+        float fbm(vec2 p) {
+          float value = 0.0;
+          float amplitude = 0.5;
+          float frequency = 1.0;
+          for (int i = 0; i < 5; i++) {
+            value += amplitude * snoise(p * frequency);
+            amplitude *= 0.5;
+            frequency *= 2.0;
+          }
+          return value;
+        }
+        
+        void main() {
+          vec2 uv = vUv;
+          vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
+          
+          // Create fluid motion - slowed down for subtlety
+          float time = uTime * 0.0025;
+          
+          // Multiple layers of noise for organic movement
+          float n1 = fbm(uv * 2.0 + time + uMouse * 0.5);
+          float n2 = fbm(uv * 3.0 - time * 0.7 + n1 * 0.5);
+          float n3 = fbm(uv * 1.5 + time * 0.3 + n2 * 0.3);
+          
+          // Create color mixing
+          float mix1 = smoothstep(-0.5, 0.5, n1);
+          float mix2 = smoothstep(-0.3, 0.7, n2);
+          float mix3 = smoothstep(-0.4, 0.6, n3);
+          
+          vec3 color = mix(uColor1, uColor2, mix1);
+          color = mix(color, uColor3, mix2 * 0.5);
+          color = mix(color, uColor4, mix3 * 0.3);
+          
+          // Add subtle vignette
+          float vignette = 1.0 - length((uv - 0.5) * 1.2);
+          vignette = smoothstep(0.0, 0.7, vignette);
+          
+          // Output with transparency
+          float alpha = 0.4 + mix1 * 0.3;
+          alpha *= vignette;
+          
+          gl_FragColor = vec4(color, alpha);
+        }
+      `
+    };
+    
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const material = new THREE.ShaderMaterial(fluidShader);
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+    
+    // Mouse tracking for shader interaction
+    let mouseX = 0.5;
+    let mouseY = 0.5;
+    let targetMouseX = 0.5;
+    let targetMouseY = 0.5;
+    
+    document.addEventListener('mousemove', (e) => {
+      targetMouseX = e.clientX / window.innerWidth;
+      targetMouseY = 1.0 - (e.clientY / window.innerHeight);
+    }, { passive: true });
+    
+    // Animation loop
+    let animationId;
+    let isVisible = true;
+    
+    function animate() {
+      if (!isVisible) return;
+      
+      animationId = requestAnimationFrame(animate);
+      
+      // Smooth mouse interpolation
+      mouseX += (targetMouseX - mouseX) * 0.005;
+      mouseY += (targetMouseY - mouseY) * 0.005;
+      
+      material.uniforms.uTime.value += 0.15;
+      material.uniforms.uMouse.value.set(mouseX, mouseY);
+      
+      renderer.render(scene, camera);
+    }
+    
+    // Visibility handling
+    document.addEventListener('visibilitychange', () => {
+      isVisible = !document.hidden;
+      if (isVisible) animate();
+      else cancelAnimationFrame(animationId);
+    });
+    
+    // Resize handling
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+    }, { passive: true });
+    
+    animate();
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       GSAP SCROLL ANIMATIONS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    gsap.registerPlugin(ScrollTrigger);
+    
+    // Kinetic text reveal
+    const kineticTexts = document.querySelectorAll('.kinetic-text');
+    kineticTexts.forEach((text, index) => {
+      gsap.fromTo(text, 
+        { 
+          y: 100, 
+          opacity: 0,
+          rotateX: -90
+        },
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          duration: 1.2,
+          delay: index * 0.15,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: text,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    });
+    
+    // Reveal animations
+    const reveals = document.querySelectorAll('.reveal');
+    reveals.forEach((el) => {
+      gsap.fromTo(el,
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+    });
+    
+    // Bento items stagger
+    const bentoItems = document.querySelectorAll('.bento-item');
+    gsap.fromTo(bentoItems,
+      { y: 60, opacity: 0, scale: 0.95 },
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.bento-grid',
+          start: 'top 80%',
+          toggleActions: 'play none none none'
+        }
+      }
+    );
+    
+    // Stats counter animation
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+      const target = parseInt(stat.getAttribute('data-count'));
+      
+      ScrollTrigger.create({
+        trigger: stat,
+        start: 'top 85%',
+        onEnter: () => {
+          gsap.to(stat, {
+            innerHTML: target,
+            duration: 2,
+            ease: 'power2.out',
+            snap: { innerHTML: 1 },
+            onUpdate: function() {
+              stat.innerHTML = Math.round(this.targets()[0].innerHTML);
+            }
+          });
+        },
+        once: true
+      });
+    });
+    
+    // Parallax effect on aurora blobs
+    gsap.to('.aurora-blob-1', {
+      y: -100,
+      scrollTrigger: {
+        trigger: '#hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1
+      }
+    });
+    
+    gsap.to('.aurora-blob-2', {
+      y: -50,
+      scrollTrigger: {
+        trigger: '#hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1.5
+      }
+    });
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       MAGNETIC BUTTONS
+       Seed [5] → Magnetic button effect
+       ═══════════════════════════════════════════════════════════════════════════ */
+    const magneticBtns = document.querySelectorAll('[data-magnetic]');
+    
+    // Only enable on non-touch devices
+    if (!isMobile) {
+      magneticBtns.forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          
+          gsap.to(btn, {
+            x: x * 0.3,
+            y: y * 0.3,
+            duration: 0.3,
+            ease: 'power2.out'
+          });
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+          gsap.to(btn, {
+            x: 0,
+            y: 0,
+            duration: 0.5,
+            ease: 'elastic.out(1, 0.5)'
+          });
+        });
+      });
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       SMOOTH SCROLL FOR NAV LINKS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          gsap.to(window, {
+            duration: 1,
+            scrollTo: { y: target, offsetY: 0 },
+            ease: 'power3.inOut'
+          });
+        }
+      });
+    });
+    
+    // Load GSAP ScrollToPlugin dynamically
+    const scrollToScript = document.createElement('script');
+    scrollToScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js';
+    document.head.appendChild(scrollToScript);
+  </script>
+</body>
+</html>

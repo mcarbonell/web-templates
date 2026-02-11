@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<!--
+  CASE-STUDIES.HTML - Portfolio/Case Studies | SEED: 195460458 | SaaS
+  [7] Gallery Density: 4 = Balanced grid layout
+  [8] Angular Geometry: Diagonal hover effects
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Studies - Nexus</title>
+    <meta name="description"
+        content="See how teams achieve amazing results with Nexus. Real stories from real customers.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .cases-hero {
+            padding: calc(72px + var(--space-16)) 0 var(--space-12);
+            text-align: center;
+            background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--surface-primary) 100%);
+        }
+
+        [data-theme="dark"] .cases-hero {
+            background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--surface-primary) 100%);
+        }
+
+        .filter-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+            justify-content: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .filter-tab {
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            background: var(--surface-tertiary);
+            transition: all var(--duration-fast);
+            cursor: pointer;
+            border: none;
+        }
+
+        .filter-tab:hover,
+        .filter-tab.active {
+            background: var(--color-primary-500);
+            color: #fff;
+        }
+
+        .case-card {
+            position: relative;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-subtle);
+            transition: all var(--duration-normal);
+        }
+
+        .case-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .case-image {
+            aspect-ratio: 16/10;
+            background: linear-gradient(135deg, var(--color-primary-400), var(--color-accent-500));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.5) 100%);
+        }
+
+        .case-logo {
+            position: absolute;
+            bottom: var(--space-4);
+            left: var(--space-4);
+            color: #fff;
+            font-weight: var(--font-bold);
+            font-size: var(--text-xl);
+            z-index: 1;
+        }
+
+        .case-content {
+            padding: var(--space-6);
+        }
+
+        .case-industry {
+            font-size: var(--text-xs);
+            font-weight: var(--font-semibold);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+            color: var(--color-primary-500);
+            margin-bottom: var(--space-2);
+        }
+
+        .case-title {
+            font-weight: var(--font-semibold);
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-3);
+            line-height: var(--leading-snug);
+        }
+
+        .case-excerpt {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+        }
+
+        .case-stats {
+            display: flex;
+            gap: var(--space-6);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .case-stat-value {
+            font-weight: var(--font-bold);
+            color: var(--color-primary-500);
+        }
+
+        .case-stat-label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .featured-case {
+            display: grid;
+            gap: var(--space-8);
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+
+        @media (min-width: 1024px) {
+            .featured-case {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .featured-image {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+        }
+
+        .featured-content {
+            padding: var(--space-8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav">
+        <div class="container nav-container">
+            <a href="index.html" class="nav-logo">Nexus</a>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link">Features</a>
+                <a href="pricing.html" class="nav-link">Pricing</a>
+                <a href="case-studies.html" class="nav-link active">Case Studies</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" aria-label="Toggle theme"></button>
+                <a href="contact.html" class="btn btn-primary mobile\:hidden">Get Started</a>
+                <button class="nav-toggle" aria-label="Toggle menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-menu">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="services.html" class="nav-link">Features</a>
+            <a href="pricing.html" class="nav-link">Pricing</a>
+            <a href="case-studies.html" class="nav-link active">Case Studies</a>
+            <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="cases-hero">
+            <div class="container">
+                <span class="text-overline text-accent reveal">Case Studies</span>
+                <h1 class="heading-1 reveal" style="margin: var(--space-4) 0 var(--space-6);">Real Results from Real
+                    Teams</h1>
+                <p class="text-body-lg text-secondary reveal" style="max-width: 600px; margin: 0 auto;">Discover how
+                    companies across industries are transforming their workflows with Nexus.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="filter-tabs reveal">
+                    <button class="filter-tab active">All</button>
+                    <button class="filter-tab">Technology</button>
+                    <button class="filter-tab">Finance</button>
+                    <button class="filter-tab">Healthcare</button>
+                    <button class="filter-tab">Retail</button>
+                    <button class="filter-tab">Agency</button>
+                </div>
+
+                <!-- Featured Case Study -->
+                <div class="featured-case reveal" style="margin-bottom: var(--space-12);">
+                    <div class="featured-image">🚀</div>
+                    <div class="featured-content">
+                        <span class="badge badge-accent"
+                            style="width: fit-content; margin-bottom: var(--space-4);">Featured</span>
+                        <span class="case-industry">Technology</span>
+                        <h2 class="heading-3" style="margin-bottom: var(--space-4);">How TechFlow Increased Productivity
+                            by 40%</h2>
+                        <p class="text-secondary" style="margin-bottom: var(--space-6);">TechFlow, a fast-growing
+                            startup with 200+ employees, was struggling with scattered tools and manual processes. With
+                            Nexus, they consolidated their stack and automated repetitive workflows.</p>
+                        <div class="case-stats" style="margin-bottom: var(--space-6);">
+                            <div>
+                                <div class="case-stat-value">40%</div>
+                                <div class="case-stat-label">Productivity Increase</div>
+                            </div>
+                            <div>
+                                <div class="case-stat-value">20hrs</div>
+                                <div class="case-stat-label">Saved per Week</div>
+                            </div>
+                            <div>
+                                <div class="case-stat-value">3mo</div>
+                                <div class="case-stat-label">ROI Timeline</div>
+                            </div>
+                        </div>
+                        <a href="case-study.html" class="btn btn-primary">Read Full Story</a>
+                    </div>
+                </div>
+
+                <!-- Case Study Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="case-study.html" class="case-card reveal">
+                        <div class="case-image" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                            💰
+                            <div class="case-logo">FinanceX</div>
+                        </div>
+                        <div class="case-content">
+                            <span class="case-industry">Finance</span>
+                            <h3 class="case-title">FinanceX Reduces Report Time by 80%</h3>
+                            <p class="case-excerpt">Automated financial reporting freed up analysts for strategic work.
+                            </p>
+                            <div class="case-stats">
+                                <div><span class="case-stat-value">80%</span><br><span class="case-stat-label">Faster
+                                        Reports</span></div>
+                                <div><span class="case-stat-value">$2M</span><br><span class="case-stat-label">Annual
+                                        Savings</span></div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="case-study.html" class="case-card reveal">
+                        <div class="case-image" style="background: linear-gradient(135deg, #10b981, #06b6d4);">
+                            🏥
+                            <div class="case-logo">MediCare+</div>
+                        </div>
+                        <div class="case-content">
+                            <span class="case-industry">Healthcare</span>
+                            <h3 class="case-title">MediCare+ Streamlines Patient Onboarding</h3>
+                            <p class="case-excerpt">Reduced patient intake time from 45 minutes to 10 minutes.</p>
+                            <div class="case-stats">
+                                <div><span class="case-stat-value">78%</span><br><span class="case-stat-label">Time
+                                        Saved</span></div>
+                                <div><span class="case-stat-value">95%</span><br><span class="case-stat-label">Patient
+                                        Satisfaction</span></div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="case-study.html" class="case-card reveal">
+                        <div class="case-image" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+                            🛍️
+                            <div class="case-logo">RetailMax</div>
+                        </div>
+                        <div class="case-content">
+                            <span class="case-industry">Retail</span>
+                            <h3 class="case-title">RetailMax Automates Inventory Management</h3>
+                            <p class="case-excerpt">Real-time inventory sync across 50+ locations eliminated stockouts.
+                            </p>
+                            <div class="case-stats">
+                                <div><span class="case-stat-value">99%</span><br><span class="case-stat-label">Stock
+                                        Accuracy</span></div>
+                                <div><span class="case-stat-value">50+</span><br><span
+                                        class="case-stat-label">Locations</span></div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="case-study.html" class="case-card reveal">
+                        <div class="case-image" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">
+                            🎨
+                            <div class="case-logo">CreativeHub</div>
+                        </div>
+                        <div class="case-content">
+                            <span class="case-industry">Agency</span>
+                            <h3 class="case-title">CreativeHub Doubles Project Throughput</h3>
+                            <p class="case-excerpt">Streamlined client approvals and asset management.</p>
+                            <div class="case-stats">
+                                <div><span class="case-stat-value">2x</span><br><span class="case-stat-label">More
+                                        Projects</span></div>
+                                <div><span class="case-stat-value">50%</span><br><span class="case-stat-label">Faster
+                                        Delivery</span></div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="case-study.html" class="case-card reveal">
+                        <div class="case-image" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">
+                            ⚡
+                            <div class="case-logo">StartupX</div>
+                        </div>
+                        <div class="case-content">
+                            <span class="case-industry">Technology</span>
+                            <h3 class="case-title">StartupX Scales from 10 to 100 Employees</h3>
+                            <p class="case-excerpt">Nexus grew with them, maintaining efficiency at every stage.</p>
+                            <div class="case-stats">
+                                <div><span class="case-stat-value">10x</span><br><span class="case-stat-label">Team
+                                        Growth</span></div>
+                                <div><span class="case-stat-value">100%</span><br><span class="case-stat-label">Process
+                                        Continuity</span></div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="case-study.html" class="case-card reveal">
+                        <div class="case-image" style="background: linear-gradient(135deg, #14b8a6, #22d3ee);">
+                            🏦
+                            <div class="case-logo">GlobalBank</div>
+                        </div>
+                        <div class="case-content">
+                            <span class="case-industry">Finance</span>
+                            <h3 class="case-title">GlobalBank Automates Compliance Workflows</h3>
+                            <p class="case-excerpt">Reduced compliance review time by 60% with AI-assisted auditing.</p>
+                            <div class="case-stats">
+                                <div><span class="case-stat-value">60%</span><br><span class="case-stat-label">Faster
+                                        Reviews</span></div>
+                                <div><span class="case-stat-value">0</span><br><span class="case-stat-label">Compliance
+                                        Issues</span></div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section"
+            style="background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700)); color: #fff;">
+            <div class="container text-center">
+                <h2 class="heading-2 reveal" style="color: #fff;">Ready to Write Your Success Story?</h2>
+                <p class="reveal"
+                    style="color: rgba(255,255,255,0.8); margin: var(--space-4) auto var(--space-8); max-width: 500px;">
+                    Join thousands of teams achieving extraordinary results with Nexus.</p>
+                <div class="flex justify-center gap-4 reveal">
+                    <a href="checkout.html" class="btn btn-lg"
+                        style="background: #fff; color: var(--color-primary-600);">Start Free Trial</a>
+                    <a href="contact.html" class="btn btn-lg" style="border: 2px solid #fff; color: #fff;">Contact
+                        Sales</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-logo">Nexus</div>
+                    <p class="footer-desc">Empowering teams to work smarter.</p>
+                </div>
+                <div>
+                    <h4 class="footer-title">Product</h4>
+                    <nav class="footer-links">
+                        <a href="services.html" class="footer-link">Features</a>
+                        <a href="pricing.html" class="footer-link">Pricing</a>
+                    </nav>
+                </div>
+                <div>
+                    <h4 class="footer-title">Company</h4>
+                    <nav class="footer-links">
+                        <a href="about.html" class="footer-link">About</a>
+                        <a href="contact.html" class="footer-link">Contact</a>
+                    </nav>
+                </div>
+                <div>
+                    <h4 class="footer-title">Legal</h4>
+                    <nav class="footer-links">
+                        <a href="#" class="footer-link">Privacy</a>
+                        <a href="#" class="footer-link">Terms</a>
+                    </nav>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copy">&copy; 2024 Nexus. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="cookie-banner">
+        <div class="cookie-content">
+            <p class="cookie-text">We use cookies to improve your experience.</p>
+            <div class="cookie-actions">
+                <button class="btn btn-sm btn-ghost" data-decline>Decline</button>
+                <button class="btn btn-sm btn-primary" data-accept>Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>

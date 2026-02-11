@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VOID Studio — Digital Craft</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FAFAF8;
+      --fg: #0A0A0A;
+      --muted: #6B6B6B;
+      --accent-primary: #E63946;
+      --accent-secondary: #2D6A4F;
+      --accent-tertiary: #0077B6;
+      --accent-yellow: #F4A261;
+      --card: #FFFFFF;
+      --border: #0A0A0A;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: var(--bg);
+      color: var(--fg);
+      overflow-x: hidden;
+    }
+
+    .font-mono {
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* Geometric shapes */
+    .geo-shape {
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .shape-1 {
+      width: clamp(60px, 15vw, 180px);
+      height: clamp(60px, 15vw, 180px);
+      background-color: var(--accent-primary);
+      top: 10%;
+      right: 5%;
+      transform: rotate(12deg);
+    }
+
+    .shape-2 {
+      width: clamp(40px, 8vw, 100px);
+      height: clamp(40px, 8vw, 100px);
+      background-color: var(--accent-secondary);
+      border-radius: 50%;
+      bottom: 20%;
+      left: 8%;
+    }
+
+    .shape-3 {
+      width: clamp(20px, 4vw, 50px);
+      height: clamp(80px, 15vw, 200px);
+      background-color: var(--accent-tertiary);
+      top: 40%;
+      right: 15%;
+    }
+
+    .shape-4 {
+      width: clamp(30px, 6vw, 80px);
+      height: clamp(30px, 6vw, 80px);
+      border: 3px solid var(--fg);
+      bottom: 35%;
+      right: 8%;
+      transform: rotate(45deg);
+    }
+
+    .shape-5 {
+      width: clamp(100px, 25vw, 300px);
+      height: 4px;
+      background-color: var(--accent-yellow);
+      top: 25%;
+      left: 0;
+    }
+
+    .shape-6 {
+      width: clamp(15px, 3vw, 40px);
+      height: clamp(15px, 3vw, 40px);
+      background-color: var(--fg);
+      border-radius: 50%;
+      top: 15%;
+      left: 20%;
+    }
+
+    .shape-7 {
+      width: clamp(60px, 12vw, 150px);
+      height: 3px;
+      background-color: var(--fg);
+      bottom: 15%;
+      left: 50%;
+      transform: rotate(-45deg);
+    }
+
+    /* Animations */
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(12deg);
+      }
+
+      50% {
+        transform: translateY(-20px) rotate(12deg);
+      }
+    }
+
+    @keyframes pulse-scale {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes slide-in-left {
+      from {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slide-in-right {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fade-up {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes spin-slow {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-pulse-scale {
+      animation: pulse-scale 4s ease-in-out infinite;
+    }
+
+    .animate-spin-slow {
+      animation: spin-slow 20s linear infinite;
+    }
+
+    /* Staggered reveals */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 {
+      transition-delay: 0.1s;
+    }
+
+    .reveal-delay-2 {
+      transition-delay: 0.2s;
+    }
+
+    .reveal-delay-3 {
+      transition-delay: 0.3s;
+    }
+
+    .reveal-delay-4 {
+      transition-delay: 0.4s;
+    }
+
+    .reveal-delay-5 {
+      transition-delay: 0.5s;
+    }
+
+    /* Button styles */
+    .btn-primary {
+      background-color: var(--fg);
+      color: var(--bg);
+      padding: 16px 32px;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border: 2px solid var(--fg);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background-color: var(--accent-primary);
+      transition: left 0.3s ease;
+      z-index: -1;
+    }
+
+    .btn-primary:hover::before {
+      left: 0;
+    }
+
+    .btn-primary:hover {
+      color: var(--bg);
+      border-color: var(--accent-primary);
+    }
+
+    .btn-primary:focus-visible {
+      outline: 3px solid var(--accent-tertiary);
+      outline-offset: 3px;
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--fg);
+      padding: 16px 32px;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border: 2px solid var(--fg);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--fg);
+      color: var(--bg);
+    }
+
+    .btn-secondary:focus-visible {
+      outline: 3px solid var(--accent-tertiary);
+      outline-offset: 3px;
+    }
+
+    /* Nav link hover */
+    .nav-link {
+      position: relative;
+      padding-bottom: 2px;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--accent-primary);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Tag style */
+    .tag {
+      display: inline-block;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid var(--fg);
+    }
+
+    /* Stat block */
+    .stat-number {
+      font-size: clamp(48px, 10vw, 80px);
+      font-weight: 700;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+    }
+
+    /* Mobile menu */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--fg);
+      color: var(--bg);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 32px;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+
+    .mobile-menu a {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--bg);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .mobile-menu a:hover {
+      color: var(--accent-primary);
+    }
+
+    /* Hamburger */
+    .hamburger {
+      width: 32px;
+      height: 24px;
+      position: relative;
+      cursor: pointer;
+      z-index: 101;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background-color: var(--fg);
+      position: absolute;
+      left: 0;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger span:nth-child(1) {
+      top: 0;
+    }
+
+    .hamburger span:nth-child(2) {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .hamburger span:nth-child(3) {
+      bottom: 0;
+    }
+
+    .hamburger.active span {
+      background-color: var(--bg);
+    }
+
+    .hamburger.active span:nth-child(1) {
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      bottom: 50%;
+      transform: translateY(50%) rotate(-45deg);
+    }
+
+    /* Card hover */
+    .work-card {
+      border: 2px solid var(--fg);
+      background-color: var(--card);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .work-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 8px 8px 0 var(--fg);
+    }
+
+    /* Focus styles */
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid var(--accent-tertiary);
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 w-full z-50 bg-[var(--bg)] border-b-2 border-[var(--fg)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 sm:h-20">
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-2" aria-label="VOID Studio Home">
+          <div class="w-8 h-8 bg-[var(--accent-primary)]"></div>
+          <span class="font-bold text-lg tracking-tight">VOID</span>
+        </a>
+
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#work" class="nav-link font-mono text-sm tracking-wide">Work</a>
+          <a href="#about" class="nav-link font-mono text-sm tracking-wide">About</a>
+          <a href="#services" class="nav-link font-mono text-sm tracking-wide">Services</a>
+          <a href="#contact" class="btn-primary">Contact</a>
+        </div>
+
+        <!-- Mobile Hamburger -->
+        <button class="hamburger md:hidden" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" aria-hidden="true">
+    <a href="#work">Work</a>
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="relative min-h-screen flex items-center pt-20 overflow-hidden">
+      <!-- Geometric Shapes -->
+      <div class="geo-shape shape-1 animate-float"></div>
+      <div class="geo-shape shape-2 animate-pulse-scale"></div>
+      <div class="geo-shape shape-3"></div>
+      <div class="geo-shape shape-4 animate-spin-slow"></div>
+      <div class="geo-shape shape-5"></div>
+      <div class="geo-shape shape-6"></div>
+      <div class="geo-shape shape-7"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+
+          <!-- Main Content -->
+          <div class="lg:col-span-8">
+            <!-- Tag -->
+            <div class="reveal reveal-delay-1 mb-6">
+              <span class="tag font-mono">Digital Design Studio</span>
+            </div>
+
+            <!-- Headline -->
+            <h1 class="reveal reveal-delay-2">
+              <span class="block text-[clamp(2.5rem,8vw,7rem)] font-bold leading-[0.9] tracking-[-0.03em]">
+                We craft
+              </span>
+              <span class="block text-[clamp(2.5rem,8vw,7rem)] font-bold leading-[0.9] tracking-[-0.03em]">
+                <span class="text-[var(--accent-primary)]">digital</span>
+              </span>
+              <span class="block text-[clamp(2.5rem,8vw,7rem)] font-bold leading-[0.9] tracking-[-0.03em]">
+                experiences
+              </span>
+            </h1>
+
+            <!-- Subheadline -->
+            <p class="reveal reveal-delay-3 mt-6 text-lg sm:text-xl text-[var(--muted)] max-w-xl leading-relaxed">
+              Bold ideas, precise execution. We transform complex problems into elegant digital solutions that resonate.
+            </p>
+
+            <!-- CTAs -->
+            <div class="reveal reveal-delay-4 flex flex-wrap gap-4 mt-10">
+              <button class="btn-primary">Start a Project</button>
+              <button class="btn-secondary">View Work</button>
+            </div>
+          </div>
+
+          <!-- Stats Column -->
+          <div class="lg:col-span-4 mt-12 lg:mt-0">
+            <div class="grid grid-cols-2 gap-6">
+              <div class="reveal reveal-delay-3">
+                <div class="stat-number text-[var(--accent-secondary)]">147</div>
+                <p class="font-mono text-xs uppercase tracking-widest mt-2 text-[var(--muted)]">Projects</p>
+              </div>
+              <div class="reveal reveal-delay-4">
+                <div class="stat-number text-[var(--accent-tertiary)]">12</div>
+                <p class="font-mono text-xs uppercase tracking-widest mt-2 text-[var(--muted)]">Years</p>
+              </div>
+              <div class="reveal reveal-delay-5">
+                <div class="stat-number text-[var(--accent-yellow)]">38</div>
+                <p class="font-mono text-xs uppercase tracking-widest mt-2 text-[var(--muted)]">Awards</p>
+              </div>
+              <div class="reveal reveal-delay-5">
+                <div class="stat-number text-[var(--accent-primary)]">99%</div>
+                <p class="font-mono text-xs uppercase tracking-widest mt-2 text-[var(--muted)]">Retention</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div
+          class="reveal reveal-delay-5 absolute bottom-8 left-4 sm:left-6 lg:left-8 hidden sm:flex items-center gap-4">
+          <div class="w-[1px] h-16 bg-[var(--fg)] relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1/2 bg-[var(--accent-primary)]"
+              style="animation: scroll-line 2s ease-in-out infinite;"></div>
+          </div>
+          <span class="font-mono text-xs uppercase tracking-widest rotate-90 origin-left translate-x-4">Scroll</span>
+        </div>
+      </div>
+
+      <style>
+        @keyframes scroll-line {
+
+          0%,
+          100% {
+            transform: translateY(-100%);
+          }
+
+          50% {
+            transform: translateY(200%);
+          }
+        }
+      </style>
+    </section>
+
+    <!-- Featured Work Preview -->
+    <section id="work" class="py-20 sm:py-32 border-t-2 border-[var(--fg)]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="reveal flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+          <div>
+            <span class="tag font-mono mb-4">Featured</span>
+            <h2 class="text-[clamp(2rem,5vw,4rem)] font-bold tracking-[-0.02em] mt-4">Selected Work</h2>
+          </div>
+          <a href="#" class="nav-link font-mono text-sm self-start sm:self-auto">View all projects →</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Work Card 1 -->
+          <article class="work-card reveal reveal-delay-1">
+            <div class="aspect-[4/3] bg-[var(--accent-primary)] flex items-center justify-center">
+              <span class="text-6xl font-bold text-[var(--bg)] opacity-20">01</span>
+            </div>
+            <div class="p-6">
+              <span class="font-mono text-xs uppercase tracking-widest text-[var(--muted)]">Branding / Web</span>
+              <h3 class="text-2xl font-bold mt-2">Meridian Labs</h3>
+              <p class="text-[var(--muted)] mt-2">Complete brand identity and digital platform for biotech innovators.
+              </p>
+            </div>
+          </article>
+
+          <!-- Work Card 2 -->
+          <article class="work-card reveal reveal-delay-2">
+            <div class="aspect-[4/3] bg-[var(--accent-secondary)] flex items-center justify-center">
+              <span class="text-6xl font-bold text-[var(--bg)] opacity-20">02</span>
+            </div>
+            <div class="p-6">
+              <span class="font-mono text-xs uppercase tracking-widest text-[var(--muted)]">Product / UX</span>
+              <h3 class="text-2xl font-bold mt-2">Canopy Finance</h3>
+              <p class="text-[var(--muted)] mt-2">Financial dashboard reimagined with clarity and precision.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 sm:py-32 bg-[var(--fg)] text-[var(--bg)]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="reveal mb-16">
+          <span class="tag border-[var(--bg)] text-[var(--bg)] font-mono">What We Do</span>
+          <h2 class="text-[clamp(2rem,5vw,4rem)] font-bold tracking-[-0.02em] mt-4">Services</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--muted)]">
+          <!-- Service 1 -->
+          <div
+            class="reveal reveal-delay-1 bg-[var(--fg)] p-8 group cursor-pointer transition-colors hover:bg-[var(--accent-primary)]">
+            <div
+              class="w-12 h-12 border-2 border-[var(--bg)] flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Brand Identity</h3>
+            <p class="text-[var(--muted)] text-sm group-hover:text-[var(--bg)] opacity-80">Strategic positioning, visual
+              systems, and brand guidelines.</p>
+          </div>
+
+          <!-- Service 2 -->
+          <div
+            class="reveal reveal-delay-2 bg-[var(--fg)] p-8 group cursor-pointer transition-colors hover:bg-[var(--accent-secondary)]">
+            <div
+              class="w-12 h-12 border-2 border-[var(--bg)] flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Web Design</h3>
+            <p class="text-[var(--muted)] text-sm group-hover:text-[var(--bg)] opacity-80">Responsive websites that
+              convert and captivate.</p>
+          </div>
+
+          <!-- Service 3 -->
+          <div
+            class="reveal reveal-delay-3 bg-[var(--fg)] p-8 group cursor-pointer transition-colors hover:bg-[var(--accent-tertiary)]">
+            <div
+              class="w-12 h-12 border-2 border-[var(--bg)] flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Product Design</h3>
+            <p class="text-[var(--muted)] text-sm group-hover:text-[var(--bg)] opacity-80">User-centered interfaces for
+              web and mobile applications.</p>
+          </div>
+
+          <!-- Service 4 -->
+          <div
+            class="reveal reveal-delay-4 bg-[var(--fg)] p-8 group cursor-pointer transition-colors hover:bg-[var(--accent-yellow)]">
+            <div
+              class="w-12 h-12 border-2 border-[var(--bg)] flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Motion Design</h3>
+            <p class="text-[var(--muted)] text-sm group-hover:text-[var(--bg)] opacity-80">Animations and interactions
+              that bring interfaces to life.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="contact" class="py-20 sm:py-32 border-t-2 border-[var(--fg)]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="reveal flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+          <div>
+            <span class="tag font-mono mb-4">Ready?</span>
+            <h2 class="text-[clamp(2rem,6vw,5rem)] font-bold tracking-[-0.02em] mt-4 max-w-3xl">
+              Let's build something <span class="text-[var(--accent-primary)]">remarkable</span> together.
+            </h2>
+          </div>
+          <button class="btn-primary whitespace-nowrap self-start lg:self-auto">
+            Get in Touch
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-8 border-t-2 border-[var(--fg)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <p class="font-mono text-xs text-[var(--muted)]">© 2024 VOID Studio. All rights reserved.</p>
+        <div class="flex gap-6">
+          <a href="#" class="font-mono text-xs text-[var(--muted)] hover:text-[var(--fg)] transition-colors">Twitter</a>
+          <a href="#"
+            class="font-mono text-xs text-[var(--muted)] hover:text-[var(--fg)] transition-colors">LinkedIn</a>
+          <a href="#"
+            class="font-mono text-xs text-[var(--muted)] hover:text-[var(--fg)] transition-colors">Dribbble</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize reveal observer
+    document.addEventListener('DOMContentLoaded', () => {
+      const reveals = document.querySelectorAll('.reveal');
+
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      });
+
+      reveals.forEach(reveal => revealObserver.observe(reveal));
+    });
+
+    // Mobile menu toggle
+    const hamburger = document.querySelector('.hamburger');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const mobileLinks = mobileMenu.querySelectorAll('a');
+
+    hamburger.addEventListener('click', () => {
+      const isOpen = hamburger.classList.toggle('active');
+      mobileMenu.classList.toggle('open');
+      mobileMenu.setAttribute('aria-hidden', !isOpen);
+      hamburger.setAttribute('aria-expanded', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+
+    // Close mobile menu on link click
+    mobileLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('open');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // Keyboard navigation for mobile menu
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('open');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+        hamburger.focus();
+      }
+    });
+  </script>
+</body>
+
+</html>

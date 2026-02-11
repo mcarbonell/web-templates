@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resources | Alex Chen - Creative Developer</title>
+  <meta name="description" content="Free resources, tools, and downloads for designers and developers. Templates, guides, and more.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  
+  <!-- Page-specific Critical CSS -->
+  <style>
+    /* Page Header */
+    .page-header {
+      padding: calc(var(--header-height) + var(--space-2xl)) 0 var(--space-xl);
+      text-align: center;
+      position: relative;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-mesh);
+      opacity: 0.5;
+      z-index: 0;
+    }
+    
+    .page-header-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .page-header h1 {
+      margin-bottom: var(--space-md);
+    }
+    
+    .page-header p {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Resources Grid (Digit 8 = 3: Subtle 3D interactions) */
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+    }
+    
+    .resource-card {
+      padding: var(--space-xl);
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--duration-normal) var(--ease-out-expo);
+    }
+    
+    .resource-card:hover {
+      transform: translateY(-8px);
+    }
+    
+    .resource-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--gradient-hero);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .resource-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .resource-card p {
+      font-size: 0.9375rem;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .resource-meta {
+      display: flex;
+      gap: var(--space-md);
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .resource-download {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      color: var(--color-primary);
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+    
+    .resource-download::after {
+      content: '↓';
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .resource-card:hover .resource-download::after {
+      transform: translateY(2px);
+    }
+    
+    /* Tools Section */
+    .tools-section {
+      background: var(--color-bg-darker);
+    }
+    
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-lg);
+    }
+    
+    .tool-card {
+      display: flex;
+      gap: var(--space-lg);
+      padding: var(--space-xl);
+      align-items: flex-start;
+    }
+    
+    .tool-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--color-bg-elevated);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    .tool-content h3 {
+      font-size: 1.125rem;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .tool-content p {
+      font-size: 0.9375rem;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-md);
+    }
+    
+    .tool-link {
+      color: var(--color-primary);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    
+    /* Newsletter Section */
+    .resources-newsletter {
+      text-align: center;
+      padding: var(--space-3xl) 0;
+      position: relative;
+    }
+    
+    .resources-newsletter::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-glow);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    
+    .resources-newsletter-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .resources-newsletter h2 {
+      margin-bottom: var(--space-md);
+    }
+    
+    .resources-newsletter p {
+      margin-bottom: var(--space-xl);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .resources-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .tools-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .resources-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .tool-card {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header" data-header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">
+          <span class="logo-text">AC</span>
+        </a>
+        
+        <nav class="main-nav" data-main-nav>
+          <ul class="nav-list">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="about.html" class="nav-link">About</a></li>
+            <li><a href="services.html" class="nav-link">Services</a></li>
+            <li><a href="case-studies.html" class="nav-link">Work</a></li>
+            <li><a href="blog.html" class="nav-link">Blog</a></li>
+            <li><a href="contact.html" class="nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+            <span class="theme-icon">🌙</span>
+          </button>
+          <a href="contact.html" class="btn btn-primary btn-sm">Let's Talk</a>
+          <button class="mobile-toggle" data-mobile-toggle aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <main>
+    <!-- Page Header -->
+    <section class="page-header">
+      <div class="container">
+        <div class="page-header-content reveal">
+          <h1>Free <span class="text-gradient">Resources</span></h1>
+          <p>Tools, templates, and guides to help you on your creative journey. All free for personal and commercial use.</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Downloads -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Downloads</h2>
+          <p>Ready-to-use resources for your next project.</p>
+        </div>
+        
+        <div class="resources-grid stagger-children">
+          <article class="resource-card card reveal" data-tilt>
+            <div class="resource-icon">🎨</div>
+            <h3>UI Kit 2024</h3>
+            <p>A comprehensive UI kit with 200+ components, variants, and design tokens for Figma.</p>
+            <div class="resource-meta">
+              <span>200+ components</span>
+              <span>Figma</span>
+            </div>
+            <a href="#" class="resource-download">Download Free</a>
+          </article>
+          
+          <article class="resource-card card reveal" data-tilt>
+            <div class="resource-icon">📐</div>
+            <h3>Wireframe Kit</h3>
+            <p>Low-fidelity wireframe components for rapid prototyping and user testing.</p>
+            <div class="resource-meta">
+              <span>100+ layouts</span>
+              <span>Figma & Sketch</span>
+            </div>
+            <a href="#" class="resource-download">Download Free</a>
+          </article>
+          
+          <article class="resource-card card reveal" data-tilt>
+            <div class="resource-icon">🎭</div>
+            <h3>Icon System</h3>
+            <p>500+ consistent, customizable icons in multiple formats and sizes.</p>
+            <div class="resource-meta">
+              <span>500+ icons</span>
+              <span>SVG, PNG, Font</span>
+            </div>
+            <a href="#" class="resource-download">Download Free</a>
+          </article>
+          
+          <article class="resource-card card reveal" data-tilt>
+            <div class="resource-icon">📱</div>
+            <h3>Device Mockups</h3>
+            <p>High-resolution device mockups for showcasing your designs in context.</p>
+            <div class="resource-meta">
+              <span>50+ devices</span>
+              <span>PSD, Figma</span>
+            </div>
+            <a href="#" class="resource-download">Download Free</a>
+          </article>
+          
+          <article class="resource-card card reveal" data-tilt>
+            <div class="resource-icon">🎬</div>
+            <h3>Animation Presets</h3>
+            <p>Ready-to-use animation presets for After Effects and Lottie.</p>
+            <div class="resource-meta">
+              <span>30+ animations</span>
+              <span>AE, Lottie</span>
+            </div>
+            <a href="#" class="resource-download">Download Free</a>
+          </article>
+          
+          <article class="resource-card card reveal" data-tilt>
+            <div class="resource-icon">📝</div>
+            <h3>Design Checklist</h3>
+            <p>Comprehensive checklist for design reviews and quality assurance.</p>
+            <div class="resource-meta">
+              <span>100+ items</span>
+              <span>PDF, Notion</span>
+            </div>
+            <a href="#" class="resource-download">Download Free</a>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Tools -->
+    <section class="section tools-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Tools & Calculators</h2>
+          <p>Handy tools to speed up your workflow.</p>
+        </div>
+        
+        <div class="tools-grid stagger-children">
+          <article class="tool-card card reveal">
+            <div class="tool-icon">⚡</div>
+            <div class="tool-content">
+              <h3>Performance Calculator</h3>
+              <p>Estimate your website's Core Web Vitals scores and get optimization recommendations based on your current setup.</p>
+              <a href="#" class="tool-link">Try it now →</a>
+            </div>
+          </article>
+          
+          <article class="tool-card card reveal">
+            <div class="tool-icon">🎨</div>
+            <div class="tool-content">
+              <h3>Color Contrast Checker</h3>
+              <p>Check WCAG compliance for your color combinations. Supports AA and AAA level requirements.</p>
+              <a href="#" class="tool-link">Try it now →</a>
+            </div>
+          </article>
+          
+          <article class="tool-card card reveal">
+            <div class="tool-icon">📐</div>
+            <div class="tool-content">
+              <h3>Spacing Calculator</h3>
+              <p>Generate consistent spacing scales based on mathematical ratios for your design systems.</p>
+              <a href="#" class="tool-link">Try it now →</a>
+            </div>
+          </article>
+          
+          <article class="tool-card card reveal">
+            <div class="tool-icon">💰</div>
+            <div class="tool-content">
+              <h3>Project Estimator</h3>
+              <p>Get a rough estimate for your web project based on scope, features, and timeline.</p>
+              <a href="#" class="tool-link">Try it now →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Guides -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Guides & Ebooks</h2>
+          <p>In-depth resources to level up your skills.</p>
+        </div>
+        
+        <div class="resources-grid stagger-children">
+          <article class="resource-card card reveal" data-tilt>
+            <div class="resource-icon">📘</div>
+            <h3>Design Systems Handbook</h3>
+            <p>A comprehensive guide to creating, maintaining, and scaling design systems.</p>
+            <div class="resource-meta">
+              <span>120 pages</span>
+              <span>PDF</span>
+            </div>
+            <a href="#" class="resource-download">Download Free</a>
+          </article>
+          
+          <article class="resource-card card reveal" data-tilt>
+            <div class="resource-icon">📗</div>
+            <h3>Freelancer's Guide</h3>
+            <p>Everything you need to know about starting and growing a freelance business.</p>
+            <div class="resource-meta">
+              <span>80 pages</span>
+              <span>PDF</span>
+            </div>
+            <a href="#" class="resource-download">Download Free</a>
+          </article>
+          
+          <article class="resource-card card reveal" data-tilt>
+            <div class="resource-icon">📙</div>
+            <h3>Performance Playbook</h3>
+            <p>Advanced techniques for optimizing web performance and Core Web Vitals.</p>
+            <div class="resource-meta">
+              <span>60 pages</span>
+              <span>PDF</span>
+            </div>
+            <a href="#" class="resource-download">Download Free</a>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Newsletter -->
+    <section class="resources-newsletter">
+      <div class="container">
+        <div class="resources-newsletter-content reveal">
+          <h2>Get New Resources First</h2>
+          <p>Subscribe to get notified when I release new free resources, tools, and guides.</p>
+          <form class="newsletter-form-inline" data-validate style="max-width: 500px; margin: 0 auto; display: flex; gap: var(--space-sm);">
+            <input type="email" placeholder="Enter your email" data-validate-field="email" required style="flex: 1; padding: var(--space-md); background: var(--color-bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: var(--color-text-primary); font-family: var(--font-primary);">
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-text">AC</span>
+          </a>
+          <p>Creative developer & designer crafting digital experiences that make an impact.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="GitHub">⌘</a>
+            <a href="#" aria-label="Dribbble">🏀</a>
+          </div>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="case-studies.html">Work</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="services.html">Web Development</a></li>
+            <li><a href="services.html">UI/UX Design</a></li>
+            <li><a href="services.html">Branding</a></li>
+            <li><a href="services.html">Consulting</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-nav">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hello@alexchen.dev">hello@alexchen.dev</a></li>
+            <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
+            <li>San Francisco, CA</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Alex Chen. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  
+  <!-- Shared Component Styles -->
+  <style>
+    /* Header Styles */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: var(--header-height);
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+    
+    .header.is-scrolled {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .header.is-hidden {
+      transform: translateY(-100%);
+    }
+    
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+    
+    .logo {
+      font-family: var(--font-primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    
+    .logo-text {
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .main-nav {
+      display: flex;
+    }
+    
+    .nav-list {
+      display: flex;
+      gap: var(--space-xl);
+      list-style: none;
+    }
+    
+    .nav-link {
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      position: relative;
+      padding: var(--space-sm) 0;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-hero);
+      transition: width var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .nav-link:hover,
+    .nav-link.is-active {
+      color: var(--color-text-primary);
+    }
+    
+    .nav-link:hover::after,
+    .nav-link.is-active::after {
+      width: 100%;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: var(--color-primary);
+    }
+    
+    .btn-sm {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.875rem;
+    }
+    
+    .mobile-toggle {
+      display: none;
+      width: 40px;
+      height: 40px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    
+    .mobile-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--color-text-primary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    /* Footer Styles */
+    .footer {
+      background: var(--color-bg-darker);
+      padding: var(--space-2xl) 0 var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .footer-brand p {
+      margin: var(--space-md) 0 var(--space-lg);
+      font-size: 1rem;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .social-links a:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    
+    .footer-nav h4 {
+      font-size: 1rem;
+      margin-bottom: var(--space-lg);
+      color: var(--color-text-primary);
+    }
+    
+    .footer-nav ul {
+      list-style: none;
+    }
+    
+    .footer-nav li {
+      margin-bottom: var(--space-sm);
+    }
+    
+    .footer-nav a {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+      transition: color var(--duration-fast) var(--ease-out-expo);
+    }
+    
+    .footer-nav a:hover {
+      color: var(--color-primary);
+    }
+    
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-lg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .footer-bottom p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    .footer-legal {
+      display: flex;
+      gap: var(--space-lg);
+    }
+    
+    .footer-legal a {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-nav {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        background: var(--color-bg-card);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: var(--space-lg);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--duration-normal) var(--ease-out-expo);
+      }
+      
+      .main-nav.is-open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .nav-list {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+      
+      .mobile-toggle {
+        display: flex;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-md);
+        text-align: center;
+      }
+    }
+  </style>
+</body>
+</html>

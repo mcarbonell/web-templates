@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOID Studio — Creative Digital Agency</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  /* ═══════════════════════════════════════════
+     RESET & BASE
+     ═══════════════════════════════════════════ */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111;
+    --text: #f0f0f0;
+    --dim: #666;
+    --accent: #a78bfa;
+    --accent2: #34d399;
+    --accent3: #f472b6;
+    --accent4: #38bdf8;
+  }
+
+  html {
+    scroll-behavior: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) var(--bg);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ═══════════════════════════════════════════
+     CUSTOM CURSOR
+     ═══════════════════════════════════════════ */
+  .cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transition: width 0.3s, height 0.3s, border-color 0.3s, background 0.3s;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+  }
+
+  .cursor.hover {
+    width: 60px;
+    height: 60px;
+    background: rgba(167, 139, 250, 0.15);
+    border-color: var(--accent2);
+  }
+
+  .cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 100000;
+    transform: translate(-50%, -50%);
+  }
+
+  .cursor-trail {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    pointer-events: none;
+    z-index: 99998;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.5s;
+  }
+
+  /* ═══════════════════════════════════════════
+     FILM GRAIN OVERLAY
+     ═══════════════════════════════════════════ */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    animation: grainAnim 0.5s steps(1) infinite;
+  }
+
+  @keyframes grainAnim {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-5%, -5%); }
+    40% { transform: translate(5%, 5%); }
+    60% { transform: translate(-2%, 3%); }
+    80% { transform: translate(3%, -2%); }
+    100% { transform: translate(0, 0); }
+  }
+
+  /* ═══════════════════════════════════════════
+     SPOTLIGHT / FLASHLIGHT
+     ═══════════════════════════════════════════ */
+  .spotlight-section {
+    position: relative;
+  }
+
+  .spotlight-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle 200px at var(--mx, 50%) var(--my, 50%),
+      transparent 0%,
+      rgba(0, 0, 0, 0.92) 100%
+    );
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* ═══════════════════════════════════════════
+     NAV
+     ═══════════════════════════════════════════ */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9000;
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    mix-blend-mode: difference;
+  }
+
+  .logo {
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+
+  .nav-links a:hover { opacity: 1; }
+
+  /* ═══════════════════════════════════════════
+     SCROLL PROGRESS BAR
+     ═══════════════════════════════════════════ */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    z-index: 9999;
+    width: 0%;
+    transition: none;
+  }
+
+  /* ═══════════════════════════════════════════
+     HERO — PARALLAX + TEXT REVEAL
+     ═══════════════════════════════════════════ */
+  .hero {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-bg-layers {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .parallax-layer {
+    position: absolute;
+    inset: -20%;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    gap: 3rem;
+    opacity: 0.06;
+  }
+
+  .parallax-layer span {
+    font-size: 8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    white-space: nowrap;
+    letter-spacing: -4px;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .parallax-layer.layer-2 {
+    opacity: 0.03;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 4px;
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+
+  .hero-title {
+    font-size: clamp(3.5rem, 10vw, 9rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -3px;
+    margin-bottom: 2rem;
+  }
+
+  .hero-title .word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    margin-right: 0.3em;
+  }
+
+  .hero-title .word span {
+    display: inline-block;
+    transform: translateY(110%);
+    animation: wordReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .hero-title .word:nth-child(2) span { animation-delay: 0.15s; }
+  .hero-title .word:nth-child(3) span { animation-delay: 0.3s; }
+
+  @keyframes wordReveal {
+    to { transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-subtitle {
+    font-size: 1.15rem;
+    color: var(--dim);
+    max-width: 450px;
+    margin: 0 auto 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+    line-height: 1.6;
+  }
+
+  .hero-cta {
+    opacity: 0;
+    animation: fadeUp 0.8s 0.9s forwards;
+  }
+
+  /* ─── MAGNETIC BUTTON ─── */
+  .magnetic-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1.2rem 3rem;
+    background: var(--text);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    cursor: none;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+    overflow: hidden;
+  }
+
+  .magnetic-btn .btn-text {
+    position: relative;
+    z-index: 2;
+    transition: color 0.3s;
+  }
+
+  .magnetic-btn .btn-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1;
+  }
+
+  .magnetic-btn:hover .btn-fill {
+    transform: translateY(0);
+  }
+
+  .magnetic-btn:hover .btn-text {
+    color: #fff;
+  }
+
+  .magnetic-btn:hover {
+    box-shadow: 0 20px 60px rgba(167, 139, 250, 0.3);
+  }
+
+  .scroll-arrow {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    font-size: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards, float 2s 2s infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(12px); }
+  }
+
+  /* ═══════════════════════════════════════════
+     INFINITE MARQUEE
+     ═══════════════════════════════════════════ */
+  .marquee-section {
+    padding: 2rem 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    overflow: hidden;
+    background: var(--bg2);
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marqueeScroll 25s linear infinite;
+  }
+
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  .marquee-item {
+    flex-shrink: 0;
+    padding: 0 3rem;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    white-space: nowrap;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+  }
+
+  .marquee-item:hover {
+    opacity: 1;
+  }
+
+  .marquee-item .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 1.5rem;
+    vertical-align: middle;
+  }
+
+  @keyframes marqueeScroll {
+    to { transform: translateX(-50%); }
+  }
+
+  /* ═══════════════════════════════════════════
+     SCROLL-TRIGGERED SECTIONS
+     ═══════════════════════════════════════════ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-80px);
+    transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(80px);
+    transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ═══════════════════════════════════════════
+     ABOUT — TEXT REVEAL ON SCROLL
+     ═══════════════════════════════════════════ */
+  .about {
+    padding: 12rem 3rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .text-reveal-container {
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+    font-weight: 600;
+    line-height: 1.6;
+  }
+
+  .text-reveal-container .word-reveal {
+    display: inline-block;
+    margin-right: 0.3em;
+    color: rgba(255, 255, 255, 0.1);
+    transition: color 0.4s;
+  }
+
+  .text-reveal-container .word-reveal.lit {
+    color: var(--text);
+  }
+
+  /* ═══════════════════════════════════════════
+     AURORA BLOBS + GLASSMORPHISM CARDS
+     ═══════════════════════════════════════════ */
+  .services {
+    position: relative;
+    padding: 10rem 3rem;
+    overflow: hidden;
+  }
+
+  .aurora-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    filter: blur(80px);
+    opacity: 0.4;
+  }
+
+  .aurora-blob {
+    position: absolute;
+    border-radius: 50%;
+    animation: auroraFloat 8s ease-in-out infinite alternate;
+  }
+
+  .aurora-blob:nth-child(1) {
+    width: 500px;
+    height: 500px;
+    background: var(--accent);
+    top: -10%;
+    left: -10%;
+    animation-duration: 7s;
+  }
+
+  .aurora-blob:nth-child(2) {
+    width: 400px;
+    height: 400px;
+    background: var(--accent2);
+    bottom: -10%;
+    right: -5%;
+    animation-duration: 9s;
+    animation-delay: -3s;
+  }
+
+  .aurora-blob:nth-child(3) {
+    width: 350px;
+    height: 350px;
+    background: var(--accent3);
+    top: 50%;
+    left: 40%;
+    animation-duration: 11s;
+    animation-delay: -5s;
+  }
+
+  @keyframes auroraFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(50px, -30px) scale(1.1); }
+    66% { transform: translate(-30px, 50px) scale(0.9); }
+    100% { transform: translate(20px, -40px) scale(1.05); }
+  }
+
+  .services-header {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  .services-header h2 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    letter-spacing: -2px;
+  }
+
+  .glass-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 2.5rem;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  }
+
+  .glass-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-card .card-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+  }
+
+  .glass-card h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .glass-card p {
+    color: var(--dim);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+
+  /* ═══════════════════════════════════════════
+     SCRAMBLE TEXT SECTION
+     ═══════════════════════════════════════════ */
+  .scramble-section {
+    padding: 10rem 3rem;
+    text-align: center;
+    background: var(--bg2);
+  }
+
+  .scramble-text {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 900;
+    letter-spacing: -2px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    min-height: 1.2em;
+  }
+
+  .scramble-subtitle {
+    margin-top: 1.5rem;
+    color: var(--dim);
+    font-size: 1rem;
+  }
+
+  /* ═══════════════════════════════════════════
+     SPOTLIGHT SECTION — PORTFOLIO
+     ═══════════════════════════════════════════ */
+  .portfolio {
+    position: relative;
+    padding: 10rem 3rem;
+  }
+
+  .portfolio-header {
+    text-align: center;
+    margin-bottom: 5rem;
+    position: relative;
+    z-index: 10;
+  }
+
+  .portfolio-header h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -2px;
+  }
+
+  .spotlight-content {
+    position: relative;
+    z-index: 6;
+  }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.05);
+  }
+
+  .portfolio-item {
+    aspect-ratio: 16/10;
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+  }
+
+  .portfolio-item .item-bg {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6rem;
+    font-weight: 900;
+    opacity: 0.08;
+    letter-spacing: -4px;
+  }
+
+  .portfolio-item:hover .item-bg {
+    transform: scale(1.1);
+  }
+
+  .portfolio-item .item-info {
+    position: absolute;
+    bottom: 2rem;
+    left: 2rem;
+    z-index: 2;
+  }
+
+  .portfolio-item .item-info h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    transform: translateY(30px);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .portfolio-item .item-info p {
+    font-size: 0.85rem;
+    color: var(--dim);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.5s 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .portfolio-item:hover .item-info h3,
+  .portfolio-item:hover .item-info p {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .portfolio-item:nth-child(1) { background: #1a0a2e; }
+  .portfolio-item:nth-child(2) { background: #0a1e1e; }
+  .portfolio-item:nth-child(3) { background: #1e0a1a; }
+  .portfolio-item:nth-child(4) { background: #0a0a2e; }
+
+  /* ═══════════════════════════════════════════
+     HORIZONTAL SCROLL SECTION
+     ═══════════════════════════════════════════ */
+  .horizontal-scroll-wrapper {
+    height: 400vh;
+    position: relative;
+  }
+
+  .horizontal-scroll-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+
+  .horizontal-track {
+    display: flex;
+    gap: 3rem;
+    padding: 0 3rem;
+    will-change: transform;
+  }
+
+  .h-card {
+    flex-shrink: 0;
+    width: 450px;
+    height: 550px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.07);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2.5rem;
+    transition: border-color 0.3s;
+  }
+
+  .h-card:hover {
+    border-color: rgba(255,255,255,0.2);
+  }
+
+  .h-card:nth-child(1) { background: linear-gradient(135deg, #1a0533, #0a0a1a); }
+  .h-card:nth-child(2) { background: linear-gradient(135deg, #0a2020, #0a0a1a); }
+  .h-card:nth-child(3) { background: linear-gradient(135deg, #200a1a, #0a0a1a); }
+  .h-card:nth-child(4) { background: linear-gradient(135deg, #0a1030, #0a0a1a); }
+  .h-card:nth-child(5) { background: linear-gradient(135deg, #1a1a00, #0a0a1a); }
+  .h-card:nth-child(6) { background: linear-gradient(135deg, #001a1a, #0a0a1a); }
+
+  .h-card .card-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 3px;
+    margin-bottom: 0.8rem;
+  }
+
+  .h-card h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+  }
+
+  .h-card p {
+    color: var(--dim);
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+
+  .h-card .card-visual {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-size: 5rem;
+    opacity: 0.15;
+    font-weight: 900;
+  }
+
+  /* ═══════════════════════════════════════════
+     STROKE TEXT + GRADIENT TEXT
+     ═══════════════════════════════════════════ */
+  .typography-section {
+    padding: 10rem 3rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .stroke-text {
+    font-size: clamp(4rem, 12vw, 12rem);
+    font-weight: 900;
+    letter-spacing: -5px;
+    -webkit-text-stroke: 2px var(--text);
+    color: transparent;
+    line-height: 1;
+    margin-bottom: 2rem;
+    transition: all 0.5s;
+  }
+
+  .stroke-text:hover {
+    color: var(--text);
+    text-shadow: 0 0 60px rgba(167, 139, 250, 0.5);
+  }
+
+  .gradient-text {
+    font-size: clamp(4rem, 12vw, 12rem);
+    font-weight: 900;
+    letter-spacing: -5px;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent), var(--accent3), var(--accent4), var(--accent2));
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientMove 4s ease infinite;
+  }
+
+  @keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ═══════════════════════════════════════════
+     IMAGE DISTORTION ON HOVER
+     ═══════════════════════════════════════════ */
+  .distortion-section {
+    padding: 10rem 3rem;
+    background: var(--bg2);
+  }
+
+  .distortion-section h2 {
+    text-align: center;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -2px;
+    margin-bottom: 5rem;
+  }
+
+  .distortion-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .distortion-item {
+    aspect-ratio: 3/4;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    cursor: none;
+  }
+
+  .distortion-item canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .distortion-item .label {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 2;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+
+  /* ═══════════════════════════════════════════
+     SCROLL SNAP SECTION
+     ═══════════════════════════════════════════ */
+  .snap-section {
+    height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .snap-section .bg-number {
+    position: absolute;
+    font-size: 40vw;
+    font-weight: 900;
+    opacity: 0.03;
+    z-index: 1;
+    line-height: 1;
+  }
+
+  .snap-content {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .snap-content h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+  }
+
+  .snap-content p {
+    color: var(--dim);
+    line-height: 1.8;
+    font-size: 1.05rem;
+  }
+
+  /* ═══════════════════════════════════════════
+     CTA — LIQUID / GRADIENT BACKGROUND
+     ═══════════════════════════════════════════ */
+  .cta {
+    padding: 12rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #1a0533 0%, #0a0a1a 50%, #0a1e2e 100%);
+  }
+
+  .cta-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta-content h2 {
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    margin-bottom: 2rem;
+  }
+
+  .cta-content p {
+    color: var(--dim);
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+  }
+
+  /* ═══════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════ */
+  footer {
+    padding: 4rem 3rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--dim);
+    font-size: 0.85rem;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .footer-links a {
+    color: var(--dim);
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover { color: var(--text); }
+
+  /* ═══════════════════════════════════════════
+     RESPONSIVE
+     ═══════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    body { cursor: auto; }
+    .cursor, .cursor-dot, .cursor-trail { display: none; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .glass-grid { grid-template-columns: 1fr; }
+    .portfolio-grid { grid-template-columns: 1fr; }
+    .distortion-grid { grid-template-columns: 1fr; }
+    .h-card { width: 300px; height: 400px; }
+    section, .about, .services, .scramble-section, .typography-section,
+    .distortion-section, .cta { padding: 6rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- GRAIN OVERLAY -->
+<div class="grain"></div>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursor-dot"></div>
+
+<!-- SCROLL PROGRESS -->
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<!-- NAV -->
+<nav>
+  <span class="logo">VOID.</span>
+  <ul class="nav-links">
+    <li><a href="#about" class="hoverable">Filosofía</a></li>
+    <li><a href="#services" class="hoverable">Servicios</a></li>
+    <li><a href="#work" class="hoverable">Trabajo</a></li>
+    <li><a href="#contact" class="hoverable">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-bg-layers">
+    <div class="parallax-layer layer-1" data-speed="0.3">
+      <span>DESIGN</span><span>CREATE</span><span>INNOVATE</span>
+      <span>BUILD</span><span>DREAM</span><span>DESIGN</span>
+      <span>CREATE</span><span>INNOVATE</span><span>BUILD</span>
+    </div>
+    <div class="parallax-layer layer-2" data-speed="0.1">
+      <span>VOID</span><span>STUDIO</span><span>VOID</span>
+      <span>STUDIO</span><span>VOID</span><span>STUDIO</span>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-label">Creative Digital Studio</div>
+    <h1 class="hero-title">
+      <span class="word"><span>Creamos</span></span>
+      <span class="word"><span>lo</span></span>
+      <span class="word"><span>imposible</span></span>
+    </h1>
+    <p class="hero-subtitle">Diseño digital, desarrollo web y experiencias interactivas que empujan los límites de lo convencional.</p>
+    <div class="hero-cta">
+      <a href="#contact" class="magnetic-btn hoverable" data-magnetic>
+        <span class="btn-fill"></span>
+        <span class="btn-text">Empezar proyecto</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="scroll-arrow">↓</div>
+</section>
+
+<!-- ═══ MARQUEE ═══ -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span class="marquee-item">Diseño Web <span class="dot" style="background:var(--accent)"></span></span>
+    <span class="marquee-item">Branding <span class="dot" style="background:var(--accent2)"></span></span>
+    <span class="marquee-item">Motion Design <span class="dot" style="background:var(--accent3)"></span></span>
+    <span class="marquee-item">Desarrollo <span class="dot" style="background:var(--accent4)"></span></span>
+    <span class="marquee-item">3D & WebGL <span class="dot" style="background:var(--accent)"></span></span>
+    <span class="marquee-item">Experiencias <span class="dot" style="background:var(--accent2)"></span></span>
+    <span class="marquee-item">Diseño Web <span class="dot" style="background:var(--accent)"></span></span>
+    <span class="marquee-item">Branding <span class="dot" style="background:var(--accent2)"></span></span>
+    <span class="marquee-item">Motion Design <span class="dot" style="background:var(--accent3)"></span></span>
+    <span class="marquee-item">Desarrollo <span class="dot" style="background:var(--accent4)"></span></span>
+    <span class="marquee-item">3D & WebGL <span class="dot" style="background:var(--accent)"></span></span>
+    <span class="marquee-item">Experiencias <span class="dot" style="background:var(--accent2)"></span></span>
+  </div>
+</div>
+
+<!-- ═══ ABOUT — TEXT REVEAL ON SCROLL ═══ -->
+<section class="about" id="about">
+  <div class="text-reveal-container" id="text-reveal">
+    Somos un estudio digital que fusiona diseño, tecnología y narrativa para crear experiencias web que no se olvidan. Cada proyecto es una oportunidad de romper las reglas y construir algo que el mundo no ha visto antes.
+  </div>
+</section>
+
+<!-- ═══ SERVICES — AURORA + GLASSMORPHISM ═══ -->
+<section class="services" id="services">
+  <div class="aurora-container">
+    <div class="aurora-blob"></div>
+    <div class="aurora-blob"></div>
+    <div class="aurora-blob"></div>
+  </div>
+
+  <div class="services-header reveal">
+    <span class="section-label" style="font-family:'JetBrains Mono'; font-size:0.75rem; color:var(--accent); letter-spacing:4px;">// SERVICIOS</span>
+    <h2>Lo que hacemos</h2>
+  </div>
+
+  <div class="glass-grid">
+    <div class="glass-card reveal" style="transition-delay: 0s;">
+      <div class="card-number">001</div>
+      <h3>Diseño de interfaces</h3>
+      <p>Interfaces intuitivas y visualmente impactantes que convierten visitantes en usuarios fieles.</p>
+    </div>
+    <div class="glass-card reveal" style="transition-delay: 0.15s;">
+      <div class="card-number">002</div>
+      <h3>Desarrollo front-end</h3>
+      <p>Código limpio, animaciones fluidas y rendimiento optimizado en cada dispositivo.</p>
+    </div>
+    <div class="glass-card reveal" style="transition-delay: 0.3s;">
+      <div class="card-number">003</div>
+      <h3>Experiencias WebGL</h3>
+      <p>Mundos 3D interactivos, shaders personalizados y visualizaciones de datos inmersivas.</p>
+    </div>
+    <div class="glass-card reveal" style="transition-delay: 0.45s;">
+      <div class="card-number">004</div>
+      <h3>Identidad de marca</h3>
+      <p>Sistemas visuales completos que comunican la esencia de tu marca en cada touchpoint.</p>
+    </div>
+    <div class="glass-card reveal" style="transition-delay: 0.6s;">
+      <div class="card-number">005</div>
+      <h3>Motion design</h3>
+      <p>Animaciones que guían, deleitan y dan vida a cada interacción del usuario.</p>
+    </div>
+    <div class="glass-card reveal" style="transition-delay: 0.75s;">
+      <div class="card-number">006</div>
+      <h3>Consultoría creativa</h3>
+      <p>Estrategia digital, dirección de arte y auditorías UX para llevar tu producto al siguiente nivel.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SCRAMBLE TEXT ═══ -->
+<section class="scramble-section">
+  <div class="reveal">
+    <span style="font-family:'JetBrains Mono'; font-size:0.75rem; color:var(--accent); letter-spacing:4px;">// MANTRA</span>
+  </div>
+  <div class="scramble-text" id="scramble-text">DESIGN IS CHAOS</div>
+  <p class="scramble-subtitle reveal">Pasa el ratón por encima para descifrar</p>
+</section>
+
+<!-- ═══ TYPOGRAPHY — STROKE + GRADIENT ═══ -->
+<section class="typography-section">
+  <div class="stroke-text reveal hoverable">BOLD</div>
+  <div class="gradient-text reveal">VIVID</div>
+</section>
+
+<!-- ═══ SPOTLIGHT PORTFOLIO ═══ -->
+<section class="portfolio spotlight-section" id="work">
+  <div class="spotlight-overlay" id="spotlight-overlay"></div>
+
+  <div class="portfolio-header">
+    <span style="font-family:'JetBrains Mono'; font-size:0.75rem; color:var(--accent); letter-spacing:4px;">// PORTFOLIO</span>
+    <h2>Proyectos destacados</h2>
+    <p style="color:var(--dim); margin-top:1rem;">Mueve el cursor para explorar</p>
+  </div>
+
+  <div class="spotlight-content">
+    <div class="portfolio-grid">
+      <div class="portfolio-item hoverable">
+        <div class="item-bg">AURORA</div>
+        <div class="item-info">
+          <h3>Proyecto Aurora</h3>
+          <p>Plataforma e-commerce inmersiva</p>
+        </div>
+      </div>
+      <div class="portfolio-item hoverable">
+        <div class="item-bg">NEON</div>
+        <div class="item-info">
+          <h3>Neon Collective</h3>
+          <p>Identidad de marca y web</p>
+        </div>
+      </div>
+      <div class="portfolio-item hoverable">
+        <div class="item-bg">PULSE</div>
+        <div class="item-info">
+          <h3>Pulse Analytics</h3>
+          <p>Dashboard de datos en tiempo real</p>
+        </div>
+      </div>
+      <div class="portfolio-item hoverable">
+        <div class="item-bg">ECHO</div>
+        <div class="item-info">
+          <h3>Echo Music</h3>
+          <p>Experiencia WebGL para artistas</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HORIZONTAL SCROLL ═══ -->
+<div class="horizontal-scroll-wrapper" id="horizontal-wrapper">
+  <div class="horizontal-scroll-sticky">
+    <div class="horizontal-track" id="horizontal-track">
+      <div class="h-card hoverable">
+        <div class="card-visual">01</div>
+        <span class="card-label">FASE 01</span>
+        <h3>Descubrimiento</h3>
+        <p>Entendemos tu visión, analizamos el mercado y definimos la estrategia del proyecto.</p>
+      </div>
+      <div class="h-card hoverable">
+        <div class="card-visual">02</div>
+        <span class="card-label">FASE 02</span>
+        <h3>Concepto</h3>
+        <p>Exploramos direcciones creativas, wireframes y prototipos de baja fidelidad.</p>
+      </div>
+      <div class="h-card hoverable">
+        <div class="card-visual">03</div>
+        <span class="card-label">FASE 03</span>
+        <h3>Diseño</h3>
+        <p>Creamos el sistema visual, las interfaces y cada micro-interacción con detalle.</p>
+      </div>
+      <div class="h-card hoverable">
+        <div class="card-visual">04</div>
+        <span class="card-label">FASE 04</span>
+        <h3>Desarrollo</h3>
+        <p>Código pixel-perfect con animaciones fluidas y rendimiento excepcional.</p>
+      </div>
+      <div class="h-card hoverable">
+        <div class="card-visual">05</div>
+        <span class="card-label">FASE 05</span>
+        <h3>Testing</h3>
+        <p>QA riguroso, optimización de rendimiento y pruebas en todos los dispositivos.</p>
+      </div>
+      <div class="h-card hoverable">
+        <div class="card-visual">06</div>
+        <span class="card-label">FASE 06</span>
+        <h3>Lanzamiento</h3>
+        <p>Despliegue, monitorización y soporte continuo para asegurar el éxito.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CTA ═══ -->
+<section class="cta" id="contact">
+  <div class="cta-bg"></div>
+  <div class="cta-content">
+    <div class="reveal">
+      <span style="font-family:'JetBrains Mono'; font-size:0.75rem; color:var(--accent); letter-spacing:4px;">// CONTACTO</span>
+    </div>
+    <h2 class="reveal" style="transition-delay:0.1s">¿Tienes una<br>idea?</h2>
+    <p class="reveal" style="transition-delay:0.2s">Transformemos tu visión en una experiencia digital que marque la diferencia.</p>
+    <div class="reveal" style="transition-delay:0.3s">
+      <a href="#" class="magnetic-btn hoverable" data-magnetic>
+        <span class="btn-fill"></span>
+        <span class="btn-text">Hablemos →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <span>© 2025 VOID Studio</span>
+  <ul class="footer-links">
+    <li><a href="#" class="hoverable">Twitter</a></li>
+    <li><a href="#" class="hoverable">Instagram</a></li>
+    <li><a href="#" class="hoverable">Dribbble</a></li>
+    <li><a href="#" class="hoverable">GitHub</a></li>
+  </ul>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT — ALL EFFECTS
+     ═══════════════════════════════════════════ -->
+<script>
+// ─────────────────────────────────────────────
+// CUSTOM CURSOR + TRAIL
+// ─────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const cursorDot = document.getElementById('cursor-dot');
+
+let mouseX = 0, mouseY = 0;
+let cursorX = 0, cursorY = 0;
+
+// Trail particles
+const trailCount = 12;
+const trails = [];
+for (let i = 0; i < trailCount; i++) {
+  const t = document.createElement('div');
+  t.className = 'cursor-trail';
+  document.body.appendChild(t);
+  trails.push({ el: t, x: 0, y: 0 });
+}
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  cursorDot.style.left = mouseX + 'px';
+  cursorDot.style.top = mouseY + 'px';
+});
+
+function animateCursor() {
+  cursorX += (mouseX - cursorX) * 0.15;
+  cursorY += (mouseY - cursorY) * 0.15;
+  cursor.style.left = cursorX + 'px';
+  cursor.style.top = cursorY + 'px';
+
+  // Trail
+  let prevX = mouseX, prevY = mouseY;
+  trails.forEach((t, i) => {
+    t.x += (prevX - t.x) * (0.3 - i * 0.02);
+    t.y += (prevY - t.y) * (0.3 - i * 0.02);
+    t.el.style.left = t.x + 'px';
+    t.el.style.top = t.y + 'px';
+    t.el.style.opacity = (1 - i / trailCount) * 0.3;
+    t.el.style.width = (8 - i * 0.5) + 'px';
+    t.el.style.height = (8 - i * 0.5) + 'px';
+    t.el.style.background = `hsl(${260 + i * 8}, 80%, 70%)`;
+    prevX = t.x;
+    prevY = t.y;
+  });
+
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// Hover effect on hoverables
+document.querySelectorAll('.hoverable').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+});
+
+
+// ─────────────────────────────────────────────
+// MAGNETIC BUTTONS
+// ─────────────────────────────────────────────
+document.querySelectorAll('[data-magnetic]').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = 'translate(0, 0)';
+  });
+});
+
+
+// ─────────────────────────────────────────────
+// SCROLL PROGRESS BAR
+// ─────────────────────────────────────────────
+const progressBar = document.getElementById('scroll-progress');
+
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = (scrollTop / docHeight) * 100;
+  progressBar.style.width = progress + '%';
+});
+
+
+// ─────────────────────────────────────────────
+// PARALLAX LAYERS
+// ─────────────────────────────────────────────
+const parallaxLayers = document.querySelectorAll('.parallax-layer');
+
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  parallaxLayers.forEach(layer => {
+    const speed = parseFloat(layer.dataset.speed);
+    layer.style.transform = `translateY(${scrollY * speed}px)`;
+  });
+});
+
+
+// ─────────────────────────────────────────────
+// SCROLL REVEAL ANIMATIONS
+// ─────────────────────────────────────────────
+const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15 });
+
+revealElements.forEach(el => revealObserver.observe(el));
+
+
+// ─────────────────────────────────────────────
+// TEXT REVEAL ON SCROLL (word by word)
+// ─────────────────────────────────────────────
+const textRevealContainer = document.getElementById('text-reveal');
+const textContent = textRevealContainer.textContent.trim();
+const words = textContent.split(/\s+/);
+
+textRevealContainer.innerHTML = words.map(w =>
+  `<span class="word-reveal">${w}</span>`
+).join(' ');
+
+const wordEls = textRevealContainer.querySelectorAll('.word-reveal');
+
+function updateTextReveal() {
+  const rect = textRevealContainer.getBoundingClientRect();
+  const windowH = window.innerHeight;
+
+  // Calculate progress (0 = section enters, 1 = section leaves)
+  const start = windowH * 0.8;
+  const end = windowH * 0.2;
+  const progress = Math.min(1, Math.max(0, (start - rect.top) / (start - end)));
+
+  const litCount = Math.floor(progress * wordEls.length);
+
+  wordEls.forEach((w, i) => {
+    if (i < litCount) {
+      w.classList.add('lit');
+    } else {
+      w.classList.remove('lit');
+    }
+  });
+}
+
+window.addEventListener('scroll', updateTextReveal);
+updateTextReveal();
+
+
+// ─────────────────────────────────────────────
+// SCRAMBLE TEXT
+// ─────────────────────────────────────────────
+const scrambleEl = document.getElementById('scramble-text');
+const originalText = scrambleEl.textContent;
+const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+let scrambleInterval = null;
+let isScrambling = false;
+
+function scramble(element, finalText, duration = 1500) {
+  if (isScrambling) return;
+  isScrambling = true;
+
+  let iteration = 0;
+  const totalIterations = 30;
+
+  clearInterval(scrambleInterval);
+  scrambleInterval = setInterval(() => {
+    element.textContent = finalText
+      .split('')
+      .map((char, index) => {
+        if (index < iteration) return finalText[index];
+        return chars[Math.floor(Math.random() * chars.length)];
+      })
+      .join('');
+
+    iteration += finalText.length / totalIterations;
+
+    if (iteration >= finalText.length) {
+      element.textContent = finalText;
+      clearInterval(scrambleInterval);
+      isScrambling = false;
+    }
+  }, duration / totalIterations);
+}
+
+const phrases = [
+  'DESIGN IS CHAOS',
+  'CODE IS POETRY',
+  'LESS IS MORE',
+  'BREAK THE RULES',
+  'THINK DIFFERENT',
+  'PUSH BOUNDARIES'
+];
+let currentPhrase = 0;
+
+scrambleEl.addEventListener('mouseenter', () => {
+  currentPhrase = (currentPhrase + 1) % phrases.length;
+  scramble(scrambleEl, phrases[currentPhrase]);
+});
+
+// Auto scramble every few seconds
+setInterval(() => {
+  if (!isScrambling) {
+    currentPhrase = (currentPhrase + 1) % phrases.length;
+    scramble(scrambleEl, phrases[currentPhrase]);
+  }
+}, 4000);
+
+
+// ─────────────────────────────────────────────
+// SPOTLIGHT / FLASHLIGHT EFFECT
+// ─────────────────────────────────────────────
+const spotlightSection = document.querySelector('.spotlight-section');
+const spotlightOverlay = document.getElementById('spotlight-overlay');
+
+spotlightSection.addEventListener('mousemove', e => {
+  const rect = spotlightSection.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width) * 100;
+  const y = ((e.clientY - rect.top) / rect.height) * 100;
+  spotlightOverlay.style.setProperty('--mx', x + '%');
+  spotlightOverlay.style.setProperty('--my', y + '%');
+});
+
+
+// ─────────────────────────────────────────────
+// HORIZONTAL SCROLL
+// ─────────────────────────────────────────────
+const hWrapper = document.getElementById('horizontal-wrapper');
+const hTrack = document.getElementById('horizontal-track');
+
+function updateHorizontalScroll() {
+  const rect = hWrapper.getBoundingClientRect();
+  const wrapperHeight = hWrapper.offsetHeight;
+  const windowH = window.innerHeight;
+  const scrollableDistance = wrapperHeight - windowH;
+
+  if (rect.top <= 0 && rect.bottom >= windowH) {
+    const progress = Math.abs(rect.top) / scrollableDistance;
+    const trackWidth = hTrack.scrollWidth - window.innerWidth;
+    hTrack.style.transform = `translateX(${-progress * trackWidth}px)`;
+  }
+}
+
+window.addEventListener('scroll', updateHorizontalScroll);
+
+
+// ─────────────────────────────────────────────
+// IMAGE DISTORTION WITH CANVAS
+// ─────────────────────────────────────────────
+function createDistortionCanvas(container, hue) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  container.appendChild(canvas);
+
+  let w, h;
+  let isHovering = false;
+  let hoverX = 0.5, hoverY = 0.5;
+
+  function resize() {
+    const rect = container.getBoundingClientRect();
+    w = canvas.width = rect.width;
+    h = canvas.height = rect.height;
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  container.addEventListener('mousemove', e => {
+    const rect = container.getBoundingClientRect();
+    hoverX = (e.clientX - rect.left) / rect.width;
+    hoverY = (e.clientY - rect.top) / rect.height;
+    isHovering = true;
+  });
+
+  container.addEventListener('mouseleave', () => {
+    isHovering = false;
+  });
+
+  let time = Math.random() * 100;
+
+  function draw() {
+    time += 0.02;
+    ctx.clearRect(0, 0, w, h);
+
+    const cols = 30;
+    const rows = 40;
+    const cellW = w / cols;
+    const cellH = h / rows;
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const nx = x / cols;
+        const ny = y / rows;
+
+        let offsetX = 0;
+        let offsetY = 0;
+
+        if (isHovering) {
+          const dx = nx - hoverX;
+          const dy = ny - hoverY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const force = Math.max(0, 0.3 - dist) * 30;
+          offsetX = dx * force;
+          offsetY = dy * force;
+        }
+
+        const wave = Math.sin(nx * 6 + time) * Math.cos(ny * 4 + time * 0.7);
+        const brightness = 30 + wave * 20 + (ny * 40);
+
+        const px = x * cellW + offsetX;
+        const py = y * cellH + offsetY;
+
+        ctx.fillStyle = `hsl(${hue + wave * 30}, 60%, ${brightness}%)`;
+        ctx.fillRect(px, py, cellW + 1, cellH + 1);
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+// Create distortion canvases
+document.addEventListener('DOMContentLoaded', () => {
+  const distortionHTML = `
+    <div class="distortion-grid">
+      <div class="distortion-item hoverable" id="dist-1">
+        <span class="label">Fluido</span>
+      </div>
+      <div class="distortion-item hoverable" id="dist-2">
+        <span class="label">Orgánico</span>
+      </div>
+      <div class="distortion-item hoverable" id="dist-3">
+        <span class="label">Dinámico</span>
+      </div>
+    </div>
+  `;
+
+  const distSection = document.querySelector('.distortion-section');
+  const existingGrid = distSection.querySelector('.distortion-grid');
+  if (!existingGrid) {
+    distSection.insertAdjacentHTML('beforeend', distortionHTML);
+  }
+
+  createDistortionCanvas(document.getElementById('dist-1'), 260);
+  createDistortionCanvas(document.getElementById('dist-2'), 160);
+  createDistortionCanvas(document.getElementById('dist-3'), 330);
+});
+
+</script>
+</body>
+</html>

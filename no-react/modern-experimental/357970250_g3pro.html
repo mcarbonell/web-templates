@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 
+    DESIGN EXPLANATION & SEED DECOMPOSITION (Seed: 357970250)
+    
+    1. STYLE: "Kinetic Archival" / Neo-Brutalist.
+       - No gradients, no blur, no shadows. Pure flat color and stroke.
+       - High contrast. 
+    
+    2. SEED DECOMPOSITION:
+       - 3: Palette size (Bg, Fg, Accent).
+       - 5: The degree of tilt applied to the main container (-3.5deg).
+       - 7: The border thickness relative unit (0.7rem spacing).
+       - 9: Font weight (900 for headers).
+       - 7: Transition speed (0.7s cubic-bezier).
+       - 0: "Zero" border-radius on main elements (sharp edges).
+       - 2: Number of columns in the grid layout on desktop.
+       - 5: Z-index layering depth.
+       - 0: The "Void" (negative space usage).
+
+    3. NOVELTY FEATURES:
+       - "Difference" blend mode custom cursor.
+       - CSS Grid that breaks the viewport edges.
+       - SVG Noise filter overlay (generated via data URI to keep single file) for texture without gradients.
+       - Typography that scales aggressively.
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S E E D : 357970250</title>
+    
+    <!-- External Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- RESET & VARS --- */
+        :root {
+            /* Light Mode (Default) */
+            --bg: #EAE8E3;      /* Unbleached Paper */
+            --fg: #111111;      /* Ink Black */
+            --accent: #FF3300;  /* International Orange */
+            --grid-line: #111111;
+            
+            /* Dimensions derived from seed */
+            --tilt: -3.5deg;
+            --border-w: 2px;
+            --pad: 1.5rem;
+            
+            --cursor-size: 30px;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0A0A0A;      /* Void */
+            --fg: #E0E0E0;      /* Concrete */
+            --accent: #CCFF00;  /* Acid Green */
+            --grid-line: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            cursor: none; /* Custom cursor handling */
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Space Grotesk', sans-serif;
+            transition: background-color 0.7s cubic-bezier(0.23, 1, 0.32, 1), color 0.7s;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- NOISE TEXTURE (No Gradient) --- */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.07;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        #cursor {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--cursor-size);
+            height: var(--cursor-size);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 10000;
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+            mix-blend-mode: difference;
+        }
+        
+        #cursor.hovered {
+            width: 80px;
+            height: 80px;
+            background-color: var(--accent);
+            border-color: transparent;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            line-height: 0.85;
+        }
+
+        .display-text {
+            font-size: clamp(4rem, 12vw, 15rem);
+            letter-spacing: -0.04em;
+            word-spacing: 100vw; /* Force break */
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            position: relative;
+        }
+
+        /* --- LAYOUT STRUCTURE --- */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            border-left: var(--border-w) solid var(--grid-line);
+            border-right: var(--border-w) solid var(--grid-line);
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--pad);
+            border-bottom: var(--border-w) solid var(--grid-line);
+            position: sticky;
+            top: 0;
+            background-color: var(--bg);
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        /* --- TOGGLE SWITCH --- */
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--fg);
+            color: var(--fg);
+            padding: 0.5rem 1rem;
+            font-family: 'Space Grotesk', monospace;
+            text-transform: uppercase;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 4rem var(--pad);
+            border-bottom: var(--border-w) solid var(--grid-line);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-inner {
+            /* The daring tilt */
+            /* transform: rotate(var(--tilt)); */
+            /* Actually, let's just tilt the text container to keep layout sane but look wild */
+        }
+
+        .outline-text {
+            color: transparent;
+            -webkit-text-stroke: 2px var(--fg);
+        }
+
+        .hero-sub {
+            margin-top: 2rem;
+            font-size: 1.2rem;
+            max-width: 400px;
+            font-weight: 300;
+            border-left: 5px solid var(--accent);
+            padding-left: 1rem;
+        }
+
+        /* --- MARQUEE --- */
+        .marquee-container {
+            border-bottom: var(--border-w) solid var(--grid-line);
+            padding: 1rem 0;
+            background: var(--fg);
+            color: var(--bg);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .marquee-content {
+            display: inline-block;
+            font-family: 'Syne', sans-serif;
+            font-size: 3rem;
+            animation: scroll 20s linear infinite;
+        }
+
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        /* --- CONTENT GRID --- */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 768px) {
+            .feature-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .feature-item {
+            padding: var(--pad);
+            border-bottom: var(--border-w) solid var(--grid-line);
+            border-right: var(--border-w) solid var(--grid-line);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: background 0.4s;
+            position: relative;
+        }
+
+        .feature-item:nth-child(even) {
+            border-right: none;
+        }
+
+        .feature-item:hover {
+            background-color: var(--fg);
+            color: var(--bg);
+        }
+        
+        .feature-item:hover .big-number {
+            color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .big-number {
+            font-size: 6rem;
+            font-family: 'Syne', sans-serif;
+            color: var(--grid-line);
+            opacity: 0.3;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .feature-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* --- INTERACTIVE BLOCK --- */
+        .interactive-area {
+            height: 60vh;
+            border-bottom: var(--border-w) solid var(--grid-line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shape {
+            width: 200px;
+            height: 200px;
+            background: var(--accent);
+            position: absolute;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 75%, 75% 75%, 75% 100%, 50% 75%, 0% 75%); /* Glitch shape */
+            transition: transform 0.1s;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 4rem var(--pad);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .footer-link {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-family: 'Syne', sans-serif;
+            text-transform: uppercase;
+            border-bottom: 2px solid transparent;
+            width: fit-content;
+        }
+        
+        .footer-link:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* --- MOBILE OPTIMIZATIONS --- */
+        @media (max-width: 768px) {
+            .display-text {
+                word-spacing: normal;
+                font-size: 3.5rem;
+            }
+            
+            .feature-item {
+                border-right: none;
+                min-height: auto;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Noise Texture Overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- Custom Cursor -->
+    <div id="cursor"></div>
+
+    <div class="layout-grid">
+        <header>
+            <div class="logo" data-hover>SEED .357</div>
+            <button class="theme-toggle" id="themeToggle" data-hover>Invert</button>
+        </header>
+
+        <main>
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-inner">
+                    <h1 class="display-text">
+                        RAW <span class="outline-text">DATA</span><br>
+                        PURE <span style="color: var(--accent)">FORM</span>
+                    </h1>
+                    <div class="hero-sub">
+                        <p>We decompose chaos into structure. A design study based on random seed generation. No gradients. No lies.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Marquee Section -->
+            <div class="marquee-container">
+                <div class="marquee-content">
+                    /// SYSTEM STATUS: NOMINAL /// ARCHITECTURE: BRUTAL /// SEED: 357970250 /// RENDER: HYPERTEXT /// SYSTEM STATUS: NOMINAL /// ARCHITECTURE: BRUTAL /// SEED: 357970250 /// RENDER: HYPERTEXT
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <section class="feature-grid">
+                <article class="feature-item" data-hover>
+                    <span class="big-number">01</span>
+                    <div>
+                        <h2 class="feature-title">Calculated<br>Asymmetry</h2>
+                        <p>Deviation from the norm creates friction. Friction creates attention.</p>
+                    </div>
+                </article>
+
+                <article class="feature-item" data-hover>
+                    <span class="big-number">02</span>
+                    <div>
+                        <h2 class="feature-title">Semantic<br>Structure</h2>
+                        <p>Built on the backbone of pure HTML5. Accessible, readable, eternal.</p>
+                    </div>
+                </article>
+
+                <article class="feature-item" data-hover>
+                    <span class="big-number">03</span>
+                    <div>
+                        <h2 class="feature-title">Contrast<br>Ratio</h2>
+                        <p>Light and void. We embrace extreme dichotomy to ensure clarity.</p>
+                    </div>
+                </article>
+
+                <article class="feature-item" data-hover>
+                    <span class="big-number">04</span>
+                    <div>
+                        <h2 class="feature-title">Visual<br>Tension</h2>
+                        <p>Using clip-paths and sharp angles to cut through the digital noise.</p>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Abstract Interactive Section -->
+            <section class="interactive-area" id="interactiveArea" data-hover>
+                <div class="shape" id="floatShape"></div>
+                <h2 style="z-index: 10; font-size: 3rem; text-align: center; mix-blend-mode: exclusion; color: #fff;">
+                    OBSERVE<br>THE VOID
+                </h2>
+            </section>
+        </main>
+
+        <footer>
+            <a href="#" class="footer-link" data-hover>Manifesto</a>
+            <a href="#" class="footer-link" data-hover>Services</a>
+            <a href="#" class="footer-link" data-hover>Contact</a>
+            
+            <div style="margin-top: 3rem; font-size: 0.8rem; opacity: 0.6;">
+                GENERATED_SEED_357970250.HTML<br>
+                © 2023 KINETIC ARCHIVAL SYSTEMS
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // --- THEME TOGGLE LOGIC ---
+        const toggleBtn = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            body.setAttribute('data-theme', 'dark');
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        // --- CUSTOM CURSOR LOGIC ---
+        const cursor = document.getElementById('cursor');
+        const hoverElements = document.querySelectorAll('[data-hover]');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Add hover states to cursor
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+
+        // --- INTERACTIVE SHAPE LOGIC ---
+        // Simple parallax effect based on mouse position within the container
+        const interactiveArea = document.getElementById('interactiveArea');
+        const shape = document.getElementById('floatShape');
+
+        interactiveArea.addEventListener('mousemove', (e) => {
+            const rect = interactiveArea.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Calculate center
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            // Offset logic
+            const moveX = (x - centerX) * 0.2; // dampen
+            const moveY = (y - centerY) * 0.2;
+
+            shape.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${moveX * 0.1}deg)`;
+        });
+
+        interactiveArea.addEventListener('mouseleave', () => {
+            shape.style.transform = `translate(0, 0) rotate(0)`;
+        });
+
+    </script>
+</body>
+</html>

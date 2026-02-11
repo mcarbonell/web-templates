@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    =============================================================================
+    CHECKOUT.HTML - Checkout Page
+    Seed: 297883763
+    =============================================================================
+    
+    SEED DECOMPOSITION:
+    ╔══════════╦═══════╦══════════════════════════════════════════════════════════╗
+    ║ Position ║ Digit ║ Design Domain                                            ║
+    ╠══════════╬═══════╬══════════════════════════════════════════════════════════╣
+    ║    1     ║   2   ║ Color: Deep Ocean (Teals, Navy, Coral accents)          ║
+    ║    2     ║   9   ║ Typography: Ultra Modern (Space Grotesk + Inter)        ║
+    ║    3     ║   7   ║ Layout: Dense spacing (0.5rem increments)               ║
+    ║    4     ║   8   ║ Animation: Maximal (step transitions, progress)         ║
+    ║    5     ║   8   ║ Corners: Super-rounded (24px-32px radius)               ║
+    ║    6     ║   3   ║ Structure: Multi-step checkout flow                     ║
+    ║    7     ║   7   ║ Density: Compact form with clear hierarchy              ║
+    ║    8     ║   6   ║ Interaction: 3D card input, animated validation         ║
+    ║    9     ║   3   ║ Geometry: Sharp progress indicators                     ║
+    ╚══════════╩═══════╩══════════════════════════════════════════════════════════╝
+    
+    PAGE PURPOSE: Secure multi-step checkout with order summary
+    =============================================================================
+  -->
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Complete your purchase securely. Fast and easy checkout process.">
+  <meta name="theme-color" content="#0f172a">
+  
+  <title>Checkout | Oceanic</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  
+  <style>
+    .checkout-header {
+      padding: 140px 0 40px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--bg-tertiary);
+    }
+    
+    .checkout-header__content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+    
+    .checkout-header__title {
+      font-size: var(--text-3xl);
+    }
+    
+    .checkout-header__secure {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+    
+    .checkout-header__secure svg {
+      color: var(--color-success);
+    }
+    
+    .progress-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+      flex-wrap: wrap;
+    }
+    
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    
+    .progress-step__number {
+      width: 32px;
+      height: 32px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    .progress-step--active .progress-step__number,
+    .progress-step--complete .progress-step__number {
+      background: var(--color-primary-500);
+      color: white;
+    }
+    
+    .progress-step__label {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+    
+    .progress-step--active .progress-step__label {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    
+    .progress-line {
+      width: 40px;
+      height: 2px;
+      background: var(--bg-tertiary);
+    }
+    
+    .checkout-section {
+      padding: var(--space-12) 0 var(--space-24);
+    }
+    
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: var(--space-12);
+      align-items: start;
+    }
+    
+    @media (max-width: 1024px) {
+      .checkout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .checkout-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
+    }
+    
+    .checkout-step {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-3xl);
+      padding: var(--space-8);
+    }
+    
+    .checkout-step__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--bg-tertiary);
+    }
+    
+    .checkout-step__number {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-ocean);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--color-primary-300);
+    }
+    
+    .checkout-step__title {
+      font-size: var(--text-xl);
+    }
+    
+    .checkout-step__edit {
+      margin-left: auto;
+      font-size: var(--text-sm);
+      color: var(--color-primary-400);
+      text-decoration: none;
+    }
+    
+    .checkout-step__edit:hover {
+      color: var(--color-primary-300);
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+    
+    @media (max-width: 640px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .form-group {
+      margin-bottom: var(--space-4);
+    }
+    
+    .form-label {
+      display: block;
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+    
+    .form-label--required::after {
+      content: '*';
+      color: var(--color-accent-500);
+      margin-left: var(--space-1);
+    }
+    
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+      border: 2px solid transparent;
+      border-radius: var(--radius-xl);
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+    
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--color-primary-500);
+      background: var(--bg-primary);
+    }
+    
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--space-3) center;
+      background-size: 1.2em;
+      padding-right: var(--space-10);
+    }
+    
+    /* Payment Cards */
+    .payment-methods {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+    
+    .payment-method {
+      flex: 1;
+      padding: var(--space-4);
+      background: var(--bg-tertiary);
+      border: 2px solid transparent;
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+    
+    .payment-method:hover {
+      background: var(--bg-elevated);
+    }
+    
+    .payment-method--active {
+      border-color: var(--color-primary-500);
+      background: var(--bg-primary);
+    }
+    
+    .payment-method__icon {
+      font-size: var(--text-2xl);
+      margin-bottom: var(--space-2);
+    }
+    
+    .payment-method__label {
+      font-size: var(--text-sm);
+      font-weight: 500;
+    }
+    
+    /* Card Input */
+    .card-input {
+      position: relative;
+    }
+    
+    .card-input__field {
+      padding-left: var(--space-12);
+    }
+    
+    .card-input__icon {
+      position: absolute;
+      left: var(--space-4);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+    
+    /* Order Summary */
+    .order-summary {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-3xl);
+      padding: var(--space-6);
+      position: sticky;
+      top: 100px;
+    }
+    
+    .order-summary__title {
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--bg-tertiary);
+    }
+    
+    .order-item {
+      display: flex;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--bg-tertiary);
+    }
+    
+    .order-item__image {
+      width: 80px;
+      height: 80px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-2xl);
+      flex-shrink: 0;
+    }
+    
+    .order-item__details {
+      flex: 1;
+    }
+    
+    .order-item__name {
+      font-weight: 500;
+      margin-bottom: var(--space-1);
+    }
+    
+    .order-item__variant {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-1);
+    }
+    
+    .order-item__quantity {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+    
+    .order-item__price {
+      font-family: var(--font-display);
+      font-weight: 600;
+      text-align: right;
+    }
+    
+    .order-summary__row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--space-3);
+      font-size: var(--text-sm);
+    }
+    
+    .order-summary__row--total {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      padding-top: var(--space-4);
+      border-top: 2px solid var(--bg-tertiary);
+      margin-top: var(--space-4);
+    }
+    
+    .order-summary__row--total .order-summary__value {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      color: var(--color-primary-400);
+    }
+    
+    .checkout-btn {
+      width: 100%;
+      margin-top: var(--space-6);
+    }
+    
+    .secure-notice {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      margin-top: var(--space-4);
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+    }
+    
+    .secure-notice svg {
+      color: var(--color-success);
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Checkout Header -->
+  <header class="checkout-header">
+    <div class="container">
+      <div class="checkout-header__content">
+        <a href="index.html" class="nav__logo" style="text-decoration: none;">
+          <svg class="nav__logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+            <path d="M10 16C10 16 12 10 16 10C20 10 22 16 22 16C22 16 20 22 16 22C12 22 10 16 10 16Z" stroke="currentColor" stroke-width="2"/>
+            <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          </svg>
+          Oceanic
+        </a>
+        <div class="checkout-header__secure">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Secure Checkout
+        </div>
+      </div>
+      
+      <div class="progress-bar" aria-label="Checkout progress">
+        <div class="progress-step progress-step--complete">
+          <span class="progress-step__number">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </span>
+          <span class="progress-step__label">Cart</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step progress-step--active">
+          <span class="progress-step__number">2</span>
+          <span class="progress-step__label">Information</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step">
+          <span class="progress-step__number">3</span>
+          <span class="progress-step__label">Payment</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step">
+          <span class="progress-step__number">4</span>
+          <span class="progress-step__label">Confirmation</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="checkout-section">
+    <div class="container">
+      <div class="checkout-grid">
+        <!-- Checkout Form -->
+        <div class="checkout-form">
+          <!-- Contact Information -->
+          <section class="checkout-step" aria-labelledby="contact-heading">
+            <div class="checkout-step__header">
+              <span class="checkout-step__number">1</span>
+              <h2 id="contact-heading" class="checkout-step__title">Contact Information</h2>
+            </div>
+            
+            <div class="form-group">
+              <label for="email" class="form-label form-label--required">Email</label>
+              <input type="email" id="email" class="form-input" placeholder="you@example.com" required>
+            </div>
+            
+            <label class="form-checkbox" style="display: flex; align-items: flex-start; gap: var(--space-3); cursor: pointer; font-size: var(--text-sm); color: var(--text-secondary);">
+              <input type="checkbox" style="margin-top: 2px;">
+              <span>Email me with news and offers</span>
+            </label>
+          </section>
+          
+          <!-- Shipping Address -->
+          <section class="checkout-step" aria-labelledby="shipping-heading">
+            <div class="checkout-step__header">
+              <span class="checkout-step__number">2</span>
+              <h2 id="shipping-heading" class="checkout-step__title">Shipping Address</h2>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName" class="form-label form-label--required">First Name</label>
+                <input type="text" id="firstName" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="lastName" class="form-label form-label--required">Last Name</label>
+                <input type="text" id="lastName" class="form-input" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="address" class="form-label form-label--required">Address</label>
+              <input type="text" id="address" class="form-input" placeholder="Street address" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="apartment" class="form-label">Apartment, suite, etc. (optional)</label>
+              <input type="text" id="apartment" class="form-input">
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city" class="form-label form-label--required">City</label>
+                <input type="text" id="city" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="postalCode" class="form-label form-label--required">Postal Code</label>
+                <input type="text" id="postalCode" class="form-input" required>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="country" class="form-label form-label--required">Country</label>
+                <select id="country" class="form-select" required>
+                  <option value="">Select country</option>
+                  <option value="US">United States</option>
+                  <option value="CA">Canada</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="AU">Australia</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="phone" class="form-label form-label--required">Phone</label>
+                <input type="tel" id="phone" class="form-input" required>
+              </div>
+            </div>
+          </section>
+          
+          <!-- Payment -->
+          <section class="checkout-step" aria-labelledby="payment-heading">
+            <div class="checkout-step__header">
+              <span class="checkout-step__number">3</span>
+              <h2 id="payment-heading" class="checkout-step__title">Payment</h2>
+            </div>
+            
+            <div class="payment-methods" role="radiogroup" aria-label="Payment method">
+              <div class="payment-method payment-method--active" role="radio" aria-checked="true" tabindex="0">
+                <div class="payment-method__icon">💳</div>
+                <div class="payment-method__label">Card</div>
+              </div>
+              <div class="payment-method" role="radio" aria-checked="false" tabindex="0">
+                <div class="payment-method__icon">🅿️</div>
+                <div class="payment-method__label">PayPal</div>
+              </div>
+              <div class="payment-method" role="radio" aria-checked="false" tabindex="0">
+                <div class="payment-method__icon">🍎</div>
+                <div class="payment-method__label">Apple Pay</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="cardNumber" class="form-label form-label--required">Card Number</label>
+              <div class="card-input">
+                <svg class="card-input__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                <input type="text" id="cardNumber" class="form-input card-input__field" placeholder="0000 0000 0000 0000" required>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="expiry" class="form-label form-label--required">Expiration Date</label>
+                <input type="text" id="expiry" class="form-input" placeholder="MM / YY" required>
+              </div>
+              <div class="form-group">
+                <label for="cvv" class="form-label form-label--required">Security Code</label>
+                <input type="text" id="cvv" class="form-input" placeholder="CVV" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="cardName" class="form-label form-label--required">Name on Card</label>
+              <input type="text" id="cardName" class="form-input" required>
+            </div>
+            
+            <label class="form-checkbox" style="display: flex; align-items: flex-start; gap: var(--space-3); cursor: pointer; font-size: var(--text-sm); color: var(--text-secondary); margin-top: var(--space-4);">
+              <input type="checkbox" style="margin-top: 2px;">
+              <span>Use shipping address as billing address</span>
+            </label>
+          </section>
+        </div>
+        
+        <!-- Order Summary -->
+        <aside class="order-summary" aria-labelledby="summary-heading">
+          <h2 id="summary-heading" class="order-summary__title">Order Summary</h2>
+          
+          <div class="order-item">
+            <div class="order-item__image">📦</div>
+            <div class="order-item__details">
+              <div class="order-item__name">Ocean Pro Bundle</div>
+              <div class="order-item__variant">Premium Package</div>
+              <div class="order-item__quantity">Qty: 1</div>
+            </div>
+            <div class="order-item__price">$299.00</div>
+          </div>
+          
+          <div class="order-item">
+            <div class="order-item__image">🎁</div>
+            <div class="order-item__details">
+              <div class="order-item__name">Coral Essentials</div>
+              <div class="order-item__variant">Standard</div>
+              <div class="order-item__quantity">Qty: 2</div>
+            </div>
+            <div class="order-item__price">$298.00</div>
+          </div>
+          
+          <div class="order-summary__row">
+            <span>Subtotal</span>
+            <span>$597.00</span>
+          </div>
+          <div class="order-summary__row">
+            <span>Shipping</span>
+            <span style="color: var(--color-success);">Free</span>
+          </div>
+          <div class="order-summary__row">
+            <span>Tax</span>
+            <span>$47.76</span>
+          </div>
+          
+          <div class="order-summary__row order-summary__row--total">
+            <span>Total</span>
+            <span class="order-summary__value">$644.76</span>
+          </div>
+          
+          <button type="submit" class="btn btn--primary btn--large checkout-btn">
+            Complete Order
+          </button>
+          
+          <div class="secure-notice">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Secure SSL Encryption
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/main.js" defer></script>
+  <script src="js/components.js" defer></script>
+</body>
+</html>

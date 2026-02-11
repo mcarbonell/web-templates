@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<!-- 
+  SEED: 006536902
+  PAGE VARIANT: blog-post.html
+  - Typography emphasis from digit-2 (0): Space Grotesk + DM Sans - Using large display headings and generous line-height for body text.
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimizing V8 isolates for serverless | NovaSaaS Blog</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .post-header {
+            padding-block: var(--space-16);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .post-content {
+            padding-block: var(--space-12);
+            font-size: var(--text-lg);
+            line-height: var(--line-height-relaxed);
+        }
+
+        .post-content h2 {
+            margin-block: var(--space-8) var(--space-4);
+        }
+
+        .post-content p {
+            margin-bottom: var(--space-6);
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            color: var(--text-muted);
+            font-size: var(--text-sm);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">NOVA<span>SAAS</span></a>
+            <nav class="nav">
+                <a href="blog.html" class="nav-link">← Back to Blog</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" style="padding-top: var(--header-height)">
+        <article>
+            <header class="post-header">
+                <div class="container container--narrow">
+                    <div class="reveal">
+                        <span class="badge mb-4">Engineering</span>
+                        <h1 class="hero-title" style="font-size: var(--text-5xl)">Optimizing V8 isolates for serverless
+                            cold starts</h1>
+                        <div class="post-meta mt-6">
+                            <div class="testimonial-avatar" style="width: 32px; height: 32px"></div>
+                            <span>Sarah Chen, CTO</span>
+                            <span class="middot">·</span>
+                            <span>Feb 15, 2026</span>
+                            <span class="middot">·</span>
+                            <span>8 min read</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="post-content">
+                <div class="container container--narrow">
+                    <div class="reveal">
+                        <p>Serverless computing promised us a future where developers could focus purely on logic,
+                            leaving infrastructure to the provider. However, the reality of "cold starts" has often
+                            marred this vision, introducing significant latency when functions are first invoked.</p>
+
+                        <h2>The V8 Isolation Model</h2>
+                        <p>At NovaSaaS, we leverage V8 isolates rather than traditional containers or virtual machines.
+                            This allows us to start a new execution environment in sub-millisecond time. In this post,
+                            we'll dive into how we manage snapshotting and pre-warming to eliminate cold starts
+                            entirely.</p>
+
+                        <div class="card bg-secondary p-8 my-8"
+                            style="font-family: var(--font-mono); font-size: var(--text-sm)">
+                            // Our proprietary isolation wrapper <br>
+                            const isolate = new Isolate({ memoryLimit: 128 }); <br>
+                            const context = isolate.createContext(); <br>
+                            await context.eval(preWarmedSnapshot);
+                        </div>
+
+                        <h2>Zero-Latency Scaling</h2>
+                        <p>By keeping a set of semi-initialized isolates ready in every global region, we can route
+                            traffic to a waiting environment without the overhead of booting a full process. This is the
+                            core magic behind NovaSaaS Core Compute.</p>
+
+                        <p>We've found that this approach reduces P99 latency by nearly 400% compared to
+                            industry-standard Lambda execution, especially for complex Node.js or Rust workloads.</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- Newsletter CTA -->
+        <section class="section bg-secondary">
+            <div class="container container--narrow text-center">
+                <h3 class="section-title">Enjoyed this post?</h3>
+                <p class="section-desc mb-6">Subscribe to our newsletter for more technical insights from the edge.</p>
+                <form class="flex gap-4 max-w-md mx-auto">
+                    <input type="email" class="input" placeholder="Your email">
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container text-center">
+            <p class="footer-desc">© 2026 NovaSaaS. SEED-006536902</p>
+        </div>
+    </footer>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

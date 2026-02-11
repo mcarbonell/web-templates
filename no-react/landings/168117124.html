@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Terra Cocina - Cocina artesanal con ingredientes locales. Restaurante de comida mediterránea contemporánea en el corazón de la ciudad.">
+    <title>Terra Cocina | Restaurante Mediterráneo Contemporáneo</title>
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Google Fonts: Inter (Modern Sans-serif) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================================================
+           DESIGN TOKENS & CSS CUSTOM PROPERTIES
+           ================================================ */
+        :root {
+            /* Earth Tone Color Palette */
+            --color-primary: #8B6F47;
+            --color-primary-light: #A0826D;
+            --color-primary-dark: #6B4E37;
+            --color-secondary: #2D4A3E;
+            --color-secondary-light: #3A5C4D;
+            --color-accent: #D4A574;
+            --color-accent-light: #E0B896;
+
+            /* Neutrals */
+            --color-bg-light: #FAF8F5;
+            --color-bg-cream: #F5F0E8;
+            --color-surface: #FFFFFF;
+            --color-text-light: #2C2C2C;
+            --color-text-muted: #5A5A5A;
+            --color-text-light-muted: #7A7A7A;
+            --color-border: #E0DCD5;
+
+            /* Spacing Scale */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2.5rem;
+            --space-xl: 4rem;
+            --space-2xl: 6rem;
+            --space-3xl: 8rem;
+
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 2rem;
+            --font-size-4xl: 2.5rem;
+            --font-size-5xl: 3.5rem;
+            --font-size-6xl: 4.5rem;
+            --font-size-hero: clamp(3rem, 8vw, 7rem);
+
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-full: 9999px;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-base: 300ms ease;
+            --transition-slow: 500ms ease;
+
+            /* Layout */
+            --max-width: 1200px;
+            --header-height: 80px;
+        }
+
+        /* Dark Theme Variables */
+        [data-theme="dark"] {
+            --color-bg-light: #1A1918;
+            --color-bg-cream: #242221;
+            --color-surface: #2D2C2B;
+            --color-text-light: #F5F5F5;
+            --color-text-muted: #B0B0B0;
+            --color-text-light-muted: #909090;
+            --color-border: #3A3938;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.4);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        /* ================================================
+           RESET & BASE STYLES
+           ================================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-bg-light);
+            color: var(--color-text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color var(--transition-base), color var(--transition-base);
+        }
+
+        /* Skip to content link - first focusable element */
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--color-primary);
+            color: white;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            z-index: 10000;
+            transition: top var(--transition-fast);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .skip-link:focus {
+            top: var(--space-sm);
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
+        /* Focus styles for all interactive elements */
+        :focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 3px;
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        /* ================================================
+           TYPOGRAPHY
+           ================================================ */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--color-text-light);
+        }
+
+        h1 { font-size: var(--font-size-hero); }
+        h2 { font-size: var(--font-size-4xl); }
+        h3 { font-size: var(--font-size-3xl); }
+        h4 { font-size: var(--font-size-2xl); }
+
+        @media (max-width: 768px) {
+            h2 { font-size: var(--font-size-3xl); }
+            h3 { font-size: var(--font-size-2xl); }
+        }
+
+        .lead {
+            font-size: var(--font-size-xl);
+            color: var(--color-text-muted);
+            max-width: 60ch;
+        }
+
+        @media (max-width: 768px) {
+            .lead { font-size: var(--font-size-lg); }
+        }
+
+        /* ================================================
+           LAYOUT UTILITIES
+           ================================================ */
+        .container {
+            width: 100%;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+
+        .section {
+            padding: var(--space-3xl) 0;
+        }
+
+        .grid {
+            display: grid;
+            gap: var(--space-lg);
+        }
+
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        @media (max-width: 1024px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+
+        .flex {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+        }
+
+        .flex-between {
+            justify-content: space-between;
+        }
+
+        .flex-center {
+            justify-content: center;
+        }
+
+        .flex-column {
+            flex-direction: column;
+        }
+
+        @media (max-width: 768px) {
+            .flex { flex-direction: column; text-align: center; }
+        }
+
+        /* ================================================
+           HEADER & NAVIGATION
+           ================================================ */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            transition: transform var(--transition-base), background-color var(--transition-base);
+        }
+
+        .site-header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: var(--font-size-xl);
+            font-weight: 800;
+            color: var(--color-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .nav-list {
+            display: flex;
+            gap: var(--space-lg);
+            list-style: none;
+            role: list;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--color-text-muted);
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-link:hover,
+        .nav-link:focus {
+            color: var(--color-primary);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--color-primary);
+            transition: width var(--transition-fast);
+        }
+
+        .nav-link:hover::after,
+        .nav-link:focus::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        /* Mobile menu toggle */
+        .mobile-menu-toggle {
+            display: none;
+            padding: var(--space-xs);
+            border-radius: var(--radius-md);
+            transition: background-color var(--transition-fast);
+        }
+
+        .mobile-menu-toggle:hover {
+            background: var(--color-bg-cream);
+        }
+
+        .mobile-menu-toggle:focus {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-list {
+                position: fixed;
+                top: var(--header-height);
+                left: 0;
+                right: 0;
+                background: var(--color-surface);
+                flex-direction: column;
+                padding: var(--space-lg);
+                gap: var(--space-md);
+                border-bottom: 1px solid var(--color-border);
+                transform: translateY(-100%);
+                opacity: 0;
+                pointer-events: none;
+                transition: transform var(--transition-base), opacity var(--transition-base);
+            }
+
+            .nav-list.active {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .mobile-menu-toggle[aria-expanded="true"] .icon-menu {
+                display: none;
+            }
+
+            .mobile-menu-toggle[aria-expanded="false"] .icon-close {
+                display: none;
+            }
+        }
+
+        /* ================================================
+           THEME TOGGLE
+           ================================================ */
+        .theme-toggle {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-cream);
+            transition: background-color var(--transition-fast), transform var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-toggle:focus {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
+        .theme-toggle svg {
+            width: 24px;
+            height: 24px;
+            position: absolute;
+            transition: opacity var(--transition-fast), transform var(--transition-fast);
+        }
+
+        .icon-sun {
+            opacity: 0;
+            transform: rotate(180deg) scale(0.5);
+        }
+
+        .icon-moon {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+
+        [data-theme="dark"] .icon-sun {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+
+        [data-theme="dark"] .icon-moon {
+            opacity: 0;
+            transform: rotate(-180deg) scale(0.5);
+        }
+
+        /* Screen reader only announcement */
+        .sr-announce {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* ================================================
+           HERO SECTION
+           ================================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: var(--header-height);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--color-bg-cream) 0%, var(--color-bg-light) 100%);
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            z-index: 2;
+            padding: var(--space-xl);
+        }
+
+        .hero h1 {
+            margin-bottom: var(--space-md);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out 0.2s forwards;
+        }
+
+        .hero .lead {
+            margin: 0 auto var(--space-lg);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out 0.4s forwards;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out 0.6s forwards;
+        }
+
+        /* Decorative background elements */
+        .hero-bg-decoration {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .decoration-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--color-accent);
+            top: -100px;
+            right: -100px;
+        }
+
+        .decoration-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--color-primary-light);
+            bottom: -50px;
+            left: -50px;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ================================================
+           BUTTONS
+           ================================================ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-xs);
+            padding: var(--space-sm) var(--space-lg);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background: var(--color-primary-dark);
+            border-color: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-text-light);
+            border-color: var(--color-border);
+        }
+
+        .btn-secondary:hover,
+        .btn-secondary:focus {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-lg {
+            padding: var(--space-md) var(--space-xl);
+            font-size: var(--font-size-lg);
+        }
+
+        /* ================================================
+           SERVICES SECTION
+           ================================================ */
+        .services {
+            background: var(--color-surface);
+            role: region;
+            aria-label: "Nuestros servicios y especialidades";
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto var(--space-xl);
+        }
+
+        .section-header h2 {
+            margin-bottom: var(--space-sm);
+        }
+
+        .services-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .service-card {
+            background: var(--color-bg-light);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            transition: transform var(--transition-base), box-shadow var(--transition-base);
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .service-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .service-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--color-bg-cream);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-md);
+            color: var(--color-primary);
+        }
+
+        .service-icon svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .service-card h3 {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--space-sm);
+        }
+
+        .service-card p {
+            color: var(--color-text-muted);
+            line-height: 1.7;
+        }
+
+        /* ================================================
+           ABOUT SECTION
+           ================================================ */
+        .about {
+            role: region;
+            aria-label: "Nuestra historia y filosofía";
+        }
+
+        .about-grid {
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .about-image {
+            position: relative;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-accent-light) 100%);
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .about-content h2 {
+            margin-bottom: var(--space-md);
+        }
+
+        .about-content p {
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-md);
+            font-size: var(--font-size-lg);
+        }
+
+        .about-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+        }
+
+        .about-feature {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-weight: 500;
+        }
+
+        .about-feature svg {
+            width: 20px;
+            height: 20px;
+            color: var(--color-primary);
+            flex-shrink: 0;
+        }
+
+        /* ================================================
+           TESTIMONIALS SECTION
+           ================================================ */
+        .testimonials {
+            background: var(--color-bg-cream);
+            role: region;
+            aria-label: "Opiniones de nuestros clientes";
+        }
+
+        .testimonials-grid {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .testimonial-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-md);
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        .testimonial-card.visible {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .testimonial-rating {
+            display: flex;
+            gap: 2px;
+            margin-bottom: var(--space-sm);
+            color: var(--color-accent);
+        }
+
+        .testimonial-text {
+            font-size: var(--font-size-lg);
+            line-height: 1.7;
+            margin-bottom: var(--space-md);
+            color: var(--color-text-light);
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-full);
+            background: var(--color-bg-cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--color-primary);
+            font-size: var(--font-size-lg);
+        }
+
+        .author-info h4 {
+            font-size: var(--font-size-base);
+            margin-bottom: 2px;
+        }
+
+        .author-info p {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-muted);
+        }
+
+        /* ================================================
+           CONTACT SECTION
+           ================================================ */
+        .contact {
+            role: region;
+            aria-label: "Contacto y reservas";
+        }
+
+        .contact-grid {
+            gap: var(--space-xl);
+        }
+
+        .contact-info {
+            background: var(--color-surface);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .contact-info h2 {
+            margin-bottom: var(--space-md);
+        }
+
+        .contact-info p {
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-lg);
+            font-size: var(--font-size-lg);
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+        }
+
+        .contact-item svg {
+            width: 24px;
+            height: 24px;
+            color: var(--color-primary);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .contact-item-content h4 {
+            font-size: var(--font-size-base);
+            margin-bottom: 4px;
+        }
+
+        .contact-item-content p,
+        .contact-item-content a {
+            color: var(--color-text-muted);
+            transition: color var(--transition-fast);
+        }
+
+        .contact-item-content a:hover {
+            color: var(--color-primary);
+        }
+
+        .contact-form-wrapper {
+            background: var(--color-surface);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .contact-form-wrapper h2 {
+            margin-bottom: var(--space-md);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: var(--space-xs);
+            color: var(--color-text-light);
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: var(--space-sm);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: var(--font-size-base);
+            background: var(--color-surface);
+            color: var(--color-text-light);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-submit {
+            width: 100%;
+            margin-top: var(--space-sm);
+        }
+
+        /* Form validation styles */
+        .form-input:invalid:not(:placeholder-shown),
+        .form-textarea:invalid:not(:placeholder-shown) {
+            border-color: #e74c3c;
+        }
+
+        .form-input:valid:not(:placeholder-shown),
+        .form-textarea:valid:not(:placeholder-shown) {
+            border-color: var(--color-primary);
+        }
+
+        /* ================================================
+           FOOTER
+           ================================================ */
+        .site-footer {
+            background: var(--color-secondary);
+            color: white;
+            padding: var(--space-xl) 0 var(--space-lg);
+            role: contentinfo;
+        }
+
+        .footer-grid {
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        @media (max-width: 1024px) {
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .footer-brand h3 {
+            color: white;
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--space-sm);
+        }
+
+        .footer-brand p {
+            color: rgba(255,255,255,0.8);
+            max-width: 300px;
+            line-height: 1.7;
+        }
+
+        .footer-column h4 {
+            color: white;
+            font-size: var(--font-size-base);
+            margin-bottom: var(--space-md);
+            font-weight: 600;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            transition: color var(--transition-fast);
+        }
+
+        .footer-links a:hover {
+            color: var(--color-accent);
+        }
+
+        .footer-bottom {
+            padding-top: var(--space-lg);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+
+        .footer-copyright {
+            color: rgba(255,255,255,0.6);
+            font-size: var(--font-size-sm);
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .footer-legal a {
+            color: rgba(255,255,255,0.6);
+            font-size: var(--font-size-sm);
+            transition: color var(--transition-fast);
+        }
+
+        .footer-legal a:hover {
+            color: white;
+        }
+
+        @media (max-width: 640px) {
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* ================================================
+           SCROLL REVEAL ANIMATIONS
+           ================================================ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered delays for grid items */
+        .services-grid .service-card:nth-child(1) { transition-delay: 0.1s; }
+        .services-grid .service-card:nth-child(2) { transition-delay: 0.2s; }
+        .services-grid .service-card:nth-child(3) { transition-delay: 0.3s; }
+        .services-grid .service-card:nth-child(4) { transition-delay: 0.4s; }
+        .services-grid .service-card:nth-child(5) { transition-delay: 0.5s; }
+        .services-grid .service-card:nth-child(6) { transition-delay: 0.6s; }
+
+        .testimonials-grid .testimonial-card:nth-child(1) { transition-delay: 0.1s; }
+        .testimonials-grid .testimonial-card:nth-child(2) { transition-delay: 0.2s; }
+        .testimonials-grid .testimonial-card:nth-child(3) { transition-delay: 0.3s; }
+
+        /* ================================================
+           RESPONSIVE ADJUSTMENTS
+           ================================================ */
+        @media (max-width: 768px) {
+            .section {
+                padding: var(--space-2xl) 0;
+            }
+
+            .hero-content {
+                padding: var(--space-md);
+            }
+
+            .container {
+                padding: 0 var(--space-sm);
+            }
+        }
+
+        /* ================================================
+           UTILITY CLASSES
+           ================================================ */
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        .mt-0 { margin-top: 0; }
+        .mb-0 { margin-bottom: 0; }
+        .mt-lg { margin-top: var(--space-lg); }
+        .mb-lg { margin-bottom: var(--space-lg); }
+    </style>
+</head>
+<body>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">Ir al contenido principal</a>
+
+    <!-- Screen reader live region for announcements -->
+    <div class="sr-announce" aria-live="polite" aria-atomic="true" id="sr-announce"></div>
+
+    <!-- ================================================
+         HEADER
+         ================================================ -->
+    <header class="site-header" role="banner">
+        <div class="container header-inner">
+            <a href="#" class="logo" aria-label="Terra Cocina - Inicio">
+                Terra Cocina
+            </a>
+
+            <nav aria-label="Menú principal">
+                <ul class="nav-list" role="list">
+                    <li role="listitem"><a href="#servicios" class="nav-link">Servicios</a></li>
+                    <li role="listitem"><a href="#nosotros" class="nav-link">Nosotros</a></li>
+                    <li role="listitem"><a href="#testimonios" class="nav-link">Testimonios</a></li>
+                    <li role="listitem"><a href="#contacto" class="nav-link">Contacto</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <button
+                    class="theme-toggle"
+                    aria-label="Cambiar tema"
+                    aria-pressed="false"
+                    data-theme-toggle
+                >
+                    <!-- Sun icon (shown in dark mode) -->
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="5"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                    </svg>
+                    <!-- Moon icon (shown in light mode) -->
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </button>
+
+                <button
+                    class="mobile-menu-toggle"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                    aria-controls="main-nav"
+                    data-menu-toggle
+                >
+                    <!-- Menu icon -->
+                    <svg class="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <!-- Close icon -->
+                    <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================================================
+         MAIN CONTENT
+         ================================================ -->
+    <main id="main-content" role="main">
+
+        <!-- ================================================
+             HERO SECTION
+             ================================================ -->
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-bg-decoration decoration-1"></div>
+            <div class="hero-bg-decoration decoration-2"></div>
+
+            <div class="hero-content">
+                <h1 id="hero-title">Sabor auténtico. Ingredientes locales.</h1>
+                <p class="lead">
+                    Descubre la esencia de la cocina mediterránea contemporánea en Terra Cocina.
+                    Donde la tradición se encuentra con la innovación en cada bocado.
+                </p>
+                <div class="hero-cta">
+                    <a href="#contacto" class="btn btn-primary btn-lg">
+                        Reservar Mesa
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="#nosotros" class="btn btn-secondary btn-lg">
+                        Nuestra Historia
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================
+             SERVICES SECTION
+             ================================================ -->
+        <section id="servicios" class="section services" role="region" aria-label="Nuestros servicios y especialidades">
+            <div class="container">
+                <div class="section-header reveal">
+                    <h2>Nuestras Especialidades</h2>
+                    <p class="lead">
+                        Ofrecemos una experiencia culinaria completa con servicios diseñados para cada momento especial.
+                    </p>
+                </div>
+
+                <div class="grid services-grid">
+                    <!-- Service 1 -->
+                    <article class="service-card reveal" role="article">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8h1a4 4 0 0 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/>
+                                <path d="M6 1v3M6 4v2M6 7v1M12 1v3M12 4v2M12 7v1M18 1v3M18 4v2M18 7v1"/>
+                            </svg>
+                        </div>
+                        <h3>Almuerzos Ejecutivos</h3>
+                        <p>Menús del día preparados con ingredientes frescos de temporada. Perfecto para reuniones de trabajo.</p>
+                    </article>
+
+                    <!-- Service 2 -->
+                    <article class="service-card reveal" role="article">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </div>
+                        <h3>Cenas Románticas</h3>
+                        <p>Ambiente íntimo y menús degustación elaborados por nuestros chefs. Una experiencia para los sentidos.</p>
+                    </article>
+
+                    <!-- Service 3 -->
+                    <article class="service-card reveal" role="article">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                        </div>
+                        <h3>Eventos Privados</h3>
+                        <p>Celebra tus momentos especiales con nosotros. Bodas, cumpleaños, reuniones familiares.</p>
+                    </article>
+
+                    <!-- Service 4 -->
+                    <article class="service-card reveal" role="article">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                        <h3>Cocina de Temporada</h3>
+                        <p>Menús que cambian con las estaciones, utilizando solo los mejores productos locales.</p>
+                    </article>
+
+                    <!-- Service 5 -->
+                    <article class="service-card reveal" role="article">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 6.5a6.5 6.5 0 1 1 13 0c0 6-6.5 11.5-6.5 11.5S8 12.5 8 6.5z"/>
+                                <path d="M10 10v.01M14 10v.01"/>
+                            </svg>
+                        </div>
+                        <h3>Experiencias Gastronómicas</h3>
+                        <p>Cenas con maridaje, talleres de cocina y catas guiadas por nuestros expertos.</p>
+                    </article>
+
+                    <!-- Service 6 -->
+                    <article class="service-card reveal" role="article">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="1" y="3" width="15" height="13"/>
+                                <polygon points="16 8 20 8 23 11 23 16 16 22 16 8"/>
+                                <circle cx="5.5" cy="18.5" r="2.5"/>
+                                <circle cx="18.5" cy="18.5" r="2.5"/>
+                            </svg>
+                        </div>
+                        <h3>Servicio de Catering</h3>
+                        <p>Llevamos la experiencia Terra Cocina a tu evento. Desde pequeñas reuniones hasta grandes celebraciones.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================
+             ABOUT SECTION
+             ================================================ -->
+        <section id="nosotros" class="section about" role="region" aria-label="Nuestra historia y filosofía">
+            <div class="container">
+                <div class="grid about-grid">
+                    <div class="about-image reveal">
+                        <!-- Placeholder image with gradient -->
+                        <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="width: 100%; height: 100%;">
+                            <defs>
+                                <linearGradient id="aboutGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:var(--color-primary-light);stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:var(--color-accent-light);stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <rect width="800" height="600" fill="url(#aboutGrad)"/>
+                            <circle cx="400" cy="300" r="150" fill="rgba(255,255,255,0.1)"/>
+                            <circle cx="400" cy="300" r="100" fill="rgba(255,255,255,0.15)"/>
+                            <text x="400" y="300" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="48" font-family="Inter">Terra Cocina</text>
+                        </svg>
+                    </div>
+
+                    <div class="about-content reveal">
+                        <h2>Nuestra Historia</h2>
+                        <p>
+                            Desde 2015, Terra Cocina ha sido un refugio para los amantes de la buena mesa.
+                            Nuestro viaje comenzó con una visión simple: crear un lugar donde la tradición
+                            culinaria mediterránea se encontrara con la innovación contemporánea.
+                        </p>
+                        <p>
+                            Cada plato que servimos cuenta una historia de pasión, dedicación y respeto
+                            por los ingredientes. Trabajamos directamente con productores locales para
+                            garantizar la máxima frescura y calidad en cada temporada.
+                        </p>
+
+                        <div class="about-features">
+                            <div class="about-feature">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                <span>Ingredientes 100% locales</span>
+                            </div>
+                            <div class="about-feature">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                <span>Chefs con estrella Michelin</span>
+                            </div>
+                            <div class="about-feature">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                <span>Ambiente acogedor</span>
+                            </div>
+                            <div class="about-feature">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                <span>Experiencia única</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================
+             TESTIMONIALS SECTION
+             ================================================ -->
+        <section id="testimonios" class="section testimonials" role="region" aria-label="Opiniones de nuestros clientes">
+            <div class="container">
+                <div class="section-header reveal">
+                    <h2>Lo Que Dicen Nuestros Clientes</h2>
+                    <p class="lead">
+                        Miles de experiencias inolvidables. Estas son algunas de las historias que nos inspiran.
+                    </p>
+                </div>
+
+                <div class="grid testimonials-grid">
+                    <!-- Testimonial 1 -->
+                    <article class="testimonial-card reveal" role="article">
+                        <div class="testimonial-rating" aria-label="5 estrellas de 5">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <p class="testimonial-text">
+                            "Una experiencia culinaria extraordinaria. Cada plato es una obra de arte y el servicio es impecable.
+                            Sin duda, el mejor restaurante de la ciudad. ¡Volveremos pronto!"
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar" aria-hidden="true">MC</div>
+                            <div class="author-info">
+                                <h4>María Castellanos</h4>
+                                <p>Cliente habitual</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Testimonial 2 -->
+                    <article class="testimonial-card reveal" role="article">
+                        <div class="testimonial-rating" aria-label="5 estrellas de 5">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <p class="testimonial-text">
+                            "Celebramos nuestro aniversario aquí y fue perfecto. El menú degustación nos transportó
+                            a través de sabores que nunca habíamos experimentado. El personal extremadamente atento."
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar" aria-hidden="true">JR</div>
+                            <div class="author-info">
+                                <h4>Javier Rodríguez</h4>
+                                <p>Reserva especial</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Testimonial 3 -->
+                    <article class="testimonial-card reveal" role="article">
+                        <div class="testimonial-rating" aria-label="5 estrellas de 5">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 21.23l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <p class="testimonial-text">
+                            "Como food blogger, he visitado restaurantes en todo el mundo. Terra Cocina se lleva
+                            una estrella más de las que puedo dar. La calidad, presentación y sabor son excepcionales."
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar" aria-hidden="true">LM</div>
+                            <div class="author-info">
+                                <h4>Laura Martínez</h4>
+                                <p>Influencer gastronómica</p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================
+             CONTACT SECTION
+             ================================================ -->
+        <section id="contacto" class="section contact" role="region" aria-label="Contacto y reservas">
+            <div class="container">
+                <div class="grid contact-grid">
+                    <!-- Contact Info -->
+                    <div class="contact-info reveal">
+                        <h2>Visítanos</h2>
+                        <p>
+                            Estamos listos para recibirte y ofrecerte una experiencia gastronómica inolvidable.
+                            Haz tu reserva o contáctanos para más información.
+                        </p>
+
+                        <div class="contact-details">
+                            <div class="contact-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                <div class="contact-item-content">
+                                    <h4>Dirección</h4>
+                                    <p>Calle del Sabor 123, 28001 Madrid</p>
+                                </div>
+                            </div>
+
+                            <div class="contact-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                </svg>
+                                <div class="contact-item-content">
+                                    <h4>Teléfono</h4>
+                                    <p><a href="tel:+34912345678">+34 912 345 678</a></p>
+                                </div>
+                            </div>
+
+                            <div class="contact-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                <div class="contact-item-content">
+                                    <h4>Horario</h4>
+                                    <p>Lun–Vie: 13:00–16:00, 20:00–23:00</p>
+                                    <p>Sáb–Dom: 13:00–00:00</p>
+                                </div>
+                            </div>
+
+                            <div class="contact-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                                <div class="contact-item-content">
+                                    <h4>Email</h4>
+                                    <p><a href="mailto:hola@terracocina.es">hola@terracocina.es</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="contact-form-wrapper reveal">
+                        <h2>Haz tu Reserva</h2>
+                        <form id="contact-form" class="contact-form" novalidate>
+                            <div class="form-group">
+                                <label for="name" class="form-label">Nombre completo *</label>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    class="form-input"
+                                    placeholder="Tu nombre"
+                                    required
+                                    minlength="2"
+                                    aria-required="true"
+                                    aria-describedby="name-error"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email *</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    class="form-input"
+                                    placeholder="tu@email.com"
+                                    required
+                                    aria-required="true"
+                                    aria-describedby="email-error"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Teléfono</label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    class="form-input"
+                                    placeholder="+34 612 345 678"
+                                    aria-describedby="phone-error"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="guests" class="form-label">Número de comensales *</label>
+                                <select
+                                    id="guests"
+                                    name="guests"
+                                    class="form-select"
+                                    required
+                                    aria-required="true"
+                                >
+                                    <option value="">Selecciona...</option>
+                                    <option value="1">1 persona</option>
+                                    <option value="2">2 personas</option>
+                                    <option value="3">3 personas</option>
+                                    <option value="4">4 personas</option>
+                                    <option value="5">5 personas</option>
+                                    <option value="6">6 personas</option>
+                                    <option value="7">7+ personas</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="date" class="form-label">Fecha *</label>
+                                <input
+                                    type="date"
+                                    id="date"
+                                    name="date"
+                                    class="form-input"
+                                    required
+                                    aria-required="true"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="time" class="form-label">Hora *</label>
+                                <select
+                                    id="time"
+                                    name="time"
+                                    class="form-select"
+                                    required
+                                    aria-required="true"
+                                >
+                                    <option value="">Selecciona...</option>
+                                    <option value="13:00">13:00</option>
+                                    <option value="13:30">13:30</option>
+                                    <option value="14:00">14:00</option>
+                                    <option value="14:30">14:30</option>
+                                    <option value="20:00">20:00</option>
+                                    <option value="20:30">20:30</option>
+                                    <option value="21:00">21:00</option>
+                                    <option value="21:30">21:30</option>
+                                    <option value="22:00">22:00</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message" class="form-label">Mensaje (opcional)</label>
+                                <textarea
+                                    id="message"
+                                    name="message"
+                                    class="form-textarea"
+                                    placeholder="Alérgias, preferencias, ocasión especial..."
+                                    maxlength="500"
+                                ></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg form-submit">
+                                Enviar Reserva
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================================================
+         FOOTER
+         ================================================ -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="grid footer-grid">
+                <!-- Brand -->
+                <div class="footer-brand">
+                    <h3>Terra Cocina</h3>
+                    <p>
+                        Restaurante de cocina mediterránea contemporánea comprometido con la calidad,
+                        la sostenibilidad y la experiencia del cliente. Desde 2015 creando momentos inolvidables.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-column">
+                    <h4>Navegación</h4>
+                    <ul class="footer-links" role="list">
+                        <li role="listitem"><a href="#hero">Inicio</a></li>
+                        <li role="listitem"><a href="#servicios">Servicios</a></li>
+                        <li role="listitem"><a href="#nosotros">Nosotros</a></li>
+                        <li role="listitem"><a href="#testimonios">Testimonios</a></li>
+                        <li role="listitem"><a href="#contacto">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services -->
+                <div class="footer-column">
+                    <h4>Servicios</h4>
+                    <ul class="footer-links" role="list">
+                        <li role="listitem"><a href="#servicios">Almuerzos Ejecutivos</a></li>
+                        <li role="listitem"><a href="#servicios">Cenas Románticas</a></li>
+                        <li role="listitem"><a href="#servicios">Eventos Privados</a></li>
+                        <li role="listitem"><a href="#servicios">Catering</a></li>
+                        <li role="listitem"><a href="#servicios">Experiencias</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div class="footer-column">
+                    <h4>Contacto</h4>
+                    <ul class="footer-links" role="list">
+                        <li role="listitem"><a href="tel:+34912345678">+34 912 345 678</a></li>
+                        <li role="listitem"><a href="mailto:hola@terracocina.es">hola@terracocina.es</a></li>
+                        <li role="listitem">Calle del Sabor 123, Madrid</li>
+                        <li role="listitem">
+                            <a href="#" aria-label="Síguenos en Instagram">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                                </svg>
+                                Instagram
+                            </a>
+                        </li>
+                        <li role="listitem">
+                            <a href="#" aria-label="Síguenos en Facebook">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                                </svg>
+                                Facebook
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="footer-copyright">
+                    &copy; 2024 Terra Cocina. Todos los derechos reservados.
+                </p>
+                <div class="footer-legal">
+                    <a href="#">Política de Privacidad</a>
+                    <a href="#">Términos de Servicio</a>
+                    <a href="#">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================================================
+         SCRIPTS
+         ================================================ -->
+    <script>
+        // ================================================
+        // THEME TOGGLE
+        // ================================================
+        const themeToggle = document.querySelector('[data-theme-toggle]');
+        const srAnnounce = document.getElementById('sr-announce');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+        // Check for saved theme or system preference
+        const getCurrentTheme = () => {
+            const saved = localStorage.getItem('theme');
+            if (saved) return saved;
+            return prefersDark.matches ? 'dark' : 'light';
+        };
+
+        // Apply theme
+        const applyTheme = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeToggle.setAttribute('aria-pressed', theme === 'dark');
+            localStorage.setItem('theme', theme);
+
+            // Announce to screen readers
+            const message = theme === 'dark' ? 'Modo oscuro activado' : 'Modo claro activado';
+            srAnnounce.textContent = message;
+        };
+
+        // Initialize theme
+        applyTheme(getCurrentTheme());
+
+        // Toggle handler
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+        });
+
+        // Listen for system theme changes
+        prefersDark.addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                applyTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+        // ================================================
+        // MOBILE MENU
+        // ================================================
+        const menuToggle = document.querySelector('[data-menu-toggle]');
+        const navList = document.querySelector('.nav-list');
+
+        menuToggle.addEventListener('click', () => {
+            const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+            menuToggle.setAttribute('aria-expanded', !expanded);
+            navList.classList.toggle('active');
+        });
+
+        // Close menu on link click
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.setAttribute('aria-expanded', 'false');
+                navList.classList.remove('active');
+            });
+        });
+
+        // ================================================
+        // SCROLL REVEAL ANIMATIONS
+        // ================================================
+        const revealElements = document.querySelectorAll('.reveal, .service-card, .testimonial-card');
+
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const triggerPoint = 100;
+
+            revealElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+
+                if (elementTop < windowHeight - triggerPoint) {
+                    element.classList.add('visible');
+                }
+            });
+        };
+
+        // Initial check
+        revealOnScroll();
+
+        // Throttled scroll listener
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    revealOnScroll();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // ================================================
+        // HEADER HIDE/SHOW ON SCROLL
+        // ================================================
+        let lastScrollY = window.scrollY;
+        const header = document.querySelector('.site-header');
+
+        const handleHeaderScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            if (currentScrollY > 100) {
+                if (currentScrollY > lastScrollY) {
+                    header.classList.add('hidden');
+                } else {
+                    header.classList.remove('hidden');
+                }
+            } else {
+                header.classList.remove('hidden');
+            }
+
+            lastScrollY = currentScrollY;
+        };
+
+        window.addEventListener('scroll', () => {
+            window.requestAnimationFrame(handleHeaderScroll);
+        });
+
+        // ================================================
+        // FORM VALIDATION & SUBMISSION
+        // ================================================
+        const contactForm = document.getElementById('contact-form');
+
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Basic validation
+            const name = document.getElementById('name');
+            const email = document.getElementById('email');
+            const guests = document.getElementById('guests');
+            const date = document.getElementById('date');
+            const time = document.getElementById('time');
+
+            let isValid = true;
+
+            // Clear previous errors
+            document.querySelectorAll('.form-error').forEach(el => el.remove());
+
+            // Name validation
+            if (!name.value.trim() || name.value.trim().length < 2) {
+                isValid = false;
+                const error = document.createElement('span');
+                error.className = 'form-error';
+                error.textContent = 'Por favor, introduce tu nombre';
+                error.style.cssText = 'color: #e74c3c; font-size: 0.875rem; margin-top: 0.25rem; display: block;';
+                name.parentNode.appendChild(error);
+                name.setAttribute('aria-invalid', 'true');
+            } else {
+                name.setAttribute('aria-invalid', 'false');
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email.value.trim() || !emailRegex.test(email.value)) {
+                isValid = false;
+                const error = document.createElement('span');
+                error.className = 'form-error';
+                error.textContent = 'Por favor, introduce un email válido';
+                error.style.cssText = 'color: #e74c3c; font-size: 0.875rem; margin-top: 0.25rem; display: block;';
+                email.parentNode.appendChild(error);
+                email.setAttribute('aria-invalid', 'true');
+            } else {
+                email.setAttribute('aria-invalid', 'false');
+            }
+
+            // Required selects
+            if (!guests.value) {
+                isValid = false;
+                const error = document.createElement('span');
+                error.className = 'form-error';
+                error.textContent = 'Selecciona el número de comensales';
+                error.style.cssText = 'color: #e74c3c; font-size: 0.875rem; margin-top: 0.25rem; display: block;';
+                guests.parentNode.appendChild(error);
+                guests.setAttribute('aria-invalid', 'true');
+            } else {
+                guests.setAttribute('aria-invalid', 'false');
+            }
+
+            if (!date.value) {
+                isValid = false;
+                const error = document.createElement('span');
+                error.className = 'form-error';
+                error.textContent = 'Selecciona una fecha';
+                error.style.cssText = 'color: #e74c3c; font-size: 0.875rem; margin-top: 0.25rem; display: block;';
+                date.parentNode.appendChild(error);
+                date.setAttribute('aria-invalid', 'true');
+            } else {
+                date.setAttribute('aria-invalid', 'false');
+            }
+
+            if (!time.value) {
+                isValid = false;
+                const error = document.createElement('span');
+                error.className = 'form-error';
+                error.textContent = 'Selecciona una hora';
+                error.style.cssText = 'color: #e74c3c; font-size: 0.875rem; margin-top: 0.25rem; display: block;';
+                time.parentNode.appendChild(error);
+                time.setAttribute('aria-invalid', 'true');
+            } else {
+                time.setAttribute('aria-invalid', 'false');
+            }
+
+            if (isValid) {
+                // Simulate form submission
+                const submitBtn = contactForm.querySelector('.form-submit');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = 'Enviando...';
+                submitBtn.disabled = true;
+
+                setTimeout(() => {
+                    // Show success message
+                    srAnnounce.textContent = 'Reserva enviada con éxito. Nos pondremos en contacto contigo pronto.';
+
+                    alert('¡Gracias por tu reserva! Nos pondremos en contacto contigo en menos de 24 horas para confirmarla.');
+
+                    contactForm.reset();
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }, 1500);
+            } else {
+                // Focus first invalid field
+                const firstError = contactForm.querySelector('[aria-invalid="true"]');
+                if (firstError) firstError.focus();
+            }
+        });
+
+        // Set minimum date to today
+        const dateInput = document.getElementById('date');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+
+        // ================================================
+        // SMOOTH SCROLL FOR ANCHOR LINKS
+        // ================================================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    const headerHeight = document.querySelector('.site-header').offsetHeight;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // ================================================
+        // INITIALIZATION COMPLETE
+        // ================================================
+        console.log('Terra Cocina - Landing page loaded successfully');
+    </script>
+</body>
+</html>

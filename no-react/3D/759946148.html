@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina | Template 759946148</title>
+    <!-- 
+    DESIGN CHOICES (Seed: 759946148)
+    1. Palette: Ethereal (Pastels, Glassmorphism, Soft Orbs) - Influenced by D1:7
+    2. Typography: Geometric Sans-Serif (Outfit) - Influenced by D2:5
+    3. 3D Scene: Liquid Simulation / Organic Mesh - Influenced by D3:9
+    4. Animation: Autonomous organic floating - Influenced by D4:9
+    5. Layout: Minimalist / Spacious - Influenced by D5:4
+    6. Shape: Soft Blobs - Influenced by D6:6
+    7. Texture: Grainy Noise overlay - Influenced by D7:1
+    8. Interaction: Subtle Hover 3D tilt on cards - Influenced by D8:4
+    9. Toggle: Dynamic SVG Icon Animation - Influenced by D9:8
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #1a1a1a;
+            --accent-color: #6366f1;
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --blob-1: #ffcfdf;
+            --blob-2: #bfe9ff;
+            --grain-opacity: 0.05;
+            --font-main: 'Outfit', sans-serif;
+            --transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --accent-color: #818cf8;
+            --glass-bg: rgba(15, 23, 42, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --blob-1: #312e81;
+            --blob-2: #1e3a8a;
+            --grain-opacity: 0.08;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color var(--transition), color var(--transition);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Grain Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: var(--grain-opacity);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: var(--accent-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 400;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.6;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+
+        .theme-toggle svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        [data-theme="dark"] .theme-toggle svg {
+            transform: rotate(180deg);
+        }
+
+        /* Sections */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 10%;
+            position: relative;
+        }
+
+        .hero {
+            align-items: flex-start;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 500px;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: 1px solid var(--text-color);
+            background: transparent;
+            color: var(--text-color);
+            font-family: var(--font-main);
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.4s;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background-color: var(--text-color);
+            transition: width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+
+        .btn:hover {
+            color: var(--bg-color);
+        }
+
+        .btn:hover::before {
+            width: 100%;
+        }
+
+        /* Feature Cards */
+        .features {
+            padding: 5rem 10%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 3rem;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            transition: transform 0.3s ease-out;
+            perspective: 1000px;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            opacity: 0.7;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1.5rem 5%;
+            }
+
+            .nav-links {
+                display: none;
+                /* Simplification for mobile demo */
+            }
+
+            section {
+                padding: 0 5%;
+                text-align: center;
+                align-items: center;
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+        }
+
+        footer {
+            padding: 3rem 5%;
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            border-top: 1px solid var(--glass-border);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">LUMINA.</div>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#work">Work</a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle brightness">
+                <svg id="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <div id="canvas-container"></div>
+
+    <main>
+        <section class="hero">
+            <h1>Sculpting Light <br>in Digital Flow</h1>
+            <p>Experience the next generation of ethereal interfaces. Built for the modern web with 3D fluidity and
+                responsive precision.</p>
+            <button class="btn">DISCOVER MORE</button>
+        </section>
+
+        <section class="features" id="work">
+            <div class="card" data-tilt>
+                <h3>Organic Flow</h3>
+                <p>Real-time mesh distortion algorithm creating a unique background for every session.</p>
+            </div>
+            <div class="card" data-tilt>
+                <h3>Ethereal Glass</h3>
+                <p>Advanced glassmorphism combined with high-performance CSS blur filters.</p>
+            </div>
+            <div class="card" data-tilt>
+                <h3>Adaptive Light</h3>
+                <p>Seamless transition between light and dark aesthetics with a single tap.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        &copy; 2026 Lumina Design Agency | Seed: 759946148
+    </footer>
+
+    <script>
+        // --- 3D SCENE (Three.js) ---
+        let scene, camera, renderer, mesh;
+        const container = document.getElementById('canvas-container');
+
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 2;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Plane with multiple segments for liquid ripple effect
+            const geometry = new THREE.PlaneGeometry(8, 5, 128, 128);
+
+            // Custom shader material for ethereal liquid look
+            const material = new THREE.MeshNormalMaterial({
+                wireframe: false,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            // Or more ethereal:
+            const etherealMaterial = new THREE.MeshPhongMaterial({
+                color: 0x6366f1,
+                shininess: 100,
+                transparent: true,
+                opacity: 0.2,
+                wireframe: true
+            });
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xffffff, 1);
+            pointLight.position.set(2, 3, 4);
+            scene.add(pointLight);
+
+            mesh = new THREE.Mesh(geometry, etherealMaterial);
+            mesh.rotation.x = -0.5;
+            scene.add(mesh);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = Date.now() * 0.001;
+
+            // Liquid Ripple Logic (D3:9 & D4:9)
+            const pos = mesh.geometry.attributes.position;
+            for (let i = 0; i < pos.count; i++) {
+                const x = pos.getX(i);
+                const y = pos.getY(i);
+
+                const z = Math.sin(x * 1.5 + time) * 0.2 +
+                    Math.cos(y * 2.0 + time * 0.8) * 0.1;
+
+                pos.setZ(i, z);
+            }
+            pos.needsUpdate = true;
+
+            mesh.rotation.z = Math.sin(time * 0.2) * 0.05;
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- THEME TOGGLE (D9:8) ---
+        const themeBtn = document.getElementById('themeToggle');
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', targetTheme);
+
+            // GSAP Icon Animation
+            gsap.to('#sun', {
+                rotation: '+=180',
+                duration: 0.8,
+                ease: 'back.out(1.7)'
+            });
+
+            // Sync 3D Colors if needed
+            if (targetTheme === 'dark') {
+                mesh.material.color.setHex(0x818cf8);
+                mesh.material.opacity = 0.1;
+            } else {
+                mesh.material.color.setHex(0x6366f1);
+                mesh.material.opacity = 0.2;
+            }
+        });
+
+        // --- HOVER 3D TILT (D8:4) ---
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+
+                gsap.to(card, {
+                    rotateX: rotateX,
+                    rotateY: rotateY,
+                    duration: 0.5,
+                    ease: 'power2.out'
+                });
+            });
+
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    rotateX: 0,
+                    rotateY: 0,
+                    duration: 0.8,
+                    ease: 'elastic.out(1, 0.3)'
+                });
+            });
+        });
+
+        // --- REVEAL ANIMATIONS (GSAP) ---
+        gsap.from('.hero h1', {
+            y: 100,
+            opacity: 0,
+            duration: 1.5,
+            ease: 'expo.out',
+            delay: 0.5
+        });
+
+        gsap.from('.hero p', {
+            y: 50,
+            opacity: 0,
+            duration: 1.5,
+            ease: 'expo.out',
+            delay: 0.8
+        });
+
+        gsap.from('.btn', {
+            scale: 0.8,
+            opacity: 0,
+            duration: 1,
+            ease: 'back.out(2)',
+            delay: 1.2
+        });
+
+        init3D();
+    </script>
+</body>
+
+</html>

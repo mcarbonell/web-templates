@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime Lounge | Barber & Grooming</title>
+    <meta name="description" content="Prime Lounge – Premium barber experience. Classic cuts, modern style. Your neighbourhood barbershop.">
+
+    <!--
+    DESIGN CHOICES (Seed: 28069454)
+    - Business: Barber (Beauty & Personal – subcategory index 1). Chosen via seed % 11 for category, (seed>>3)%3 for sub.
+    - Brand: "Prime Lounge" – random word combo from lists (Prime + Lounge). Domain hint: primelounge.barber / .io
+    - Hero: Bento grid layout – dice 2 % 5 = 2. Grid of cells: headline block, visual block, CTA block for a distinctive look.
+    - Special feature: 3D tilt on cards (86 % 6 = 2). Mouse/touch tilt on service and pricing cards for depth.
+    - Animation: Elastic easing (93 % 5 = 3). cubic-bezier(0.68, -0.55, 0.265, 1.55) for entrances and hovers.
+    - Palette: Warm amber/gold accent (HSL from dice 40,27,60 → hue ~96, sat 70%, L 45%) #c9a227 light mode;
+      dark mode bg #0f0e0c, surface #1c1914, accent #d4af37. Contrast verified for WCAG AA.
+    - Typography: Geometric sans – Syne (headings) + DM Sans (body) for a bold, modern barber feel.
+    - No inline styles; no Tailwind; no React. Single file, semantic classes, external libs only if needed (none for tilt).
+    -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #c9a227;
+            --primary-dark: #a6851f;
+            --accent: #d4af37;
+            --bg: #faf8f5;
+            --surface: #f0ebe3;
+            --text: #1a1a18;
+            --text-muted: #5c564c;
+            --outline: #1a1a18;
+            --border: rgba(26, 26, 24, 0.12);
+            --font-heading: 'Syne', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+            --radius: 12px;
+            --radius-lg: 20px;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f0e0c;
+            --surface: #1c1914;
+            --text: #f0ebe3;
+            --text-muted: #a39e94;
+            --outline: #f0ebe3;
+            --border: rgba(240, 235, 227, 0.12);
+            --primary: #d4af37;
+            --primary-dark: #c9a227;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            html { scroll-behavior: auto !important; }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.4s var(--ease-out), color 0.4s var(--ease-out);
+        }
+
+        /* Skip link – first focusable for a11y */
+        .skip-link {
+            position: absolute;
+            top: -48px;
+            left: 12px;
+            padding: 12px 20px;
+            background: var(--primary);
+            color: #0f0e0c;
+            font-weight: 700;
+            text-decoration: none;
+            z-index: 9999;
+            border-radius: var(--radius);
+            transition: top 0.25s var(--ease-out);
+        }
+        .skip-link:focus {
+            top: 12px;
+            outline: 2px solid var(--outline);
+            outline-offset: 2px;
+        }
+
+        /* Focus visible – 2px minimum */
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--outline);
+            outline-offset: 2px;
+        }
+
+        /* Header */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            z-index: 100;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            transition: background 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 1.35rem;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .logo span { color: var(--primary); }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            gap: 1.75rem;
+        }
+
+        .nav-list a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .nav-list a:hover { color: var(--primary); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.3s var(--ease-elastic), box-shadow 0.3s var(--ease-out);
+        }
+        .btn:focus-visible { outline: 2px solid var(--outline); outline-offset: 2px; }
+        .btn-primary {
+            background: var(--primary);
+            color: #0f0e0c;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201, 162, 39, 0.35); }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* Mobile menu */
+        .menu-toggle {
+            display: none;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            border-radius: var(--radius);
+        }
+        .menu-toggle svg { width: 24px; height: 24px; }
+
+        @media (max-width: 768px) {
+            .nav-list { display: none; }
+            .nav .btn { display: none; }
+            .menu-toggle { display: flex; }
+        }
+
+        /* Main */
+        main { padding-top: 72px; }
+
+        /* Hero – Bento grid */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 16px;
+            padding: 32px 5% 48px;
+            max-width: 1280px;
+            margin: 0 auto;
+            min-height: 85vh;
+            align-content: center;
+        }
+
+        .hero-cell {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: transform 0.5s var(--ease-elastic), box-shadow 0.4s var(--ease-out);
+        }
+
+        .hero-cell-a {
+            grid-column: 1;
+            grid-row: 1 / 3;
+        }
+        .hero-cell-b {
+            grid-column: 2;
+            grid-row: 1;
+        }
+        .hero-cell-c {
+            grid-column: 3;
+            grid-row: 1 / 3;
+        }
+        .hero-cell-d {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .hero-tag {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .hero-title {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        .hero-desc {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 320px;
+            margin-bottom: 24px;
+        }
+
+        .hero-cta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .hero-visual {
+            width: 100%;
+            height: 100%;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius);
+            color: #0f0e0c;
+        }
+
+        .hero-visual svg {
+            width: 120px;
+            height: 120px;
+            opacity: 0.9;
+        }
+
+        .hero-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .hero-stats span {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 2rem;
+            color: var(--primary);
+            line-height: 1;
+        }
+        .hero-stats small { color: var(--text-muted); font-size: 0.85rem; }
+
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .hero-cell-a { grid-column: 1 / 3; grid-row: 1; }
+            .hero-cell-b { grid-column: 1; grid-row: 2; }
+            .hero-cell-c { grid-column: 2; grid-row: 2; }
+            .hero-cell-d { grid-column: 1 / 3; grid-row: 3; }
+        }
+
+        @media (max-width: 600px) {
+            .hero {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                min-height: auto;
+            }
+            .hero-cell-a, .hero-cell-b, .hero-cell-c, .hero-cell-d {
+                grid-column: 1;
+                grid-row: auto;
+            }
+        }
+
+        /* Section common */
+        .section {
+            padding: 80px 5%;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 560px;
+            margin-bottom: 40px;
+        }
+
+        /* Services – 3D tilt cards */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            list-style: none;
+        }
+
+        .service-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            list-style: none;
+            transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        .service-card:hover {
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="dark"] .service-card:hover {
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-card .card-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+
+        .service-card h3 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* About */
+        .about-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        .about-visual {
+            aspect-ratio: 4/3;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .about-visual svg { width: 80px; height: 80px; color: var(--primary); }
+
+        .about-text p {
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .about-inner { grid-template-columns: 1fr; }
+        }
+
+        /* Gallery strip */
+        .gallery-strip {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 16px 0;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .gallery-strip::-webkit-scrollbar { height: 8px; }
+        .gallery-strip::-webkit-scrollbar-track { background: var(--surface); border-radius: 4px; }
+        .gallery-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .gallery-item {
+            flex: 0 0 280px;
+            height: 200px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gallery-item svg { width: 48px; height: 48px; color: var(--text-muted); }
+
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            list-style: none;
+        }
+
+        .pricing-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            list-style: none;
+            transition: transform 0.4s var(--ease-out);
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        .pricing-card h3 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .pricing-card .price {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .pricing-card ul {
+            list-style: none;
+        }
+        .pricing-card li {
+            padding: 6px 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        .pricing-card li::before { content: "✓ "; color: var(--primary); font-weight: 700; }
+
+        /* Testimonials */
+        .testimonials-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .testimonial-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            list-style: none;
+        }
+
+        .testimonial-card blockquote {
+            font-size: 1rem;
+            color: var(--text);
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .testimonial-card cite {
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Contact */
+        .contact-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        .contact-info {
+            list-style: none;
+        }
+        .contact-info li {
+            padding: 12px 0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .contact-info svg { flex-shrink: 0; width: 20px; height: 20px; color: var(--primary); }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .contact-form label {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            padding: 14px 16px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            color: var(--text);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .contact-wrap { grid-template-columns: 1fr; }
+        }
+
+        /* Footer */
+        .site-footer {
+            padding: 48px 5% 24px;
+            border-top: 1px solid var(--border);
+            margin-top: 48px;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 32px;
+        }
+
+        .footer-brand {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text);
+        }
+        .footer-brand span { color: var(--primary); }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            gap: 24px;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+        .footer-links a:hover { color: var(--primary); }
+
+        .footer-bottom {
+            max-width: 1280px;
+            margin: 32px auto 0;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.25s, color 0.25s;
+        }
+        .theme-toggle:hover { background: var(--border); }
+        .theme-toggle svg { width: 22px; height: 22px; }
+        .theme-toggle .icon-moon { display: none; }
+        [data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+        [data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Aria-live for theme change */
+        .theme-announcer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+        }
+    </style>
+</head>
+
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Theme change announcer for screen readers -->
+    <div id="theme-announcer" class="theme-announcer" aria-live="polite" aria-atomic="true"></div>
+
+    <header class="site-header" role="banner">
+        <a href="#" class="logo">Prime <span>Lounge</span></a>
+        <nav class="nav" role="navigation" aria-label="Main navigation">
+            <ul class="nav-list" role="list">
+                <li role="listitem"><a href="#services">Services</a></li>
+                <li role="listitem"><a href="#about">About</a></li>
+                <li role="listitem"><a href="#pricing">Pricing</a></li>
+                <li role="listitem"><a href="#contact">Contact</a></li>
+            </ul>
+            <button type="button" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode" id="theme-toggle">
+                <svg class="icon-sun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                <svg class="icon-moon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <a href="#contact" class="btn btn-primary">Book now</a>
+            <button type="button" class="menu-toggle" aria-label="Open menu" aria-expanded="false" id="menu-toggle">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            </button>
+        </nav>
+    </header>
+
+    <main id="main-content" role="main">
+        <!-- Hero: Bento grid (design dice: bento layout) -->
+        <section class="hero" role="region" aria-labelledby="hero-heading">
+            <div class="hero-cell hero-cell-a">
+                <span class="hero-tag">Barber & Grooming</span>
+                <h1 class="hero-title" id="hero-heading">Where style meets the chair.</h1>
+                <p class="hero-desc">Classic cuts and modern grooming in a relaxed space. Walk in or book ahead.</p>
+                <div class="hero-cta">
+                    <a href="#contact" class="btn btn-primary">Book appointment</a>
+                    <a href="#services" class="btn btn-ghost">Services</a>
+                </div>
+            </div>
+            <div class="hero-cell hero-cell-b">
+                <div class="hero-visual" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3v18M9 8h6M8 12h8M7 16h10"/>
+                        <circle cx="12" cy="6" r="2"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="hero-cell hero-cell-c">
+                <div class="hero-stats">
+                    <span>12+</span>
+                    <small>Years in the neighbourhood</small>
+                    <span>5k+</span>
+                    <small>Happy clients</small>
+                </div>
+            </div>
+            <div class="hero-cell hero-cell-d">
+                <div class="hero-visual" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19h16M4 15l4-8 4 4 4-4 4 8"/></svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services – cards with 3D tilt (special feature) -->
+        <section id="services" class="section" role="region" aria-labelledby="services-heading" aria-label="Our services">
+            <h2 class="section-title" id="services-heading">What we do</h2>
+            <p class="section-desc">From classic fades to hot-towel shaves. Quality tools and attention to detail.</p>
+            <ul class="services-grid" role="list">
+                <li class="service-card tilt-card" role="listitem">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M9 8h6M8 12h8"/><circle cx="12" cy="6" r="2"/></svg>
+                    <h3>Haircut & Style</h3>
+                    <p>Precision cuts and styling for every look. Fades, layers, and classic shapes.</p>
+                </li>
+                <li class="service-card tilt-card" role="listitem">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+                    <h3>Beard & Moustache</h3>
+                    <p>Trim, shape, and condition. We keep your beard sharp and healthy.</p>
+                </li>
+                <li class="service-card tilt-card" role="listitem">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h8M12 8v8"/><circle cx="12" cy="12" r="10"/></svg>
+                    <h3>Hot Towel Shave</h3>
+                    <p>Traditional straight-razor shave with hot towels and premium products.</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- About -->
+        <section id="about" class="section" role="region" aria-labelledby="about-heading" aria-label="About us">
+            <h2 class="section-title" id="about-heading">About Prime Lounge</h2>
+            <p class="section-desc">A neighbourhood barbershop with a focus on craft and comfort.</p>
+            <div class="about-inner">
+                <div class="about-visual" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="about-text">
+                    <p>We opened Prime Lounge to bring back the experience of a real barbershop: skilled hands, honest conversation, and a place to slow down. Our team has years of experience in cuts, fades, and classic grooming.</p>
+                    <p>Whether you're in for a quick trim or the full hot-towel treatment, we've got you. Walk-ins welcome; appointments recommended for weekends.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery strip -->
+        <section class="section" role="region" aria-labelledby="gallery-heading" aria-label="Gallery">
+            <h2 class="section-title" id="gallery-heading">The space</h2>
+            <p class="section-desc">Our shop – clean, relaxed, and built for good cuts.</p>
+            <div class="gallery-strip">
+                <div class="gallery-item" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+                <div class="gallery-item" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+                <div class="gallery-item" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+                <div class="gallery-item" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+            </div>
+        </section>
+
+        <!-- Pricing – tilt cards -->
+        <section id="pricing" class="section" role="region" aria-labelledby="pricing-heading" aria-label="Pricing">
+            <h2 class="section-title" id="pricing-heading">Rates</h2>
+            <p class="section-desc">Clear pricing. No surprises.</p>
+            <ul class="pricing-grid" role="list">
+                <li class="pricing-card tilt-card" role="listitem">
+                    <h3>Classic Cut</h3>
+                    <div class="price">$35</div>
+                    <ul role="list">
+                        <li role="listitem">Haircut & style</li>
+                        <li role="listitem">Neck cleanup</li>
+                        <li role="listitem">~30 min</li>
+                    </ul>
+                </li>
+                <li class="pricing-card tilt-card" role="listitem">
+                    <h3>Cut + Beard</h3>
+                    <div class="price">$50</div>
+                    <ul role="list">
+                        <li role="listitem">Haircut & beard trim</li>
+                        <li role="listitem">Shape & product</li>
+                        <li role="listitem">~45 min</li>
+                    </ul>
+                </li>
+                <li class="pricing-card tilt-card" role="listitem">
+                    <h3>Full Service</h3>
+                    <div class="price">$75</div>
+                    <ul role="list">
+                        <li role="listitem">Cut, beard, hot towel</li>
+                        <li role="listitem">Premium products</li>
+                        <li role="listitem">~60 min</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="section" role="region" aria-labelledby="testimonials-heading" aria-label="Testimonials">
+            <h2 class="section-title" id="testimonials-heading">What people say</h2>
+            <ul class="testimonials-list" role="list">
+                <li class="testimonial-card" role="listitem">
+                    <blockquote>Best fade I've had in years. The team knows what they're doing and the vibe is always chill.</blockquote>
+                    <cite>— Marcus T.</cite>
+                </li>
+                <li class="testimonial-card" role="listitem">
+                    <blockquote>Prime Lounge is my go-to. Consistent cuts, fair price, and they actually listen to what you want.</blockquote>
+                    <cite>— Jake L.</cite>
+                </li>
+                <li class="testimonial-card" role="listitem">
+                    <blockquote>Hot towel shave is a treat. Feels like a proper old-school barbershop with a modern touch.</blockquote>
+                    <cite>— David K.</cite>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="section" role="region" aria-labelledby="contact-heading" aria-label="Contact">
+            <h2 class="section-title" id="contact-heading">Book or drop in</h2>
+            <p class="section-desc">We're open Mon–Sat. Appointments recommended for weekends.</p>
+            <div class="contact-wrap">
+                <div>
+                    <ul class="contact-info" role="list">
+                        <li role="listitem">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            123 Barber Lane, Your City
+                        </li>
+                        <li role="listitem">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            (555) 123-4567
+                        </li>
+                        <li role="listitem">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="m22 6-10 7L2 6"/></svg>
+                            hello@primelounge.barber
+                        </li>
+                    </ul>
+                </div>
+                <form class="contact-form" action="#" method="post" aria-label="Contact form">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required autocomplete="name" placeholder="Your name">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Preferred date/time or question"></textarea>
+                    <button type="submit" class="btn btn-primary">Send message</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-inner">
+            <span class="footer-brand">Prime <span>Lounge</span></span>
+            <ul class="footer-links" role="list">
+                <li role="listitem"><a href="#services">Services</a></li>
+                <li role="listitem"><a href="#pricing">Pricing</a></li>
+                <li role="listitem"><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+        <p class="footer-bottom">© Prime Lounge. Local barber & grooming.</p>
+    </footer>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // Theme toggle + aria-live announcement
+            var themeKey = 'prime-lounge-theme';
+            var toggle = document.getElementById('theme-toggle');
+            var announcer = document.getElementById('theme-announcer');
+            var iconSun = document.querySelector('.icon-sun');
+            var iconMoon = document.querySelector('.icon-moon');
+
+            function getTheme() {
+                var stored = localStorage.getItem(themeKey);
+                if (stored) return stored;
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function setTheme(theme) {
+                var val = theme === 'dark' ? 'dark' : '';
+                document.documentElement.setAttribute('data-theme', val);
+                document.body.setAttribute('data-theme', val);
+                localStorage.setItem(themeKey, theme);
+                if (announcer) announcer.textContent = theme === 'dark' ? 'Dark mode on' : 'Light mode on';
+            }
+
+            if (toggle) {
+                setTheme(getTheme());
+                toggle.addEventListener('click', function () {
+                    var next = getTheme() === 'dark' ? 'light' : 'dark';
+                    setTheme(next);
+                });
+            }
+
+            // 3D tilt on .tilt-card (special feature – dice: tilt3d)
+            var cards = document.querySelectorAll('.tilt-card');
+            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            if (!reduceMotion && cards.length) {
+                cards.forEach(function (card) {
+                    card.addEventListener('mouseenter', function () { card.classList.add('tilt-active'); });
+                    card.addEventListener('mouseleave', function () {
+                        card.classList.remove('tilt-active');
+                        card.style.transform = '';
+                    });
+                    card.addEventListener('mousemove', function (e) {
+                        if (!card.classList.contains('tilt-active')) return;
+                        var rect = card.getBoundingClientRect();
+                        var x = (e.clientX - rect.left) / rect.width;
+                        var y = (e.clientY - rect.top) / rect.height;
+                        var tiltX = (y - 0.5) * 12;
+                        var tiltY = (x - 0.5) * -12;
+                        card.style.transform = 'perspective(800px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) scale3d(1.02,1.02,1.02)';
+                    });
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

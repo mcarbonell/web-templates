@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNSEEN // Experimental Design</title>
+    <!-- 
+    DESIGN SEED: 288841317
+    
+    DECOMPOSITION LOGIC:
+    - Primary Technique: WebGL Fluid Simulation (Seed % 5 = 2)
+    - Bonus Technique: Scramble Text (Seed % 5 = 2)
+    - Color Palette: Brutalist Deep Crimson & Bone White (Seed % 4 = 1)
+    - Layout Style: Asymmetric Overflow (Seed % 3 = 0)
+    
+    CONCEPTUAL APPROACH:
+    "Brutalist Fluidity". A juxtaposition of rigid, bold typography and harsh crimson tones 
+    with a highly organic, custom-shaded WebGL fluid background. The design breaks 
+    standard UI patterns by using asymmetric overlaps and magnetic interaction points.
+    
+    TECH STACK:
+    - Vanilla HTML5/CSS3
+    - WebGL (Three.js + Custom Shaders) for 60fps background
+    - Scroll-Driven Animations (CSS @keyframes + JS)
+    - Custom Scramble Engine (Vanilla JS)
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;700;900&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #F5F5F0;
+            --fg: #1A1A1A;
+            --accent: #930C10;
+            --accent-rgb: 147, 12, 16;
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --transition: 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0A0A0A;
+            --fg: #F5F5F0;
+            --accent: #FF3B3F;
+            --accent-rgb: 255, 59, 63;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            transition: background-color var(--transition), color var(--transition);
+            line-height: 1.2;
+        }
+
+        /* WebGL Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            background: none;
+            border: 2px solid var(--fg);
+            padding: 0.5rem 1rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--fg);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle:hover {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        /* Layout Sections */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding-top: 10rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 900;
+            line-height: 0.85;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .glitch-text {
+            color: var(--accent);
+            display: block;
+        }
+
+        .hero-desc {
+            font-size: 1.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            text-align: right;
+            font-weight: 300;
+        }
+
+        /* Bento / Asymmetric Grid */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+            margin-top: 5vh;
+        }
+
+        .card {
+            background: rgba(var(--accent-rgb), 0.05);
+            border: 1px solid rgba(var(--accent-rgb), 0.2);
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: transform 0.5s var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .card-1 {
+            grid-column: 1 / 7;
+            grid-row: 1 / 3;
+            height: 400px;
+        }
+
+        .card-2 {
+            grid-column: 7 / 13;
+            grid-row: 1 / 2;
+        }
+
+        .card-3 {
+            grid-column: 7 / 10;
+            grid-row: 2 / 3;
+        }
+
+        .card-4 {
+            grid-column: 10 / 13;
+            grid-row: 2 / 3;
+        }
+
+        .card h3 {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        /* Magnetic Button */
+        .magnetic-wrap {
+            display: inline-block;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .btn-magnetic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            transition: transform 0.1s linear;
+        }
+
+        /* Scroll Progress */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: var(--accent);
+            z-index: 1000;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .grid-container {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .card {
+                height: auto !important;
+            }
+
+            .hero-desc {
+                text-align: left;
+                margin-left: 0;
+            }
+        }
+
+        /* Scramble Animation Class */
+        .scramble {
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scroll-progress" id="progress-bar"></div>
+    <div id="canvas-container"></div>
+
+    <nav>
+        <div class="logo">UNSEEN // STUDIO</div>
+        <button class="theme-toggle" id="theme-btn">DARK_MODE</button>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1 id="hero-title">
+                <span class="scramble" data-value="FUTURE">FUTURE</span><br>
+                <span class="glitch-text scramble" data-value="ARCHIVE">ARCHIVE</span>
+            </h1>
+            <p class="hero-desc">
+                An experimental design laboratory exploring the boundary between organic fluidity and digital brutality.
+                Seed: 288841317.
+            </p>
+            <div class="magnetic-wrap">
+                <button class="btn-magnetic">EXPLORE</button>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="grid-container">
+                <div class="card card-1">
+                    <h3>01 / PHILOSOPHY</h3>
+                    <p>We reject the standard. We embrace the noise. Our systems are built to feel alive through
+                        high-frequency WebGL noise and kinetic responses.</p>
+                </div>
+                <div class="card card-2">
+                    <h3>02 / FLUIDITY</h3>
+                    <p>Integrated WebGL shaders simulate 2D fluid dynamics at peak 60fps performance.</p>
+                </div>
+                <div class="card card-3">
+                    <h3>03 / CORE</h3>
+                    <p>Brutalist Bones.</p>
+                </div>
+                <div class="card card-4">
+                    <h3>04 / TECH</h3>
+                    <p>Modern GPU Logic.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="footer" style="min-height: 50vh; text-align: center;">
+            <h2 class="scramble" data-value="CONTACT US" style="font-size: 5vw;">CONTACT US</h2>
+            <p style="font-family: var(--font-mono); margin-top: 2rem;">RE-BOOT // 2026</p>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // --- THEME ENGINE ---
+        const themeBtn = document.getElementById('theme-btn');
+        themeBtn.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', next);
+            themeBtn.innerText = next === 'light' ? 'DARK_MODE' : 'LIGHT_MODE';
+        });
+
+        // --- SCRAMBLE ENGINE ---
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                this.update = this.update.bind(this);
+            }
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise((resolve) => (this.resolve = resolve));
+                this.queue = [];
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end });
+                }
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+            update() {
+                let output = '';
+                let complete = 0;
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.randomChar();
+                            this.queue[i].char = char;
+                        }
+                        output += `<span style="opacity: 0.5">${char}</span>`;
+                    } else {
+                        output += from;
+                    }
+                }
+                this.el.innerHTML = output;
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+        }
+
+        const scrambleEls = document.querySelectorAll('.scramble');
+        scrambleEls.forEach(el => {
+            const fx = new TextScramble(el);
+            const original = el.getAttribute('data-value');
+
+            // Trigger on intersection
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    fx.setText(original);
+                }
+            }, { threshold: 0.5 });
+            observer.observe(el);
+        });
+
+        // --- MAGNETIC BUTTON ---
+        const magBtn = document.querySelector('.btn-magnetic');
+        const magWrap = document.querySelector('.magnetic-wrap');
+
+        magWrap.addEventListener('mousemove', (e) => {
+            const rect = magWrap.getBoundingClientRect();
+            const relX = e.clientX - rect.left;
+            const relY = e.clientY - rect.top;
+            const x = (relX - rect.width / 2) * 0.4;
+            const y = (relY - rect.height / 2) * 0.4;
+            magBtn.style.transform = `translate(${x}px, ${y}px)`;
+        });
+
+        magWrap.addEventListener('mouseleave', () => {
+            magBtn.style.transform = `translate(0px, 0px)`;
+        });
+
+        // --- SCROLL PROGRESS ---
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+        });
+
+        // --- WEBGL FLUID SHADER ---
+        let scene, camera, renderer, material, mesh;
+        let mouse = new THREE.Vector2(0.5, 0.5);
+
+        function initWebGL() {
+            scene = new THREE.Scene();
+            camera = new THREE.Camera();
+            camera.position.z = 1;
+
+            const geometry = new THREE.PlaneBufferGeometry(2, 2);
+
+            const uniforms = {
+                u_time: { value: 1.0 },
+                u_resolution: { value: new THREE.Vector2() },
+                u_mouse: { value: new THREE.Vector2() }
+            };
+
+            const vertexShader = `
+                void main() {
+                    gl_Position = vec4(position, 1.0);
+                }
+            `;
+
+            const fragmentShader = `
+                uniform float u_time;
+                uniform vec2 u_resolution;
+                uniform vec2 u_mouse;
+
+                #define PI 3.14159265359
+
+                vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+                float snoise(vec2 v) {
+                    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                    vec2 i  = floor(v + dot(v, C.yy) );
+                    vec2 x0 = v -   i + dot(i, C.xx);
+                    vec2 i1;
+                    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                    vec4 x12 = x0.xyxy + C.xxzz;
+                    x12.xy -= i1;
+                    i = mod289(i);
+                    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                    m = m*m ;
+                    m = m*m ;
+                    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                    vec3 h = abs(x) - 0.5;
+                    vec3 ox = floor(x + 0.5);
+                    vec3 a0 = x - ox;
+                    m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                    vec3 g;
+                    g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                    return 130.0 * dot(m, g);
+                }
+
+                void main() {
+                    vec2 st = gl_FragCoord.xy/u_resolution.xy;
+                    st.x *= u_resolution.x/u_resolution.y;
+
+                    vec3 color = vec3(0.0);
+                    vec2 pos = vec2(st*1.5);
+
+                    float n = snoise(pos + u_time * 0.1);
+                    
+                    // Ripple at mouse
+                    float dist = distance(st, u_mouse);
+                    float ripple = sin(dist * 20.0 - u_time * 2.0) * 0.5 + 0.5;
+                    ripple *= smoothstep(0.5, 0.0, dist);
+
+                    color = vec3(0.5 + 0.5 * sin(u_time + pos.x + n), 
+                                 0.5 + 0.5 * sin(u_time + pos.y + n),
+                                 0.5 + 0.5 * sin(u_time + n));
+                    
+                    // Tint towards Crimson #930C10
+                    vec3 crimson = vec3(0.57, 0.05, 0.06);
+                    color = mix(color, crimson, 0.6 + ripple);
+
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `;
+
+            material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader
+            });
+
+            mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            onWindowResize();
+            window.addEventListener('resize', onWindowResize, false);
+
+            document.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX / window.innerWidth;
+                mouse.y = 1.0 - (e.clientY / window.innerHeight);
+            });
+
+            animate();
+        }
+
+        function onWindowResize() {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            material.uniforms.u_resolution.value.x = renderer.domElement.width;
+            material.uniforms.u_resolution.value.y = renderer.domElement.height;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            material.uniforms.u_time.value += 0.01;
+            material.uniforms.u_mouse.value.lerp(mouse, 0.1);
+            renderer.render(scene, camera);
+        }
+
+        initWebGL();
+
+    </script>
+</body>
+
+</html>

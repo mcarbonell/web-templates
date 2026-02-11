@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mario Raúl Carbonell | Full Stack & AI Specialist</title>
+    <!-- 
+        ID: 584075463
+        DESIGN CHOICES EXPLANATION (Seed-based):
+        1. Aesthetic (Digit 5): Modern Brutalism. Large typography, raw borders, and a stark contrast between elements. 
+        2. 3D Element (Digit 8): Liquid Morphing Sphere. Using Three.js to create a blob-like structure representing the fluid nature of AI and complex algorithms.
+        3. Navigation (Digit 4): Floating Minimalist Bar with glassmorphism.
+        4. Typography (Digit 0): Space Grotesk for a tech-heavy, modern look.
+        5. Accents (Digit 7): Glitch effects and noise grain overlays to add a "designer agency" premium feel.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Inter:wght@400;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #111111;
+            --accent-color: #ff2e63;
+            --secondary-color: #252a34;
+            --noise-opacity: 0.05;
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Space Grotesk', sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #080808;
+            --text-color: #e0e0e0;
+            --accent-color: #00f3ff;
+            --secondary-color: #1a1a1a;
+            --noise-opacity: 0.08;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            line-height: 1.6;
+        }
+
+        /* Grain Overlay */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: var(--noise-opacity);
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC42NSIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNuKSIvPjwvc3ZnPg==');
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s ease;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-follower {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.15s ease;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1200px;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .toggle-btn:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        /* 3d Container */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* Hero Section */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 10%;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 12vw, 8rem);
+            line-height: 0.9;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .hero .subtitle {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            max-width: 600px;
+            font-weight: 300;
+            color: var(--text-color);
+            filter: opacity(0.8);
+        }
+
+        .accent-text {
+            color: var(--accent-color);
+            font-style: italic;
+        }
+
+        /* Marquee */
+        .marquee-container {
+            overflow: hidden;
+            display: flex;
+            background: var(--text-color);
+            color: var(--bg-color);
+            padding: 1rem 0;
+            transform: rotate(-2deg) translateY(50px);
+            position: relative;
+            z-index: 10;
+        }
+
+        .marquee {
+            white-space: nowrap;
+            display: flex;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .marquee span {
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: 2rem;
+            padding: 0 2rem;
+            text-transform: uppercase;
+        }
+
+        /* About Section */
+        .about {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-content h2 {
+            font-family: var(--font-heading);
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-item {
+            border-left: 2px solid var(--accent-color);
+            padding-left: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 900;
+            font-family: var(--font-heading);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .project-card {
+            position: relative;
+            height: 400px;
+            background: var(--secondary-color);
+            overflow: hidden;
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            border: 2px solid var(--accent-color);
+        }
+
+        .project-info {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            text-align: center;
+        }
+
+        .contact h2 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-family: var(--font-heading);
+        }
+
+        .contact-email {
+            font-size: 2rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 2rem;
+            display: inline-block;
+        }
+
+        /* Utilities */
+        .lang-en {
+            display: none;
+        }
+
+        [lang="en"] .lang-en {
+            display: block;
+        }
+
+        [lang="en"] .lang-es {
+            display: none;
+        }
+
+        [lang="en"] .lang-inline-en {
+            display: inline;
+        }
+
+        [lang="en"] .lang-inline-es {
+            display: none;
+        }
+
+        .lang-inline-en {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .about {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 4rem;
+            }
+        }
+
+        .scroll-down {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0) translateX(-50%);
+            }
+
+            40% {
+                transform: translateY(-10px) translateX(-50%);
+            }
+
+            60% {
+                transform: translateY(-5px) translateX(-50%);
+            }
+        }
+    </style>
+</head>
+
+<body lang="es">
+    <div class="noise"></div>
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <div id="canvas-container"></div>
+
+    <nav>
+        <div class="logo">M.C. // DEV</div>
+        <ul class="nav-links">
+            <li><a href="#about" class="lang-es">Sobre mí</a><a href="#about" class="lang-en">About</a></li>
+            <li><a href="#projects" class="lang-es">Proyectos</a><a href="#projects" class="lang-en">Projects</a></li>
+            <li><a href="#contact" class="lang-es">Contacto</a><a href="#contact" class="lang-en">Contact</a></li>
+        </ul>
+        <div class="controls">
+            <button class="toggle-btn" id="lang-toggle">English</button>
+            <button class="toggle-btn" id="theme-toggle">Mode</button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1 class="reveal">
+                <span class="lang-es">Eficiencia<br><span class="accent-text">Algorítmica</span></span>
+                <span class="lang-en">Algorithmic<br><span class="accent-text">Efficiency</span></span>
+            </h1>
+            <p class="subtitle reveal">
+                <span class="lang-es">Hola, soy Mario Raúl Carbonell. Especialista en desarrollo web, aplicaciones a
+                    medida e inteligencia artificial.</span>
+                <span class="lang-en">Hi, I'm Mario Raúl Carbonell. Specialist in web development, custom applications,
+                    and artificial intelligence.</span>
+            </p>
+            <div class="scroll-down">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14M19 12l-7 7-7-7" />
+                </svg>
+            </div>
+        </section>
+
+        <div class="marquee-container">
+            <div class="marquee">
+                <span>AI CONSULTING</span>
+                <span>CHESS ENGINES</span>
+                <span>HIGH PERFORMANCE COMPUTING</span>
+                <span>FULL STACK</span>
+                <span>AI CONSULTING</span>
+                <span>CHESS ENGINES</span>
+                <span>HIGH PERFORMANCE COMPUTING</span>
+                <span>FULL STACK</span>
+            </div>
+        </div>
+
+        <section id="about" class="about">
+            <div class="about-visual">
+                <!-- Three.js will be more interactive here potentially or just stay background -->
+            </div>
+            <div class="about-content">
+                <h2 class="reveal">
+                    <span class="lang-es">Resolviendo lo <span class="accent-text">difícil</span></span>
+                    <span class="lang-en">Solving the <span class="accent-text">Complex</span></span>
+                </h2>
+                <p class="reveal">
+                    <span class="lang-es">Desde motores de ajedrez hasta consultoría de IA avanzada, transformo ideas
+                        complejas en código eficiente. Mi pasión reside en el diseño de algoritmos que desafían lo
+                        convencional.</span>
+                    <span class="lang-en">From chess engines to advanced AI consulting, I transform complex ideas into
+                        efficient code. My passion lies in designing algorithms that defy convention.</span>
+                </p>
+                <div class="stat-grid" style="margin-top: 2rem;">
+                    <div class="stat-item reveal">
+                        <div class="stat-number">10+</div>
+                        <div class="stat-label">
+                            <span class="lang-es">Años Experiencia</span>
+                            <span class="lang-en">Years Exp</span>
+                        </div>
+                    </div>
+                    <div class="stat-item reveal">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">
+                            <span class="lang-es">Eficiencia</span>
+                            <span class="lang-en">Efficiency</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <h2 class="reveal">
+                <span class="lang-es">Selección de Proyectos</span>
+                <span class="lang-en">Selected Works</span>
+            </h2>
+            <div class="projects-grid">
+                <div class="project-card reveal">
+                    <div class="project-info">
+                        <h3>Chess Engine Alpha</h3>
+                        <p>Rust, C++, Optimization</p>
+                    </div>
+                </div>
+                <div class="project-card reveal">
+                    <div class="project-info">
+                        <h3>AI Predictive Model</h3>
+                        <p>Python, TensorFlow, Big Data</p>
+                    </div>
+                </div>
+                <div class="project-card reveal">
+                    <div class="project-info">
+                        <h3>Custom CRM System</h3>
+                        <p>Node.js, React, PostgreSQL</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <h2 class="reveal">
+                <span class="lang-es">¿Tienes un <br><span class="accent-text">desafío?</span></span>
+                <span class="lang-en">Got a <br><span class="accent-text">Challenge?</span></span>
+            </h2>
+            <a href="mailto:mcarbonell@example.com" class="contact-email reveal">hello@mcarbonell.dev</a>
+            <div style="margin-top: 3rem;">
+                <p>GitHub: <a href="https://github.com/mcarbonell" target="_blank"
+                        style="color: inherit;">github.com/mcarbonell</a></p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 3D SCENE
+        let scene, camera, renderer, blob;
+        let clock = new THREE.Clock();
+
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            const geometry = new THREE.IcosahedronGeometry(1.5, 30);
+            const material = new THREE.MeshPhongMaterial({
+                color: 0xbc13fe,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3
+            });
+
+            blob = new THREE.Mesh(geometry, material);
+            scene.add(blob);
+
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(5, 5, 5);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+            camera.position.z = 5;
+
+            // Store original positions for displacement
+            blob.geometry.userData.origP = blob.geometry.attributes.position.array.slice();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            let time = clock.getElapsedTime();
+
+            const positions = blob.geometry.attributes.position.array;
+            const orig = blob.geometry.userData.origP;
+
+            for (let i = 0; i < positions.length; i += 3) {
+                let x = orig[i];
+                let y = orig[i + 1];
+                let z = orig[i + 2];
+
+                let noise = Math.sin(x * 1.5 + time) * 0.1 +
+                    Math.cos(y * 1.5 + time) * 0.1 +
+                    Math.sin(z * 1.5 + time) * 0.1;
+
+                positions[i] = x + (x * noise);
+                positions[i + 1] = y + (y * noise);
+                positions[i + 2] = z + (z * noise);
+            }
+            blob.geometry.attributes.position.needsUpdate = true;
+
+            blob.rotation.y += 0.005;
+            blob.rotation.z += 0.003;
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // CURSOR
+        const cursor = document.querySelector('.cursor');
+        const follower = document.querySelector('.cursor-follower');
+
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1 });
+            gsap.to(follower, { x: e.clientX, y: e.clientY, duration: 0.3 });
+
+            // Sphere reacts to mouse
+            if (blob) {
+                blob.rotation.x = e.clientY * 0.001;
+                blob.rotation.y = e.clientX * 0.001;
+            }
+        });
+
+        // THEME TOGGLE
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            const current = document.body.getAttribute('data-theme');
+            document.body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+
+            // Update 3D colors
+            if (blob) {
+                blob.material.color.set(current === 'dark' ? 0xbc13fe : 0x00f3ff);
+            }
+        });
+        document.body.setAttribute('data-theme', 'dark');
+
+        // LANGUAGE TOGGLE
+        const langToggle = document.getElementById('lang-toggle');
+        langToggle.addEventListener('click', () => {
+            const current = document.body.getAttribute('lang');
+            const target = current === 'es' ? 'en' : 'es';
+            document.body.setAttribute('lang', target);
+            langToggle.textContent = target === 'es' ? 'English' : 'Español';
+        });
+
+        // ANIMATIONS
+        gsap.registerPlugin(ScrollTrigger);
+
+        document.querySelectorAll('.reveal').forEach((el) => {
+            gsap.from(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 90%",
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1.2,
+                ease: "power4.out"
+            });
+        });
+
+        // Scroll influence on 3D
+        window.addEventListener('scroll', () => {
+            if (blob) {
+                blob.position.y = window.scrollY * -0.002;
+                blob.scale.setScalar(1 + window.scrollY * 0.0005);
+            }
+        });
+
+        init3D();
+        animate();
+    </script>
+</body>
+
+</html>

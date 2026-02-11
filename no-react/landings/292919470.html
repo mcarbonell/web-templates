@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bean & Brew – Café Landing Page</title>
+  <meta name="description" content="A striking, modern landing page for a local café, featuring light/dark mode, glassmorphism, and smooth animations.">
+  <style>
+    /* ==== CSS Variables ==== */
+    :root {
+      --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --color-bg: #fdfdfd;
+      --color-fg: #222222;
+      --color-primary: #c0392b; /* deep red */
+      --color-primary-dark: #e74c3c;
+      --color-accent: #f1c40f; /* gold */
+      --color-muted: #777777;
+      --focus-outline: 2px solid #f1c40f;
+    }
+    .dark {
+      --color-bg: #1e1e1e;
+      --color-fg: #e0e0e0;
+      --color-primary: #e74c3c;
+      --color-primary-dark: #c0392b;
+      --color-accent: #f1c40f;
+      --color-muted: #bbbbbb;
+    }
+
+    /* ==== Global Reset ==== */
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-fg);
+      line-height: 1.6;
+    }
+    a { color: var(--color-primary); text-decoration:none; }
+    a:hover, a:focus { text-decoration:underline; }
+    a:focus { outline: var(--focus-outline); }
+
+    /* ==== Skip Link ==== */
+    .skip-link {
+      position:absolute;
+      top:-40px;
+      left:0;
+      background:#000;
+      color:#fff;
+      padding:8px 12px;
+      z-index:100;
+    }
+    .skip-link:focus { top:0; }
+
+    /* ==== Layout ==== */
+    header[role="banner"] { padding:1rem 2rem; background:var(--color-primary); color:#fff; }
+    nav[role="navigation"] { display:flex; gap:1rem; }
+    main[role="main"] { padding:2rem; }
+    footer[role="contentinfo"] { padding:1rem 2rem; background:#333; color:#fff; text-align:center; }
+
+    /* ==== Hero ==== */
+    .hero {
+      position:relative;
+      height:80vh;
+      min-height:400px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      background:url('https://picsum.photos/seed/coffee/1200/800') center/cover no-repeat;
+      color:#fff;
+    }
+    .hero::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,0.45);
+    }
+    .hero-content {
+      position:relative;
+      max-width:800px;
+      text-shadow:0 2px 4px rgba(0,0,0,0.6);
+    }
+    .hero h1 { font-size:2.8rem; margin-bottom:.5rem; }
+    .hero p { font-size:1.2rem; margin-bottom:1.5rem; }
+    .hero button {
+      background:var(--color-accent);
+      border:none;
+      padding:.75rem 1.5rem;
+      font-size:1rem;
+      cursor:pointer;
+      border-radius:4px;
+    }
+    .hero button:focus { outline: var(--focus-outline); }
+
+    /* ==== Sections ==== */
+    .section {
+      padding:4rem 2rem;
+    }
+    .section[role="region"] { margin-bottom:2rem; }
+    .section h2 {
+      font-size:2rem;
+      margin-bottom:1rem;
+      color:var(--color-primary);
+    }
+    .grid {
+      display:grid;
+      gap:2rem;
+      grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+    }
+    .card {
+      background:rgba(255,255,255,0.8);
+      backdrop-filter:blur(10px);
+      padding:1.5rem;
+      border-radius:8px;
+      box-shadow:0 4px 6px rgba(0,0,0,0.1);
+    }
+    .card h3 { margin-bottom:.5rem; }
+    .card p { margin-bottom:0; }
+
+    /* ==== Theme Toggle ==== */
+    .theme-toggle {
+      position:fixed;
+      top:1rem;
+      right:1rem;
+      background:var(--color-accent);
+      border:none;
+      padding:.5rem;
+      border-radius:50%;
+      cursor:pointer;
+      width:40px;
+      height:40px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .theme-toggle:focus { outline: var(--focus-outline); }
+
+    /* ==== Accessibility ==== */
+    [role="list"] { list-style:none; }
+    [role="listitem"] { margin-bottom:.5rem; }
+
+    /* ==== Motion Preference ==== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:0.001ms!important; transition-duration:0.001ms!important; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header role="banner" aria-label="Site Header">
+    <h1>Bean & Brew</h1>
+    <nav role="navigation" aria-label="Primary Navigation">
+      <a href="#about">About</a>
+      <a href="#menu">Menu</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <button class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
+    🌙
+  </button>
+
+  <main role="main" id="main-content">
+    <!-- Hero Section -->
+    <section class="hero" role="region" aria-label="Hero">
+      <div class="hero-content">
+        <h1>Fresh Brew, Cozy Vibes</h1>
+        <p>Discover the perfect cup of coffee in the heart of the city.</p>
+        <button onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'});">Explore Menu</button>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section" role="region" aria-label="About" aria-labelledby="about-heading">
+      <h2 id="about-heading">Our Story</h2>
+      <p>Founded in 2022, Bean & Brew is a neighborhood café that blends classic espresso craftsmanship with modern design. Our beans are sourced from sustainable farms, and our baristas are passionate about every pour.</p>
+    </section>
+
+    <!-- Menu -->
+    <section id="menu" class="section" role="region" aria-label="Menu" aria-labelledby="menu-heading">
+      <h2 id="menu-heading">Signature Drinks</h2>
+      <div class="grid" role="list">
+        <article class="card" role="listitem">
+          <h3>Espresso</h3>
+          <p>Rich, velvety, and perfectly balanced.</p>
+        </article>
+        <article class="card" role="listitem">
+          <h3>Cold Brew</h3>
+          <p>Smooth, chilled, and brewed for 12 hours.</p>
+        </article>
+        <article class="card" role="listitem">
+          <h3>Matcha Latte</h3>
+          <p>Organic matcha with oat milk, a vibrant green delight.</p>
+        </article>
+        <article class="card" role="listitem">
+          <h3>Affogato</h3>
+          <p>Vanilla ice‑cream drowned in a shot of hot espresso.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section id="gallery" class="section" role="region" aria-label="Gallery" aria-labelledby="gallery-heading">
+      <h2 id="gallery-heading">Gallery</h2>
+      <div class="grid">
+        <img src="https://picsum.photos/seed/bean1/400/300" alt="Barista preparing espresso" loading="lazy">
+        <img src="https://picsum.photos/seed/bean2/400/300" alt="Cozy interior with wooden tables" loading="lazy">
+        <img src="https://picsum.photos/seed/bean3/400/300" alt="Freshly baked croissant on a plate" loading="lazy">
+        <img src="https://picsum.photos/seed/bean4/400/300" alt="Night view of café with warm lighting" loading="lazy">
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section" role="region" aria-label="Contact" aria-labelledby="contact-heading">
+      <h2 id="contact-heading">Visit Us</h2>
+      <p>123 Coffee Lane • Cityville, ST 12345</p>
+      <p>Open Mon‑Fri 7 am‑7 pm • Sat‑Sun 8 am‑5 pm</p>
+      <p>Phone: <a href="tel:+1234567890">+1 234 567 890</a></p>
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <p>&copy; 2026 Bean & Brew. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Theme toggle with persisted preference
+    const toggle = document.querySelector('.theme-toggle');
+    const html = document.documentElement;
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const setTheme = (dark) => {
+      html.classList.toggle('dark', dark);
+      toggle.setAttribute('aria-pressed', dark);
+    };
+
+    // Load saved preference
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      setTheme(saved === 'dark');
+    } else {
+      setTheme(prefersDark.matches);
+    }
+
+    toggle.addEventListener('click', () => {
+      const isDark = html.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      toggle.setAttribute('aria-pressed', isDark);
+    });
+  </script>
+</body>
+</html>

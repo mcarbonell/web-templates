@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - SaaSFlow</title>
+    <meta name="description" content="Complete your SaaSFlow subscription - secure checkout process with multiple payment options">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <style>
+        /* Seed 672710564 - Checkout Page Styles */
+        /* Position 7 (5): Form density - Medium with clear structure */
+        
+        .checkout-hero {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: white;
+            padding: var(--space-xl) 0;
+            text-align: center;
+        }
+        
+        .checkout-section {
+            padding: var(--space-2xl) 0 var(--space-3xl);
+        }
+        
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3xl);
+            max-width: var(--content-max-width);
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+        
+        .checkout-form {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+        }
+        
+        .order-summary {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        
+        .form-section {
+            margin-bottom: var(--space-2xl);
+        }
+        
+        .form-section h3 {
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .payment-method {
+            padding: var(--space-md);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            background-color: var(--color-surface);
+        }
+        
+        .payment-method:hover {
+            border-color: var(--color-primary);
+        }
+        
+        .payment-method.selected {
+            border-color: var(--color-primary);
+            background-color: var(--color-primary);
+            color: white;
+        }
+        
+        .payment-icon {
+            font-size: var(--text-2xl);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md) 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-total {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-top: var(--space-lg);
+            padding-top: var(--space-lg);
+            border-top: 2px solid var(--color-border);
+        }
+        
+        .security-badges {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-lg);
+            margin-top: var(--space-xl);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--color-text-light);
+            font-size: var(--text-sm);
+        }
+        
+        .promo-code {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .promo-input {
+            flex: 1;
+        }
+        
+        .steps-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: var(--space-2xl);
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--color-border);
+            color: var(--color-text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: var(--text-sm);
+        }
+        
+        .step.active .step-number {
+            background-color: var(--color-primary);
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background-color: var(--color-success);
+            color: white;
+        }
+        
+        .step-connector {
+            width: 40px;
+            height: 2px;
+            background-color: var(--color-border);
+        }
+        
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .order-summary {
+                position: static;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+            
+            .steps-indicator {
+                flex-direction: column;
+                gap: var(--space-md);
+            }
+            
+            .step {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .step-connector {
+                width: 2px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">SaaSFlow</a>
+            <button class="navbar-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="navbar-menu">
+                <li><a href="index.html" class="navbar-link">Home</a></li>
+                <li><a href="about.html" class="navbar-link">About</a></li>
+                <li><a href="services.html" class="navbar-link">Services</a></li>
+                <li><a href="pricing.html" class="navbar-link">Pricing</a></li>
+                <li><a href="blog.html" class="navbar-link">Blog</a></li>
+                <li><a href="contact.html" class="navbar-link">Contact</a></li>
+                <li><button class="theme-toggle" aria-label="Toggle theme">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Checkout Hero -->
+    <header class="checkout-hero">
+        <div class="container">
+            <h1>Complete Your Order</h1>
+            <p>Secure checkout with instant activation</p>
+        </div>
+    </header>
+
+    <!-- Steps Indicator -->
+    <div class="container">
+        <div class="steps-indicator">
+            <div class="step completed">
+                <div class="step-number">1</div>
+                <span>Choose Plan</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step active">
+                <div class="step-number">2</div>
+                <span>Checkout</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <span>Confirmation</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Section -->
+    <section class="checkout-section">
+        <div class="checkout-container">
+            <!-- Checkout Form -->
+            <div class="checkout-form">
+                <form data-validate id="checkoutForm">
+                    <!-- Account Information -->
+                    <div class="form-section">
+                        <h3>Account Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="firstName">First Name *</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="lastName">Last Name *</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label class="form-label" for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="company">Company Name</label>
+                                <input type="text" id="company" name="company">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="form-section">
+                        <h3>Payment Method</h3>
+                        <div class="payment-methods">
+                            <div class="payment-method selected" data-method="card">
+                                <div class="payment-icon">💳</div>
+                                <div>Credit Card</div>
+                            </div>
+                            <div class="payment-method" data-method="paypal">
+                                <div class="payment-icon">🅿️</div>
+                                <div>PayPal</div>
+                            </div>
+                            <div class="payment-method" data-method="bank">
+                                <div class="payment-icon">🏦</div>
+                                <div>Bank Transfer</div>
+                            </div>
+                        </div>
+                        
+                        <div id="cardPayment">
+                            <div class="form-group">
+                                <label class="form-label" for="cardNumber">Card Number *</label>
+                                <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" required maxlength="19">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="cardName">Name on Card *</label>
+                                <input type="text" id="cardName" name="cardName" required>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="expiry">Expiry Date *</label>
+                                    <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required maxlength="5">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="cvv">CVV *</label>
+                                    <input type="text" id="cvv" name="cvv" placeholder="123" required maxlength="4">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Billing Address -->
+                    <div class="form-section">
+                        <h3>Billing Address</h3>
+                        <div class="form-group">
+                            <label class="form-label" for="address">Street Address *</label>
+                            <input type="text" id="address" name="address" required>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="city">City *</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="state">State/Province *</label>
+                                <input type="text" id="state" name="state" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="zip">ZIP/Postal Code *</label>
+                                <input type="text" id="zip" name="zip" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="country">Country *</label>
+                                <select id="country" name="country" required>
+                                    <option value="">Select Country</option>
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="AU">Australia</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" style="width: 100%;">Complete Order</button>
+                </form>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <h3>Order Summary</h3>
+                
+                <div class="order-item">
+                    <div>
+                        <div style="font-weight: 600;">Professional Plan</div>
+                        <div style="font-size: var(--text-sm); color: var(--color-text-light);">Monthly billing</div>
+                    </div>
+                    <div>$99.00</div>
+                </div>
+                
+                <div class="order-item">
+                    <div>
+                        <div>Users</div>
+                        <div style="font-size: var(--text-sm); color: var(--color-text-light);">Up to 25 users</div>
+                    </div>
+                    <div>Included</div>
+                </div>
+                
+                <div class="order-item">
+                    <div>Storage</div>
+                    <div>100GB</div>
+                </div>
+                
+                <!-- Promo Code -->
+                <div class="promo-code">
+                    <input type="text" class="promo-input" placeholder="Promo code" id="promoCode">
+                    <button class="btn btn-secondary" type="button" id="applyPromo">Apply</button>
+                </div>
+                
+                <div class="order-item">
+                    <div>Subtotal</div>
+                    <div>$99.00</div>
+                </div>
+                
+                <div class="order-item">
+                    <div>Tax (estimated)</div>
+                    <div>$8.91</div>
+                </div>
+                
+                <div class="order-item order-total">
+                    <div>Total</div>
+                    <div>$107.91</div>
+                </div>
+                
+                <!-- Security Badges -->
+                <div class="security-badges">
+                    <div class="security-badge">
+                        <span>🔒</span>
+                        <span>SSL Secured</span>
+                    </div>
+                    <div class="security-badge">
+                        <span>✓</span>
+                        <span>PCI Compliant</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="services.html">Features</a></li>
+                        <li><a href="pricing.html">Pricing</a></li>
+                        <li><a href="case-studies.html">Case Studies</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="help.html">Help Center</a></li>
+                        <li><a href="docs.html">Documentation</a></li>
+                        <li><a href="api.html">API</a></li>
+                        <li><a href="status.html">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="security.html">Security</a></li>
+                        <li><a href="compliance.html">Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SaaSFlow. All rights reserved.</p>
+                <div class="flex gap-md">
+                    <a href="#" aria-label="Twitter">𝕏</a>
+                    <a href="#" aria-label="LinkedIn">in</a>
+                    <a href="#" aria-label="GitHub">⚡</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Payment method selection
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            const cardPayment = document.getElementById('cardPayment');
+            
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', () => {
+                    paymentMethods.forEach(m => m.classList.remove('selected'));
+                    method.classList.add('selected');
+                    
+                    const selectedMethod = method.dataset.method;
+                    cardPayment.style.display = selectedMethod === 'card' ? 'block' : 'none';
+                });
+            });
+            
+            // Card number formatting
+            const cardNumberInput = document.getElementById('cardNumber');
+            cardNumberInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\s/g, '');
+                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                e.target.value = formattedValue;
+            });
+            
+            // Expiry date formatting
+            const expiryInput = document.getElementById('expiry');
+            expiryInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                }
+                e.target.value = value;
+            });
+            
+            // CVV formatting
+            const cvvInput = document.getElementById('cvv');
+            cvvInput.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '');
+            });
+            
+            // Form submission
+            const form = document.getElementById('checkoutForm');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Simulate successful checkout
+                const successMessage = document.createElement('div');
+                successMessage.className = 'alert alert-success';
+                successMessage.textContent = 'Order completed successfully! Redirecting to your account...';
+                successMessage.style.cssText = `
+                    background-color: var(--color-success);
+                    color: white;
+                    padding: var(--space-lg);
+                    border-radius: var(--radius-md);
+                    margin-bottom: var(--space-lg);
+                    text-align: center;
+                    font-size: var(--text-lg);
+                `;
+                
+                form.parentNode.insertBefore(successMessage, form);
+                form.style.display = 'none';
+                
+                // Simulate redirect
+                setTimeout(() => {
+                    alert('This is a demo. In a real application, you would be redirected to your account dashboard.');
+                }, 2000);
+            });
+            
+            // Promo code application
+            document.getElementById('applyPromo').addEventListener('click', () => {
+                const promoInput = document.getElementById('promoCode');
+                if (promoInput.value) {
+                    alert('Demo: Promo code would be validated here');
+                    promoInput.value = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

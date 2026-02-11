@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VECTRA — Design Studio</title>
+    <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  DESIGN DECISIONS (Seed: 670386165)                         ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║                                                              ║
+    ║  CONCEPT: "Diagonal Brutalism meets Swiss Precision"         ║
+    ║                                                              ║
+    ║  LAYOUT: Asymmetric broken grid with diagonal clip-paths     ║
+    ║  — Sections are sliced at sharp angles (8-12deg)             ║
+    ║  — Content blocks overlap and break expected alignment       ║
+    ║                                                              ║
+    ║  COLORS:                                                     ║
+    ║  — Dark mode: Near-black (#0a0a0a) + Electric Cyan (#00f0ff)║
+    ║  — Light mode: Off-white (#f0ede8) + Deep Navy (#0a1628)    ║
+    ║  — Accent: Hot Coral (#ff3d5a) used sparingly for CTA       ║
+    ║  — No gradients anywhere — flat, solid color blocks          ║
+    ║                                                              ║
+    ║  TYPOGRAPHY:                                                 ║
+    ║  — Headlines: "Anton" (ultra-condensed, aggressive)          ║
+    ║  — Body: "DM Mono" (monospace for techy contrast)            ║
+    ║  — Extreme size contrast (8rem headlines vs 0.85rem body)    ║
+    ║  — Mixed-weight, uppercase headlines                         ║
+    ║                                                              ║
+    ║  ANIMATIONS:                                                 ║
+    ║  — Clip-path reveal animations on scroll (IntersectionObs)   ║
+    ║  — Diagonal wipe transitions                                 ║
+    ║  — Staggered text line reveals                               ║
+    ║  — Hover: sharp geometric transforms, no easing curves       ║
+    ║                                                              ║
+    ║  SHAPES: Diagonal stripe motifs as decorative elements       ║
+    ║  — 45-degree repeating stripe patterns via CSS               ║
+    ║  — Sharp polygon clip-paths on images/sections               ║
+    ║                                                              ║
+    ║  UNIQUE FEATURES:                                            ║
+    ║  — Oversized numbering system for sections                   ║
+    ║  — Text that breaks out of containers deliberately           ║
+    ║  — Rotating diagonal badge element                           ║
+    ║  — Marquee-style scrolling ticker                            ║
+    ║  — Cards with corner-cut geometric styling                   ║
+    ║                                                              ║
+    ╚══════════════════════════════════════════════════════════════╝
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ===== CUSTOM PROPERTIES ===== */
+        :root {
+            --speed: 0.6s;
+            --step: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #f0ede8;
+            --text-secondary: #888888;
+            --accent: #00f0ff;
+            --accent-alt: #ff3d5a;
+            --stripe-color: #1a1a1a;
+            --card-bg: #141414;
+            --card-border: #222222;
+            --toggle-bg: #222222;
+            --ticker-bg: #00f0ff;
+            --ticker-text: #0a0a0a;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f0ede8;
+            --bg-secondary: #e6e2db;
+            --bg-tertiary: #ddd8cf;
+            --text-primary: #0a1628;
+            --text-secondary: #6b6560;
+            --accent: #0a1628;
+            --accent-alt: #ff3d5a;
+            --stripe-color: #e6e2db;
+            --card-bg: #e9e5de;
+            --card-border: #d5d0c8;
+            --toggle-bg: #d5d0c8;
+            --ticker-bg: #0a1628;
+            --ticker-text: #f0ede8;
+        }
+
+        /* ===== RESET ===== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ===== BASE ===== */
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'DM Mono', monospace;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background-color 0.4s, color 0.4s;
+            line-height: 1.6;
+        }
+
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            background: var(--toggle-bg);
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            width: 3rem;
+            height: 3rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, transform 0.2s;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .theme-toggle__icon--light,
+        .theme-toggle__icon--dark {
+            position: absolute;
+            transition: opacity 0.3s;
+        }
+
+        [data-theme="dark"] .theme-toggle__icon--light {
+            opacity: 1;
+        }
+
+        [data-theme="dark"] .theme-toggle__icon--dark {
+            opacity: 0;
+        }
+
+        [data-theme="light"] .theme-toggle__icon--light {
+            opacity: 0;
+        }
+
+        [data-theme="light"] .theme-toggle__icon--dark {
+            opacity: 1;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 900;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            mix-blend-mode: difference;
+        }
+
+        .nav__logo {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.6rem;
+            letter-spacing: 0.15em;
+            color: #f0ede8;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .nav__links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav__link {
+            color: #f0ede8;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .nav__link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #f0ede8;
+            transition: width 0.3s;
+        }
+
+        .nav__link:hover::after {
+            width: 100%;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero__stripe-bg {
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 60%;
+            height: 140%;
+            background: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 20px,
+                var(--stripe-color) 20px,
+                var(--stripe-color) 22px
+            );
+            transform: skewX(-5deg);
+            pointer-events: none;
+        }
+
+        .hero__content {
+            position: relative;
+            z-index: 2;
+            max-width: 90rem;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero__eyebrow {
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .hero__eyebrow::before {
+            content: '';
+            display: block;
+            width: 3rem;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        .hero__title {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(4rem, 14vw, 12rem);
+            line-height: 0.85;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            margin-bottom: 3rem;
+        }
+
+        .hero__title-line {
+            display: block;
+            clip-path: inset(0 100% 0 0);
+            animation: revealText 1s var(--step) forwards;
+        }
+
+        .hero__title-line:nth-child(2) {
+            animation-delay: 0.15s;
+            color: var(--accent);
+            padding-left: 8vw;
+        }
+
+        .hero__title-line:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes revealText {
+            to {
+                clip-path: inset(0 0 0 0);
+            }
+        }
+
+        .hero__description {
+            max-width: 28rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            margin-left: 8vw;
+            line-height: 1.8;
+        }
+
+        .hero__cta-group {
+            display: flex;
+            gap: 1.5rem;
+            margin-left: 8vw;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-block;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 1rem 2.5rem;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .btn--primary {
+            background: var(--accent-alt);
+            color: #ffffff;
+            border: none;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 85% 100%, 0 100%);
+        }
+
+        .btn--primary:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%, 0 100%);
+            transform: translateY(-2px);
+        }
+
+        .btn--secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--text-primary);
+        }
+
+        .btn--secondary:hover {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .hero__badge {
+            position: absolute;
+            right: 10%;
+            bottom: 15%;
+            width: 10rem;
+            height: 10rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+        }
+
+        .hero__badge-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: rotateBadge 15s linear infinite;
+        }
+
+        @keyframes rotateBadge {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hero__badge-center {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        .hero__scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .hero__scroll-line {
+            width: 1px;
+            height: 4rem;
+            background: var(--text-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero__scroll-line::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            animation: scrollLine 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollLine {
+            0% { top: -100%; }
+            50% { top: 100%; }
+            100% { top: 100%; }
+        }
+
+        /* ===== TICKER ===== */
+        .ticker {
+            background: var(--ticker-bg);
+            color: var(--ticker-text);
+            padding: 1rem 0;
+            overflow: hidden;
+            transform: rotate(-2deg) scale(1.05);
+            margin: -2rem 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .ticker__track {
+            display: flex;
+            width: max-content;
+            animation: tickerScroll 20s linear infinite;
+        }
+
+        .ticker__item {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .ticker__separator {
+            display: inline-block;
+            width: 0.6rem;
+            height: 0.6rem;
+            background: var(--ticker-text);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        @keyframes tickerScroll {
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* ===== SECTION COMMON ===== */
+        .section {
+            padding: 8rem 2rem;
+            position: relative;
+        }
+
+        .section__number {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(6rem, 20vw, 18rem);
+            color: var(--stripe-color);
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            line-height: 1;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .section__header {
+            max-width: 60rem;
+            margin-bottom: 5rem;
+        }
+
+        .section__label {
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section__label::before {
+            content: '';
+            width: 2rem;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        .section__title {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            text-transform: uppercase;
+            line-height: 0.95;
+            letter-spacing: -0.01em;
+        }
+
+        /* ===== SERVICES / ABOUT ===== */
+        .about {
+            background: var(--bg-secondary);
+            clip-path: polygon(0 5%, 100% 0, 100% 95%, 0 100%);
+            padding: 12rem 2rem;
+        }
+
+        .about__grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 72rem;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .about__visual {
+            position: relative;
+            aspect-ratio: 4 / 5;
+        }
+
+        .about__image-block {
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 80% 100%, 0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about__image-block::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 8px,
+                rgba(0,0,0,0.1) 8px,
+                rgba(0,0,0,0.1) 10px
+            );
+        }
+
+        .about__image-overlay {
+            position: absolute;
+            bottom: -2rem;
+            right: -2rem;
+            background: var(--accent-alt);
+            color: #ffffff;
+            padding: 2rem;
+            font-family: 'Anton', sans-serif;
+            font-size: 3rem;
+            line-height: 1;
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .about__text {
+            padding: 2rem 0;
+        }
+
+        .about__description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 2;
+        }
+
+        .about__stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat {
+            border-left: 3px solid var(--accent);
+            padding-left: 1.5rem;
+        }
+
+        .stat__number {
+            font-family: 'Anton', sans-serif;
+            font-size: 3rem;
+            line-height: 1;
+            color: var(--text-primary);
+        }
+
+        .stat__label {
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* ===== SERVICES CARDS ===== */
+        .services {
+            padding: 10rem 2rem;
+        }
+
+        .services__grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 72rem;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 3rem 2rem;
+            position: relative;
+            transition: transform 0.4s var(--step), background 0.3s;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s var(--step);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:nth-child(2) {
+            transform: translateY(3rem);
+        }
+
+        .service-card:nth-child(2):hover {
+            transform: translateY(calc(3rem - 8px));
+        }
+
+        .service-card__icon {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .service-card__title {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .service-card__text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .service-card__number {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-family: 'Anton', sans-serif;
+            font-size: 3rem;
+            color: var(--stripe-color);
+            line-height: 1;
+        }
+
+        /* ===== WORK / PORTFOLIO ===== */
+        .work {
+            background: var(--bg-tertiary);
+            clip-path: polygon(0 0, 100% 4%, 100% 100%, 0 96%);
+            padding: 12rem 2rem;
+        }
+
+        .work__grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 2rem;
+            max-width: 72rem;
+            margin: 0 auto;
+        }
+
+        .work-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .work-item__visual {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            background: var(--card-bg);
+            position: relative;
+            overflow: hidden;
+            transition: clip-path 0.5s var(--step);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .work-item:hover .work-item__visual {
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 85% 100%, 0 100%);
+        }
+
+        .work-item__visual::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .work-item:nth-child(1) .work-item__visual::before {
+            background: var(--accent);
+            opacity: 0.15;
+        }
+
+        .work-item:nth-child(2) .work-item__visual::before {
+            background: var(--accent-alt);
+            opacity: 0.15;
+        }
+
+        .work-item:nth-child(3) .work-item__visual::before {
+            background: var(--accent);
+            opacity: 0.1;
+        }
+
+        .work-item__pattern {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 30px,
+                var(--bg-secondary) 30px,
+                var(--bg-secondary) 32px
+            );
+            opacity: 0.5;
+        }
+
+        .work-item__label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            padding: 2rem;
+            z-index: 2;
+        }
+
+        .work-item__category {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .work-item__title {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+
+        .work-item:nth-child(2) {
+            grid-row: span 2;
+        }
+
+        .work-item:nth-child(2) .work-item__visual {
+            aspect-ratio: auto;
+            height: 100%;
+        }
+
+        .work-item:nth-child(3) .work-item__visual {
+            aspect-ratio: 16 / 10;
+        }
+
+        .work-item__arrow {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 3rem;
+            height: 3rem;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            z-index: 2;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            transition: clip-path 0.3s, transform 0.3s;
+            transform: translate(120%, -120%);
+        }
+
+        .work-item:hover .work-item__arrow {
+            transform: translate(0, 0);
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%);
+        }
+
+        /* ===== TESTIMONIAL ===== */
+        .testimonial {
+            padding: 10rem 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .testimonial__inner {
+            max-width: 50rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .testimonial__quote-mark {
+            font-family: 'Anton', sans-serif;
+            font-size: 12rem;
+            line-height: 0.5;
+            color: var(--accent);
+            opacity: 0.2;
+            position: absolute;
+            top: -2rem;
+            left: -2rem;
+            user-select: none;
+        }
+
+        .testimonial__text {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            text-transform: uppercase;
+            line-height: 1.2;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .testimonial__author {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .testimonial__name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .testimonial__role {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta {
+            background: var(--accent);
+            color: var(--bg-primary);
+            clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 100%);
+            padding: 12rem 2rem 8rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta__stripes {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 40px,
+                rgba(0,0,0,0.05) 40px,
+                rgba(0,0,0,0.05) 42px
+            );
+            pointer-events: none;
+        }
+
+        .cta__content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta__title {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(3rem, 10vw, 8rem);
+            text-transform: uppercase;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .cta__subtitle {
+            font-size: 0.85rem;
+            max-width: 30rem;
+            margin: 0 auto 3rem;
+            line-height: 1.8;
+            opacity: 0.8;
+        }
+
+        .cta .btn--cta {
+            background: var(--bg-primary);
+            color: var(--accent);
+            border: none;
+            display: inline-block;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 1.2rem 3rem;
+            cursor: pointer;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 85% 100%, 0 100%);
+            transition: clip-path 0.3s, transform 0.3s;
+        }
+
+        .cta .btn--cta:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%, 0 100%);
+            transform: scale(1.05);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--bg-secondary);
+            padding: 5rem 2rem 2rem;
+        }
+
+        .footer__grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            max-width: 72rem;
+            margin: 0 auto;
+            margin-bottom: 5rem;
+        }
+
+        .footer__brand-name {
+            font-family: 'Anton', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer__brand-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 20rem;
+        }
+
+        .footer__heading {
+            font-family: 'Anton', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .footer__links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .footer__link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s;
+        }
+
+        .footer__link:hover {
+            color: var(--text-primary);
+        }
+
+        .footer__bottom {
+            max-width: 72rem;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== REVEAL ANIMATIONS ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 0.8s var(--step), transform 0.8s var(--step);
+        }
+
+        .reveal--visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-clip {
+            clip-path: inset(100% 0 0 0);
+            transition: clip-path 0.8s var(--step);
+        }
+
+        .reveal-clip--visible {
+            clip-path: inset(0 0 0 0);
+        }
+
+        .reveal-diagonal {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            transition: clip-path 1s var(--step);
+        }
+
+        .reveal-diagonal--visible {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        /* Stagger children */
+        .stagger > * {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s var(--step), transform 0.6s var(--step);
+        }
+
+        .stagger--visible > *:nth-child(1) { transition-delay: 0s; opacity: 1; transform: translateY(0); }
+        .stagger--visible > *:nth-child(2) { transition-delay: 0.1s; opacity: 1; transform: translateY(0); }
+        .stagger--visible > *:nth-child(3) { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+        .stagger--visible > *:nth-child(4) { transition-delay: 0.3s; opacity: 1; transform: translateY(0); }
+        .stagger--visible > *:nth-child(5) { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
+        .stagger--visible > *:nth-child(6) { transition-delay: 0.5s; opacity: 1; transform: translateY(0); }
+
+        /* ===== MOBILE NAV ===== */
+        .nav__burger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0.5rem;
+        }
+
+        .nav__burger-line {
+            width: 24px;
+            height: 2px;
+            background: #f0ede8;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .services__grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .service-card:nth-child(2) {
+                transform: none;
+            }
+
+            .service-card:nth-child(2):hover {
+                transform: translateY(-8px);
+            }
+
+            .work__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .work-item:nth-child(2) {
+                grid-row: auto;
+            }
+
+            .work-item:nth-child(2) .work-item__visual {
+                aspect-ratio: 16 / 10;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav__links {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: var(--bg-primary);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3rem;
+                mix-blend-mode: normal;
+                z-index: 999;
+            }
+
+            .nav__links--open {
+                display: flex;
+            }
+
+            .nav__links--open .nav__link {
+                color: var(--text-primary);
+                font-size: 1.5rem;
+            }
+
+            .nav__burger {
+                display: flex;
+                z-index: 1000;
+            }
+
+            .nav__burger--open .nav__burger-line:nth-child(1) {
+                transform: translateY(7px) rotate(45deg);
+            }
+
+            .nav__burger--open .nav__burger-line:nth-child(2) {
+                opacity: 0;
+            }
+
+            .nav__burger--open .nav__burger-line:nth-child(3) {
+                transform: translateY(-7px) rotate(-45deg);
+            }
+
+            .hero__title {
+                font-size: clamp(3rem, 14vw, 6rem);
+            }
+
+            .hero__title-line:nth-child(2) {
+                padding-left: 0;
+            }
+
+            .hero__description,
+            .hero__cta-group {
+                margin-left: 0;
+            }
+
+            .hero__cta-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero__badge {
+                display: none;
+            }
+
+            .hero__stripe-bg {
+                width: 80%;
+                opacity: 0.4;
+            }
+
+            .about__grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .about__visual {
+                max-height: 20rem;
+            }
+
+            .services__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section__number {
+                font-size: 5rem;
+            }
+
+            .footer__grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+
+            .footer__brand {
+                grid-column: span 2;
+            }
+
+            .footer__bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .about {
+                clip-path: polygon(0 2%, 100% 0, 100% 98%, 0 100%);
+                padding: 8rem 2rem;
+            }
+
+            .work {
+                clip-path: polygon(0 0, 100% 2%, 100% 100%, 0 98%);
+                padding: 8rem 2rem;
+            }
+
+            .cta {
+                clip-path: polygon(0 5%, 100% 0, 100% 100%, 0 100%);
+                padding: 8rem 2rem 6rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer__brand {
+                grid-column: auto;
+            }
+
+            .about__stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" aria-label="Toggle dark/light theme" type="button">
+        <span class="theme-toggle__icon--light">☀</span>
+        <span class="theme-toggle__icon--dark">☾</span>
+    </button>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="#" class="nav__logo">Vectra</a>
+        <button class="nav__burger" aria-label="Toggle menu" type="button">
+            <span class="nav__burger-line"></span>
+            <span class="nav__burger-line"></span>
+            <span class="nav__burger-line"></span>
+        </button>
+        <ul class="nav__links">
+            <li><a href="#about" class="nav__link">About</a></li>
+            <li><a href="#services" class="nav__link">Services</a></li>
+            <li><a href="#work" class="nav__link">Work</a></li>
+            <li><a href="#contact" class="nav__link">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero__stripe-bg" aria-hidden="true"></div>
+        <div class="hero__content">
+            <p class="hero__eyebrow">Design Studio — Est. 2019</p>
+            <h1 class="hero__title">
+                <span class="hero__title-line">We Build</span>
+                <span class="hero__title-line">Digital</span>
+                <span class="hero__title-line">Futures</span>
+            </h1>
+            <p class="hero__description">
+                Crafting bold digital experiences at the intersection of 
+                design, technology, and culture. We don't follow trends — 
+                we set them.
+            </p>
+            <div class="hero__cta-group">
+                <a href="#contact" class="btn btn--primary">Start a Project</a>
+                <a href="#work" class="btn btn--secondary">View Work</a>
+            </div>
+        </div>
+
+        <!-- Rotating Badge -->
+        <aside class="hero__badge" aria-hidden="true">
+            <svg class="hero__badge-text" viewBox="0 0 200 200">
+                <defs>
+                    <path id="circlePath" d="M 100, 100 m -75, 0 a 75,75 0 1,1 150,0 a 75,75 0 1,1 -150,0"/>
+                </defs>
+                <text fill="currentColor" font-family="'DM Mono', monospace" font-size="12" letter-spacing="6">
+                    <textPath href="#circlePath">VECTRA STUDIO • DESIGN • CREATE • INNOVATE •</textPath>
+                </text>
+            </svg>
+            <span class="hero__badge-center">✦</span>
+        </aside>
+
+        <div class="hero__scroll-indicator">
+            <span>Scroll</span>
+            <div class="hero__scroll-line"></div>
+        </div>
+    </header>
+
+    <!-- Ticker -->
+    <div class="ticker" aria-hidden="true">
+        <div class="ticker__track">
+            <span class="ticker__item">Brand Strategy <span class="ticker__separator"></span></span>
+            <span class="ticker__item">Digital Design <span class="ticker__separator"></span></span>
+            <span class="ticker__item">Web Development <span class="ticker__separator"></span></span>
+            <span class="ticker__item">Motion Design <span class="ticker__separator"></span></span>
+            <span class="ticker__item">Creative Direction <span class="ticker__separator"></span></span>
+            <span class="ticker__item">UX Research <span class="ticker__separator"></span></span>
+            <span class="ticker__item">Brand Strategy <span class="ticker__separator"></span></span>
+            <span class="ticker__item">Digital Design <span class="ticker__separator"></span></span>
+            <span class="ticker__item">Web Development <span class="ticker__separator"></span></span>
+            <span class="ticker__item">Motion Design <span class="ticker__separator"></span></span>
+            <span class="ticker__item">Creative Direction <span class="ticker__separator"></span></span>
+            <span class="ticker__item">UX Research <span class="ticker__separator"></span></span>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+        <span class="section__number reveal" aria-hidden="true">01</span>
+        <div class="about__grid">
+            <figure class="about__visual reveal-diagonal">
+                <div class="about__image-block"></div>
+                <figcaption class="about__image-overlay">6+<br><small style="font-size: 0.5em; font-family: 'DM Mono', monospace;">Years</small></figcaption>
+            </figure>
+            <div class="about__text stagger">
+                <header class="section__header">
+                    <p class="section__label">Who We Are</p>
+                    <h2 class="section__title">Designed to Disrupt</h2>
+                </header>
+                <p class="about__description">
+                    We are a collective of designers, developers, and strategists 
+                    who believe in the power of bold design. Every pixel is 
+                    intentional. Every interaction is crafted. We create digital 
+                    experiences that demand attention and deliver results.
+                </p>
+                <p class="about__description">
+                    Based in the intersection of art and technology, our studio 
+                    pushes boundaries while maintaining unwavering attention to 
+                    craft and detail.
+                </p>
+                <div class="about__stats">
+                    <div class="stat">
+                        <p class="stat__number">147</p>
+                        <p class="stat__label">Projects Delivered</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat__number">38</p>
+                        <p class="stat__label">Awards Won</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat__number">12</p>
+                        <p class="stat__label">Team Members</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat__number">99%</p>
+                        <p class="stat__label">Client Retention</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services section">
+        <span class="section__number reveal" aria-hidden="true">02</span>
+        <header class="section__header reveal">
+            <p class="section__label">What We Do</p>
+            <h2 class="section__title">Services Built<br>for Impact</h2>
+        </header>
+        <div class="services__grid stagger">
+            <article class="service-card">
+                <span class="service-card__number" aria-hidden="true">01</span>
+                <span class="service-card__icon" aria-hidden="true">◈</span>
+                <h3 class="service-card__title">Brand Identity</h3>
+                <p class="service-card__text">
+                    Complete brand systems from strategy to visual identity. 
+                    Logos, guidelines, tone of voice — everything your brand 
+                    needs to stand apart.
+                </p>
+            </article>
+            <article class="service-card">
+                <span class="service-card__number" aria-hidden="true">02</span>
+                <span class="service-card__icon" aria-hidden="true">◐</span>
+                <h3 class="service-card__title">Digital Product</h3>
+                <p class="service-card__text">
+                    End-to-end product design and development. Web applications, 
+                    mobile experiences, and platforms that users actually love 
+                    to interact with.
+                </p>
+            </article>
+            <article class="service-card">
+                <span class="service-card__number" aria-hidden="true">03</span>
+                <span class="service-card__icon" aria-hidden="true">◭</span>
+                <h3 class="service-card__title">Creative Dev</h3>
+                <p class="service-card__text">
+                    Interactive experiences, WebGL, animations, and 
+                    experimental interfaces. Where technology meets 
+                    artistic expression.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <!-- Work Section -->
+    <section id="work" class="work section">
+        <span class="section__number reveal" aria-hidden="true">03</span>
+        <header class="section__header reveal">
+            <p class="section__label">Selected Work</p>
+            <h2 class="section__title">Projects That<br>Speak Volumes</h2>
+        </header>
+        <div class="work__grid stagger">
+            <article class="work-item reveal">
+                <div class="work-item__visual">
+                    <div class="work-item__pattern" aria-hidden="true"></div>
+                    <div class="work-item__label">
+                        <p class="work-item__category">Branding / Web</p>
+                        <h3 class="work-item__title">Nexus Protocol</h3>
+                    </div>
+                    <span class="work-item__arrow" aria-hidden="true">↗</span>
+                </div>
+            </article>
+            <article class="work-item reveal">
+                <div class="work-item__visual">
+                    <div class="work-item__pattern" aria-hidden="true"></div>
+                    <div class="work-item__label">
+                        <p class="work-item__category">Product Design</p>
+                        <h3 class="work-item__title">Terraform Labs</h3>
+                    </div>
+                    <span class="work-item__arrow" aria-hidden="true">↗</span>
+                </div>
+            </article>
+            <article class="work-item reveal">
+                <div class="work-item__visual">
+                    <div class="work-item__pattern" aria-hidden="true"></div>
+                    <div class="work-item__label">
+                        <p class="work-item__category">Interactive</p>
+                        <h3 class="work-item__title">Void Gallery</h3>
+                    </div>
+                    <span class="work-item__arrow" aria-hidden="true">↗</span>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- Testimonial -->
+    <section class="testimonial section">
+        <blockquote class="testimonial__inner reveal">
+            <span class="testimonial__quote-mark" aria-hidden="true">"</span>
+            <p class="testimonial__text">
+                Vectra didn't just redesign our brand — they redefined how 
+                our customers experience us. The results were immediate 
+                and extraordinary.
+            </p>
+            <footer class="testimonial__author">
+                <cite class="testimonial__name">Sarah Chen</cite>
+                <span class="testimonial__role">CEO, Nexus Protocol</span>
+            </footer>
+        </blockquote>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="contact" class="cta">
+        <div class="cta__stripes" aria-hidden="true"></div>
+        <div class="cta__content reveal">
+            <h2 class="cta__title">Let's Build<br>Something Bold</h2>
+            <p class="cta__subtitle">
+                Ready to transform your digital presence? Let's talk about 
+                your next project and create something extraordinary together.
+            </p>
+            <a href="mailto:hello@vectrastudio.com" class="btn btn--cta">Get in Touch</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__grid">
+            <div class="footer__brand">
+                <p class="footer__brand-name">Vectra</p>
+                <p class="footer__brand-desc">
+                    A design studio crafting bold digital experiences. 
+                    Based everywhere, creating for everyone who dares 
+                    to be different.
+                </p>
+            </div>
+            <nav aria-label="Footer navigation">
+                <p class="footer__heading">Navigate</p>
+                <ul class="footer__links">
+                    <li><a href="#about" class="footer__link">About</a></li>
+                    <li><a href="#services" class="footer__link">Services</a></li>
+                    <li><a href="#work" class="footer__link">Work</a></li>
+                    <li><a href="#contact" class="footer__link">Contact</a></li>
+                </ul>
+            </nav>
+            <nav aria-label="Social links">
+                <p class="footer__heading">Social</p>
+                <ul class="footer__links">
+                    <li><a href="#" class="footer__link">Twitter/X</a></li>
+                    <li><a href="#" class="footer__link">Instagram</a></li>
+                    <li><a href="#" class="footer__link">Dribbble</a></li>
+                    <li><a href="#" class="footer__link">LinkedIn</a></li>
+                </ul>
+            </nav>
+            <div>
+                <p class="footer__heading">Contact</p>
+                <ul class="footer__links">
+                    <li><a href="mailto:hello@vectrastudio.com" class="footer__link">hello@vectrastudio.com</a></li>
+                    <li><a href="tel:+1234567890" class="footer__link">+1 (234) 567-890</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <p>© 2024 Vectra Studio. All rights reserved.</p>
+            <p>Designed with sharp edges and bold intent.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ===== THEME TOGGLE =====
+        const themeToggle = document.querySelector('.theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved preference
+        const savedTheme = localStorage.getItem('vectra-theme');
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('vectra-theme', next);
+        });
+
+        // ===== MOBILE NAV =====
+        const burger = document.querySelector('.nav__burger');
+        const navLinks = document.querySelector('.nav__links');
+
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('nav__burger--open');
+            navLinks.classList.toggle('nav__links--open');
+        });
+
+        // Close nav on link click
+        document.querySelectorAll('.nav__link').forEach(link => {
+            link.addEventListener('click', () => {
+                burger.classList.remove('nav__burger--open');
+                navLinks.classList.remove('nav__links--open');
+            });
+        });
+
+        // ===== SCROLL REVEAL =====
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    if (el.classList.contains('reveal')) {
+                        el.classList.add('reveal--visible');
+                    }
+                    if (el.classList.contains('reveal-clip')) {
+                        el.classList.add('reveal-clip--visible');
+                    }
+                    if (el.classList.contains('reveal-diagonal')) {
+                        el.classList.add('reveal-diagonal--visible');
+                    }
+                    if (el.classList.contains('stagger')) {
+                        el.classList.add('stagger--visible');
+                    }
+                    revealObserver.unobserve(el);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal, .reveal-clip, .reveal-diagonal, .stagger').forEach(el => {
+            revealObserver.observe(el);
+        });
+
+        // ===== SMOOTH COUNTER ANIMATION =====
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const target = el.textContent;
+                    const isPercent = target.includes('%');
+                    const num = parseInt(target);
+
+                    if (isNaN(num)) return;
+
+                    let current = 0;
+                    const duration = 1500;
+                    const step = Math.ceil(num / (duration / 16));
+                    const suffix = isPercent ? '%' : '';
+
+                    const timer = setInterval(() => {
+                        current += step;
+                        if (current >= num) {
+                            current = num;
+                            clearInterval(timer);
+                        }
+                        el.textContent = current + suffix;
+                    }, 16);
+
+                    counterObserver.unobserve(el);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat__number').forEach(el => {
+            counterObserver.observe(el);
+        });
+
+        // ===== NAV HIDE/SHOW ON SCROLL =====
+        let lastScrollY = 0;
+        const nav = document.querySelector('.nav');
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                nav.style.transform = 'translateY(-100%)';
+                nav.style.transition = 'transform 0.4s';
+            } else {
+                nav.style.transform = 'translateY(0)';
+            }
+
+            lastScrollY = currentScrollY;
+        }, { passive: true });
+    </script>
+</body>
+</html>

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHER | Kinetic Architecture Studio</title>
+    <meta name="description"
+        content="Aether is a boundary-pushing architectural studio specializing in kinetic structures and digital spatial experiences.">
+    <!-- 
+    DESIGN CHOICES BASED ON SEED: 351490051
+    
+    [35] - COLOR PALETTE & ATMOSPHERE:
+    The first two digits '35' define a high-contrast 'Midnight Cyber' aesthetic. 
+    A palette of Deep Obsidian (#0A0A0B), Stark White (#FFFFFF), and a striking 'Primal Violet' (#8B5CF6).
+    NO GRADIENTS used as requested. All colors are solid, bold, and unapologetic.
+
+    [14] - GRID & LAYOUT:
+    The digits '14' influenced a 14-column underlying grid logic for the desktop view, 
+    translated into a CSS Grid system that utilizes asymmetric placements to create
+    a sense of controlled chaos and modern movement.
+
+    [90] - TYPOGRAPHY:
+    '90' dictates the massive 90px (and larger) display typography. 
+    The use of 'Syne' (extra-bold) provides a unique, almost sculptural feel to the headings.
+    Letter-spacing is manipulated to feel intentional and architectural.
+
+    [05] - MICRO-INTERACTIONS:
+    '05' represents the 0.5s transition timing used throughout the page. 
+    Animations are sharp, linear, and mechanical, mimicking the movement of kinetic architecture.
+
+    [1] - UNIFYING MOTIF:
+    The final digit '1' establishes the 'Single Line' motif. 
+    1px solid borders, dividers, and framing elements are the primary decorative tool, 
+    replacing traditional shadows or glows.
+    -->
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #0A0A0B;
+            --surface: #141416;
+            --primary: #8B5CF6;
+            --accent: #FFFFFF;
+            --text-main: #E2E2E2;
+            --text-dim: #888888;
+            --border: #262626;
+            --transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Syne', sans-serif;
+            text-transform: uppercase;
+            font-weight: 800;
+            line-height: 0.9;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        /* --- UI Elements --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 18px 32px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid var(--primary);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            font-size: 0.8rem;
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: var(--primary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--accent);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .section-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            display: block;
+            font-weight: 600;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 3rem;
+        }
+
+        nav ul li a {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary);
+        }
+
+        /* --- Hero --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 5vw;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero h1 {
+            font-size: clamp(4rem, 12vw, 10rem);
+            margin-bottom: 2rem;
+            color: var(--accent);
+            max-width: 900px;
+        }
+
+        .hero-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: -2rem;
+        }
+
+        .hero-desc {
+            max-width: 400px;
+            font-size: 1.1rem;
+            color: var(--text-dim);
+        }
+
+        .hero-scroll {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            writing-mode: vertical-rl;
+            position: absolute;
+            right: 2rem;
+            bottom: 2rem;
+            color: var(--text-dim);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* --- Showcase --- */
+        .showcase {
+            padding: 8rem 5vw;
+            display: grid;
+            grid-template-columns: repeat(14, 1fr);
+            gap: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .showcase-text {
+            grid-column: 1 / 7;
+        }
+
+        .showcase-text h2 {
+            font-size: 4.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .showcase-image {
+            grid-column: 8 / 15;
+            aspect-ratio: 16/9;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .placeholder-box {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--border);
+            font-size: 5rem;
+        }
+
+        .showcase-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0px solid var(--primary);
+            transition: var(--transition);
+        }
+
+        .showcase-image:hover::after {
+            border-width: 15px;
+        }
+
+        /* --- Stats --- */
+        .stats {
+            padding: 4rem 5vw;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-num {
+            display: block;
+            font-family: 'Syne', sans-serif;
+            font-size: 5rem;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-dim);
+        }
+
+        /* --- Services --- */
+        .services {
+            padding: 8rem 5vw;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .service-card {
+            background: var(--surface);
+            padding: 4rem 3rem;
+            transition: var(--transition);
+        }
+
+        .service-card:hover {
+            background: var(--bg);
+        }
+
+        .service-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-card p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* --- Split Section --- */
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 80vh;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .split-left {
+            padding: 8rem 5vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 1px solid var(--border);
+        }
+
+        .split-right {
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .spinning-text {
+            width: 300px;
+            height: 300px;
+            border: 1px dashed var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- Gallery --- */
+        .gallery {
+            padding: 8rem 5vw;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 400px;
+            gap: 2rem;
+        }
+
+        .gallery-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+        }
+
+        .gallery-item.wide {
+            grid-column: span 2;
+        }
+
+        .gallery-item.tall {
+            grid-row: span 2;
+        }
+
+        .item-info {
+            z-index: 2;
+        }
+
+        .item-info h4 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        .item-category {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary);
+        }
+
+        /* --- CTA --- */
+        .cta {
+            padding: 10rem 5vw;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            position: relative;
+        }
+
+        .cta h2 {
+            font-size: clamp(3rem, 10vw, 8rem);
+            margin-bottom: 4rem;
+        }
+
+        .cta-links {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+        }
+
+        .social-link {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .social-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .social-link:hover::after {
+            width: 100%;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 4rem 5vw;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        .footer-lines {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            display: flex;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 100%;
+        }
+
+        .footer-line:nth-child(odd) {
+            background: var(--primary);
+        }
+
+        .footer-line:nth-child(even) {
+            background: var(--bg);
+        }
+
+        /* --- Mobile Optimization --- */
+        @media (max-width: 1024px) {
+            nav {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 5rem;
+            }
+
+            .showcase {
+                grid-template-columns: 1fr;
+            }
+
+            .showcase-text,
+            .showcase-image {
+                grid-column: span 1;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .split {
+                grid-template-columns: 1fr;
+            }
+
+            .split-left {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-item.wide,
+            .gallery-item.tall {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+
+            .stats {
+                flex-wrap: wrap;
+                gap: 2rem;
+            }
+
+            .stat-item {
+                flex: 1 1 40%;
+            }
+        }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">AETHER.</div>
+        <nav>
+            <ul>
+                <li><a href="#work">Work</a></li>
+                <li><a href="#studio">Studio</a></li>
+                <li><a href="#process">Process</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="menu-trigger">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <span class="section-tag">// KINETIC SPATIAL SYSTEMS</span>
+            <h1>SCULPTING <br> THE VOID</h1>
+            <div class="hero-flex">
+                <p class="hero-desc">We design structures that breathe, move, and respond. Architecture is no longer
+                    static—it is a temporal experience.</p>
+                <div class="hero-btns">
+                    <a href="#work" class="btn">Explore Projects</a>
+                </div>
+            </div>
+            <div class="hero-scroll">SCROLL TO DISCOVER</div>
+        </section>
+
+        <!-- Stats Identity -->
+        <section class="stats">
+            <div class="stat-item">
+                <span class="stat-num">14</span>
+                <span class="stat-label">Global Awards</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">50+</span>
+                <span class="stat-label">Neural Blueprints</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">09</span>
+                <span class="stat-label">Cities Reimagined</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">100</span>
+                <span class="stat-label">Percent Radical</span>
+            </div>
+        </section>
+
+        <!-- Showcase 1 -->
+        <section id="work" class="showcase">
+            <div class="showcase-text">
+                <span class="section-tag">// FEATURED CASE 01</span>
+                <h2>THE QUARTZ <br> PAVILION</h2>
+                <p style="margin-bottom: 2rem; color: var(--text-dim);">A responsive exterior skin that shifts opacity
+                    based on atmospheric pressure and solar intensity. Located in the heart of Neo-Tokyo.</p>
+                <a href="#" class="btn btn-outline">View Details</a>
+            </div>
+            <div class="showcase-image">
+                <div class="placeholder-box">
+                    <i class="fas fa-cube"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services -->
+        <section id="studio" class="services">
+            <span class="section-tag">// OUR CAPABILITIES</span>
+            <div class="services-grid">
+                <div class="service-card">
+                    <i class="fas fa-drafting-pencil"></i>
+                    <h3>KINETIC DESIGN</h3>
+                    <p>Designing structures with mechanical joints and responsive surfaces that adapt to human presence.
+                    </p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-microchip"></i>
+                    <h3>NEURAL URBANISM</h3>
+                    <p>Using AI to simulate urban flow and generate optimized spatial configurations for future cities.
+                    </p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-vr-cardboard"></i>
+                    <h3>DIGITAL TWINS</h3>
+                    <p>Every physical structure we build has a 1:1 digital counterpart in the metaverse for remote
+                        interaction.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Split Narrative -->
+        <section class="split">
+            <div class="split-left">
+                <span class="section-tag">// PHILOSOPHY</span>
+                <h2 style="font-size: 3.5rem; margin-bottom: 2rem;">BEYOND THE <br> CONCRETE</h2>
+                <p style="color: var(--text-dim); margin-bottom: 2rem; font-size: 1.2rem;">"Architecture is the art of
+                    organizing light and shadow. We simply added time as the fourth dimension."</p>
+                <p>We refuse the mundane. Each project is an experiment in physics and psychology, pushing the limits of
+                    what a building can 'do' rather than just what it 'is'.</p>
+            </div>
+            <div class="split-right">
+                <div class="spinning-text">
+                    <i class="fas fa-atom" style="font-size: 4rem; color: var(--primary);"></i>
+                </div>
+                <div style="position: absolute; bottom: 2rem; left: 2rem; font-size: 0.6rem; letter-spacing: 2px;">
+                    COORDINATES: 35.1490051 N, 139.6917 E
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery -->
+        <section class="gallery">
+            <span class="section-tag">// VISUAL ARCHIVE</span>
+            <div class="gallery-grid">
+                <div class="gallery-item tall" style="background: #1a1a1c;">
+                    <div class="item-info">
+                        <span class="item-category">Experiment</span>
+                        <h4>Void Analysis</h4>
+                    </div>
+                </div>
+                <div class="gallery-item wide" style="background: #111113;">
+                    <div class="item-info">
+                        <span class="item-category">Project</span>
+                        <h4>The Helix Spire</h4>
+                    </div>
+                </div>
+                <div class="gallery-item" style="background: #151517;">
+                    <div class="item-info">
+                        <span class="item-category">Concept</span>
+                        <h4>Oceanic Pods</h4>
+                    </div>
+                </div>
+                <div class="gallery-item" style="background: #0f0f11;">
+                    <div class="item-info">
+                        <span class="item-category">Structure</span>
+                        <h4>Glass Membrane</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section id="contact" class="cta">
+            <span class="section-tag">// JOIN THE EVOLUTION</span>
+            <h2>START A <br> REVOLUTION</h2>
+            <div class="cta-links">
+                <a href="#" class="social-link">Instagram</a>
+                <a href="#" class="social-link">LinkedIn</a>
+                <a href="#" class="social-link">Behance</a>
+                <a href="#" class="social-link">Email</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="logo">AETHER.</div>
+        <div class="footer-copy">© 2026 Aether Kinetic Studio. All Rights Reserved.</div>
+        <div class="footer-loc">LONDON / TOKYO / MARS</div>
+        <div class="footer-lines">
+            <div class="footer-line"></div>
+            <div class="footer-line"></div>
+            <div class="footer-line"></div>
+            <div class="footer-line"></div>
+            <div class="footer-line"></div>
+            <div class="footer-line"></div>
+            <div class="footer-line"></div>
+            <div class="footer-line"></div>
+            <div class="footer-line"></div>
+            <div class="footer-line"></div>
+        </div>
+    </footer>
+
+    <!-- Simple Smooth Scroll Script -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Simple Parallax / Reveal Effect
+        window.addEventListener('scroll', () => {
+            const boxes = document.querySelectorAll('.gallery-item, .service-card, .showcase-image');
+            boxes.forEach(box => {
+                const boxTop = box.getBoundingClientRect().top;
+                if (boxTop < window.innerHeight * 0.8) {
+                    box.style.opacity = '1';
+                    box.style.transform = 'translateY(0)';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
