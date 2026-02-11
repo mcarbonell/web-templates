@@ -11,12 +11,7 @@ A curated collection of production-ready, high-performance website templates fea
 - **Full Multi-Page Websites** (`no-react/websites/`) - Complete 12-page website templates with about, contact, services, and more
 
 ### React Templates
-- **Business-Specific Themes** (`react/`) - Ready-to-use templates for local businesses:
-  - Law firms
-  - Bakeries
-  - Barbershops (men's & women's)
-  - Restaurants & bars
-  - Auto repair shops
+- **Unique modern Themes** (`react/`) - Ready-to-use templates.
 
 ## ✨ Key Features
 
@@ -40,7 +35,7 @@ open no-react/3D/109330182.html
 
 ### React Templates
 ```bash
-cd react/panaderia
+cd react/unique-modern-hero-design
 npm install
 npm start
 ```
