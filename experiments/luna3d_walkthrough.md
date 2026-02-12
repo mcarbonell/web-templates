@@ -30,7 +30,7 @@ The user mark the pace of the story by scrolling.
 
 ## Final Result
 You can find the implementation in:
-[luna_3d.html](file:///c:/Users/mrcm_/Local/proj/web-templates/no-react/modern-experimental/luna_3d.html)
+[luna_3d.html](./experiments/luna_3d.html)
 
 > [!TIP]
 > Use the mouse wheel or touch-scroll slowly to appreciate the micro-animations of the rabbit and the soft glow transitions.
