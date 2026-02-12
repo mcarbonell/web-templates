@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luna's First Flight | 3D Story</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0510;
+            --accent: #ffd700;
+            --secondary: #4a3b6b;
+            --text: #ffffff;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            height: 1000vh;
+            /* Long scroll for the narrative */
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            box-shadow: 0 0 10px var(--accent);
+            transition: width 0.1s ease-out;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+        }
+
+        section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10%;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem;
+            border-radius: 30px;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            pointer-events: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .scroll-hint {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.6;
+            transition: opacity 0.5s;
+        }
+
+        .mouse {
+            width: 20px;
+            height: 35px;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .wheel {
+            width: 3px;
+            height: 6px;
+            background-color: #fff;
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scroll-anim 2s infinite;
+        }
+
+        @keyframes scroll-anim {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translate(-50%, 8px);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, 16px);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            section {
+                padding: 0 5%;
+            }
+
+            .glass-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="scroll-hint" id="scrollHint">
+        <div class="mouse">
+            <div class="wheel"></div>
+        </div>
+        <span style="font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Scroll to begin Luna's
+            journey</span>
+    </div>
+
+    <main class="content-layer">
+        <section id="scene-1">
+            <div class="glass-card visible">
+                <h2>The Silent Meadow</h2>
+                <p>In a forest where every firefly danced with light, little Luna sat alone. Her tail remained dark, no
+                    matter how hard she tried to glow.</p>
+            </div>
+        </section>
+
+        <section id="scene-2">
+            <div class="glass-card">
+                <h2>Finding a Friend</h2>
+                <p>The night was cold when she heard a soft whimper. In the deep grass, a baby rabbit had lost its way,
+                    trembling in the shadows.</p>
+            </div>
+        </section>
+
+        <section id="scene-3">
+            <div class="glass-card">
+                <h2>The Inner Warmth</h2>
+                <p>Luna wanted to help. She closed her eyes and thought of the warmest things: her mother's hug, the
+                    summer sun, and the kindness in her heart.</p>
+            </div>
+        </section>
+
+        <section id="scene-4">
+            <div class="glass-card">
+                <h2>The First Blink</h2>
+                <p>Then, it happened. A tiny spark, then a warm golden bloom. Luna was finally glowing, brighter than
+                    any firefly had ever glowed before.</p>
+            </div>
+        </section>
+
+        <section id="scene-5">
+            <div class="glass-card">
+                <h2>Guiding Light</h2>
+                <p>With her new light, she led the baby rabbit through the dark, pathless woods, ensuring every step was
+                    safe and clear.</p>
+            </div>
+        </section>
+
+        <section id="scene-6">
+            <div class="glass-card">
+                <h2>Home at Last</h2>
+                <p>The rabbit was safe. Luna realized that her light wasn't for dancing—it was for helping those who
+                    couldn't find their way.</p>
+                <div style="margin-top: 2rem;">
+                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+                        style="background: var(--accent); border: none; padding: 10px 20px; border-radius: 20px; font-family: inherit; font-weight: bold; cursor: pointer;">Begin
+                        Again</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+          }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        // --- Core Setup ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0510);
+        scene.fog = new THREE.FogExp2(0x0a0510, 0.04);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.tonemapping = THREE.ReinhardToneMapping;
+        document.body.appendChild(renderer.domElement);
+
+        // --- Post Processing ---
+        const composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0.2;
+        bloomPass.strength = 1.0;
+        bloomPass.radius = 1.0;
+        composer.addPass(bloomPass);
+
+        // --- Camera Path (Spline) ---
+        const curvePoints = [
+            new THREE.Vector3(0, 5, 20),      // Intro
+            new THREE.Vector3(10, 2, 5),      // Meadow
+            new THREE.Vector3(-10, 1, -10),   // Finding Rabbit
+            new THREE.Vector3(0, 3, -30),     // First Glow
+            new THREE.Vector3(15, 2, -50),    // Path finding
+            new THREE.Vector3(0, 5, -80)      // Reunion
+        ];
+        const curve = new THREE.CatmullRomCurve3(curvePoints);
+
+        // --- Lighting ---
+        const ambientLight = new THREE.AmbientLight(0x4a3b6b, 0.5);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffd700, 0, 50); // Luna's light (initially off)
+        scene.add(pointLight);
+
+        // --- Characters ---
+        // Luna (Firefly) - A small group of glowing spheres
+        const lunaGroup = new THREE.Group();
+        const lunaBodyGeo = new THREE.SphereGeometry(0.15, 8, 8);
+        const lunaBodyMat = new THREE.MeshStandardMaterial({ color: 0x4a3b6b, emissive: 0x4a3b6b, emissiveIntensity: 2 });
+        const lunaBody = new THREE.Mesh(lunaBodyGeo, lunaBodyMat);
+        lunaGroup.add(lunaBody);
+
+        const lunaCoreGeo = new THREE.SphereGeometry(0.05, 8, 8);
+        const lunaCoreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const lunaCore = new THREE.Mesh(lunaCoreGeo, lunaCoreMat);
+        lunaGroup.add(lunaCore);
+
+        scene.add(lunaGroup);
+
+        // Rabbit (Low Poly)
+        const rabbitGroup = new THREE.Group();
+        const rabbitBodyGeo = new THREE.CapsuleGeometry(0.3, 0.4, 4, 8);
+        const rabbitBodyMat = new THREE.MeshStandardMaterial({ color: 0xc4a574 });
+        const rabbitBody = new THREE.Mesh(rabbitBodyGeo, rabbitBodyMat);
+        rabbitBody.rotation.x = Math.PI / 2;
+        rabbitGroup.add(rabbitBody);
+
+        const rabbitHeadGeo = new THREE.SphereGeometry(0.25, 8, 8);
+        const rabbitHead = new THREE.Mesh(rabbitHeadGeo, rabbitBodyMat);
+        rabbitHead.position.set(0, 0.4, 0.2);
+        rabbitGroup.add(rabbitHead);
+
+        const rabbitEarGeo = new THREE.CapsuleGeometry(0.05, 0.3, 2, 4);
+        const rabbitEarL = new THREE.Mesh(rabbitEarGeo, rabbitBodyMat);
+        rabbitEarL.position.set(-0.1, 0.65, 0.2);
+        rabbitEarL.rotation.z = -0.2;
+        const rabbitEarR = rabbitEarL.clone();
+        rabbitEarR.position.set(0.1, 0.65, 0.2);
+        rabbitEarR.rotation.z = 0.2;
+        rabbitGroup.add(rabbitEarL, rabbitEarR);
+
+        rabbitGroup.position.set(-8, 0, -15);
+        scene.add(rabbitGroup);
+
+        // --- Environment ---
+        const dummy = new THREE.Object3D();
+
+        // Trees
+        function createTree(x, z) {
+            const tree = new THREE.Group();
+            const trunkGeo = new THREE.CylinderGeometry(0.2, 0.3, 2, 8);
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f });
+            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+            trunk.position.y = 1;
+            tree.add(trunk);
+
+            const leavesGeo = new THREE.ConeGeometry(1.5, 4, 8);
+            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x1a3d17, flatShading: true });
+            const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+            leaves.position.y = 3;
+            tree.add(leaves);
+
+            tree.position.set(x, 0, z);
+            tree.rotation.y = Math.random() * Math.PI;
+            scene.add(tree);
+        }
+
+        for (let i = 0; i < 80; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 20 + Math.random() * 80;
+            createTree(Math.cos(angle) * radius, Math.sin(angle) * radius - 30);
+        }
+
+        // Instanced Flowers
+        const flowerCount = 800;
+        const flowerGeo = new THREE.SphereGeometry(0.1, 4, 4);
+        const flowerInstanced = new THREE.InstancedMesh(flowerGeo, new THREE.MeshStandardMaterial({}), flowerCount);
+
+        for (let i = 0; i < flowerCount; i++) {
+            const x = (Math.random() - 0.5) * 100;
+            const z = (Math.random() - 0.5) * 100 - 30;
+            dummy.position.set(x, 0.4, z);
+            dummy.scale.setScalar(0.5 + Math.random() * 1);
+            dummy.updateMatrix();
+            flowerInstanced.setMatrixAt(i, dummy.matrix);
+            flowerInstanced.setColorAt(i, new THREE.Color().setHSL(Math.random(), 0.7, 0.5));
+        }
+        scene.add(flowerInstanced);
+
+        // Burrow (End Scene)
+        const burrowGroup = new THREE.Group();
+        const burrowGeo = new THREE.SphereGeometry(3, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+        const burrowMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f, side: THREE.DoubleSide });
+        const burrow = new THREE.Mesh(burrowGeo, burrowMat);
+        burrow.scale.y = 0.5;
+        burrowGroup.add(burrow);
+
+        // Family of rabbits at burrow
+        for (let i = 0; i < 3; i++) {
+            const familyMem = rabbitGroup.clone();
+            familyMem.position.set(2 + i, 0, 1);
+            familyMem.scale.setScalar(0.8 + Math.random() * 0.5);
+            burrowGroup.add(familyMem);
+        }
+
+        burrowGroup.position.set(0, 0, -100);
+        scene.add(burrowGroup);
+
+        // Instanced Grass
+        const grassCount = 5000;
+        const grassGeo = new THREE.PlaneGeometry(0.2, 0.6);
+        const grassMat = new THREE.MeshStandardMaterial({ color: 0x2d4a22, side: THREE.DoubleSide, alphaTest: 0.5 });
+        const grassInstanced = new THREE.InstancedMesh(grassGeo, grassMat, grassCount);
+
+        for (let i = 0; i < grassCount; i++) {
+            const x = (Math.random() - 0.5) * 100;
+            const z = (Math.random() - 0.5) * 100 - 30;
+            dummy.position.set(x, 0.3, z);
+            dummy.rotation.y = Math.random() * Math.PI;
+            dummy.scale.setScalar(0.5 + Math.random() * 1);
+            dummy.updateMatrix();
+            grassInstanced.setMatrixAt(i, dummy.matrix);
+        }
+        scene.add(grassInstanced);
+
+        // Stars
+        const starsCount = 3000;
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = new Float32Array(starsCount * 3);
+        for (let i = 0; i < starsCount * 3; i++) {
+            starPos[i] = (Math.random() - 0.5) * 400;
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starMat = new THREE.PointsMaterial({ size: 0.7, color: 0xffffff, transparent: true, opacity: 0.5 });
+        const stars = new THREE.Points(starGeo, starMat);
+        scene.add(stars);
+
+        // Ground
+        const groundGeo = new THREE.PlaneGeometry(1000, 1000);
+        groundGeo.rotateX(-Math.PI / 2);
+        const groundMat = new THREE.MeshStandardMaterial({ color: 0x050c05, roughness: 1 });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        scene.add(ground);
+
+        // --- Scroll Logic ---
+        let targetScroll = 0;
+        let currentScroll = 0;
+        const progressBar = document.getElementById('progressBar');
+        const cards = document.querySelectorAll('.glass-card');
+
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement;
+            const b = document.body;
+            const st = 'scrollTop';
+            const sh = 'scrollHeight';
+            targetScroll = (h[st] || b[st]) / ((h[sh] || b[sh]) - h.clientHeight);
+
+            progressBar.style.width = (targetScroll * 100) + '%';
+
+            // Toggle visibility of cards
+            const sectionIdx = Math.floor(targetScroll * cards.length + 0.1);
+            cards.forEach((card, idx) => {
+                if (idx === sectionIdx) card.classList.add('visible');
+                else card.classList.remove('visible');
+            });
+
+            if (targetScroll > 0.02) document.getElementById('scrollHint').style.opacity = 0;
+            else document.getElementById('scrollHint').style.opacity = 0.6;
+        });
+
+        // --- Animation Loop ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+
+            // Smoothing scroll movement (LERP)
+            currentScroll += (targetScroll - currentScroll) * 0.05;
+
+            // Update camera position along spline
+            const pos = curve.getPointAt(currentScroll);
+            camera.position.copy(pos);
+
+            // Look ahead
+            const lookPos = curve.getPointAt(Math.min(currentScroll + 0.01, 1));
+            camera.lookAt(lookPos);
+
+            // --- Luna Animation ---
+            // Luna follows camera with a bit of "drift"
+            const lunaTargetPos = pos.clone().add(new THREE.Vector3(
+                Math.sin(time * 0.5) * 0.5,
+                -1 + Math.cos(time * 0.8) * 0.2,
+                -2
+            ));
+            lunaGroup.position.lerp(lunaTargetPos, 0.1);
+            lunaGroup.rotation.y = time * 0.5;
+
+            // Update Luna's light position
+            pointLight.position.copy(lunaGroup.position);
+
+            // --- Rabbit & Story Logic ---
+            // Scene 2/3: Finding Rabbit (approx 20-50% scroll)
+            if (currentScroll > 0.2 && currentScroll < 0.6) {
+                // Rabbit "vibrates" slightly (shivering)
+                rabbitGroup.position.x = -8 + Math.sin(time * 20) * 0.02;
+            }
+
+            // Scene 4/5: Guidance (approx 60-90% scroll)
+            if (currentScroll > 0.6) {
+                // Rabbit follows Luna (with delay)
+                const rabbitTargetZ = -15 - (currentScroll - 0.6) * 100;
+                rabbitGroup.position.z += (rabbitTargetZ - rabbitGroup.position.z) * 0.05;
+                rabbitGroup.position.x += (lunaGroup.position.x - rabbitGroup.position.x) * 0.02;
+
+                // Rabbit "hops"
+                rabbitGroup.position.y = Math.abs(Math.sin(time * 5)) * 0.3;
+            }
+
+            // Light Intensity Transition
+            if (currentScroll > 0.55) { // Scene 4+ (First Glow)
+                const glowLevel = Math.min(1, (currentScroll - 0.55) * 5);
+                pointLight.intensity = 100 * glowLevel;
+                bloomPass.strength = 1.0 + glowLevel * 1.5;
+                lunaBodyMat.emissiveIntensity = 2 + glowLevel * 5;
+                lunaCoreMat.color.setHSL(0.1, 1, 0.5 + glowLevel * 0.5);
+            } else {
+                pointLight.intensity = 0;
+                bloomPass.strength = 1.0;
+                lunaBodyMat.emissiveIntensity = 1;
+            }
+
+            // --- Background Fireflies ---
+            stars.rotation.y = time * 0.01;
+            stars.position.y = Math.sin(time * 0.2) * 5;
+
+            composer.render();
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+
+</html>
