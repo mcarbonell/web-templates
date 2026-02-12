@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escena de Naturaleza - Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            max-width: 300px;
+        }
+        #fps {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">Cargando escena...</div>
+    <div id="info">
+        <strong>Escena de Naturaleza</strong><br>
+        🖱️ Click izquierdo + arrastrar: Rotar<br>
+        🖱️ Click derecho + arrastrar: Desplazar<br>
+        🖱️ Rueda: Zoom<br>
+        <span id="modelCount">Modelos: 0</span>
+    </div>
+    <div id="fps">FPS: --</div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // Configuración de la escena
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB); // Cielo azul
+        scene.fog = new THREE.Fog(0x87CEEB, 50, 200);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(30, 25, 30);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        // Controles
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2.1;
+        controls.minDistance = 10;
+        controls.maxDistance = 100;
+
+        // Iluminación
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xfff4e6, 0.8);
+        sunLight.position.set(50, 50, 30);
+        sunLight.castShadow = true;
+        sunLight.shadow.camera.left = -50;
+        sunLight.shadow.camera.right = 50;
+        sunLight.shadow.camera.top = 50;
+        sunLight.shadow.camera.bottom = -50;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        scene.add(sunLight);
+
+        // Suelo de hierba
+        const groundGeometry = new THREE.PlaneGeometry(100, 100);
+        const groundMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x5a8f3a,
+            roughness: 0.8
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Loader
+        const loader = new GLTFLoader();
+        const basePath = '../assets/3D/kenney_nature-kit/Models/GLTF format/';
+        
+        let modelsLoaded = 0;
+        const totalModels = 60; // Aproximado
+
+        function updateLoadingProgress() {
+            modelsLoaded++;
+            document.getElementById('modelCount').textContent = `Modelos: ${modelsLoaded}`;
+            if (modelsLoaded >= totalModels - 5) {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        // Función para cargar y posicionar modelos
+        function loadModel(filename, position, rotation = 0, scale = 1) {
+            loader.load(
+                basePath + filename,
+                (gltf) => {
+                    const model = gltf.scene;
+                    model.position.set(position.x, position.y, position.z);
+                    model.rotation.y = rotation;
+                    model.scale.setScalar(scale);
+                    
+                    model.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    
+                    scene.add(model);
+                    updateLoadingProgress();
+                },
+                undefined,
+                (error) => console.error('Error cargando ' + filename, error)
+            );
+        }
+
+        // Composición de la escena
+        
+        // Árboles grandes en el perímetro
+        loadModel('tree_oak.glb', { x: -20, y: 0, z: -20 }, Math.random() * Math.PI * 2, 1.2);
+        loadModel('tree_oak_dark.glb', { x: 20, y: 0, z: -20 }, Math.random() * Math.PI * 2, 1.1);
+        loadModel('tree_detailed.glb', { x: -25, y: 0, z: 10 }, Math.random() * Math.PI * 2, 1);
+        loadModel('tree_detailed_dark.glb', { x: 25, y: 0, z: 15 }, Math.random() * Math.PI * 2, 1);
+        loadModel('tree_plateau.glb', { x: -15, y: 0, z: 25 }, Math.random() * Math.PI * 2, 1.1);
+        loadModel('tree_plateau_fall.glb', { x: 15, y: 0, z: 25 }, Math.random() * Math.PI * 2, 1);
+
+        // Pinos variados
+        loadModel('tree_pineTallA.glb', { x: -30, y: 0, z: 0 }, Math.random() * Math.PI * 2, 1.2);
+        loadModel('tree_pineTallB.glb', { x: 30, y: 0, z: 5 }, Math.random() * Math.PI * 2, 1.1);
+        loadModel('tree_pineRoundA.glb', { x: -18, y: 0, z: -10 }, Math.random() * Math.PI * 2, 1);
+        loadModel('tree_pineRoundC.glb', { x: 22, y: 0, z: -15 }, Math.random() * Math.PI * 2, 1);
+        loadModel('tree_pineDefaultA.glb', { x: -25, y: 0, z: -30 }, Math.random() * Math.PI * 2, 1.1);
+        loadModel('tree_pineDefaultB.glb', { x: 28, y: 0, z: -25 }, Math.random() * Math.PI * 2, 1);
+
+        // Árboles medianos
+        loadModel('tree_default.glb', { x: -12, y: 0, z: -5 }, Math.random() * Math.PI * 2, 1);
+        loadModel('tree_default_fall.glb', { x: 10, y: 0, z: -8 }, Math.random() * Math.PI * 2, 1);
+        loadModel('tree_thin.glb', { x: -8, y: 0, z: 12 }, Math.random() * Math.PI * 2, 1);
+        loadModel('tree_thin_fall.glb', { x: 12, y: 0, z: 10 }, Math.random() * Math.PI * 2, 1);
+
+        // Árboles pequeños en el claro
+        loadModel('tree_small.glb', { x: -5, y: 0, z: -2 }, Math.random() * Math.PI * 2, 1);
+        loadModel('tree_small_fall.glb', { x: 6, y: 0, z: 2 }, Math.random() * Math.PI * 2, 1);
+        loadModel('tree_simple.glb', { x: -3, y: 0, z: 8 }, Math.random() * Math.PI * 2, 0.9);
+
+        // Rocas grandes
+        loadModel('rock_largeA.glb', { x: -10, y: 0, z: 5 }, Math.random() * Math.PI * 2, 1.2);
+        loadModel('rock_largeB.glb', { x: 8, y: 0, z: -5 }, Math.random() * Math.PI * 2, 1.1);
+        loadModel('rock_largeD.glb', { x: 2, y: 0, z: 10 }, Math.random() * Math.PI * 2, 1);
+        loadModel('rock_tallA.glb', { x: -15, y: 0, z: -15 }, Math.random() * Math.PI * 2, 1);
+        loadModel('rock_tallC.glb', { x: 18, y: 0, z: 18 }, Math.random() * Math.PI * 2, 1.1);
+
+        // Rocas medianas dispersas
+        loadModel('rock_smallA.glb', { x: -2, y: 0, z: -3 }, Math.random() * Math.PI * 2, 1);
+        loadModel('rock_smallB.glb', { x: 4, y: 0, z: 5 }, Math.random() * Math.PI * 2, 1);
+        loadModel('rock_smallC.glb', { x: -6, y: 0, z: 8 }, Math.random() * Math.PI * 2, 1);
+        loadModel('rock_smallD.glb', { x: 7, y: 0, z: -2 }, Math.random() * Math.PI * 2, 1);
+        loadModel('rock_smallE.glb', { x: -4, y: 0, z: 4 }, Math.random() * Math.PI * 2, 1);
+        loadModel('rock_smallF.glb', { x: 3, y: 0, z: -6 }, Math.random() * Math.PI * 2, 1);
+
+        // Arbustos
+        loadModel('plant_bushLarge.glb', { x: -7, y: 0, z: -8 }, Math.random() * Math.PI * 2, 1);
+        loadModel('plant_bushDetailed.glb', { x: 9, y: 0, z: 7 }, Math.random() * Math.PI * 2, 1);
+        loadModel('plant_bush.glb', { x: -3, y: 0, z: 6 }, Math.random() * Math.PI * 2, 1);
+        loadModel('plant_bushSmall.glb', { x: 5, y: 0, z: -4 }, Math.random() * Math.PI * 2, 1);
+        loadModel('plant_bushTriangle.glb', { x: -8, y: 0, z: 3 }, Math.random() * Math.PI * 2, 1);
+
+        // Hierba alta
+        loadModel('grass_large.glb', { x: -1, y: 0, z: 2 }, Math.random() * Math.PI * 2, 1);
+        loadModel('grass.glb', { x: 2, y: 0, z: 3 }, Math.random() * Math.PI * 2, 1);
+        loadModel('grass_leafsLarge.glb', { x: -2, y: 0, z: -1 }, Math.random() * Math.PI * 2, 1);
+        loadModel('grass_leafs.glb', { x: 4, y: 0, z: 1 }, Math.random() * Math.PI * 2, 1);
+
+        // Flores dispersas
+        loadModel('flower_redA.glb', { x: 1, y: 0, z: 1 }, Math.random() * Math.PI * 2, 1);
+        loadModel('flower_redB.glb', { x: -1, y: 0, z: 3 }, Math.random() * Math.PI * 2, 1);
+        loadModel('flower_yellowA.glb', { x: 3, y: 0, z: -1 }, Math.random() * Math.PI * 2, 1);
+        loadModel('flower_yellowB.glb', { x: -2, y: 0, z: 4 }, Math.random() * Math.PI * 2, 1);
+        loadModel('flower_purpleA.glb', { x: 2, y: 0, z: 6 }, Math.random() * Math.PI * 2, 1);
+        loadModel('flower_purpleB.glb', { x: -3, y: 0, z: -2 }, Math.random() * Math.PI * 2, 1);
+        loadModel('flower_yellowC.glb', { x: 5, y: 0, z: 3 }, Math.random() * Math.PI * 2, 1);
+        loadModel('flower_redC.glb', { x: -4, y: 0, z: 1 }, Math.random() * Math.PI * 2, 1);
+        loadModel('flower_purpleC.glb', { x: 1, y: 0, z: -4 }, Math.random() * Math.PI * 2, 1);
+
+        // Hongos
+        loadModel('mushroom_redGroup.glb', { x: -5, y: 0, z: -1 }, Math.random() * Math.PI * 2, 1);
+        loadModel('mushroom_tanGroup.glb', { x: 6, y: 0, z: -3 }, Math.random() * Math.PI * 2, 1);
+        loadModel('mushroom_red.glb', { x: -1, y: 0, z: 5 }, Math.random() * Math.PI * 2, 1);
+        loadModel('mushroom_tan.glb', { x: 3, y: 0, z: 4 }, Math.random() * Math.PI * 2, 1);
+        loadModel('mushroom_redTall.glb', { x: -6, y: 0, z: 2 }, Math.random() * Math.PI * 2, 1);
+
+        // Plantas planas
+        loadModel('plant_flatTall.glb', { x: -4, y: 0, z: -5 }, Math.random() * Math.PI * 2, 1);
+        loadModel('plant_flatShort.glb', { x: 7, y: 0, z: 4 }, Math.random() * Math.PI * 2, 1);
+
+        // Contador de FPS
+        let lastTime = performance.now();
+        let frames = 0;
+        let fps = 0;
+
+        function updateFPS() {
+            const currentTime = performance.now();
+            frames++;
+            
+            if (currentTime >= lastTime + 1000) {
+                fps = Math.round((frames * 1000) / (currentTime - lastTime));
+                document.getElementById('fps').textContent = `FPS: ${fps}`;
+                frames = 0;
+                lastTime = currentTime;
+            }
+        }
+
+        // Animación
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+            updateFPS();
+        }
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

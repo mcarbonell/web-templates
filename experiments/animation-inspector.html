@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspector de Animaciones GLB</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        #container {
+            display: flex;
+            height: 100vh;
+        }
+        #sidebar {
+            width: 350px;
+            background: #252526;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #3e3e42;
+        }
+        #viewer {
+            flex: 1;
+            position: relative;
+        }
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            color: #4ec9b0;
+        }
+        h2 {
+            font-size: 16px;
+            color: #569cd6;
+            margin: 20px 0 10px 0;
+        }
+        .info-section {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .info-item {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .label {
+            color: #9cdcfe;
+            font-weight: bold;
+        }
+        .value {
+            color: #ce9178;
+        }
+        .animation-list {
+            list-style: none;
+            padding: 0;
+        }
+        .animation-item {
+            background: #2d2d30;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-left: 3px solid #4ec9b0;
+        }
+        .animation-item:hover {
+            background: #3e3e42;
+        }
+        .animation-item.active {
+            background: #094771;
+            border-left-color: #569cd6;
+        }
+        .animation-name {
+            font-weight: bold;
+            color: #dcdcaa;
+            margin-bottom: 5px;
+        }
+        .animation-details {
+            font-size: 12px;
+            color: #858585;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+        .hidden {
+            display: none;
+        }
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        button:disabled {
+            background: #3e3e42;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="sidebar">
+            <h1>🎬 Inspector de Animaciones</h1>
+            
+            <div class="info-section">
+                <h2>Modelo</h2>
+                <div class="info-item">
+                    <span class="label">Archivo:</span>
+                    <span class="value" id="fileName">character-f.glb</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Animaciones:</span>
+                    <span class="value" id="animCount">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Meshes:</span>
+                    <span class="value" id="meshCount">-</span>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>Animaciones Disponibles</h2>
+                <ul class="animation-list" id="animationList">
+                    <li style="color: #858585;">Cargando...</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="viewer">
+            <div id="loading">Cargando modelo...</div>
+            <div id="controls">
+                <button id="playBtn">▶ Play</button>
+                <button id="pauseBtn">⏸ Pause</button>
+                <button id="stopBtn">⏹ Stop</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // Configuración de la escena
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x2d2d30);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(3, 2, 5);
+
+        const viewerElement = document.getElementById('viewer');
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(viewerElement.clientWidth, viewerElement.clientHeight);
+        renderer.shadowMap.enabled = true;
+        viewerElement.appendChild(renderer.domElement);
+
+        // Controles
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.target.set(0, 1, 0);
+
+        // Iluminación
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 10, 5);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+
+        const fillLight = new THREE.DirectionalLight(0x4ec9b0, 0.3);
+        fillLight.position.set(-5, 5, -5);
+        scene.add(fillLight);
+
+        // Suelo
+        const groundGeometry = new THREE.PlaneGeometry(20, 20);
+        const groundMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x1e1e1e,
+            roughness: 0.8
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Grid
+        const gridHelper = new THREE.GridHelper(20, 20, 0x3e3e42, 0x2d2d30);
+        scene.add(gridHelper);
+
+        // Variables para animación
+        let mixer = null;
+        let animations = [];
+        let currentAction = null;
+        let model = null;
+
+        // Cargar modelo
+        const loader = new GLTFLoader();
+        const modelPath = '../assets/3D/kenney_blocky-characters_20/Models/GLB format/character-f.glb';
+
+        loader.load(
+            modelPath,
+            (gltf) => {
+                model = gltf.scene;
+                animations = gltf.animations;
+
+                // Posicionar modelo
+                model.position.set(0, 0, 0);
+                
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                scene.add(model);
+
+                // Configurar mixer de animaciones
+                if (animations.length > 0) {
+                    mixer = new THREE.AnimationMixer(model);
+                }
+
+                // Actualizar UI
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('animCount').textContent = animations.length;
+                
+                let meshCount = 0;
+                model.traverse((child) => {
+                    if (child.isMesh) meshCount++;
+                });
+                document.getElementById('meshCount').textContent = meshCount;
+
+                // Mostrar animaciones
+                displayAnimations();
+
+                console.log('Modelo cargado:', gltf);
+                console.log('Animaciones encontradas:', animations);
+            },
+            (progress) => {
+                console.log('Cargando:', (progress.loaded / progress.total * 100).toFixed(2) + '%');
+            },
+            (error) => {
+                console.error('Error cargando modelo:', error);
+                document.getElementById('loading').textContent = 'Error al cargar el modelo';
+            }
+        );
+
+        // Mostrar lista de animaciones
+        function displayAnimations() {
+            const listElement = document.getElementById('animationList');
+            listElement.innerHTML = '';
+
+            if (animations.length === 0) {
+                listElement.innerHTML = '<li style="color: #858585;">No se encontraron animaciones</li>';
+                return;
+            }
+
+            animations.forEach((clip, index) => {
+                const li = document.createElement('li');
+                li.className = 'animation-item';
+                
+                const duration = clip.duration.toFixed(2);
+                const tracks = clip.tracks.length;
+                
+                li.innerHTML = `
+                    <div class="animation-name">${clip.name}</div>
+                    <div class="animation-details">
+                        Duración: ${duration}s | Tracks: ${tracks}
+                    </div>
+                `;
+                
+                li.addEventListener('click', () => {
+                    playAnimation(index);
+                    
+                    // Actualizar UI
+                    document.querySelectorAll('.animation-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    li.classList.add('active');
+                });
+                
+                listElement.appendChild(li);
+            });
+
+            // Reproducir primera animación automáticamente
+            if (animations.length > 0) {
+                playAnimation(0);
+                listElement.children[0].classList.add('active');
+            }
+        }
+
+        // Reproducir animación
+        function playAnimation(index) {
+            if (!mixer || index >= animations.length) return;
+
+            // Detener animación actual
+            if (currentAction) {
+                currentAction.stop();
+            }
+
+            // Reproducir nueva animación
+            const clip = animations[index];
+            currentAction = mixer.clipAction(clip);
+            currentAction.reset();
+            currentAction.play();
+
+            console.log('Reproduciendo:', clip.name);
+        }
+
+        // Controles de reproducción
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (currentAction) {
+                currentAction.paused = false;
+                currentAction.play();
+            }
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (currentAction) {
+                currentAction.paused = true;
+            }
+        });
+
+        document.getElementById('stopBtn').addEventListener('click', () => {
+            if (currentAction) {
+                currentAction.stop();
+            }
+        });
+
+        // Animación
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            if (mixer) {
+                mixer.update(delta);
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            const width = viewerElement.clientWidth;
+            const height = viewerElement.clientHeight;
+            
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escena de Naturaleza Densa - Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            max-width: 300px;
+        }
+        #fps {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">Cargando escena densa...</div>
+    <div id="info">
+        <strong>Bosque Denso</strong><br>
+        🖱️ Click izquierdo + arrastrar: Rotar<br>
+        🖱️ Click derecho + arrastrar: Desplazar<br>
+        🖱️ Rueda: Zoom<br>
+        <span id="modelCount">Modelos: 0</span>
+    </div>
+    <div id="fps">FPS: --</div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // Configuración de la escena
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB);
+        scene.fog = new THREE.Fog(0x87CEEB, 30, 120);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(25, 20, 25);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        // Controles
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2.1;
+        controls.minDistance = 5;
+        controls.maxDistance = 80;
+
+        // Iluminación
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xfff4e6, 0.9);
+        sunLight.position.set(50, 60, 30);
+        sunLight.castShadow = true;
+        sunLight.shadow.camera.left = -60;
+        sunLight.shadow.camera.right = 60;
+        sunLight.shadow.camera.top = 60;
+        sunLight.shadow.camera.bottom = -60;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        scene.add(sunLight);
+
+        // Suelo base
+        const groundGeometry = new THREE.PlaneGeometry(120, 120);
+        const groundMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x4a7c2f,
+            roughness: 0.9
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Loader
+        const loader = new GLTFLoader();
+        const basePath = '../assets/3D/kenney_nature-kit/Models/GLTF format/';
+        
+        let modelsLoaded = 0;
+        let totalModels = 0;
+
+        function updateLoadingProgress() {
+            modelsLoaded++;
+            document.getElementById('modelCount').textContent = `Modelos: ${modelsLoaded}`;
+            if (modelsLoaded >= totalModels - 10) {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        function loadModel(filename, position, rotation = 0, scale = 1) {
+            totalModels++;
+            loader.load(
+                basePath + filename,
+                (gltf) => {
+                    const model = gltf.scene;
+                    model.position.set(position.x, position.y, position.z);
+                    model.rotation.y = rotation;
+                    model.scale.setScalar(scale);
+                    
+                    model.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    
+                    scene.add(model);
+                    updateLoadingProgress();
+                },
+                undefined,
+                (error) => {
+                    console.error('Error cargando ' + filename, error);
+                    updateLoadingProgress();
+                }
+            );
+        }
+
+        // Función para generar posición aleatoria en un rango
+        function randomPos(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function randomRot() {
+            return Math.random() * Math.PI * 2;
+        }
+
+        // === COMPOSICIÓN DE ESCENA DENSA ===
+
+        // ACANTILADOS Y TERRENO ELEVADO (creando niveles)
+        // Acantilados formando una colina en el fondo
+        for (let i = 0; i < 8; i++) {
+            const x = randomPos(-35, -25);
+            const z = randomPos(-35, -20);
+            loadModel('cliff_block_stone.glb', { x, y: 0, z }, randomRot(), 1);
+        }
+        
+        for (let i = 0; i < 6; i++) {
+            const x = randomPos(-35, -25);
+            const z = randomPos(-35, -20);
+            loadModel('cliff_half_stone.glb', { x, y: 2, z }, randomRot(), 1);
+        }
+
+        // Acantilados laterales
+        loadModel('cliff_large_stone.glb', { x: -30, y: 0, z: 10 }, randomRot(), 1.2);
+        loadModel('cliff_large_rock.glb', { x: 28, y: 0, z: -15 }, randomRot(), 1.1);
+        loadModel('cliff_cornerLarge_stone.glb', { x: -25, y: 0, z: -25 }, randomRot(), 1);
+        loadModel('cliff_cornerLarge_rock.glb', { x: 25, y: 0, z: 25 }, randomRot(), 1);
+
+        // PUENTE DE MADERA cruzando el centro
+        loadModel('bridge_wood.glb', { x: 0, y: 0.2, z: 0 }, 0, 1);
+        loadModel('bridge_side_wood.glb', { x: -3, y: 0, z: 0 }, 0, 1);
+        loadModel('bridge_side_wood.glb', { x: 3, y: 0, z: 0 }, Math.PI, 1);
+
+        // CAMINO/RÍO con rocas
+        for (let i = -5; i <= 5; i++) {
+            loadModel('ground_pathRocks.glb', { x: i * 2, y: 0, z: randomPos(-2, 2) }, randomRot(), 1);
+        }
+
+        // BOSQUE DENSO - Árboles grandes en capas
+        // Capa exterior (perímetro)
+        const outerTreePositions = [
+            // Fondo
+            [-35, -30], [-30, -35], [-25, -32], [-20, -35], [-15, -33],
+            [35, -30], [30, -35], [25, -32], [20, -35], [15, -33],
+            // Laterales
+            [-35, -20], [-35, -10], [-35, 0], [-35, 10], [-35, 20], [-35, 30],
+            [35, -20], [35, -10], [35, 0], [35, 10], [35, 20], [35, 30],
+            // Frente
+            [-30, 35], [-20, 35], [-10, 35], [10, 35], [20, 35], [30, 35]
+        ];
+
+        const treeTypes = [
+            'tree_oak.glb', 'tree_oak_dark.glb', 'tree_oak_fall.glb',
+            'tree_detailed.glb', 'tree_detailed_dark.glb', 'tree_detailed_fall.glb',
+            'tree_plateau.glb', 'tree_plateau_dark.glb', 'tree_plateau_fall.glb',
+            'tree_pineTallA.glb', 'tree_pineTallB.glb', 'tree_pineTallC.glb',
+            'tree_pineRoundA.glb', 'tree_pineRoundB.glb', 'tree_pineRoundC.glb'
+        ];
+
+        outerTreePositions.forEach(([x, z]) => {
+            const tree = treeTypes[Math.floor(Math.random() * treeTypes.length)];
+            const offset = randomPos(-2, 2);
+            loadModel(tree, { x: x + offset, y: 0, z: z + offset }, randomRot(), randomPos(0.9, 1.3));
+        });
+
+        // Capa media - árboles medianos más densos
+        for (let i = 0; i < 40; i++) {
+            const angle = (i / 40) * Math.PI * 2;
+            const radius = randomPos(15, 25);
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            
+            const mediumTrees = ['tree_default.glb', 'tree_default_fall.glb', 'tree_thin.glb', 
+                                 'tree_thin_fall.glb', 'tree_tall.glb', 'tree_tall_fall.glb'];
+            const tree = mediumTrees[Math.floor(Math.random() * mediumTrees.length)];
+            loadModel(tree, { x, y: 0, z }, randomRot(), randomPos(0.8, 1.1));
+        }
+
+        // Árboles pequeños dispersos en el área central
+        for (let i = 0; i < 15; i++) {
+            const x = randomPos(-12, 12);
+            const z = randomPos(-12, 12);
+            // Evitar el puente
+            if (Math.abs(z) > 4 || Math.abs(x) > 8) {
+                const smallTrees = ['tree_small.glb', 'tree_small_fall.glb', 'tree_simple.glb', 
+                                   'tree_simple_fall.glb', 'tree_fat.glb'];
+                const tree = smallTrees[Math.floor(Math.random() * smallTrees.length)];
+                loadModel(tree, { x, y: 0, z }, randomRot(), randomPos(0.7, 1));
+            }
+        }
+
+        // Pinos variados adicionales
+        for (let i = 0; i < 20; i++) {
+            const x = randomPos(-30, 30);
+            const z = randomPos(-30, 30);
+            if (Math.sqrt(x*x + z*z) > 18) {
+                const pines = ['tree_pineDefaultA.glb', 'tree_pineDefaultB.glb', 
+                              'tree_pineSmallA.glb', 'tree_pineSmallB.glb'];
+                const tree = pines[Math.floor(Math.random() * pines.length)];
+                loadModel(tree, { x, y: 0, z }, randomRot(), randomPos(0.9, 1.2));
+            }
+        }
+
+        // ROCAS ABUNDANTES
+        // Rocas grandes estratégicamente colocadas
+        const largeRocks = ['rock_largeA.glb', 'rock_largeB.glb', 'rock_largeC.glb', 
+                           'rock_largeD.glb', 'rock_largeE.glb', 'rock_largeF.glb'];
+        for (let i = 0; i < 25; i++) {
+            const x = randomPos(-35, 35);
+            const z = randomPos(-35, 35);
+            const rock = largeRocks[Math.floor(Math.random() * largeRocks.length)];
+            loadModel(rock, { x, y: 0, z }, randomRot(), randomPos(0.8, 1.3));
+        }
+
+        // Rocas altas
+        const tallRocks = ['rock_tallA.glb', 'rock_tallB.glb', 'rock_tallC.glb', 
+                          'rock_tallD.glb', 'rock_tallE.glb'];
+        for (let i = 0; i < 15; i++) {
+            const x = randomPos(-32, 32);
+            const z = randomPos(-32, 32);
+            const rock = tallRocks[Math.floor(Math.random() * tallRocks.length)];
+            loadModel(rock, { x, y: 0, z }, randomRot(), randomPos(0.9, 1.2));
+        }
+
+        // Rocas pequeñas muy dispersas
+        const smallRocks = ['rock_smallA.glb', 'rock_smallB.glb', 'rock_smallC.glb', 
+                           'rock_smallD.glb', 'rock_smallE.glb', 'rock_smallF.glb',
+                           'rock_smallG.glb', 'rock_smallH.glb', 'rock_smallI.glb'];
+        for (let i = 0; i < 60; i++) {
+            const x = randomPos(-40, 40);
+            const z = randomPos(-40, 40);
+            const rock = smallRocks[Math.floor(Math.random() * smallRocks.length)];
+            loadModel(rock, { x, y: 0, z }, randomRot(), randomPos(0.7, 1.1));
+        }
+
+        // ARBUSTOS DENSOS
+        const bushes = ['plant_bush.glb', 'plant_bushLarge.glb', 'plant_bushDetailed.glb',
+                       'plant_bushSmall.glb', 'plant_bushTriangle.glb', 'plant_bushLargeTriangle.glb'];
+        for (let i = 0; i < 50; i++) {
+            const x = randomPos(-35, 35);
+            const z = randomPos(-35, 35);
+            const bush = bushes[Math.floor(Math.random() * bushes.length)];
+            loadModel(bush, { x, y: 0, z }, randomRot(), randomPos(0.8, 1.2));
+        }
+
+        // HIERBA ALTA
+        const grasses = ['grass.glb', 'grass_large.glb', 'grass_leafs.glb', 'grass_leafsLarge.glb'];
+        for (let i = 0; i < 70; i++) {
+            const x = randomPos(-38, 38);
+            const z = randomPos(-38, 38);
+            const grass = grasses[Math.floor(Math.random() * grasses.length)];
+            loadModel(grass, { x, y: 0, z }, randomRot(), randomPos(0.9, 1.1));
+        }
+
+        // FLORES ABUNDANTES
+        const flowers = ['flower_redA.glb', 'flower_redB.glb', 'flower_redC.glb',
+                        'flower_yellowA.glb', 'flower_yellowB.glb', 'flower_yellowC.glb',
+                        'flower_purpleA.glb', 'flower_purpleB.glb', 'flower_purpleC.glb'];
+        for (let i = 0; i < 80; i++) {
+            const x = randomPos(-40, 40);
+            const z = randomPos(-40, 40);
+            const flower = flowers[Math.floor(Math.random() * flowers.length)];
+            loadModel(flower, { x, y: 0, z }, randomRot(), 1);
+        }
+
+        // HONGOS EN GRUPOS
+        for (let i = 0; i < 20; i++) {
+            const x = randomPos(-35, 35);
+            const z = randomPos(-35, 35);
+            const mushrooms = ['mushroom_red.glb', 'mushroom_tan.glb', 
+                             'mushroom_redTall.glb', 'mushroom_tanTall.glb'];
+            const mushroom = mushrooms[Math.floor(Math.random() * mushrooms.length)];
+            loadModel(mushroom, { x, y: 0, z }, randomRot(), randomPos(0.8, 1.1));
+        }
+
+        // Grupos de hongos
+        for (let i = 0; i < 10; i++) {
+            const x = randomPos(-30, 30);
+            const z = randomPos(-30, 30);
+            const groups = ['mushroom_redGroup.glb', 'mushroom_tanGroup.glb'];
+            const group = groups[Math.floor(Math.random() * groups.length)];
+            loadModel(group, { x, y: 0, z }, randomRot(), 1);
+        }
+
+        // PLANTAS PLANAS
+        for (let i = 0; i < 30; i++) {
+            const x = randomPos(-38, 38);
+            const z = randomPos(-38, 38);
+            const plants = ['plant_flatTall.glb', 'plant_flatShort.glb'];
+            const plant = plants[Math.floor(Math.random() * plants.length)];
+            loadModel(plant, { x, y: 0, z }, randomRot(), 1);
+        }
+
+        // Contador de FPS
+        let lastTime = performance.now();
+        let frames = 0;
+        let fps = 0;
+
+        function updateFPS() {
+            const currentTime = performance.now();
+            frames++;
+            
+            if (currentTime >= lastTime + 1000) {
+                fps = Math.round((frames * 1000) / (currentTime - lastTime));
+                document.getElementById('fps').textContent = `FPS: ${fps}`;
+                frames = 0;
+                lastTime = currentTime;
+            }
+        }
+
+        // Animación
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+            updateFPS();
+        }
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
