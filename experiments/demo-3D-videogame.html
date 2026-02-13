@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blocky Character - 3D Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #1a1f3a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --accent: #667eea;
+            --accent-hover: #5a67d8;
+            --border: #2d3748;
+        }
+
+        body.light-theme {
+            --bg-primary: #f7fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --accent: #5a67d8;
+            --accent-hover: #4c51bf;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent), #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .viewer-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 600px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .controls-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid var(--border);
+            height: fit-content;
+        }
+
+        .controls-section h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .animation-grid {
+            display: grid;
+            gap: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .animation-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .animation-grid::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 10px;
+        }
+
+        .animation-grid::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .anim-btn {
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .anim-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .anim-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .info-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid var(--border);
+            margin-top: 30px;
+        }
+
+        .info-section h2 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .info-section p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--text-secondary);
+            border-top: 2px solid var(--border);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Blocky Character Demo</h1>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="theme-icon">🌙</span>
+                <span id="theme-text">Modo Oscuro</span>
+            </button>
+        </header>
+
+        <div class="main-content">
+            <div class="viewer-section">
+                <div id="canvas-container">
+                    <div class="loading">Cargando modelo 3D...</div>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <h2>🎬 Animaciones</h2>
+                <div class="animation-grid" id="animation-controls"></div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>ℹ️ Información</h2>
+            <p>Este es un personaje estilo Minecraft con 27 animaciones diferentes.</p>
+            <p>🖱️ Arrastra para rotar | 🔍 Scroll para zoom | Click en las animaciones para reproducirlas</p>
+            <p>Modelo 3D cortesía de Kenney Assets</p>
+        </div>
+
+        <footer>
+            <p>Demo experimental - Modelo 3D interactivo con Three.js</p>
+        </footer>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        let scene, camera, renderer, controls, mixer, model, currentAction;
+        const animations = [];
+        const animationNames = [
+            { name: 'static', duration: '0.10s', tracks: 21 },
+            { name: 'idle', duration: '1.33s', tracks: 4 },
+            { name: 'walk', duration: '0.67s', tracks: 6 },
+            { name: 'sprint', duration: '0.50s', tracks: 7 },
+            { name: 'sit', duration: '0.17s', tracks: 3 },
+            { name: 'drive', duration: '0.17s', tracks: 5 },
+            { name: 'die', duration: '0.33s', tracks: 8 },
+            { name: 'pick-up', duration: '0.33s', tracks: 4 },
+            { name: 'emote-yes', duration: '0.67s', tracks: 4 },
+            { name: 'emote-no', duration: '0.67s', tracks: 4 },
+            { name: 'holding-right', duration: '0.17s', tracks: 1 },
+            { name: 'holding-left', duration: '0.17s', tracks: 1 },
+            { name: 'holding-both', duration: '0.17s', tracks: 2 },
+            { name: 'holding-right-shoot', duration: '0.20s', tracks: 3 },
+            { name: 'holding-left-shoot', duration: '0.20s', tracks: 3 },
+            { name: 'holding-both-shoot', duration: '0.20s', tracks: 4 },
+            { name: 'attack-melee-right', duration: '0.42s', tracks: 7 },
+            { name: 'attack-melee-left', duration: '0.42s', tracks: 7 },
+            { name: 'attack-kick-right', duration: '0.58s', tracks: 7 },
+            { name: 'attack-kick-left', duration: '0.58s', tracks: 7 },
+            { name: 'interact-right', duration: '0.67s', tracks: 4 },
+            { name: 'interact-left', duration: '0.67s', tracks: 4 },
+            { name: 'wheelchair-sit', duration: '0.17s', tracks: 4 },
+            { name: 'wheelchair-move-forward', duration: '0.50s', tracks: 6 },
+            { name: 'wheelchair-move-back', duration: '0.50s', tracks: 6 },
+            { name: 'wheelchair-move-left', duration: '0.50s', tracks: 6 },
+            { name: 'wheelchair-move-right', duration: '0.50s', tracks: 6 }
+        ];
+
+        function init() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x667eea);
+            
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(3, 2, 5);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            container.innerHTML = '';
+            container.appendChild(renderer.domElement);
+            
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.set(0, 1, 0);
+            
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 10, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            const pointLight = new THREE.PointLight(0xf093fb, 0.5);
+            pointLight.position.set(-5, 5, -5);
+            scene.add(pointLight);
+            
+            const gridHelper = new THREE.GridHelper(10, 10, 0xffffff, 0xffffff);
+            gridHelper.material.opacity = 0.2;
+            gridHelper.material.transparent = true;
+            scene.add(gridHelper);
+            
+            loadModel();
+            
+            window.addEventListener('resize', onWindowResize);
+            animate();
+        }
+
+        function loadModel() {
+            const loader = new GLTFLoader();
+            loader.load(
+                '../assets/3D/kenney_blocky-characters_20/Models/GLB format/character-c.glb',
+                (gltf) => {
+                    model = gltf.scene;
+                    model.position.set(0, 0, 0);
+                    model.scale.set(1, 1, 1);
+                    
+                    model.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    
+                    scene.add(model);
+                    
+                    mixer = new THREE.AnimationMixer(model);
+                    gltf.animations.forEach((clip) => {
+                        animations.push(clip);
+                    });
+                    
+                    createAnimationControls();
+                    
+                    if (animations.length > 1) {
+                        playAnimation(1);
+                    }
+                },
+                (xhr) => {
+                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                },
+                (error) => {
+                    console.error('Error loading model:', error);
+                }
+            );
+        }
+
+        function createAnimationControls() {
+            const container = document.getElementById('animation-controls');
+            
+            animationNames.forEach((anim, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'anim-btn';
+                btn.innerHTML = `<strong>${anim.name}</strong><br><small>${anim.duration} • ${anim.tracks} tracks</small>`;
+                btn.onclick = () => playAnimation(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function playAnimation(index) {
+            if (!mixer || !animations[index]) return;
+            
+            if (currentAction) {
+                currentAction.fadeOut(0.3);
+            }
+            
+            currentAction = mixer.clipAction(animations[index]);
+            currentAction.reset().fadeIn(0.3).play();
+            
+            document.querySelectorAll('.anim-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = 0.016;
+            if (mixer) mixer.update(delta);
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        window.toggleTheme = function() {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            document.getElementById('theme-icon').textContent = isLight ? '☀️' : '🌙';
+            document.getElementById('theme-text').textContent = isLight ? 'Modo Claro' : 'Modo Oscuro';
+            
+            if (scene) {
+                scene.background = new THREE.Color(isLight ? 0xf7fafc : 0x667eea);
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>

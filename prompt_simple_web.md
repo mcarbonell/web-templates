@@ -26,6 +26,8 @@ Use one or more of this techniques:
  Image distortion
  Liquid transitions
 
+ Mandatory: incorporate Custom Shaders (WebGL) or Webgl postprocessing or Dithering or ASCII-to-Canvas or Scrollytelling. Maintain 60 fps on mid-range mobile devices
+
 To add variety to the design choices use this random seed number 357970250.
 
 First think of random desgin choices, then decompose the seed number to extract randomness.

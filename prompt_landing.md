@@ -174,7 +174,7 @@ You can add a "brand name generator" using random words/combinations and an opti
 
 Make some daring and bold decisions creating a unique, memorable aesthetic.
 
-Proceed inmedatedly and write the file as landings/${seednumber}.html with html comments in the file explaing the design choices.
+Proceed inmedatedly and write the file as no-react/landings/${seednumber}.html with html comments in the file explaing the design choices.
 
 Target modern browser support, Chrome Firefox and Safari.
 

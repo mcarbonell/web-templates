@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Low Poly Hedgehog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        .info-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 30px;
+            color: #e8d5b7;
+            text-align: center;
+            border: 1px solid rgba(232, 213, 183, 0.2);
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .info-panel h1 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: #ffd93d;
+        }
+        
+        .info-panel p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffd93d;
+            font-size: 1.5rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <div class="loading" id="loading">Loading...</div>
+    </div>
+    
+    <div class="info-panel">
+        <h1>🦔 Low Poly Hedgehog</h1>
+        <p>Click & drag to rotate • Scroll to zoom</p>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        
+        // Camera
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5, 4, 7);
+        
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        
+        // Controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 4;
+        controls.maxDistance = 15;
+        controls.target.set(0, 0.5, 0);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xfff5e6, 1.5);
+        mainLight.position.set(5, 10, 5);
+        mainLight.castShadow = true;
+        mainLight.shadow.mapSize.width = 1024;
+        mainLight.shadow.mapSize.height = 1024;
+        mainLight.shadow.camera.near = 0.5;
+        mainLight.shadow.camera.far = 50;
+        scene.add(mainLight);
+
+        const fillLight = new THREE.DirectionalLight(0x88aaff, 0.4);
+        fillLight.position.set(-5, 3, -5);
+        scene.add(fillLight);
+
+        const rimLight = new THREE.DirectionalLight(0xffd700, 0.3);
+        rimLight.position.set(0, 5, -8);
+        scene.add(rimLight);
+
+        // Materials
+        const bodyMaterial = new THREE.MeshStandardMaterial({
+            color: 0x8B6914,
+            roughness: 0.8,
+            metalness: 0.1,
+            flatShading: true
+        });
+
+        const bellyMaterial = new THREE.MeshStandardMaterial({
+            color: 0xD4A574,
+            roughness: 0.9,
+            metalness: 0.0,
+            flatShading: true
+        });
+
+        const spineMaterial = new THREE.MeshStandardMaterial({
+            color: 0x5C4033,
+            roughness: 0.7,
+            metalness: 0.1,
+            flatShading: true
+        });
+
+        const noseMaterial = new THREE.MeshStandardMaterial({
+            color: 0x1a1a1a,
+            roughness: 0.3,
+            metalness: 0.2,
+            flatShading: true
+        });
+
+        const eyeMaterial = new THREE.MeshStandardMaterial({
+            color: 0x000000,
+            roughness: 0.2,
+            metalness: 0.5,
+            flatShading: true
+        });
+
+        // Hedgehog group
+        const hedgehog = new THREE.Group();
+
+        // Body (main ellipsoid)
+        const bodyGeometry = new THREE.SphereGeometry(1, 12, 10);
+        bodyGeometry.scale(1, 0.7, 0.8);
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.castShadow = true;
+        body.receiveShadow = true;
+        hedgehog.add(body);
+
+        // Belly
+        const bellyGeometry = new THREE.SphereGeometry(0.75, 10, 8);
+        bellyGeometry.scale(0.8, 0.5, 0.6);
+        const belly = new THREE.Mesh(bellyGeometry, bellyMaterial);
+        belly.position.set(0.1, -0.15, 0);
+        belly.castShadow = true;
+        hedgehog.add(belly);
+
+        // Snout
+        const snoutGeometry = new THREE.ConeGeometry(0.35, 0.7, 8);
+        snoutGeometry.rotateZ(-Math.PI / 2);
+        const snout = new THREE.Mesh(snoutGeometry, bodyMaterial);
+        snout.position.set(0.95, 0.05, 0);
+        snout.castShadow = true;
+        hedgehog.add(snout);
+
+        // Nose
+        const noseGeometry = new THREE.SphereGeometry(0.1, 8, 6);
+        const nose = new THREE.Mesh(noseGeometry, noseMaterial);
+        nose.position.set(1.25, 0.05, 0);
+        hedgehog.add(nose);
+
+        // Eyes
+        const eyeGeometry = new THREE.SphereGeometry(0.1, 8, 6);
+        
+        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        leftEye.position.set(0.65, 0.25, 0.35);
+        hedgehog.add(leftEye);
+        
+        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        rightEye.position.set(0.65, 0.25, -0.35);
+        hedgehog.add(rightEye);
+
+        // Eye highlights
+        const highlightGeometry = new THREE.SphereGeometry(0.03, 6, 4);
+        const highlightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        
+        const leftHighlight = new THREE.Mesh(highlightGeometry, highlightMaterial);
+        leftHighlight.position.set(0.72, 0.28, 0.38);
+        hedgehog.add(leftHighlight);
+        
+        const rightHighlight = new THREE.Mesh(highlightGeometry, highlightMaterial);
+        rightHighlight.position.set(0.72, 0.28, -0.32);
+        hedgehog.add(rightHighlight);
+
+        // Ears
+        const earGeometry = new THREE.SphereGeometry(0.15, 8, 6);
+        earGeometry.scale(1, 1.2, 0.8);
+        
+        const leftEar = new THREE.Mesh(earGeometry, bellyMaterial);
+        leftEar.position.set(0.4, 0.5, 0.45);
+        hedgehog.add(leftEar);
+        
+        const rightEar = new THREE.Mesh(earGeometry, bellyMaterial);
+        rightEar.position.set(0.4, 0.5, -0.45);
+        hedgehog.add(rightEar);
+
+        // Spines
+        const spineGeometry = new THREE.ConeGeometry(0.08, 0.35, 5);
+        const spines = [];
+        
+        // Back spines (arranged in rows)
+        const spinePositions = [
+            // Top row
+            { x: -0.3, y: 0.45, z: 0, rotX: 0, rotZ: 0 },
+            { x: -0.5, y: 0.5, z: 0, rotX: 0, rotZ: 0 },
+            { x: -0.7, y: 0.45, z: 0, rotX: 0, rotZ: 0 },
+            // Upper back rows
+            { x: -0.2, y: 0.4, z: 0.3, rotX: 0.3, rotZ: -0.2 },
+            { x: -0.4, y: 0.45, z: 0.35, rotX: 0.2, rotZ: -0.15 },
+            { x: -0.6, y: 0.4, z: 0.3, rotX: 0.15, rotZ: -0.1 },
+            { x: -0.2, y: 0.4, z: -0.3, rotX: -0.3, rotZ: -0.2 },
+            { x: -0.4, y: 0.45, z: -0.35, rotX: -0.2, rotZ: -0.15 },
+            { x: -0.6, y: 0.4, z: -0.3, rotX: -0.15, rotZ: -0.1 },
+            // Middle rows
+            { x: 0, y: 0.35, z: 0.45, rotX: 0.4, rotZ: -0.3 },
+            { x: -0.2, y: 0.35, z: 0.5, rotX: 0.35, rotZ: -0.25 },
+            { x: -0.4, y: 0.38, z: 0.5, rotX: 0.3, rotZ: -0.2 },
+            { x: -0.6, y: 0.35, z: 0.45, rotX: 0.25, rotZ: -0.15 },
+            { x: 0, y: 0.35, z: -0.45, rotX: -0.4, rotZ: -0.3 },
+            { x: -0.2, y: 0.35, z: -0.5, rotX: -0.35, rotZ: -0.25 },
+            { x: -0.4, y: 0.38, z: -0.5, rotX: -0.3, rotZ: -0.2 },
+            { x: -0.6, y: 0.35, z: -0.45, rotX: -0.25, rotZ: -0.15 },
+            // Lower back
+            { x: 0.1, y: 0.25, z: 0.5, rotX: 0.5, rotZ: -0.35 },
+            { x: -0.1, y: 0.28, z: 0.55, rotX: 0.45, rotZ: -0.3 },
+            { x: -0.3, y: 0.3, z: 0.55, rotX: 0.4, rotZ: -0.25 },
+            { x: -0.5, y: 0.28, z: 0.5, rotX: 0.35, rotZ: -0.2 },
+            { x: 0.1, y: 0.25, z: -0.5, rotX: -0.5, rotZ: -0.35 },
+            { x: -0.1, y: 0.28, z: -0.55, rotX: -0.45, rotZ: -0.3 },
+            { x: -0.3, y: 0.3, z: -0.55, rotX: -0.4, rotZ: -0.25 },
+            { x: -0.5, y: 0.28, z: -0.5, rotX: -0.35, rotZ: -0.2 },
+            // Side spines
+            { x: 0.3, y: 0.15, z: 0.55, rotX: 0.6, rotZ: -0.4 },
+            { x: 0.2, y: 0.1, z: 0.6, rotX: 0.7, rotZ: -0.5 },
+            { x: 0.3, y: 0.15, z: -0.55, rotX: -0.6, rotZ: -0.4 },
+            { x: 0.2, y: 0.1, z: -0.6, rotX: -0.7, rotZ: -0.5 },
+        ];
+
+        spinePositions.forEach((pos, i) => {
+            const spine = new THREE.Mesh(spineGeometry, spineMaterial);
+            spine.position.set(pos.x, pos.y, pos.z);
+            spine.rotation.x = pos.rotX || 0;
+            spine.rotation.z = pos.rotZ || 0;
+            spine.castShadow = true;
+            spines.push(spine);
+            hedgehog.add(spine);
+        });
+
+        // Legs
+        const legGeometry = new THREE.CylinderGeometry(0.12, 0.1, 0.2, 8);
+        const legPositions = [
+            { x: 0.5, z: 0.4 },
+            { x: 0.5, z: -0.4 },
+            { x: -0.4, z: 0.35 },
+            { x: -0.4, z: -0.35 },
+        ];
+
+        legPositions.forEach(pos => {
+            const leg = new THREE.Mesh(legGeometry, bodyMaterial);
+            leg.position.set(pos.x, -0.45, pos.z);
+            leg.castShadow = true;
+            hedgehog.add(leg);
+            
+            // Paw
+            const pawGeometry = new THREE.SphereGeometry(0.1, 8, 6);
+            pawGeometry.scale(1, 0.5, 1);
+            const paw = new THREE.Mesh(pawGeometry, bellyMaterial);
+            paw.position.set(pos.x, -0.55, pos.z);
+            paw.castShadow = true;
+            hedgehog.add(paw);
+        });
+
+        // Position hedgehog
+        hedgehog.position.y = 0.3;
+        scene.add(hedgehog);
+
+        // Ground
+        const groundGeometry = new THREE.CircleGeometry(8, 32);
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            color: 0x2d4a3e,
+            roughness: 1,
+            metalness: 0
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.55;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Small decorative elements (grass tufts)
+        const grassMaterial = new THREE.MeshStandardMaterial({
+            color: 0x4a7c59,
+            roughness: 0.8,
+            flatShading: true
+        });
+
+        for (let i = 0; i < 15; i++) {
+            const angle = (i / 15) * Math.PI * 2;
+            const radius = 2 + Math.random() * 3;
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            
+            const grassGeometry = new THREE.ConeGeometry(0.05, 0.2 + Math.random() * 0.15, 4);
+            const grass = new THREE.Mesh(grassGeometry, grassMaterial);
+            grass.position.set(x, -0.4, z);
+            grass.rotation.x = (Math.random() - 0.5) * 0.3;
+            grass.rotation.z = (Math.random() - 0.5) * 0.3;
+            scene.add(grass);
+        }
+
+        // Hide loading
+        document.getElementById('loading').style.display = 'none';
+
+        // Animation
+        let time = 0;
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            time += clock.getDelta();
+            
+            // Subtle breathing animation
+            const breathe = Math.sin(time * 2) * 0.02;
+            body.scale.y = 1 + breathe;
+            body.scale.x = 1 - breathe * 0.5;
+            
+            // Subtle spine movement
+            spines.forEach((spine, i) => {
+                const offset = i * 0.1;
+                spine.rotation.x += Math.sin(time * 3 + offset) * 0.002;
+            });
+            
+            // Gentle idle animation
+            hedgehog.rotation.y = Math.sin(time * 0.5) * 0.1;
+            hedgehog.position.y = 0.3 + Math.sin(time * 2) * 0.02;
+            
+            // Eye blink occasionally
+            if (Math.floor(time) % 5 === 0 && Math.sin(time * 10) > 0.95) {
+                leftEye.scale.y = 0.1;
+                rightEye.scale.y = 0.1;
+            } else {
+                leftEye.scale.y = 1;
+                rightEye.scale.y = 1;
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

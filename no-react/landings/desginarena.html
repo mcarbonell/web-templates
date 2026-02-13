@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS - Award-Winning Design Agency</title>
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* CSS Variables for Theming */
+        :root {
+            --primary-color: #357970;
+            --secondary-color: #970250;
+            --accent-color: #f5f5f5;
+            --text-color: #333;
+            --bg-color: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --transition-speed: 0.3s;
+        }
+        
+        [data-theme="dark"] {
+            --primary-color: #4da39f;
+            --secondary-color: #c94060;
+            --accent-color: #e0e0e0;
+            --text-color: #f5f5f5;
+            --bg-color: #121212;
+            --glass-bg: rgba(0, 0, 0, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        /* WebGL Canvas */
+        #shader-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: background-color var(--transition-speed);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: var(--primary-color);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color var(--transition-speed);
+        }
+        
+        nav a:hover {
+            color: var(--primary-color);
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            text-align: center;
+            z-index: 1;
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+            position: relative;
+        }
+        
+        .hero-title span {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            opacity: 0.8;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Kinetic Typography Animation */
+        @keyframes kinetic-text {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-10px); }
+            75% { transform: translateY(10px); }
+        }
+        
+        .kinetic-letter {
+            display: inline-block;
+            animation: kinetic-text var(--animation-duration, 1s) infinite;
+            animation-delay: calc(var(--letter-index) * 0.05s);
+        }
+        
+        /* Bento Grid */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .bento-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            cursor: pointer;
+        }
+        
+        .bento-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bento-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .bento-item p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        
+        /* Parallax Section */
+        .parallax-section {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 110%;
+            height: 110%;
+            background-image: url('https://picsum.photos/seed/nexusdesign/1600/900.jpg');
+            background-size: cover;
+            background-position: center;
+            will-change: transform;
+        }
+        
+        .parallax-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            max-width: 800px;
+        }
+        
+        .parallax-content h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 1rem;
+        }
+        
+        /* Scroll Snapping */
+        .scroll-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+        }
+        
+        .scroll-section {
+            height: 100vh;
+            scroll-snap-align: start;
+        }
+        
+        /* ASCII Art Effect */
+        .ascii-art {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 0.8;
+            color: var(--text-color);
+            opacity: 0.1;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            pointer-events: none;
+            white-space: pre;
+            z-index: 0;
+        }
+        
+        /* Magnetic Button */
+        .magnetic-button {
+            position: relative;
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform var(--transition-speed);
+            cursor: pointer;
+        }
+        
+        .magnetic-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--secondary-color);
+            border-radius: 50px;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            z-index: -1;
+        }
+        
+        .magnetic-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .magnetic-button:hover::before {
+            opacity: 1;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .bento-grid {
+                grid-template-columns: 1fr;
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- WebGL Canvas for Custom Shader -->
+    <canvas id="shader-canvas"></canvas>
+    
+    <!-- ASCII Art Background -->
+    <div class="ascii-art">
+        NEXUS DESIGN AGENCY
+        ████████████████████████
+        ██  ████  ██  ████  ██
+        ██  ████  ██  ████  ██
+        ████████████████████████
+        ██  ████  ██  ████  ██
+        ██  ████  ██  ████  ██
+        ████████████████████████
+        ██  ████  ██  ████  ██
+        ██  ████  ██  ████  ██
+        ████████████████████████
+    </div>
+    
+    <!-- Header -->
+    <header>
+        <div class="logo">NEXUS</div>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <button class="theme-toggle" id="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="scroll-container">
+        <!-- Hero Section -->
+        <section class="scroll-section hero" id="home">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="kinetic-letter" style="--letter-index: 0; --animation-duration: 1.2s;">N</span>
+                    <span class="kinetic-letter" style="--letter-index: 1; --animation-duration: 1.1s;">E</span>
+                    <span class="kinetic-letter" style="--letter-index: 2; --animation-duration: 1.3s;">X</span>
+                    <span class="kinetic-letter" style="--letter-index: 3; --animation-duration: 1.0s;">U</span>
+                    <span class="kinetic-letter" style="--letter-index: 4; --animation-duration: 1.2s;">S</span>
+                </h1>
+                <p class="hero-subtitle">Redefining Digital Experiences Through Innovative Design</p>
+                <a href="#services" class="cta-button">Explore Our Work</a>
+            </div>
+        </section>
+        
+        <!-- Services Section - Bento Grid -->
+        <section class="scroll-section" id="services">
+            <div class="bento-grid">
+                <div class="bento-item">
+                    <h3><i class="fas fa-paint-brush"></i> Brand Identity</h3>
+                    <p>Crafting memorable brand experiences that resonate with your audience and stand out in the digital landscape.</p>
+                </div>
+                <div class="bento-item">
+                    <h3><i class="fas fa-mobile-alt"></i> UI/UX Design</h3>
+                    <p>Creating intuitive interfaces that delight users and drive engagement through thoughtful design.</p>
+                </div>
+                <div class="bento-item">
+                    <h3><i class="fas fa-code"></i> Web Development</h3>
+                    <p>Building responsive, high-performance websites with cutting-edge technologies and best practices.</p>
+                </div>
+                <div class="bento-item">
+                    <h3><i class="fas fa-chart-line"></i> Digital Strategy</h3>
+                    <p>Developing data-driven strategies that align with your business goals and maximize ROI.</p>
+                </div>
+                <div class="bento-item">
+                    <h3><i class="fas fa-video"></i> Motion Design</h3>
+                    <p>Bringing your brand to life through compelling animations and interactive experiences.</p>
+                </div>
+                <div class="bento-item">
+                    <h3><i class="fas fa-cube"></i> 3D Visualization</h3>
+                    <p>Creating immersive 3D experiences that push the boundaries of web design.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About Section - Parallax -->
+        <section class="scroll-section parallax-section" id="about">
+            <div class="parallax-bg"></div>
+            <div class="parallax-content">
+                <h2>We Are Design Visionaries</h2>
+                <p>With over a decade of experience in digital design, our team of creatives and technologists collaborate to push the boundaries of what's possible on the web. We believe in creating experiences that are not just visually stunning, but also functional and meaningful.</p>
+                <br>
+                <p>Our award-winning work has been recognized by industry leaders and has helped clients transform their digital presence into powerful tools for growth and engagement.</p>
+                <br>
+                <a href="#contact" class="magnetic-button">Get In Touch</a>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section class="scroll-section" id="contact">
+            <div style="height: 100%; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+                <div class="bento-item" style="max-width: 600px; text-align: center;">
+                    <h2>Let's Create Something Extraordinary Together</h2>
+                    <p style="margin: 2rem 0;">Ready to transform your digital presence? We'd love to hear about your project and how we can help bring your vision to life.</p>
+                    <a href="mailto:hello@nexusdesign.com" class="cta-button">Send us a message</a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = (currentTheme === 'dark' || currentTheme === null) ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            
+            // Update icon
+            const icon = themeToggle.querySelector('i');
+            if (newTheme === 'dark') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+        
+        // WebGL Custom Shader
+        const canvas = document.getElementById('shader-canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        
+        // Resize canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        
+        // Vertex shader
+        const vertexShaderSource = `
+            attribute vec2 a_position;
+            void main() {
+                gl_Position = vec4(a_position, 0.0, 1.0);
+            }
+        `;
+        
+        // Fragment shader with noise effect
+        const fragmentShaderSource = `
+            precision mediump float;
+            uniform float u_time;
+            uniform vec2 u_resolution;
+            uniform float u_isDark;
+            
+            // Noise function
+            float random(vec2 st) {
+                return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+            }
+            
+            // Noise pattern
+            float noise(vec2 st) {
+                vec2 i = floor(st);
+                vec2 f = fract(st);
+                
+                float a = random(i);
+                float b = random(i + vec2(1.0, 0.0));
+                float c = random(i + vec2(0.0, 1.0));
+                float d = random(i + vec2(1.0, 1.0));
+                
+                vec2 u = f * f * (3.0 - 2.0 * f);
+                
+                return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+            }
+            
+            void main() {
+                vec2 st = gl_FragCoord.xy / u_resolution.xy;
+                st.x *= u_resolution.x / u_resolution.y;
+                
+                vec3 color = vec3(0.0);
+                
+                // Create animated noise pattern
+                float n = 0.0;
+                float amplitude = 0.5;
+                float frequency = 1.0;
+                
+                for(int i = 0; i < 5; i++) {
+                    n += amplitude * noise(st * frequency + u_time * 0.1);
+                    amplitude *= 0.5;
+                    frequency *= 2.0;
+                }
+                
+                // Color based on theme uniform
+                if (u_isDark > 0.5) {
+                    // Dark mode - darker colors
+                    color = vec3(n * 0.15, n * 0.2, n * 0.25);
+                } else {
+                    // Light mode - brighter but not too bright
+                    color = vec3(0.75 + n * 0.15, 0.78 + n * 0.12, 0.82 + n * 0.1);
+                }
+                
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+        
+        // Create shaders
+        function createShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                console.error('Shader compilation error:', gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+            
+            return shader;
+        }
+        
+        // Create shader program
+        function createProgram(gl, vertexShader, fragmentShader) {
+            const program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                console.error('Program linking error:', gl.getProgramInfoLog(program));
+                gl.deleteProgram(program);
+                return null;
+            }
+            
+            return program;
+        }
+        
+        // Initialize WebGL
+        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+        const program = createProgram(gl, vertexShader, fragmentShader);
+        
+        // Set up geometry
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        
+        const positions = [
+            -1, -1,
+             1, -1,
+            -1,  1,
+            -1,  1,
+             1, -1,
+             1,  1,
+        ];
+        
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        
+        // Get attribute and uniform locations
+        const positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
+        const timeUniformLocation = gl.getUniformLocation(program, 'u_time');
+        const resolutionUniformLocation = gl.getUniformLocation(program, 'u_resolution');
+        const isDarkUniformLocation = gl.getUniformLocation(program, 'u_isDark');
+        
+        // Animation loop
+        let lastTheme = '';
+        function render(time) {
+            time *= 0.001; // Convert to seconds
+            
+            // Get current theme (null means default/light)
+            const currentTheme = body.getAttribute('data-theme');
+            const isDark = (currentTheme === 'dark') ? 1.0 : 0.0;
+            
+            // Debug log
+            if (currentTheme !== lastTheme) {
+                console.log('Theme:', currentTheme, 'isDark:', isDark);
+                lastTheme = currentTheme;
+            }
+            
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            
+            gl.useProgram(program);
+            
+            // Set uniforms
+            gl.uniform1f(timeUniformLocation, time);
+            gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
+            gl.uniform1f(isDarkUniformLocation, isDark);
+            
+            // Bind position buffer and set attribute
+            gl.enableVertexAttribArray(positionAttributeLocation);
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+            
+            // Draw
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            
+            requestAnimationFrame(render);
+        }
+        
+        requestAnimationFrame(render);
+        
+        // Parallax effect
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallaxBg = document.querySelector('.parallax-bg');
+            
+            if (parallaxBg) {
+                parallaxBg.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+        
+        // Magnetic button effect
+        const magneticButtons = document.querySelectorAll('.magnetic-button');
+        
+        magneticButtons.forEach(button => {
+            button.addEventListener('mousemove', (e) => {
+                const rect = button.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                button.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px) scale(1.05)`;
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'translate(0, 0) scale(1)';
+            });
+        });
+        
+        // Initialize theme based on system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            body.setAttribute('data-theme', 'dark');
+            themeToggle.querySelector('i').classList.remove('fa-moon');
+            themeToggle.querySelector('i').classList.add('fa-sun');
+        }
+    </script>
+</body>
+</html>

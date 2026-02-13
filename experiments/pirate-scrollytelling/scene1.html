@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Capitan Barbarossa</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #1a1a2e;
+        }
+        canvas {
+            display: block;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: monospace;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">Cargando capitán...</div>
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB);
+        
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 3, 8);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        // Controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        dirLight.position.set(5, 10, 5);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        // Ground
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(20, 20),
+            new THREE.MeshStandardMaterial({ color: 0x5a8f3a })
+        );
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Grid helper
+        const grid = new THREE.GridHelper(20, 20);
+        scene.add(grid);
+
+        // Load captain
+        const loader = new GLTFLoader();
+        let mixer = null;
+        let captainModel = null;
+
+        loader.load(
+            '../../assets/3D/pirate-kit/glTF/Characters_Captain_Barbarossa.gltf',
+            (gltf) => {
+                console.log('=== CAPITÁN CARGADO ===');
+                console.log('Escena:', gltf.scene);
+                console.log('Animaciones:', gltf.animations);
+                
+                captainModel = gltf.scene;
+                
+                // Position
+                captainModel.position.set(0, 0, 0);
+                captainModel.scale.set(1, 1, 1);
+                
+                // Inspect all children
+                console.log('\n=== HIJOS DEL MODELO ===');
+                let meshCount = 0;
+                let skinnedMeshCount = 0;
+                
+                captainModel.traverse((child) => {
+                    console.log(`- ${child.name || 'sin nombre'} | Tipo: ${child.type}`);
+                    
+                    if (child.isMesh || child.isSkinnedMesh) {
+                        meshCount++;
+                        console.log(`  -> Mesh #${meshCount}: ${child.name}`);
+                        console.log(`  -> Visible: ${child.visible}`);
+                        console.log(`  -> Material: ${child.material ? 'SÍ' : 'NO'}`);
+                        
+                        if (child.isSkinnedMesh) {
+                            skinnedMeshCount++;
+                            console.log(`  -> ES SKINNEDMESH!`);
+                            console.log(`  -> Skeleton huesos: ${child.skeleton ? child.skeleton.bones.length : 'N/A'}`);
+                            
+                            if (child.skeleton) {
+                                console.log(`  -> Huesos:`);
+                                child.skeleton.bones.forEach((bone, i) => {
+                                    console.log(`     [${i}] ${bone.name}`);
+                                });
+                            }
+                        }
+                        
+                        // Ensure visible
+                        child.visible = true;
+                        if (child.material) {
+                            child.material = child.material.clone();
+                        }
+                    }
+                });
+                
+                console.log(`\nTotal meshes: ${meshCount}`);
+                console.log(`Total SkinnedMesh: ${skinnedMeshCount}`);
+                
+                scene.add(captainModel);
+                
+                // Animation
+                if (gltf.animations && gltf.animations.length > 0) {
+                    console.log('\n=== INICIANDO ANIMACIONES ===');
+                    mixer = new THREE.AnimationMixer(captainModel);
+                    
+                    gltf.animations.forEach((anim, i) => {
+                        console.log(`[${i}] ${anim.name}`);
+                    });
+                    
+                    const idleAction = mixer.clipAction(gltf.animations.find(a => a.name === 'Idle'));
+                    if (idleAction) {
+                        idleAction.play();
+                        console.log('Animación Idle iniciada');
+                    }
+                }
+                
+                // Add debug box
+                const box = new THREE.Box3().setFromObject(captainModel);
+                const size = box.getSize(new THREE.Vector3());
+                console.log('\nDimensiones:', size);
+                console.log('Centro:', box.getCenter(new THREE.Vector3()));
+                
+                const debugBox = new THREE.Mesh(
+                    new THREE.BoxGeometry(size.x, size.y, size.z),
+                    new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+                );
+                debugBox.position.copy(box.getCenter(new THREE.Vector3()));
+                scene.add(debugBox);
+                
+                document.getElementById('info').textContent = 'Capitán cargado! Usa el ratón para rotar/zoom';
+            },
+            (progress) => {
+                const percent = (progress.loaded / progress.total * 100).toFixed(0);
+                document.getElementById('info').textContent = `Cargando: ${percent}%`;
+            },
+            (error) => {
+                console.error('Error cargando:', error);
+                document.getElementById('info').textContent = 'Error al cargar';
+            }
+        );
+
+        // Animation loop
+        const clock = new THREE.Clock();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            if (mixer) mixer.update(delta);
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

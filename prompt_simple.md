@@ -24,7 +24,7 @@ Use one or more of this techniques:
 - Magnetic buttons
 - Scramble text
 
-Mandatory: incorporate Custom Shaders (WebGL) or Webgl postprocessing or Dithering or ASCII-to-Canvas. Maintain 60fps on mid-range mobile devices
+Mandatory: incorporate Custom Shaders (WebGL) or Webgl postprocessing or Dithering or ASCII-to-Canvas. Maintain 60 fps on mid-range mobile devices
 
 To add variety to the design choices use a random seed number.
 
@@ -40,7 +40,7 @@ Explain the design in html comments in the header of the html file.
 
 Make some daring and bold decisions creating a unique, memorable aesthetic.
 
-Target modern browser support, Chrome Firefox and Safari.
+Target modern browser support, Chrome, Edge, Firefox and Safari.
 
 Don´t ask questions. Don´t try to open a browser. 
 

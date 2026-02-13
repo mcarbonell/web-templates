@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS | Experimental Digital Experience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f3f5;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-tertiary: #868e96;
+            --accent-primary: #4263eb;
+            --accent-secondary: #748ffc;
+            --accent-tertiary: #91a7ff;
+            --neon-cyan: #00d9ff;
+            --neon-magenta: #ff00ff;
+            --neon-yellow: #fff700;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --grid-gap: 1.5rem;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #f8f9fa;
+            --text-secondary: #dee2e6;
+            --text-tertiary: #adb5bd;
+            --accent-primary: #5c7cfa;
+            --accent-secondary: #748ffc;
+            --accent-tertiary: #91a7ff;
+            --neon-cyan: #00ffff;
+            --neon-magenta: #ff00ff;
+            --neon-yellow: #ffff00;
+            --glass-bg: rgba(0, 0, 0, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --grid-gap: 1.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            min-height: 100vh;
+        }
+
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-magenta));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .theme-toggle {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 26px;
+            height: 26px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            transform: translateX(30px);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            scroll-snap-align: start;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 8rem);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+            line-height: 1;
+        }
+
+        .kinetic-text {
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-magenta), var(--neon-yellow));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 800px;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .scramble-text {
+            font-family: 'JetBrains Mono', monospace;
+            border-right: 2px solid var(--neon-cyan);
+            padding-right: 0.5rem;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: var(--neon-cyan); }
+        }
+
+        .magnetic-button {
+            position: relative;
+            padding: 1.2rem 2.5rem;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-magenta));
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+
+        .magnetic-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--neon-magenta), var(--neon-cyan));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .magnetic-button:hover::before {
+            opacity: 1;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--grid-gap);
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            scroll-snap-align: start;
+        }
+
+        .bento-item {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .bento-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px var(--shadow-color);
+        }
+
+        .bento-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .bento-content {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .aurora-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.3;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .stroke-text {
+            -webkit-text-stroke: 1px var(--neon-cyan);
+            color: transparent;
+            font-weight: 800;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .parallax-section {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            scroll-snap-align: start;
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-magenta));
+            opacity: 0.1;
+            transform: translateY(0);
+            will-change: transform;
+        }
+
+        .footer {
+            background: var(--bg-secondary);
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            scroll-snap-align: start;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .ascii-art {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            color: var(--text-tertiary);
+            margin: 2rem 0;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            .nav-links {
+                gap: 1rem;
+            }
+            .hero {
+                padding: 1rem;
+            }
+            .hero-title {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+            }
+            .bento-grid {
+                grid-template-columns: 1fr;
+                padding: 2rem 1rem;
+            }
+            .bento-item {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            .magnetic-button {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        section {
+            scroll-snap-align: start;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <canvas id="webgl-canvas"></canvas>
+    <div class="aurora-container" id="aurora-container"></div>
+    
+    <header class="header">
+        <div class="logo">NEXUS</div>
+        <nav class="nav-links">
+            <a href="#hero" class="nav-link">Home</a>
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#showcase" class="nav-link">Showcase</a>
+            <a href="#contact" class="nav-link">Contact</a>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+        </nav>
+    </header>
+
+    <section class="hero" id="hero">
+        <h1 class="hero-title">
+            <span class="kinetic-text">DIGITAL</span>
+            <br>
+            <span class="stroke-text">FRONTIER</span>
+        </h1>
+        <p class="hero-subtitle">
+            Where <span class="scramble-text" id="scramble-text">innovation</span> meets 
+            <span class="kinetic-text">experimentation</span>
+        </p>
+        <button class="magnetic-button" id="cta-button">Enter the Nexus</button>
+    </section>
+
+    <section class="parallax-section" id="features">
+        <div class="parallax-bg" id="parallax-bg"></div>
+        <div class="glass-card" style="max-width: 800px; margin: 2rem; z-index: 1;">
+            <h2 style="font-size: 3rem; margin-bottom: 1.5rem;">Experimental Features</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+                Pushing the boundaries of web design.
+            </p>
+            <div class="bento-grid" id="bento-grid"></div>
+        </div>
+    </section>
+
+    <section class="bento-grid" id="showcase" style="min-height: auto; padding: 6rem 2rem;"></section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <h2 class="logo" style="margin-bottom: 2rem;">NEXUS</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                Experimental digital experience | Seed: <strong>389306740</strong>
+            </p>
+            <div class="ascii-art" id="ascii-art"></div>
+            <p style="color: var(--text-tertiary); font-size: 0.9rem;">
+                © 2024 NEXUS Experimental
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const SEED = 389306740;
+        
+        function seededRandom(seed) {
+            let value = seed;
+            return function() {
+                value = (value * 9301 + 49297) % 233280;
+                return value / 233280;
+            };
+        }
+        
+        const random = seededRandom(SEED);
+        
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+        
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            body.setAttribute('data-theme', savedTheme);
+        }
+        
+        const ctaButton = document.getElementById('cta-button');
+        
+        ctaButton.addEventListener('mousemove', (e) => {
+            const rect = ctaButton.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const deltaX = (x - centerX) / centerX;
+            const deltaY = (y - centerY) / centerY;
+            const strength = 10;
+            ctaButton.style.transform = `translate(${deltaX * strength}px, ${deltaY * strength}px)`;
+        });
+        
+        ctaButton.addEventListener('mouseleave', () => {
+            ctaButton.style.transform = 'translate(0, 0)';
+        });
+        
+        const scrambleText = document.getElementById('scramble-text');
+        const originalText = 'innovation';
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        
+        function scramble() {
+            let iterations = 0;
+            const interval = setInterval(() => {
+                scrambleText.textContent = originalText
+                    .split('')
+                    .map((char, index) => {
+                        if (index < iterations) return originalText[index];
+                        return chars[Math.floor(random() * chars.length)];
+                    })
+                    .join('');
+                
+                if (iterations >= originalText.length) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        scrambleText.textContent = originalText;
+                        setTimeout(scramble, 2000);
+                    }, 1000);
+                }
+                iterations += 1 / 3;
+            }, 30);
+        }
+        
+        scramble();
+        
+        const bentoGrid = document.getElementById('bento-grid');
+        const showcaseGrid = document.getElementById('showcase');
+        const bentoTitles = [
+            'WebGL Shaders', 'Kinetic Typography', 'Fluid Simulation',
+            'ASCII Dithering', 'Glassmorphism', 'Parallax Scrolling',
+            'Magnetic UI', 'Scroll Snapping', 'Gradient Text',
+            'Aurora Effects', 'Bento Grids', 'Stroke Text'
+        ];
+        
+        const bentoContents = [
+            'Real-time ASCII dithering shader with WebGL',
+            'Animated text with scramble effects',
+            'Fluid simulation with gradient blobs',
+            'ASCII art rendering with dithering',
+            'Glass-like transparency with blur',
+            'Depth-based parallax scrolling',
+            'Interactive buttons with magnetic attraction',
+            'Vertical scroll snapping navigation',
+            'Animated gradient text patterns',
+            'Dynamic gradient blobs animation',
+            'Modular grid layout with interactions',
+            'Text with stroke outlines'
+        ];
+        
+        for (let i = 0; i < 20; i++) {
+            const titleIndex = Math.floor(random() * bentoTitles.length);
+            const contentIndex = Math.floor(random() * bentoContents.length);
+            
+            const bentoItem = document.createElement('div');
+            bentoItem.className = 'bento-item';
+            bentoItem.innerHTML = `
+                <h3 class="bento-title">${bentoTitles[titleIndex]}</h3>
+                <p class="bento-content">${bentoContents[contentIndex]}</p>
+            `;
+            
+            if (i < 10) {
+                bentoGrid.appendChild(bentoItem);
+            } else {
+                showcaseGrid.appendChild(bentoItem);
+            }
+            
+            bentoItem.style.animationDelay = `${random() * 0.5}s`;
+        }
+        
+        const auroraContainer = document.getElementById('aurora-container');
+        const colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff7700'];
+        
+        for (let i = 0; i < 5; i++) {
+            const blob = document.createElement('div');
+            blob.className = 'aurora-blob';
+            const size = 300 + random() * 200;
+            const color = colors[Math.floor(random() * colors.length)];
+            const x = random() * 100;
+            const y = random() * 100;
+            const delay = random() * 5;
+            
+            blob.style.width = `${size}px`;
+            blob.style.height = `${size}px`;
+            blob.style.background = `radial-gradient(circle, ${color}40, transparent 70%)`;
+            blob.style.left = `${x}%`;
+            blob.style.top = `${y}%`;
+            blob.style.animationDelay = `${delay}s`;
+            auroraContainer.appendChild(blob);
+        }
+        
+        const parallaxBg = document.getElementById('parallax-bg');
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const rate = scrolled * -0.5;
+            parallaxBg.style.transform = `translateY(${rate}px)`;
+        });
+        
+        const asciiArt = document.getElementById('ascii-art');
+        const asciiPatterns = [
+            `            ███╗   ██╗███████╗██╗  ██╗██╗   ██╗███████╗
+            ████╗  ██║██╔════╝╚██╗██╔╝██║   ██║██╔════╝
+            ██╔██╗ ██║█████╗   ╚███╔╝ ██║   ██║███████╗
+            ██║╚██╗██║██╔══╝   ██╔██╗ ██║   ██║╚════██║
+            ██║ ╚████║███████╗██╔╝ ██╗╚██████╔╝███████║
+            ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝`
+        ];
+        
+        asciiArt.textContent = asciiPatterns[0];
+        
+        function initWebGL() {
+            try {
+                const canvas = document.getElementById('webgl-canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                
+                if (!gl) {
+                    console.log('WebGL not supported');
+                    return;
+                }
+                
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ 
+                    canvas: canvas,
+                    alpha: true,
+                    antialias: true 
+                });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x00ffff,
+                    wireframe: true 
+                });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                
+                camera.position.z = 3;
+                
+                function animate() {
+                    requestAnimationFrame(animate);
+                    cube.rotation.x += 0.005;
+                    cube.rotation.y += 0.005;
+                    renderer.render(scene, camera);
+                }
+                
+                animate();
+                
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+                
+            } catch (error) {
+                console.log('WebGL failed:', error);
+            }
+        }
+        
+        window.addEventListener('load', initWebGL);
+        
+        console.log(`NEXUS Experimental | Seed: ${SEED}`);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbarossa's Treasure - Adventure Awaits</title>
+    <meta name="description" content="Únete a la tripulación del Capitán Barbarossa y descubre tesoros legendarios.">
+    <style>
+        :root {
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-pill: 999px;
+            --font-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition-fast: 200ms ease-out;
+            --transition-med: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            transition: background-color var(--transition-med), color var(--transition-med);
+        }
+
+        /* Light Theme */
+        body.theme-light {
+            --bg-surface: #faf9f6;
+            --bg-elevated: #ffffff;
+            --fg-primary: #1a1a2e;
+            --fg-muted: #4a4a68;
+            --fg-soft: #6b7280;
+            --accent-primary: #d4a574;
+            --accent-secondary: #8b5a2b;
+            --accent-glow: rgba(212, 165, 116, 0.3);
+            --border-subtle: rgba(26, 26, 46, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(139, 90, 43, 0.2);
+            --header-bg: rgba(250, 249, 246, 0.85);
+            --shadow-soft: 0 20px 60px rgba(26, 26, 46, 0.1);
+            --gradient-hero: linear-gradient(135deg, #faf9f6 0%, #f5f0e8 50%, #ebe4d8 100%);
+        }
+
+        /* Dark Theme */
+        body.theme-dark {
+            --bg-surface: #0a0a0f;
+            --bg-elevated: #12121a;
+            --fg-primary: #f5f0e8;
+            --fg-muted: #a8a8b8;
+            --fg-soft: #6b7280;
+            --accent-primary: #e8b88a;
+            --accent-secondary: #d4a574;
+            --accent-glow: rgba(232, 184, 138, 0.25);
+            --border-subtle: rgba(245, 240, 232, 0.1);
+            --card-bg: rgba(18, 18, 26, 0.9);
+            --card-border: rgba(212, 165, 116, 0.2);
+            --header-bg: rgba(10, 10, 15, 0.85);
+            --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.5);
+            --gradient-hero: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #1a1a2e 100%);
+        }
+
+        body {
+            background: var(--gradient-hero);
+            color: var(--fg-primary);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-subtle);
+            transition: background var(--transition-med);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--fg-primary);
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .brand-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--fg-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-primary);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-primary);
+            transition: width var(--transition-fast);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            width: 56px;
+            height: 30px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            position: relative;
+            transition: all var(--transition-fast);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            transition: transform var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        body.theme-dark .toggle-thumb {
+            transform: translateX(26px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 2rem;
+            padding: 8rem 4rem 4rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding: 7rem 2rem 3rem;
+            }
+        }
+
+        .hero-content {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--accent-glow);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-pill);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title .highlight {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-description {
+            font-size: 1.15rem;
+            color: var(--fg-muted);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-description {
+                margin: 0 auto 2rem;
+            }
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-actions {
+                justify-content: center;
+            }
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: #1a1a2e;
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--fg-primary);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-elevated);
+        }
+
+        /* 3D Viewer */
+        .hero-3d {
+            position: relative;
+            height: 600px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-3d {
+                height: 450px;
+                order: -1;
+            }
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, var(--bg-elevated) 0%, transparent 70%);
+            position: relative;
+        }
+
+        #canvas-container canvas {
+            display: block;
+        }
+
+        .model-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--fg-muted);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-subtle);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Animation Controls */
+        .animation-controls {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-pill);
+            z-index: 10;
+        }
+
+        .anim-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            color: var(--fg-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: var(--radius-pill);
+            transition: all var(--transition-fast);
+        }
+
+        .anim-btn:hover {
+            color: var(--fg-primary);
+            background: var(--accent-glow);
+        }
+
+        .anim-btn.active {
+            background: var(--accent-primary);
+            color: #1a1a2e;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            color: var(--fg-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--accent-glow);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-description {
+            color: var(--fg-muted);
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 4rem 2rem;
+            background: var(--bg-elevated);
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .stat-item:nth-child(1) { animation-delay: 0.1s; }
+        .stat-item:nth-child(2) { animation-delay: 0.2s; }
+        .stat-item:nth-child(3) { animation-delay: 0.3s; }
+        .stat-item:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--fg-muted);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 6rem 2rem;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .cta-description {
+            color: var(--fg-muted);
+            font-size: 1.15rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .site-footer {
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-text {
+            color: var(--fg-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .footer-link {
+            color: var(--fg-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color var(--transition-fast);
+        }
+
+        .footer-link:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 6rem 1.5rem 2rem;
+            }
+
+            .hero-3d {
+                height: 350px;
+            }
+
+            .features {
+                padding: 4rem 1.5rem;
+            }
+
+            .stats {
+                padding: 3rem 1.5rem;
+            }
+
+            .cta {
+                padding: 4rem 1.5rem;
+            }
+        }
+
+        /* Focus states for accessibility */
+        :focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 3px;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body class="theme-light">
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="#" class="brand">
+                <div class="brand-icon">⚓</div>
+                <span class="brand-text">Barbarossa's Treasure</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#features" class="nav-link">Características</a>
+                <a href="#stats" class="nav-link">Estadísticas</a>
+                <a href="#cta" class="nav-link">Únete</a>
+            </nav>
+            <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+                <div class="toggle-thumb">
+                    <span id="themeIcon">☀️</span>
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span>🏴‍☠️</span>
+                <span>Aventura Pirata</span>
+            </div>
+            <h1 class="hero-title">
+                Descubre el <span class="highlight">Tesoro Perdido</span> del Capitán Barbarossa
+            </h1>
+            <p class="hero-description">
+                Únete a la legendaria tripulación del temido Capitán Barbarossa. Navega por mares desconocidos, 
+                descubre islas misteriosas y encuentra tesoros que solo existen en las leyendas más antiguas.
+            </p>
+            <div class="hero-actions">
+                <a href="#cta" class="btn btn-primary">
+                    <span>⚔️</span>
+                    Unirse a la Tripulación
+                </a>
+                <a href="#features" class="btn btn-secondary">
+                    Explorar Más
+                </a>
+            </div>
+        </div>
+        <div class="hero-3d">
+            <div id="canvas-container">
+                <div class="model-loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando Capitán Barbarossa...</p>
+                </div>
+            </div>
+            <div class="animation-controls" id="animControls" style="display: none;">
+                <button class="anim-btn" data-anim="Idle">Idle</button>
+                <button class="anim-btn" data-anim="Walk">Caminar</button>
+                <button class="anim-btn" data-anim="Run">Correr</button>
+                <button class="anim-btn" data-anim="Wave">Saludar</button>
+                <button class="anim-btn" data-anim="Sword">Espada</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2 class="section-title">¿Por qué unirte a nuestra tripulación?</h2>
+            <p class="section-subtitle">
+                Descubre las ventajas de navegar con los piratas más temidos de los siete mares.
+            </p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🗺️</div>
+                <h3 class="feature-title">Mapas del Tesoro</h3>
+                <p class="feature-description">
+                    Acceso exclusivo a mapas antiguos que revelan la ubicación de tesoros olvidados por la historia.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⛵</div>
+                <h3 class="feature-title">Flota Legendaria</h3>
+                <p class="feature-description">
+                    Navega en los barcos más rápidos y resistentes que han surcado los océanos.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3 class="feature-title">Botín Exclusivo</h3>
+                <p class="feature-description">
+                    Reparto equitativo del botín. Oro, joyas y artefactos místicos esperan ser descubiertos.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏝️</div>
+                <h3 class="feature-title">Isla Base</h3>
+                <p class="feature-description">
+                    Tu propia isla privada en el Caribe, escondida de la Marina Real y otros piratas.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🦜</div>
+                <h3 class="feature-title">Compañeros Leales</h3>
+                <p class="feature-description">
+                    Una tripulación unida por el honor pirata. La lealtad es nuestra moneda más valiosa.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <h3 class="feature-title">Entrenamiento de Combate</h3>
+                <p class="feature-description">
+                    Aprende las artes del combate pirata de los mejores espadachines del mar.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats" id="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value">247</div>
+                <div class="stat-label">Tesoros Encontrados</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">1.2M</div>
+                <div class="stat-label">Millas Navegadas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">89</div>
+                <div class="stat-label">Tripulantes Activos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">∞</div>
+                <div class="stat-label">Aventuras por Vivir</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="cta">
+        <h2 class="cta-title">¿Listo para zarpar?</h2>
+        <p class="cta-description">
+            El Capitán Barbarossa busca almas valientes para su próxima expedición. 
+            El mar te llama, el tesoro te espera. ¿Tienes lo que se necesita?
+        </p>
+        <a href="#" class="btn btn-primary">
+            <span>🏴‍☠️</span>
+            Comenzar tu Aventura
+        </a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p class="footer-text">© 2024 Barbarossa's Treasure. Todos los derechos reservados.</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Código Pirata</a>
+                <a href="#" class="footer-link">Términos</a>
+                <a href="#" class="footer-link">Contacto</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Three.js -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        
+        function setTheme(isDark) {
+            document.body.classList.toggle('theme-dark', isDark);
+            document.body.classList.toggle('theme-light', !isDark);
+            themeIcon.textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        // Check for saved theme preference or default to light
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(savedTheme === 'dark' || (!savedTheme && prefersDark));
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('theme-light');
+            setTheme(isDark);
+        });
+
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        // Three.js Setup
+        const container = document.getElementById('canvas-container');
+        const loadingElement = document.getElementById('loading');
+        const animControls = document.getElementById('animControls');
+
+        // Scene
+        const scene = new THREE.Scene();
+
+        // Camera
+        const camera = new THREE.PerspectiveCamera(
+            45,
+            container.clientWidth / container.clientHeight,
+            0.1,
+            1000
+        );
+        camera.position.set(2.5, 1.5, 3);
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true, 
+            alpha: true 
+        });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        container.appendChild(renderer.domElement);
+
+        // Controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.target.set(0, 1, 0);
+        controls.minDistance = 1.5;
+        controls.maxDistance = 6;
+        controls.maxPolarAngle = Math.PI / 1.8;
+        controls.enablePan = false;
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xfff5e6, 1.2);
+        mainLight.position.set(5, 8, 5);
+        mainLight.castShadow = true;
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        mainLight.shadow.camera.near = 0.5;
+        mainLight.shadow.camera.far = 50;
+        mainLight.shadow.camera.left = -10;
+        mainLight.shadow.camera.right = 10;
+        mainLight.shadow.camera.top = 10;
+        mainLight.shadow.camera.bottom = -10;
+        scene.add(mainLight);
+
+        const fillLight = new THREE.DirectionalLight(0x8ec8ff, 0.4);
+        fillLight.position.set(-5, 3, -5);
+        scene.add(fillLight);
+
+        const rimLight = new THREE.DirectionalLight(0xffd4a3, 0.6);
+        rimLight.position.set(0, 5, -8);
+        scene.add(rimLight);
+
+        // Ground
+        const groundGeometry = new THREE.CircleGeometry(3, 64);
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            color: 0x5c4033,
+            roughness: 0.9,
+            metalness: 0.1
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.01;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Animation variables
+        let mixer = null;
+        let animations = [];
+        let currentAction = null;
+        let model = null;
+
+        // Load Model
+        const loader = new GLTFLoader();
+        const modelPath = '../assets/3D/pirate-kit/glTF/Characters_Captain_Barbarossa.gltf';
+
+        loader.load(
+            modelPath,
+            (gltf) => {
+                model = gltf.scene;
+                animations = gltf.animations;
+
+                // Position and scale model
+                model.position.set(0, 0, 0);
+                model.scale.set(1, 1, 1);
+
+                // Setup shadows
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                scene.add(model);
+
+                // Setup animation mixer
+                if (animations.length > 0) {
+                    mixer = new THREE.AnimationMixer(model);
+                    
+                    // Show animation controls
+                    animControls.style.display = 'flex';
+                    
+                    // Create animation map by name
+                    const animMap = {};
+                    animations.forEach((clip, index) => {
+                        animMap[clip.name] = index;
+                    });
+                    
+                    // Setup animation buttons
+                    const animButtons = animControls.querySelectorAll('.anim-btn');
+                    animButtons.forEach((btn) => {
+                        const animName = btn.dataset.anim;
+                        if (animMap[animName] !== undefined) {
+                            btn.addEventListener('click', () => {
+                                playAnimation(animMap[animName]);
+                                animButtons.forEach(b => b.classList.remove('active'));
+                                btn.classList.add('active');
+                            });
+                        } else {
+                            btn.style.display = 'none';
+                        }
+                    });
+
+                    // Play Idle animation by default
+                    if (animMap['Idle'] !== undefined) {
+                        playAnimation(animMap['Idle']);
+                        const idleBtn = animControls.querySelector('[data-anim="Idle"]');
+                        if (idleBtn) idleBtn.classList.add('active');
+                    }
+                }
+
+                // Hide loading
+                loadingElement.style.display = 'none';
+
+                console.log('Model loaded successfully!');
+                console.log('Animations found:', animations.map(a => a.name));
+            },
+            (progress) => {
+                const percent = (progress.loaded / progress.total * 100).toFixed(0);
+                loadingElement.querySelector('p').textContent = `Cargando... ${percent}%`;
+            },
+            (error) => {
+                console.error('Error loading model:', error);
+                loadingElement.querySelector('p').textContent = 'Error al cargar el modelo';
+            }
+        );
+
+        // Play animation function
+        function playAnimation(index) {
+            if (!mixer || index >= animations.length) return;
+
+            const clip = animations[index];
+            const newAction = mixer.clipAction(clip);
+
+            if (currentAction && currentAction !== newAction) {
+                currentAction.fadeOut(0.3);
+            }
+
+            newAction.reset();
+            newAction.fadeIn(0.3);
+            newAction.play();
+
+            currentAction = newAction;
+        }
+
+        // Animation loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            
+            if (mixer) {
+                mixer.update(delta);
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Handle resize
+        function onResize() {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        window.addEventListener('resize', onResize);
+
+        // Start animation
+        animate();
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

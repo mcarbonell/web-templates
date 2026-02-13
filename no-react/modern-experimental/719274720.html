@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--
+    ============================================================
+    LANDING PAGE - SEED: 719274720
+    ============================================================
+    
+    DESIGN DECISIONS BASED ON SEED DECOMPOSITION:
+    
+    Seed: 719274720
+    
+    [7] - WebGL Postprocessing (mandatory technique)
+          → Chromatic aberration, vignette, noise grain, color grading
+          → Optimized for 60fps on mid-range mobile
+    
+    [19] - Color Palette: Cyberpunk/Neon aesthetic
+           → Dark: #0a0a0f base, #ff00ff magenta, #00ffff cyan, #f0ff00 acid
+           → Light: #f8f7f4 base, deep magenta/cyan accents
+    
+    [27] - Typography: Space Grotesk (display) + JetBrains Mono (code/ASCII)
+           → Bold, geometric, tech-forward
+    
+    [47] - Scramble Text Effect on headings
+           → Characters decode on scroll/load
+    
+    [20] - Bento Grid Layout
+           → Asymmetric grid, varied cell sizes
+           → Glassmorphism cards
+    
+    [0] - Gradient Animated Text + Stroke Text
+          → Shimmer gradients on key text
+          → Outlined typography for impact
+    
+    ADDITIONAL TECHNIQUES:
+    - Aurora/gradient blobs in background
+    - Magnetic buttons with hover physics
+    - Glassmorphism overlay cards
+    - Scroll-driven reveal animations
+    
+    AESTHETIC: Brutalist-meets-Cyberpunk
+    - High contrast, bold typography
+    - Glitch-inspired details
+    - Fluid motion, sharp edges
+    
+    TARGET: Chrome, Firefox, Safari (modern)
+    OPTIMIZED: Mobile-first, 60fps target
+    
+    ============================================================
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS — Digital Experience Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           CSS CUSTOM PROPERTIES
+           ============================================ */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --text-primary: #f8f7f4;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent-magenta: #ff00ff;
+            --accent-cyan: #00ffff;
+            --accent-acid: #f0ff00;
+            --accent-orange: #ff6b35;
+            --glass-bg: rgba(18, 18, 26, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --gradient-neon: linear-gradient(135deg, var(--accent-magenta), var(--accent-cyan));
+            --gradient-acid: linear-gradient(135deg, var(--accent-cyan), var(--accent-acid));
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition-fast: 0.15s ease;
+            --transition-medium: 0.3s ease;
+            --transition-slow: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            --border-radius: 12px;
+            --border-radius-lg: 24px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8f7f4;
+            --bg-secondary: #ebe9e4;
+            --bg-tertiary: #ddd9d2;
+            --text-primary: #0a0a0f;
+            --text-secondary: #4a4a55;
+            --text-muted: #8a8a95;
+            --accent-magenta: #c500c5;
+            --accent-cyan: #00a5a5;
+            --accent-acid: #b8c400;
+            --glass-bg: rgba(248, 247, 244, 0.8);
+            --glass-border: rgba(0, 0, 0, 0.08);
+        }
+
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-display);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color var(--transition-medium), color var(--transition-medium);
+        }
+
+        /* ============================================
+           WEBGL CANVAS
+           ============================================ */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ============================================
+           AURORA BLOBS
+           ============================================ */
+        .aurora-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .aurora-blob--magenta {
+            width: 60vmax;
+            height: 60vmax;
+            background: var(--accent-magenta);
+            top: -20%;
+            left: -20%;
+            animation-delay: 0s;
+        }
+
+        .aurora-blob--cyan {
+            width: 50vmax;
+            height: 50vmax;
+            background: var(--accent-cyan);
+            bottom: -30%;
+            right: -20%;
+            animation-delay: -7s;
+        }
+
+        .aurora-blob--acid {
+            width: 40vmax;
+            height: 40vmax;
+            background: var(--accent-acid);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
+            opacity: 0.2;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(5%, 10%) scale(1.05);
+            }
+            50% {
+                transform: translate(-5%, 5%) scale(0.95);
+            }
+            75% {
+                transform: translate(10%, -5%) scale(1.02);
+            }
+        }
+
+        /* ============================================
+           MAIN CONTENT WRAPPER
+           ============================================ */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================
+           HEADER & NAVIGATION
+           ============================================ */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--accent-magenta);
+        }
+
+        .nav-links {
+            display: none;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .nav-links {
+                display: flex;
+            }
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-neon);
+            transition: width var(--transition-medium);
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: relative;
+            width: 56px;
+            height: 28px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background var(--transition-medium);
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: var(--gradient-neon);
+            border-radius: 50%;
+            transition: transform var(--transition-medium);
+        }
+
+        [data-theme="light"] .theme-toggle::before {
+            transform: translateX(28px);
+        }
+
+        .theme-toggle-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            opacity: 0.6;
+        }
+
+        .theme-toggle-icon--moon {
+            left: 6px;
+        }
+
+        .theme-toggle-icon--sun {
+            right: 6px;
+        }
+
+        /* ============================================
+           HERO SECTION
+           ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8rem 1.5rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero-tagline {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent-cyan);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: reveal 0.8s ease forwards;
+            animation-delay: 0.2s;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 10vw, 7rem);
+            font-weight: 700;
+            line-height: 0.95;
+            letter-spacing: -0.03em;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title-line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .hero-title-line span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100%);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero-title-line:nth-child(1) span { animation-delay: 0.3s; }
+        .hero-title-line:nth-child(2) span { animation-delay: 0.4s; }
+        .hero-title-line:nth-child(3) span { animation-delay: 0.5s; }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes reveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stroke Text */
+        .stroke-text {
+            -webkit-text-stroke: 2px var(--text-primary);
+            color: transparent;
+        }
+
+        [data-theme="light"] .stroke-text {
+            -webkit-text-stroke-color: var(--text-primary);
+        }
+
+        /* Gradient Animated Text */
+        .gradient-text {
+            background: var(--gradient-neon);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 540px;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: reveal 0.8s ease forwards;
+            animation-delay: 0.6s;
+        }
+
+        .hero-cta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            opacity: 0;
+            animation: reveal 0.8s ease forwards;
+            animation-delay: 0.7s;
+        }
+
+        /* ============================================
+           MAGNETIC BUTTONS
+           ============================================ */
+        .btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-decoration: none;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+            overflow: hidden;
+        }
+
+        .btn--primary {
+            background: var(--gradient-neon);
+            color: var(--bg-primary);
+        }
+
+        .btn--primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .btn--primary:hover::before {
+            opacity: 1;
+        }
+
+        .btn--secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--glass-border);
+        }
+
+        .btn--secondary:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-magnetic {
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ============================================
+           BENTO GRID SECTION
+           ============================================ */
+        .bento-section {
+            padding: 4rem 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bento-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(3, minmax(200px, auto));
+            }
+        }
+
+        .bento-card {
+            position: relative;
+            z-index: 1;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            overflow: hidden;
+            transition: transform var(--transition-medium), border-color var(--transition-medium);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .bento-card.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .bento-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-magenta);
+        }
+
+        @media (min-width: 1024px) {
+            .bento-card--large {
+                grid-column: span 2;
+                grid-row: span 2;
+            }
+
+            .bento-card--wide {
+                grid-column: span 2;
+            }
+
+            .bento-card--tall {
+                grid-row: span 2;
+            }
+        }
+
+        .bento-card-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cyan);
+        }
+
+        .bento-card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .bento-card-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .bento-card-number {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* ASCII Art Card */
+        .bento-card--ascii {
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ascii-art {
+            font-family: var(--font-mono);
+            font-size: clamp(0.4rem, 1vw, 0.6rem);
+            line-height: 1.2;
+            color: var(--accent-magenta);
+            white-space: pre;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        /* Stats Card */
+        .bento-card--stats {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-number {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            background: var(--gradient-acid);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* ============================================
+           SCRAMBLE TEXT SECTION
+           ============================================ */
+        .scramble-section {
+            padding: 6rem 1.5rem;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .scramble-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .scramble-text {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -0.02em;
+        }
+
+        .scramble-word {
+            display: inline-block;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+        }
+
+        /* ============================================
+           FEATURES SECTION
+           ============================================ */
+        .features-section {
+            padding: 4rem 1.5rem 8rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .feature-item {
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+            border-left: 2px solid var(--accent-magenta);
+            transition: border-color var(--transition-fast), background var(--transition-fast);
+        }
+
+        .feature-item:hover {
+            border-color: var(--accent-cyan);
+            background: var(--glass-bg);
+        }
+
+        .feature-number {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        footer {
+            padding: 3rem 1.5rem;
+            border-top: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .footer-container {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .footer-logo {
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .footer-logo span {
+            color: var(--accent-magenta);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-copy {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           SCROLL ANIMATIONS
+           ============================================ */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============================================
+           UTILITY CLASSES
+           ============================================ */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* ============================================
+           MOBILE MENU
+           ============================================ */
+        .mobile-menu-btn {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .mobile-menu-btn {
+                display: none;
+            }
+        }
+
+        .mobile-menu-btn span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: transform var(--transition-fast), opacity var(--transition-fast);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-medium), visibility var(--transition-medium);
+        }
+
+        .mobile-menu.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-menu a {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .mobile-menu a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        /* ============================================
+           REDUCED MOTION
+           ============================================ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- WebGL Canvas for Postprocessing -->
+    <canvas id="webgl-canvas" aria-hidden="true"></canvas>
+
+    <!-- Aurora Background Blobs -->
+    <div class="aurora-container" aria-hidden="true">
+        <div class="aurora-blob aurora-blob--magenta"></div>
+        <div class="aurora-blob aurora-blob--cyan"></div>
+        <div class="aurora-blob aurora-blob--acid"></div>
+    </div>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Header -->
+        <header>
+            <nav>
+                <a href="#" class="logo">NEXUS<span>.</span></a>
+                <ul class="nav-links">
+                    <li><a href="#work">Work</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="header-actions">
+                    <button class="theme-toggle" aria-label="Toggle theme" type="button">
+                        <svg class="theme-toggle-icon theme-toggle-icon--moon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                        <svg class="theme-toggle-icon theme-toggle-icon--sun" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"/>
+                            <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"/>
+                            <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"/>
+                            <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                    <button class="mobile-menu-btn" aria-label="Open menu" type="button">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" role="dialog" aria-modal="true">
+            <button class="mobile-menu-close" aria-label="Close menu" type="button">&times;</button>
+            <a href="#work">Work</a>
+            <a href="#services">Services</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+        </div>
+
+        <!-- Hero Section -->
+        <main>
+            <section class="hero">
+                <div class="hero-content">
+                    <p class="hero-tagline">Digital Experience Studio</p>
+                    <h1 class="hero-title">
+                        <span class="hero-title-line"><span>We craft</span></span>
+                        <span class="hero-title-line"><span><span class="gradient-text">digital</span></span></span>
+                        <span class="hero-title-line"><span><span class="stroke-text">experiences</span></span></span>
+                    </h1>
+                    <p class="hero-description">
+                        Award-winning design studio specializing in immersive web experiences, 
+                        brand identities, and digital products that push boundaries.
+                    </p>
+                    <div class="hero-cta">
+                        <a href="#work" class="btn btn--primary btn-magnetic">
+                            <span>View Our Work</span>
+                        </a>
+                        <a href="#contact" class="btn btn--secondary btn-magnetic">
+                            <span>Get in Touch</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bento Grid Section -->
+            <section class="bento-section" id="work">
+                <div class="bento-container">
+                    <header class="section-header scroll-reveal">
+                        <h2 class="section-title">What We Do</h2>
+                        <p class="section-subtitle">
+                            We blend creativity with technology to deliver exceptional digital experiences.
+                        </p>
+                    </header>
+                    <div class="bento-grid">
+                        <!-- Large Card -->
+                        <article class="bento-card bento-card--large scroll-reveal">
+                            <span class="bento-card-number">01</span>
+                            <svg class="bento-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                                <polyline points="2 17 12 22 22 17"/>
+                                <polyline points="2 12 12 17 22 12"/>
+                            </svg>
+                            <h3 class="bento-card-title">Immersive Web Experiences</h3>
+                            <p class="bento-card-text">
+                                We create cutting-edge websites that captivate audiences with WebGL, 
+                                advanced animations, and interactive storytelling. Every pixel is 
+                                crafted to deliver memorable experiences.
+                            </p>
+                        </article>
+
+                        <!-- ASCII Art Card -->
+                        <article class="bento-card bento-card--ascii scroll-reveal">
+                            <pre class="ascii-art" aria-hidden="true">
+    ██╗███╗   ██╗███████╗██╗ ██████╗ 
+    ██║████╗  ██║██╔════╝██║██╔════╝ 
+    ██║██╔██╗ ██║█████╗  ██║██║      
+    ██║██║╚██╗██║██╔══╝  ██║██║      
+    ██║██║ ╚████║██║     ██║╚██████╗ 
+    ╚═╝╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝ 
+                            </pre>
+                        </article>
+
+                        <!-- Stats Card -->
+                        <article class="bento-card bento-card--stats scroll-reveal">
+                            <span class="stat-number">150+</span>
+                            <span class="stat-label">Projects Delivered</span>
+                        </article>
+
+                        <!-- Wide Card -->
+                        <article class="bento-card bento-card--wide scroll-reveal">
+                            <span class="bento-card-number">02</span>
+                            <svg class="bento-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                                <line x1="9" y1="9" x2="9.01" y2="9"/>
+                                <line x1="15" y1="9" x2="15.01" y2="9"/>
+                            </svg>
+                            <h3 class="bento-card-title">Brand Identity</h3>
+                            <p class="bento-card-text">
+                                Strategic brand development that resonates with your audience and stands out in the market.
+                            </p>
+                        </article>
+
+                        <!-- Tall Card -->
+                        <article class="bento-card bento-card--tall scroll-reveal">
+                            <span class="bento-card-number">03</span>
+                            <svg class="bento-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                            <h3 class="bento-card-title">Digital Products</h3>
+                            <p class="bento-card-text">
+                                End-to-end product design and development for web and mobile platforms.
+                            </p>
+                        </article>
+
+                        <!-- Stats Card 2 -->
+                        <article class="bento-card bento-card--stats scroll-reveal">
+                            <span class="stat-number">12</span>
+                            <span class="stat-label">Years of Excellence</span>
+                        </article>
+
+                        <!-- Regular Card -->
+                        <article class="bento-card scroll-reveal">
+                            <span class="bento-card-number">04</span>
+                            <svg class="bento-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            </svg>
+                            <h3 class="bento-card-title">3D & Motion</h3>
+                            <p class="bento-card-text">
+                                Stunning 3D visuals and motion design that bring brands to life.
+                            </p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Scramble Text Section -->
+            <section class="scramble-section">
+                <div class="scramble-container scroll-reveal">
+                    <p class="scramble-text">
+                        We believe in <span class="scramble-word" data-text="innovation">innovation</span>, 
+                        <span class="scramble-word" data-text="creativity">creativity</span>, and 
+                        <span class="scramble-word" data-text="excellence">excellence</span>.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features-section" id="services">
+                <div class="features-container">
+                    <header class="section-header scroll-reveal">
+                        <h2 class="section-title">Our Process</h2>
+                        <p class="section-subtitle">
+                            A proven methodology that delivers results.
+                        </p>
+                    </header>
+                    <div class="features-grid">
+                        <article class="feature-item scroll-reveal">
+                            <span class="feature-number">01</span>
+                            <h3 class="feature-title">Discovery</h3>
+                            <p class="feature-text">
+                                Deep dive into your brand, goals, and audience to uncover opportunities 
+                                for meaningful impact.
+                            </p>
+                        </article>
+                        <article class="feature-item scroll-reveal">
+                            <span class="feature-number">02</span>
+                            <h3 class="feature-title">Strategy</h3>
+                            <p class="feature-text">
+                                Develop a comprehensive roadmap that aligns creative vision with 
+                                business objectives.
+                            </p>
+                        </article>
+                        <article class="feature-item scroll-reveal">
+                            <span class="feature-number">03</span>
+                            <h3 class="feature-title">Design</h3>
+                            <p class="feature-text">
+                                Craft visually stunning and intuitive designs that resonate with 
+                                your target audience.
+                            </p>
+                        </article>
+                        <article class="feature-item scroll-reveal">
+                            <span class="feature-number">04</span>
+                            <h3 class="feature-title">Development</h3>
+                            <p class="feature-text">
+                                Build robust, scalable solutions using cutting-edge technologies 
+                                and best practices.
+                            </p>
+                        </article>
+                        <article class="feature-item scroll-reveal">
+                            <span class="feature-number">05</span>
+                            <h3 class="feature-title">Testing</h3>
+                            <p class="feature-text">
+                                Rigorous quality assurance to ensure flawless performance across 
+                                all devices and browsers.
+                            </p>
+                        </article>
+                        <article class="feature-item scroll-reveal">
+                            <span class="feature-number">06</span>
+                            <h3 class="feature-title">Launch</h3>
+                            <p class="feature-text">
+                                Strategic deployment and ongoing support to maximize your 
+                                digital presence.
+                            </p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer id="contact">
+            <div class="footer-container">
+                <p class="footer-logo">NEXUS<span>.</span></p>
+                <nav class="footer-links">
+                    <a href="#">Twitter</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">LinkedIn</a>
+                    <a href="#">Dribbble</a>
+                </nav>
+                <p class="footer-copy">&copy; 2024 NEXUS Studio. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ============================================
+        // WEBGL POSTPROCESSING
+        // ============================================
+        (function() {
+            const canvas = document.getElementById('webgl-canvas');
+            const gl = canvas.getContext('webgl', { 
+                alpha: true, 
+                antialias: false,
+                powerPreference: 'low-power'
+            });
+
+            if (!gl) {
+                console.warn('WebGL not supported');
+                return;
+            }
+
+            // Resize canvas
+            function resize() {
+                const dpr = Math.min(window.devicePixelRatio, 2);
+                canvas.width = window.innerWidth * dpr;
+                canvas.height = window.innerHeight * dpr;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            // Vertex shader
+            const vertexShaderSource = `
+                attribute vec2 a_position;
+                varying vec2 v_uv;
+                void main() {
+                    v_uv = a_position * 0.5 + 0.5;
+                    gl_Position = vec4(a_position, 0.0, 1.0);
+                }
+            `;
+
+            // Fragment shader with noise, vignette, and chromatic aberration
+            const fragmentShaderSource = `
+                precision mediump float;
+                varying vec2 v_uv;
+                uniform float u_time;
+                uniform vec2 u_resolution;
+                uniform vec3 u_color1;
+                uniform vec3 u_color2;
+
+                // Simplex noise function
+                vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+                float snoise(vec2 v) {
+                    const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                                       -0.577350269189626, 0.024390243902439);
+                    vec2 i  = floor(v + dot(v, C.yy));
+                    vec2 x0 = v - i + dot(i, C.xx);
+                    vec2 i1;
+                    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                    vec4 x12 = x0.xyxy + C.xxzz;
+                    x12.xy -= i1;
+                    i = mod289(i);
+                    vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
+                                   + i.x + vec3(0.0, i1.x, 1.0));
+                    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+                                           dot(x12.zw,x12.zw)), 0.0);
+                    m = m*m;
+                    m = m*m;
+                    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                    vec3 h = abs(x) - 0.5;
+                    vec3 ox = floor(x + 0.5);
+                    vec3 a0 = x - ox;
+                    m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+                    vec3 g;
+                    g.x = a0.x * x0.x + h.x * x0.y;
+                    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                    return 130.0 * dot(m, g);
+                }
+
+                void main() {
+                    vec2 uv = v_uv;
+                    float aspect = u_resolution.x / u_resolution.y;
+                    
+                    // Time-based animation
+                    float t = u_time * 0.15;
+                    
+                    // Noise layers
+                    float noise1 = snoise(uv * 2.0 + t * 0.5) * 0.5 + 0.5;
+                    float noise2 = snoise(uv * 4.0 - t * 0.3) * 0.5 + 0.5;
+                    float noise3 = snoise(uv * 8.0 + t * 0.2) * 0.5 + 0.5;
+                    
+                    float combinedNoise = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
+                    
+                    // Color gradient
+                    vec3 color = mix(u_color1, u_color2, combinedNoise);
+                    
+                    // Vignette
+                    vec2 vignetteUv = uv * (1.0 - uv);
+                    float vignette = vignetteUv.x * vignetteUv.y * 15.0;
+                    vignette = pow(vignette, 0.25);
+                    
+                    // Chromatic aberration (subtle)
+                    float aberration = 0.002;
+                    float r = combinedNoise + snoise(uv * 3.0 + vec2(aberration, 0.0) + t * 0.1) * 0.1;
+                    float b = combinedNoise + snoise(uv * 3.0 - vec2(aberration, 0.0) + t * 0.1) * 0.1;
+                    
+                    color.r = mix(color.r, color.r * r, 0.3);
+                    color.b = mix(color.b, color.b * b, 0.3);
+                    
+                    // Apply vignette
+                    color *= vignette;
+                    
+                    // Scanlines (very subtle)
+                    float scanline = sin(uv.y * u_resolution.y * 0.5) * 0.02 + 1.0;
+                    color *= scanline;
+                    
+                    // Grain
+                    float grain = snoise(uv * u_resolution * 0.5 + t * 100.0) * 0.03;
+                    color += grain;
+                    
+                    // Output with low opacity for overlay effect
+                    gl_FragColor = vec4(color, 0.08);
+                }
+            `;
+
+            // Compile shader
+            function createShader(type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error(gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                return shader;
+            }
+
+            const vertexShader = createShader(gl.VERTEX_SHADER, vertexShaderSource);
+            const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+            // Create program
+            const program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                console.error(gl.getProgramInfoLog(program));
+                return;
+            }
+
+            // Geometry
+            const positions = new Float32Array([
+                -1, -1,
+                 1, -1,
+                -1,  1,
+                 1,  1
+            ]);
+
+            const buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+            const positionLocation = gl.getAttribLocation(program, 'a_position');
+            const timeLocation = gl.getUniformLocation(program, 'u_time');
+            const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+            const color1Location = gl.getUniformLocation(program, 'u_color1');
+            const color2Location = gl.getUniformLocation(program, 'u_color2');
+
+            gl.enableVertexAttribArray(positionLocation);
+            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+            // Animation loop
+            let startTime = performance.now();
+            let lastFrameTime = startTime;
+            const targetFPS = 60;
+            const frameInterval = 1000 / targetFPS;
+
+            function render(currentTime) {
+                requestAnimationFrame(render);
+
+                const elapsed = currentTime - lastFrameTime;
+                if (elapsed < frameInterval) return;
+
+                lastFrameTime = currentTime - (elapsed % frameInterval);
+
+                const time = (currentTime - startTime) * 0.001;
+
+                gl.clearColor(0, 0, 0, 0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                gl.useProgram(program);
+                gl.uniform1f(timeLocation, time);
+                gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+
+                // Theme-based colors
+                const isDark = !document.documentElement.hasAttribute('data-theme') || 
+                               document.documentElement.getAttribute('data-theme') === 'dark';
+                
+                if (isDark) {
+                    gl.uniform3f(color1Location, 1.0, 0.0, 1.0); // Magenta
+                    gl.uniform3f(color2Location, 0.0, 1.0, 1.0); // Cyan
+                } else {
+                    gl.uniform3f(color1Location, 0.77, 0.0, 0.77); // Darker magenta
+                    gl.uniform3f(color2Location, 0.0, 0.65, 0.65); // Darker cyan
+                }
+
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            }
+
+            requestAnimationFrame(render);
+        })();
+
+        // ============================================
+        // THEME TOGGLE
+        // ============================================
+        (function() {
+            const toggle = document.querySelector('.theme-toggle');
+            const root = document.documentElement;
+
+            // Check for saved preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                root.setAttribute('data-theme', savedTheme);
+            } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+                root.setAttribute('data-theme', 'light');
+            }
+
+            toggle.addEventListener('click', function() {
+                const currentTheme = root.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                
+                if (newTheme === 'dark') {
+                    root.removeAttribute('data-theme');
+                } else {
+                    root.setAttribute('data-theme', newTheme);
+                }
+                
+                localStorage.setItem('theme', newTheme);
+            });
+        })();
+
+        // ============================================
+        // SCRAMBLE TEXT EFFECT
+        // ============================================
+        (function() {
+            const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            const scrambleWords = document.querySelectorAll('.scramble-word');
+            
+            let hasAnimated = false;
+
+            function scrambleText(element, finalText, duration) {
+                const length = finalText.length;
+                const frameRate = 30;
+                const totalFrames = duration / (1000 / frameRate);
+                let frame = 0;
+
+                function update() {
+                    if (frame >= totalFrames) {
+                        element.textContent = finalText;
+                        return;
+                    }
+
+                    const progress = frame / totalFrames;
+                    const revealCount = Math.floor(progress * length);
+                    
+                    let result = '';
+                    for (let i = 0; i < length; i++) {
+                        if (i < revealCount) {
+                            result += finalText[i];
+                        } else {
+                            result += scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+                        }
+                    }
+                    
+                    element.textContent = result;
+                    frame++;
+                    
+                    requestAnimationFrame(update);
+                }
+
+                update();
+            }
+
+            function animateScramble() {
+                if (hasAnimated) return;
+                hasAnimated = true;
+
+                scrambleWords.forEach((word, index) => {
+                    const finalText = word.getAttribute('data-text');
+                    setTimeout(() => {
+                        scrambleText(word, finalText, 800);
+                    }, index * 200);
+                });
+            }
+
+            // Trigger on scroll into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateScramble();
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            const scrambleSection = document.querySelector('.scramble-section');
+            if (scrambleSection) {
+                observer.observe(scrambleSection);
+            }
+        })();
+
+        // ============================================
+        // SCROLL REVEAL
+        // ============================================
+        (function() {
+            const revealElements = document.querySelectorAll('.scroll-reveal, .bento-card');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('revealed');
+                        }, index * 50);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            revealElements.forEach(el => observer.observe(el));
+        })();
+
+        // ============================================
+        // MAGNETIC BUTTONS
+        // ============================================
+        (function() {
+            const magneticButtons = document.querySelectorAll('.btn-magnetic');
+
+            magneticButtons.forEach(button => {
+                button.addEventListener('mousemove', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    this.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+                });
+
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translate(0, 0)';
+                });
+            });
+        })();
+
+        // ============================================
+        // MOBILE MENU
+        // ============================================
+        (function() {
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const closeBtn = document.querySelector('.mobile-menu-close');
+            const menuLinks = mobileMenu.querySelectorAll('a');
+
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            closeBtn.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            menuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+        })();
+
+        // ============================================
+        // SMOOTH SCROLL
+        // ============================================
+        (function() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

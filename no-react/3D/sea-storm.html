@@ -1,0 +1,737 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storm Wrath: Galleon in Tempest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background-color: #000;
+            color: #ccc;
+        }
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            max-width: 320px;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 0 10px #00aaff;
+        }
+        p {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            color: #aaa;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            background: linear-gradient(to bottom, #2a2a2a, #111);
+            border: 1px solid #555;
+            color: #ddd;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: linear-gradient(to bottom, #3a3a3a, #222);
+            border-color: #00aaff;
+            color: #fff;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            color: #00aaff;
+            z-index: 1000;
+            background-color: rgba(0,0,0,0.8);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #00aaff;
+        }
+        .hidden {
+            display: none;
+        }
+        #stats {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 90;
+        }
+        .credits {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 0.8rem;
+            color: #777;
+        }
+        .slider-container {
+            margin-top: 10px;
+        }
+        label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            color: #bbb;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00aaff;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="loading">
+            <div>LOADING EPIC STORM SCENE...</div>
+            <div style="font-size: 1rem; margin-top: 15px;">Preparing waves, lightning, and ship...</div>
+        </div>
+        <div id="canvas-container"></div>
+        <div id="ui">
+            <h1>⚓ STORM WRATH</h1>
+            <p>A cinematic 3D simulation of a wooden galleon battling a violent North Atlantic storm. Experience photorealistic waves, dynamic lightning, and dense rainfall.</p>
+            <div class="controls">
+                <button id="toggleRain">Toggle Rain</button>
+                <button id="toggleLightning">Toggle Lightning</button>
+                <button id="toggleCamera">Change Camera</button>
+                <button id="stormIntensity">Increase Storm</button>
+            </div>
+            <div class="slider-container">
+                <label for="waveHeight">Wave Intensity: <span id="waveValue">High</span></label>
+                <input type="range" id="waveHeight" min="1" max="5" value="3" step="0.5">
+            </div>
+            <div class="slider-container">
+                <label for="windSpeed">Wind Speed: <span id="windValue">Violent</span></label>
+                <input type="range" id="windSpeed" min="1" max="10" value="7" step="0.5">
+            </div>
+        </div>
+        <div id="stats"></div>
+        <div class="credits">Cinematic 3D Simulation | WebGL & Three.js | Inspired by Pirates of the Caribbean</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    
+    <!-- Shaders (must be loaded before post-processing passes) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/FilmShader.min.js"></script>
+    
+    <!-- Post-processing passes -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/FilmPass.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.min.js"></script>
+
+    <script>
+        // Main Three.js Application
+        let scene, camera, renderer, composer;
+        let ship, ocean, rainParticles, lightningGroup;
+        let directionalLight, lanternLight1, lanternLight2, lightningFlash;
+        let clock = new THREE.Clock();
+        let waveHeight = 3;
+        let windSpeed = 7;
+        let rainEnabled = true;
+        let lightningEnabled = true;
+        let cameraMode = 0; // 0: orbital, 1: deck, 2: wide
+        let cameraTarget = new THREE.Vector3();
+        let cameraShake = { intensity: 0, decay: 0.95 };
+        let stormIntensity = 1.0;
+        let controls;
+
+        // DOM Elements
+        const loadingElement = document.getElementById('loading');
+        const canvasContainer = document.getElementById('canvas-container');
+        const toggleRainBtn = document.getElementById('toggleRain');
+        const toggleLightningBtn = document.getElementById('toggleLightning');
+        const toggleCameraBtn = document.getElementById('toggleCamera');
+        const stormIntensityBtn = document.getElementById('stormIntensity');
+        const waveHeightSlider = document.getElementById('waveHeight');
+        const windSpeedSlider = document.getElementById('windSpeed');
+        const waveValueSpan = document.getElementById('waveValue');
+        const windValueSpan = document.getElementById('windValue');
+
+        // Initialize the scene
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050814, 0.015);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+            camera.position.set(40, 20, 60);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 0.8;
+            canvasContainer.appendChild(renderer.domElement);
+
+            // Orbit Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI * 0.8;
+            controls.minDistance = 20;
+            controls.maxDistance = 200;
+            controls.enabled = false; // We'll control camera manually for cinematic effect
+
+            // Post-processing
+            composer = new THREE.EffectComposer(renderer);
+            const renderPass = new THREE.RenderPass(scene, camera);
+            composer.addPass(renderPass);
+
+            // Bloom pass for lightning and water highlights
+            const bloomPass = new THREE.UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight),
+                0.8, 0.4, 0.85
+            );
+            composer.addPass(bloomPass);
+
+            // Film pass for cinematic grain
+            const filmPass = new THREE.FilmPass(0.1, 0.5, 2048, false);
+            composer.addPass(filmPass);
+
+            // Lighting
+            // Ambient light for minimal base illumination
+            const ambientLight = new THREE.AmbientLight(0x111122);
+            scene.add(ambientLight);
+
+            // Directional moonlight (very dim, for silhouette)
+            directionalLight = new THREE.DirectionalLight(0x223355, 0.1);
+            directionalLight.position.set(-100, 200, 100);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.camera.left = -150;
+            directionalLight.shadow.camera.right = 150;
+            directionalLight.shadow.camera.top = 150;
+            directionalLight.shadow.camera.bottom = -150;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            scene.add(directionalLight);
+
+            // Lantern lights (warm, swinging)
+            lanternLight1 = new THREE.PointLight(0xffaa55, 1.5, 30);
+            lanternLight1.position.set(8, 12, -5);
+            scene.add(lanternLight1);
+
+            lanternLight2 = new THREE.PointLight(0xffaa55, 1.2, 25);
+            lanternLight2.position.set(-6, 10, 8);
+            scene.add(lanternLight2);
+
+            // Lightning flash (instant, high intensity)
+            lightningFlash = new THREE.PointLight(0xffffff, 0, 500);
+            lightningFlash.position.set(0, 200, -100);
+            scene.add(lightningFlash);
+
+            // Create ocean
+            createOcean();
+            
+            // Create rain
+            createRain();
+            
+            // Create lightning effect
+            createLightning();
+            
+            // Load ship model (using a simple geometry for demo, but structured to look like a galleon)
+            createShip();
+            
+            // Sky dome
+            createSky();
+
+            // Event Listeners
+            window.addEventListener('resize', onWindowResize);
+            toggleRainBtn.addEventListener('click', toggleRain);
+            toggleLightningBtn.addEventListener('click', toggleLightning);
+            toggleCameraBtn.addEventListener('click', toggleCamera);
+            stormIntensityBtn.addEventListener('click', increaseStorm);
+            waveHeightSlider.addEventListener('input', updateWaveHeight);
+            windSpeedSlider.addEventListener('input', updateWindSpeed);
+
+            // Hide loading screen after a delay (simulating asset loading)
+            setTimeout(() => {
+                loadingElement.classList.add('hidden');
+            }, 2500);
+
+            // Start animation
+            animate();
+        }
+
+        function createOcean() {
+            const waterGeometry = new THREE.PlaneGeometry(2000, 2000, 128, 128);
+            const waterMaterial = new THREE.MeshStandardMaterial({
+                color: 0x0a1a2a,
+                roughness: 0.1,
+                metalness: 0.9,
+                side: THREE.DoubleSide
+            });
+            ocean = new THREE.Mesh(waterGeometry, waterMaterial);
+            ocean.rotation.x = -Math.PI / 2;
+            ocean.position.y = -5;
+            ocean.receiveShadow = true;
+            scene.add(ocean);
+        }
+
+        function createRain() {
+            const rainCount = 15000;
+            const rainGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(rainCount * 3);
+            const velocities = new Float32Array(rainCount);
+
+            for (let i = 0; i < rainCount; i++) {
+                const i3 = i * 3;
+                positions[i3] = (Math.random() - 0.5) * 400;
+                positions[i3 + 1] = Math.random() * 100 + 50;
+                positions[i3 + 2] = (Math.random() - 0.5) * 400;
+                velocities[i] = 0.5 + Math.random() * 1.5;
+            }
+
+            rainGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            rainGeometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 1));
+
+            const rainMaterial = new THREE.PointsMaterial({
+                color: 0xaaaaee,
+                size: 0.15,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+
+            rainParticles = new THREE.Points(rainGeometry, rainMaterial);
+            scene.add(rainParticles);
+        }
+
+        function createLightning() {
+            lightningGroup = new THREE.Group();
+            
+            // Create multiple lightning bolt geometries
+            for (let i = 0; i < 5; i++) {
+                const lightning = createSingleLightning();
+                lightning.visible = false;
+                lightningGroup.add(lightning);
+            }
+            
+            scene.add(lightningGroup);
+        }
+
+        function createSingleLightning() {
+            const points = [];
+            const startX = (Math.random() - 0.5) * 300;
+            const startY = 150 + Math.random() * 100;
+            const startZ = (Math.random() - 0.5) * 300;
+            
+            let x = startX;
+            let y = startY;
+            let z = startZ;
+            
+            points.push(new THREE.Vector3(x, y, z));
+            
+            const segments = 10 + Math.floor(Math.random() * 15);
+            for (let i = 0; i < segments; i++) {
+                x += (Math.random() - 0.5) * 40;
+                y -= 10 + Math.random() * 15;
+                z += (Math.random() - 0.5) * 40;
+                points.push(new THREE.Vector3(x, y, z));
+            }
+            
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({
+                color: 0x88ccff,
+                transparent: true,
+                opacity: 0.9
+            });
+            
+            return new THREE.Line(geometry, material);
+        }
+
+        function createShip() {
+            const shipGroup = new THREE.Group();
+            
+            // Hull (main body)
+            const hullGeometry = new THREE.BoxGeometry(25, 8, 8);
+            const hullMaterial = new THREE.MeshStandardMaterial({
+                color: 0x4a3920,
+                roughness: 0.8,
+                metalness: 0.2,
+                bumpScale: 0.05
+            });
+            const hull = new THREE.Mesh(hullGeometry, hullMaterial);
+            hull.position.y = 2;
+            hull.castShadow = true;
+            hull.receiveShadow = true;
+            shipGroup.add(hull);
+            
+            // Deck
+            const deckGeometry = new THREE.BoxGeometry(26, 0.5, 9);
+            const deckMaterial = new THREE.MeshStandardMaterial({
+                color: 0x3d2d14,
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            const deck = new THREE.Mesh(deckGeometry, deckMaterial);
+            deck.position.y = 6;
+            deck.castShadow = true;
+            deck.receiveShadow = true;
+            shipGroup.add(deck);
+            
+            // Masts
+            const mastHeight = 30;
+            const mastGeometry = new THREE.CylinderGeometry(0.4, 0.6, mastHeight, 8);
+            const mastMaterial = new THREE.MeshStandardMaterial({
+                color: 0x2a1e0f,
+                roughness: 0.8
+            });
+            
+            const mast1 = new THREE.Mesh(mastGeometry, mastMaterial);
+            mast1.position.set(0, mastHeight/2 + 6, 0);
+            shipGroup.add(mast1);
+            
+            const mast2 = new THREE.Mesh(mastGeometry, mastMaterial);
+            mast2.position.set(-8, mastHeight/2 + 6, 0);
+            mast2.scale.y = 0.8;
+            shipGroup.add(mast2);
+            
+            const mast3 = new THREE.Mesh(mastGeometry, mastMaterial);
+            mast3.position.set(8, mastHeight/2 + 6, 0);
+            mast3.scale.y = 0.7;
+            shipGroup.add(mast3);
+            
+            // Sails (tattered)
+            const sailGeometry = new THREE.PlaneGeometry(12, 20);
+            const sailMaterial = new THREE.MeshStandardMaterial({
+                color: 0xe8e1d5,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.9,
+                roughness: 0.9
+            });
+            
+            const sail1 = new THREE.Mesh(sailGeometry, sailMaterial);
+            sail1.position.set(0, 20, 0);
+            sail1.rotation.y = Math.PI / 2;
+            shipGroup.add(sail1);
+            
+            const sail2 = new THREE.Mesh(sailGeometry, sailMaterial);
+            sail2.position.set(-8, 16, 0);
+            sail2.rotation.y = Math.PI / 2;
+            sail2.scale.set(0.8, 0.8, 1);
+            shipGroup.add(sail2);
+            
+            // Crow's nest
+            const nestGeometry = new THREE.CylinderGeometry(2, 2.2, 2, 8);
+            const nest = new THREE.Mesh(nestGeometry, mastMaterial);
+            nest.position.set(0, mastHeight + 4, 0);
+            shipGroup.add(nest);
+            
+            // Lanterns
+            const lanternGeometry = new THREE.SphereGeometry(0.8, 8, 8);
+            const lanternMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffaa33,
+                emissive: 0xff5500,
+                emissiveIntensity: 0.5
+            });
+            
+            const lantern1 = new THREE.Mesh(lanternGeometry, lanternMaterial);
+            lantern1.position.set(8, 12, -5);
+            shipGroup.add(lantern1);
+            
+            const lantern2 = new THREE.Mesh(lanternGeometry, lanternMaterial);
+            lantern2.position.set(-6, 10, 8);
+            shipGroup.add(lantern2);
+            
+            ship = shipGroup;
+            scene.add(ship);
+        }
+
+        function createSky() {
+            const skyGeometry = new THREE.SphereGeometry(800, 32, 32);
+            const skyMaterial = new THREE.MeshStandardMaterial({
+                color: 0x0a0a1a,
+                side: THREE.BackSide,
+                emissive: 0x050514,
+                emissiveIntensity: 0.1
+            });
+            const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+            scene.add(sky);
+            
+            // Cloud layers
+            const cloudCount = 40;
+            for (let i = 0; i < cloudCount; i++) {
+                const cloudGeometry = new THREE.SphereGeometry(20 + Math.random() * 30, 7, 7);
+                const cloudMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x222233,
+                    transparent: true,
+                    opacity: 0.7,
+                    roughness: 1
+                });
+                const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
+                cloud.position.set(
+                    (Math.random() - 0.5) * 600,
+                    100 + Math.random() * 150,
+                    (Math.random() - 0.5) * 600
+                );
+                scene.add(cloud);
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+            
+            // Update ocean waves
+            if (ocean && ocean.geometry.attributes.position) {
+                const positions = ocean.geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    const x = positions[i];
+                    const z = positions[i + 2];
+                    positions[i + 1] = Math.sin(x * 0.02 + time * 1.5) * waveHeight * 2 +
+                                     Math.sin(z * 0.03 + time * 1.2) * waveHeight * 1.5 +
+                                     Math.sin(x * 0.01 + z * 0.01 + time * 2) * waveHeight;
+                }
+                ocean.geometry.attributes.position.needsUpdate = true;
+                ocean.geometry.computeVertexNormals();
+            }
+            
+            // Update ship rocking and movement
+            if (ship) {
+                const rockX = Math.sin(time * 0.7) * 0.15 * stormIntensity;
+                const rockZ = Math.sin(time * 0.5) * 0.2 * stormIntensity;
+                const rockY = Math.sin(time * 0.3) * 0.1 * stormIntensity;
+                
+                ship.rotation.x = rockX;
+                ship.rotation.z = rockZ;
+                ship.position.y = rockY - 5;
+                
+                // Move ship with waves
+                const waveOffset = Math.sin(time * 0.5) * 2 * stormIntensity;
+                ship.position.x = waveOffset * 0.5;
+                ship.position.z = Math.sin(time * 0.3) * 1.5 * stormIntensity;
+                
+                // Sails flapping
+                if (ship.children.length > 7) {
+                    const sail1 = ship.children[7];
+                    const sail2 = ship.children[8];
+                    if (sail1) sail1.rotation.z = Math.sin(time * 2) * 0.3 * windSpeed * 0.1;
+                    if (sail2) sail2.rotation.z = Math.sin(time * 1.7) * 0.2 * windSpeed * 0.1;
+                }
+                
+                // Lantern swinging
+                lanternLight1.position.y = 12 + Math.sin(time * 2) * 0.5;
+                lanternLight1.position.x = 8 + Math.sin(time * 1.5) * 0.3;
+                
+                lanternLight2.position.y = 10 + Math.sin(time * 2.2) * 0.4;
+                lanternLight2.position.z = 8 + Math.sin(time * 1.8) * 0.2;
+            }
+            
+            // Update rain
+            if (rainParticles && rainEnabled) {
+                const positions = rainParticles.geometry.attributes.position.array;
+                const velocities = rainParticles.geometry.attributes.velocity.array;
+                
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i + 1] -= velocities[i / 3] * windSpeed * 0.5 * stormIntensity;
+                    positions[i] += Math.sin(time * 0.5 + i) * 0.1 * windSpeed * 0.3;
+                    
+                    // Reset raindrop if it falls too low
+                    if (positions[i + 1] < -10) {
+                        positions[i + 1] = Math.random() * 100 + 50;
+                        positions[i] = (Math.random() - 0.5) * 400;
+                        positions[i + 2] = (Math.random() - 0.5) * 400;
+                    }
+                }
+                rainParticles.geometry.attributes.position.needsUpdate = true;
+            }
+            
+            // Random lightning strikes
+            if (lightningEnabled && Math.random() < 0.003 * stormIntensity) {
+                triggerLightning();
+            }
+            
+            // Update lightning flash intensity
+            if (lightningFlash.intensity > 0) {
+                lightningFlash.intensity *= 0.85;
+                if (lightningFlash.intensity < 0.1) {
+                    lightningFlash.intensity = 0;
+                }
+            }
+            
+            // Update camera
+            updateCamera(time, delta);
+            
+            // Update camera shake
+            if (cameraShake.intensity > 0.01) {
+                cameraShake.intensity *= cameraShake.decay;
+                camera.position.x += (Math.random() - 0.5) * cameraShake.intensity;
+                camera.position.y += (Math.random() - 0.5) * cameraShake.intensity;
+                camera.position.z += (Math.random() - 0.5) * cameraShake.intensity;
+            }
+            
+            // Update post-processing exposure based on lightning
+            renderer.toneMappingExposure = 0.8 + lightningFlash.intensity * 2;
+            
+            // Render
+            composer.render();
+        }
+
+        function updateCamera(time, delta) {
+            // Cinematic camera movement
+            switch (cameraMode) {
+                case 0: // Orbital around ship
+                    const radius = 60 + Math.sin(time * 0.1) * 10;
+                    const angle = time * 0.1;
+                    cameraTarget.set(0, 5, 0);
+                    camera.position.x = Math.cos(angle) * radius;
+                    camera.position.z = Math.sin(angle) * radius;
+                    camera.position.y = 20 + Math.sin(time * 0.2) * 5;
+                    camera.lookAt(cameraTarget);
+                    break;
+                    
+                case 1: // Deck level, close
+                    const deckAngle = time * 0.05;
+                    const deckRadius = 15;
+                    cameraTarget.set(0, 8, 0);
+                    camera.position.x = Math.cos(deckAngle) * deckRadius;
+                    camera.position.z = Math.sin(deckAngle) * deckRadius;
+                    camera.position.y = 10 + Math.sin(time * 0.5) * 2;
+                    camera.lookAt(cameraTarget);
+                    break;
+                    
+                case 2: // Wide establishing shot
+                    const wideAngle = time * 0.03;
+                    const wideRadius = 100;
+                    cameraTarget.set(0, 0, 0);
+                    camera.position.x = Math.cos(wideAngle) * wideRadius;
+                    camera.position.z = Math.sin(wideAngle) * wideRadius;
+                    camera.position.y = 40 + Math.sin(time * 0.1) * 10;
+                    camera.lookAt(cameraTarget);
+                    break;
+            }
+            
+            // Add subtle camera shake based on storm intensity
+            if (Math.random() < 0.1 * stormIntensity) {
+                cameraShake.intensity = 0.2 * stormIntensity;
+            }
+        }
+
+        function triggerLightning() {
+            // Flash the lightning light
+            lightningFlash.intensity = 5 + Math.random() * 5;
+            
+            // Show random lightning bolt
+            if (lightningGroup.children.length > 0) {
+                const bolt = lightningGroup.children[Math.floor(Math.random() * lightningGroup.children.length)];
+                bolt.visible = true;
+                
+                // Position bolt randomly in sky
+                bolt.position.x = (Math.random() - 0.5) * 200;
+                bolt.position.z = (Math.random() - 0.5) * 200;
+                bolt.position.y = 100 + Math.random() * 100;
+                
+                // Hide bolt after short duration
+                setTimeout(() => {
+                    bolt.visible = false;
+                }, 100);
+            }
+            
+            // Increase camera shake during lightning
+            cameraShake.intensity = 0.5;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // UI Controls
+        function toggleRain() {
+            rainEnabled = !rainEnabled;
+            rainParticles.visible = rainEnabled;
+            toggleRainBtn.textContent = rainEnabled ? 'Disable Rain' : 'Enable Rain';
+        }
+
+        function toggleLightning() {
+            lightningEnabled = !lightningEnabled;
+            toggleLightningBtn.textContent = lightningEnabled ? 'Disable Lightning' : 'Enable Lightning';
+        }
+
+        function toggleCamera() {
+            cameraMode = (cameraMode + 1) % 3;
+            const modes = ['Orbital Camera', 'Deck Camera', 'Wide Shot'];
+            toggleCameraBtn.textContent = modes[cameraMode];
+        }
+
+        function increaseStorm() {
+            stormIntensity = Math.min(stormIntensity + 0.3, 3);
+            waveHeight = Math.min(waveHeight + 0.5, 5);
+            windSpeed = Math.min(windSpeed + 1, 10);
+            
+            waveHeightSlider.value = waveHeight;
+            windSpeedSlider.value = windSpeed;
+            updateWaveHeight();
+            updateWindSpeed();
+            
+            stormIntensityBtn.textContent = `Storm: ${stormIntensity.toFixed(1)}x`;
+            cameraShake.intensity = 0.3;
+        }
+
+        function updateWaveHeight() {
+            waveHeight = parseFloat(waveHeightSlider.value);
+            const labels = ['Calm', 'Moderate', 'High', 'Storm', 'Monstrous'];
+            waveValueSpan.textContent = labels[Math.min(Math.floor(waveHeight) - 1, 4)] || 'High';
+        }
+
+        function updateWindSpeed() {
+            windSpeed = parseFloat(windSpeedSlider.value);
+            const labels = ['Breeze', 'Moderate', 'Strong', 'Gale', 'Storm', 'Violent', 'Hurricane'];
+            windValueSpan.textContent = labels[Math.min(Math.floor(windSpeed) - 1, 6)] || 'Strong';
+        }
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>

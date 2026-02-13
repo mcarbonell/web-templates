@@ -1,0 +1,571 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVEL | Award-Winning Design Agency</title>
+    <style>
+        :root {
+            /* Design tokens based on seed decomposition */
+            --seed: 357970250;
+            --hue: calc((var(--seed) * 7) % 360);
+            --accent-hue: calc((var(--seed) * 13) % 360);
+            --text-hue: calc((var(--seed) * 5) % 360);
+            
+            /* Light mode colors */
+            --bg-primary: hsl(var(--hue), 70%, 95%);
+            --bg-secondary: hsl(var(--hue), 50%, 85%);
+            --text-primary: hsl(var(--text-hue), 20%, 15%);
+            --text-secondary: hsl(var(--text-hue), 15%, 45%);
+            --accent: hsl(var(--accent-hue), 80%, 60%);
+            --glass-bg: hsla(var(--hue), 50%, 80%, 0.3);
+            
+            /* Dark mode colors */
+            .dark-mode & {
+                --bg-primary: hsl(var(--hue), 40%, 8%);
+                --bg-secondary: hsl(var(--hue), 30%, 12%);
+                --text-primary: hsl(var(--text-hue), 15%, 95%);
+                --text-secondary: hsl(var(--text-hue), 10%, 75%);
+                --accent: hsl(var(--accent-hue), 80%, 65%);
+                --glass-bg: hsla(var(--hue), 30%, 40%, 0.25);
+            }
+            
+            /* Variables for animations */
+            --anim-duration: 1.2s;
+            --magnetic-strength: 0.15;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.4s, color 0.4s;
+        }
+
+        /* WebGL Canvas */
+        #aurora-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        /* Header Styles */
+        header {
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            position: relative;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+            transform-origin: right;
+            animation: scanline 8s infinite linear;
+        }
+
+        /* Theme Toggle */
+        .theme-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: var(--glass-bg);
+            border-radius: 30px;
+            border: 1px solid var(--accent);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .theme-switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: white;
+            top: 1px;
+            left: 1px;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .dark-mode .theme-switch::after {
+            transform: translateX(30px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10% 5rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 12vw, 8rem);
+            line-height: 0.9;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .hero-title span {
+            display: inline-block;
+            animation: scramble var(--anim-duration) infinite alternate;
+            animation-delay: calc(var(--i) * 0.1s);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+        }
+
+        /* Magnetic Button */
+        .magnetic-btn {
+            position: relative;
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--accent);
+            border-radius: 50px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+            overflow: hidden;
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: -1;
+            border-radius: 50px;
+        }
+
+        .magnetic-btn:hover {
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .magnetic-btn:hover::before {
+            opacity: 0.9;
+        }
+
+        /* Bento Grid */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+            gap: 2rem;
+            padding: 5rem 5%;
+            grid-auto-flow: dense;
+        }
+
+        .bento-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid hsla(var(--hue), 50%, 60%, 0.3);
+            border-radius: 24px;
+            padding: 2.5rem;
+            transition: transform 0.4s, box-shadow 0.4s;
+            position: relative;
+            overflow: hidden;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bento-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .bento-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .bento-text {
+            color: var(--text-secondary);
+            flex-grow: 1;
+        }
+
+        .bento-number {
+            position: absolute;
+            bottom: -30px;
+            right: -20px;
+            font-size: 10rem;
+            font-weight: 900;
+            opacity: 0.1;
+            z-index: 0;
+            transform: rotate(-15deg);
+        }
+
+        /* Aurora Blobs */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: 1;
+            opacity: 0.7;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-20px, 20px); }
+            50% { transform: translate(20px, -20px); }
+            75% { transform: translate(20px, 20px); }
+        }
+
+        @keyframes scanline {
+            0% { transform: scaleX(0); transform-origin: right; }
+            50% { transform: scaleX(1); transform-origin: right; }
+            51% { transform: scaleX(0); transform-origin: left; }
+            100% { transform: scaleX(1); transform-origin: left; }
+        }
+
+        @keyframes scramble {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-10px) rotate(-5deg); }
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 50px;
+            border: 2px solid var(--accent);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scroll-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .bento-item.large {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+            
+            .hero {
+                padding-bottom: 3rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- WebGL Background -->
+    <canvas id="aurora-canvas"></canvas>
+    
+    <!-- Header -->
+    <header>
+        <div class="logo">NOVEL</div>
+        <div class="theme-switch" id="theme-toggle"></div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span style="--i:0">B</span>
+                <span style="--i:1">R</span>
+                <span style="--i:2">E</span>
+                <span style="--i:3">A</span>
+                <span style="--i:4">K</span>
+                <span style="--i:5">I</span>
+                <span style="--i:6">N</span>
+                <span style="--i:7">G</span>
+                <span style="--i:8">&nbsp;</span>
+                <span style="--i:9">C</span>
+                <span style="--i:10">O</span>
+                <span style="--i:11">N</span>
+                <span style="--i:12">V</span>
+                <span style="--i:13">E</span>
+                <span style="--i:14">N</span>
+                <span style="--i:15">T</span>
+                <span style="--i:16">I</span>
+                <span style="--i:17">O</span>
+                <span style="--i:18">N</span>
+                <span style="--i:19">S</span>
+            </h1>
+            <p class="hero-subtitle">Award-winning digital agency crafting extraordinary experiences through bold design and cutting-edge technology</p>
+            <div class="magnetic-btn">Explore Our Work</div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-dot"></div>
+        </div>
+    </section>
+    
+    <!-- Bento Grid Section -->
+    <section class="bento-grid">
+        <div class="bento-item large">
+            <h3 class="bento-title">Digital Alchemy</h3>
+            <p class="bento-text">We transform complex challenges into elegant digital solutions that push boundaries and captivate audiences. Our approach merges artistry with engineering precision.</p>
+            <div class="blob" style="width: 150px; height: 150px; top: -50px; left: -50px;"></div>
+        </div>
+        
+        <div class="bento-item">
+            <h3 class="bento-title">Award-Winning</h3>
+            <p class="bento-text">Recognized by industry leaders for innovative design and technical excellence.</p>
+            <div class="blob" style="width: 100px; height: 100px; bottom: -30px; right: -30px;"></div>
+        </div>
+        
+        <div class="bento-item">
+            <h3 class="bento-title">Bold Solutions</h3>
+            <p class="bento-text">Fearlessly exploring new territories to create unprecedented digital experiences.</p>
+            <div class="blob" style="width: 80px; height: 80px; top: -40px; right: -20px;"></div>
+        </div>
+        
+        <div class="bento-item">
+            <h3 class="bento-title">Technical Excellence</h3>
+            <p class="bento-text">Building future-proof solutions with the latest web technologies and frameworks.</p>
+            <div class="blob" style="width: 120px; height: 120px; bottom: -50px; left: -40px;"></div>
+        </div>
+        
+        <div class="bento-item large">
+            <h3 class="bento-title">Human-Centered Design</h3>
+            <p class="bento-text">Every solution begins with deep user understanding and ends with intuitive, accessible experiences that delight users.</p>
+            <div class="blob" style="width: 180px; height: 180px; bottom: -70px; right: -70px;"></div>
+        </div>
+    </section>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+        
+        // Initialize theme from localStorage
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            body.classList.add('dark-mode');
+        }
+        
+        // WebGL Aurora Background
+        const canvas = document.getElementById('aurora-canvas');
+        const gl = canvas.getContext('webgl');
+        
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Vertex shader
+        const vsSource = `
+            attribute vec4 aVertexPosition;
+            void main() {
+                gl_Position = aVertexPosition;
+            }
+        `;
+        
+        // Fragment shader with aurora effect
+        const fsSource = `
+            precision mediump float;
+            uniform float uTime;
+            uniform vec2 uResolution;
+            uniform vec3 uColor1;
+            uniform vec3 uColor2;
+            uniform vec3 uColor3;
+            
+            float random(vec2 st) {
+                return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+            }
+            
+            void main() {
+                vec2 st = gl_FragCoord.xy/uResolution.xy;
+                st.x *= uResolution.x/uResolution.y;
+                
+                vec3 color = vec3(0.0);
+                vec2 pos = vec2(0.0);
+                
+                // Create moving blobs
+                for (float i = 0.0; i < 5.0; i++) {
+                    pos = vec2(
+                        sin(uTime * 0.2 + i) * 0.5 + 0.5,
+                        cos(uTime * 0.3 + i * 2.0) * 0.5 + 0.5
+                    );
+                    
+                    float d = distance(st, pos);
+                    color += smoothstep(0.3, 0.0, d) * mix(uColor1, uColor2, i/5.0);
+                }
+                
+                // Add noise texture
+                float noise = random(vec2(floor(st.x * 20.0), floor(st.y * 20.0)));
+                color += noise * 0.05;
+                
+                gl_FragColor = vec4(color, 0.8);
+            }
+        `;
+        
+        // Compile shader
+        function compileShader(source, type) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            return shader;
+        }
+        
+        const vertexShader = compileShader(vsSource, gl.VERTEX_SHADER);
+        const fragmentShader = compileShader(fsSource, gl.FRAGMENT_SHADER);
+        
+        // Create program
+        const shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+        gl.useProgram(shaderProgram);
+        
+        // Set up geometry
+        const vertices = new Float32Array([
+            -1, -1,
+             1, -1,
+            -1,  1,
+             1,  1
+        ]);
+        
+        const vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+        
+        const aVertexPosition = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
+        gl.enableVertexAttribArray(aVertexPosition);
+        gl.vertexAttribPointer(aVertexPosition, 2, gl.FLOAT, false, 0, 0);
+        
+        // Get uniform locations
+        const uTime = gl.getUniformLocation(shaderProgram, 'uTime');
+        const uResolution = gl.getUniformLocation(shaderProgram, 'uResolution');
+        const uColor1 = gl.getUniformLocation(shaderProgram, 'uColor1');
+        const uColor2 = gl.getUniformLocation(shaderProgram, 'uColor2');
+        const uColor3 = gl.getUniformLocation(shaderProgram, 'uColor3');
+        
+        // Set initial colors based on theme
+        function updateColors() {
+            const isDark = body.classList.contains('dark-mode');
+            const color1 = isDark ? [0.3, 0.7, 1.0] : [0.9, 0.4, 0.6];
+            const color2 = isDark ? [0.7, 0.3, 0.9] : [0.4, 0.6, 0.9];
+            const color3 = isDark ? [0.2, 0.8, 0.7] : [0.7, 0.3, 0.5];
+            
+            gl.uniform3fv(uColor1, color1);
+            gl.uniform3fv(uColor2, color2);
+            gl.uniform3fv(uColor3, color3);
+        }
+        updateColors();
+        
+        // Animation loop
+        function render(time) {
+            time *= 0.001; // Convert to seconds
+            
+            gl.uniform1f(uTime, time);
+            gl.uniform2f(uResolution, canvas.width, canvas.height);
+            
+            updateColors();
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            
+            requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+        
+        // Magnetic button effect
+        const magneticBtn = document.querySelector('.magnetic-btn');
+        const magneticStrength = parseFloat(getComputedStyle(magneticBtn).getPropertyValue('--magnetic-strength'));
+        magneticBtn.addEventListener('mousemove', (e) => {
+            const rect = magneticBtn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            
+            magneticBtn.style.transform = `translate(${x * magneticStrength}px, ${y * magneticStrength}px)`;
+        });
+        
+        magneticBtn.addEventListener('mouseleave', () => {
+            magneticBtn.style.transform = 'translate(0, 0)';
+        });
+        
+        // Add floating blobs
+        const blobColors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F1C'];
+        document.querySelectorAll('.blob').forEach(blob => {
+            const color = blobColors[Math.floor(Math.random() * blobColors.length)];
+            blob.style.background = `radial-gradient(circle, ${color} 0%, transparent 70%)`;
+        });
+    </script>
+</body>
+</html>
