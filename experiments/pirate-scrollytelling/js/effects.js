@@ -75,17 +75,39 @@ export class LightningSystem {
         this.probability = options.probability || 0.02;
         this.minDuration = options.minDuration || 100;
         this.maxDuration = options.maxDuration || 250;
-        this.minIntensity = options.minIntensity || 2.0;
-        this.maxIntensity = options.maxIntensity || 4.0;
+        this.minIntensity = options.minIntensity || 3.0;
+        this.maxIntensity = options.maxIntensity || 6.0;
         
-        this.light = new THREE.PointLight(0xffffff, 0, 100);
-        this.light.position.set(0, 30, 0);
+        // Luz principal del relámpago (PointLight con mayor alcance)
+        this.light = new THREE.PointLight(0xaaccff, 0, 200);
+        this.light.position.set(0, 20, 0);  // Más cerca de la escena
+        this.light.castShadow = false; // Sombras muy costosas para flashes
         parent.add(this.light);
         
+        // Luz direccional adicional para iluminar toda la escena
+        this.dirLight = new THREE.DirectionalLight(0xaaccff, 0);
+        this.dirLight.position.set(10, 30, 10);  // Posición más efectiva
+        parent.add(this.dirLight);
+        
+        // Referencia a la escena para cambiar background
+        this.scene = parent;
+        this.originalBgColor = null;
+        
         this.isActive = false;
+        this.enabled = true;
+    }
+    
+    setEnabled(enabled) {
+        this.enabled = enabled;
+        if (!enabled) {
+            this.light.intensity = 0;
+            this.dirLight.intensity = 0;
+        }
     }
     
     update() {
+        if (!this.enabled) return;
+        
         if (!this.isActive && Math.random() < this.probability) {
             this.flash();
         }
@@ -93,18 +115,41 @@ export class LightningSystem {
     
     flash() {
         this.isActive = true;
-        this.light.intensity = this.minIntensity + Math.random() * (this.maxIntensity - this.minIntensity);
+        
+        const intensity = this.minIntensity + Math.random() * (this.maxIntensity - this.minIntensity);
+        
+        // Encender luces
+        this.light.intensity = intensity;
+        this.dirLight.intensity = intensity * 0.7;  // Aumentado para mejor visibilidad
+        
+        // Flash en el background (más claro momentáneamente)
+        if (this.scene && this.scene.background) {
+            this.originalBgColor = this.scene.background.clone();
+            this.scene.background.setHex(0x2a2a4e);  // Azul oscuro sutil
+        }
         
         const duration = this.minDuration + Math.random() * (this.maxDuration - this.minDuration);
         
+        // Apagar después del duration
         setTimeout(() => {
             this.light.intensity = 0;
+            this.dirLight.intensity = 0;
+            
+            // Restaurar background
+            if (this.scene && this.originalBgColor) {
+                this.scene.background.copy(this.originalBgColor);
+            }
+            
             this.isActive = false;
         }, duration);
+        
+        // Log para debug
+        console.log(' Relámpago! Intensidad:', intensity.toFixed(1), 'Duración:', duration.toFixed(0), 'ms');
     }
     
     dispose() {
         this.light.parent?.remove(this.light);
+        this.dirLight.parent?.remove(this.dirLight);
     }
 }
 

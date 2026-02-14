@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escena 5: La Playa del Botín - El Último Pirata</title>
+    
+    <!-- Three.js moderno -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #ff6b35;
+            font-family: 'Georgia', serif;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        /* Panel de información debug */
+        #debug-panel {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 100;
+            max-width: 320px;
+            border: 1px solid rgba(255, 215, 0, 0.5);
+        }
+        
+        #debug-panel h3 {
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        #debug-panel p {
+            margin: 5px 0;
+            color: #aaa;
+        }
+        
+        #debug-panel .value {
+            color: #FFD700;
+        }
+        
+        #debug-panel .section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #debug-panel .section-title {
+            color: #FFD700;
+            font-size: 11px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        /* Checkboxes estilo toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 6px 0;
+            padding: 4px 0;
+        }
+        
+        .toggle-row label {
+            color: #ccc;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        
+        .toggle-row input[type="checkbox"] {
+            width: 40px;
+            height: 20px;
+            appearance: none;
+            background: #333;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+        }
+        
+        .toggle-row input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #666;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        
+        .toggle-row input[type="checkbox"]:checked {
+            background: #FFD700;
+        }
+        
+        .toggle-row input[type="checkbox"]:checked::before {
+            left: 22px;
+            background: #fff;
+        }
+        
+        /* Slider estilo */
+        .slider-row {
+            margin: 8px 0;
+        }
+        
+        .slider-row label {
+            display: block;
+            color: #ccc;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+        
+        .slider-row input[type="range"] {
+            width: 100%;
+            height: 6px;
+            appearance: none;
+            background: #333;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #FFD700;
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            color: #FFD700;
+            font-size: 10px;
+            text-align: right;
+        }
+        
+        /* Panel de historia */
+        #story-panel {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            max-width: 500px;
+            width: 90%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .story-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, #FFD700, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .story-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dialogue {
+            font-style: italic;
+            color: #FFD700;
+            font-size: 0.95rem;
+            margin: 0.5rem 0;
+            padding: 0.3rem 0.8rem;
+            border-left: 2px solid #ff6b35;
+        }
+        
+        .dialogue strong {
+            color: #fff;
+            font-style: normal;
+        }
+        
+        /* Loading */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px 60px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        #loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-top-color: #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Controles de cámara */
+        #controls-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        
+        /* Botón reset cámara */
+        #reset-camera {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 215, 0, 0.8);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 100;
+            transition: background 0.3s;
+        }
+        
+        #reset-camera:hover {
+            background: #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div id="loading">
+        <div id="loading-spinner"></div>
+        <div style="color: #FFD700; font-size: 1.2rem;">Cargando escena...</div>
+        <div id="loading-text" style="font-size: 14px; margin-top: 10px; color: #888;">Preparando la playa</div>
+    </div>
+    
+    <!-- Panel de historia -->
+    <div id="story-panel">
+        <h1 class="story-title">La Playa del Botín</h1>
+        <p class="story-text">
+            Tras derrotar al Kraken, la tripulación emerge victoriosa en una playa paradisíaca. 
+            El tesoro brilla bajo el sol del atardecer. ¡La aventura ha valido la pena!
+        </p>
+        <div class="dialogue">
+            <strong>Barbarossa:</strong> "¡Este tesoro es para toda la tripulación! ¡Menos para el esqueleto, que no necesita oro!"
+        </div>
+        <div class="dialogue">
+            <strong>Skeleton:</strong> "¡Pero quiero mi parte para comprar un sombrero!"
+        </div>
+    </div>
+    
+    <!-- Debug panel -->
+    <div id="debug-panel">
+        <h3>Debug - Escena 5: Playa del Botín</h3>
+        
+        <p>FPS: <span id="fps" class="value">--</span></p>
+        <p>Modelos cargados: <span id="models-loaded" class="value">--</span></p>
+        <p>Personajes: <span id="characters-loaded" class="value">--</span></p>
+        
+        <div class="section">
+            <div class="section-title">Efectos</div>
+            
+            <div class="toggle-row">
+                <label for="toggle-sparkles">Destellos de oro</label>
+                <input type="checkbox" id="toggle-sparkles" checked>
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-waves">Olas de mar</label>
+                <input type="checkbox" id="toggle-waves" checked>
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-seagulls">Gaviotas</label>
+                <input type="checkbox" id="toggle-seagulls" checked>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Iluminación</div>
+            
+            <div class="slider-row">
+                <label>Intensidad sol</label>
+                <input type="range" id="sun-intensity" min="0" max="3" step="0.1" value="1.5">
+                <div class="slider-value"><span id="sun-value">1.5</span></div>
+            </div>
+            
+            <div class="slider-row">
+                <label>Intensidad ambiental</label>
+                <input type="range" id="ambient-intensity" min="0" max="1" step="0.05" value="0.6">
+                <div class="slider-value"><span id="ambient-value">0.6</span></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Helpers</div>
+            
+            <div class="toggle-row">
+                <label for="toggle-axes">Ejes XYZ</label>
+                <input type="checkbox" id="toggle-axes">
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-grid">Grid suelo</label>
+                <input type="checkbox" id="toggle-grid">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reset cámara -->
+    <button id="reset-camera">Reset Cámara</button>
+    
+    <!-- Controles hint -->
+    <div id="controls-hint">
+        Arrastra para rotar | Scroll para zoom | Click derecho para panear
+    </div>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        
+        import { CONFIG, createFallbackGeometry } from './js/config.js';
+        import { AnimationManager } from './js/animations.js';
+        
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let scene, camera, renderer, controls;
+        let clock = new THREE.Clock();
+        let animationManager;
+        
+        // Modelos cargados
+        let loadedModels = {};
+        
+        // Elementos de la escena
+        let beachGroup;
+        let barbarossaModel, anneModel, henryModel, skeletonModel;
+        let waterMesh;
+        let sparklesParticles;
+        let seagullSprites = [];
+        
+        // Luces
+        let ambientLight;
+        let sunLight;
+        
+        // Helpers
+        let axesHelper, gridHelper;
+        
+        // Debug state
+        let debugState = {
+            sparkles: true,
+            waves: true,
+            seagulls: true,
+            axes: false,
+            grid: false
+        };
+        
+        // FPS counter
+        let frameCount = 0;
+        let lastTime = performance.now();
+        
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        async function init() {
+            setupThreeJS();
+            setupLights();
+            setupControls();
+            setupDebugControls();
+            setupHelpers();
+            
+            await loadModels();
+            
+            buildScene();
+            
+            // Ocultar loading
+            document.getElementById('loading').classList.add('hidden');
+            
+            // Iniciar animación
+            animate();
+        }
+        
+        // ============================================
+        // THREE.JS SETUP
+        // ============================================
+        function setupThreeJS() {
+            scene = new THREE.Scene();
+            
+            // Background gradiente atardecer
+            scene.background = new THREE.Color(0xff6b35);
+            
+            // Niebla dorada ligera
+            scene.fog = new THREE.Fog(0xfff5e6, 30, 100);
+            
+            camera = new THREE.PerspectiveCamera(
+                CONFIG.camera.fov,
+                window.innerWidth / window.innerHeight,
+                CONFIG.camera.near,
+                CONFIG.camera.far
+            );
+            camera.position.set(15, 8, 25);
+            
+            renderer = new THREE.WebGLRenderer({
+                antialias: CONFIG.renderer.antialias,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, CONFIG.renderer.pixelRatioLimit));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.3;
+            
+            document.body.appendChild(renderer.domElement);
+            
+            // Resize handler
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        // ============================================
+        // LUCES
+        // ============================================
+        function setupLights() {
+            // Luz ambiental cálida
+            ambientLight = new THREE.AmbientLight(0xfff5e6, 0.6);
+            scene.add(ambientLight);
+            
+            // Sol del atardecer (naranja/dorado)
+            sunLight = new THREE.DirectionalLight(0xff6b35, 1.5);
+            sunLight.position.set(-30, 15, -20);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            sunLight.shadow.camera.near = 0.5;
+            sunLight.shadow.camera.far = 100;
+            sunLight.shadow.camera.left = -30;
+            sunLight.shadow.camera.right = 30;
+            sunLight.shadow.camera.top = 30;
+            sunLight.shadow.camera.bottom = -30;
+            scene.add(sunLight);
+            
+            // Hemisphere light
+            const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0xE6C288, 0.4);
+            scene.add(hemiLight);
+        }
+        
+        // ============================================
+        // CONTROLES
+        // ============================================
+        function setupControls() {
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 5;
+            controls.maxDistance = 60;
+            controls.maxPolarAngle = Math.PI / 2 + 0.1;
+            controls.target.set(0, 1, 0);
+        }
+        
+        // ============================================
+        // HELPERS
+        // ============================================
+        function setupHelpers() {
+            // Ejes
+            axesHelper = new THREE.AxesHelper(10);
+            axesHelper.visible = false;
+            scene.add(axesHelper);
+            
+            // Grid
+            gridHelper = new THREE.GridHelper(80, 40, 0xE6C288, 0xC4A862);
+            gridHelper.position.y = 0.01;
+            gridHelper.visible = false;
+            scene.add(gridHelper);
+        }
+        
+        // ============================================
+        // CONTROLES DEBUG
+        // ============================================
+        function setupDebugControls() {
+            // Toggle destellos
+            document.getElementById('toggle-sparkles').addEventListener('change', (e) => {
+                debugState.sparkles = e.target.checked;
+                if (sparklesParticles) {
+                    sparklesParticles.visible = debugState.sparkles;
+                }
+            });
+            
+            // Toggle olas
+            document.getElementById('toggle-waves').addEventListener('change', (e) => {
+                debugState.waves = e.target.checked;
+            });
+            
+            // Toggle gaviotas
+            document.getElementById('toggle-seagulls').addEventListener('change', (e) => {
+                debugState.seagulls = e.target.checked;
+                seagullSprites.forEach(sprite => {
+                    sprite.visible = debugState.seagulls;
+                });
+            });
+            
+            // Intensidad sol
+            document.getElementById('sun-intensity').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                document.getElementById('sun-value').textContent = value.toFixed(1);
+                sunLight.intensity = value;
+            });
+            
+            // Intensidad ambiental
+            document.getElementById('ambient-intensity').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                document.getElementById('ambient-value').textContent = value.toFixed(2);
+                ambientLight.intensity = value;
+            });
+            
+            // Toggle ejes
+            document.getElementById('toggle-axes').addEventListener('change', (e) => {
+                debugState.axes = e.target.checked;
+                axesHelper.visible = debugState.axes;
+            });
+            
+            // Toggle grid
+            document.getElementById('toggle-grid').addEventListener('change', (e) => {
+                debugState.grid = e.target.checked;
+                gridHelper.visible = debugState.grid;
+            });
+            
+            // Reset cámara
+            document.getElementById('reset-camera').addEventListener('click', () => {
+                camera.position.set(15, 8, 25);
+                controls.target.set(0, 1, 0);
+                controls.update();
+            });
+        }
+        
+        // ============================================
+        // CARGA DE MODELOS
+        // ============================================
+        async function loadModels() {
+            const loader = new GLTFLoader();
+            const modelsToLoad = {
+                // Personajes
+                barbarossa: CONFIG.models.barbarossa,
+                anne: CONFIG.models.anne,
+                henry: CONFIG.models.henry,
+                skeleton: CONFIG.models.skeleton,
+                // Props de tesoro
+                chestGold: CONFIG.models.chestGold,
+                coins: CONFIG.models.coins,
+                goldBag: CONFIG.models.goldBag,
+                barrel: CONFIG.models.barrel,
+                // Environment
+                palmTree1: CONFIG.models.palmTree1,
+                palmTree2: CONFIG.models.palmTree2,
+                rock1: CONFIG.models.rock1,
+                rock2: CONFIG.models.rock2
+            };
+            
+            const total = Object.keys(modelsToLoad).length;
+            let loaded = 0;
+            let successCount = 0;
+            
+            const loadModel = (name, path) => {
+                return new Promise((resolve) => {
+                    loader.load(
+                        path,
+                        (gltf) => {
+                            loadedModels[name] = gltf.scene;
+                            
+                            // Guardar animaciones si existen
+                            if (gltf.animations && gltf.animations.length > 0) {
+                                loadedModels[name + '_animations'] = gltf.animations;
+                                console.log(`Animaciones de ${name}:`, gltf.animations.map(a => a.name));
+                            }
+                            
+                            // Configurar sombras
+                            gltf.scene.traverse((child) => {
+                                if (child.isMesh) {
+                                    child.castShadow = true;
+                                    child.receiveShadow = true;
+                                }
+                            });
+                            
+                            loaded++;
+                            successCount++;
+                            document.getElementById('loading-text').textContent = 
+                                `${loaded}/${total} modelos cargados`;
+                            document.getElementById('models-loaded').textContent = `${successCount}/${total}`;
+                            
+                            console.log(`Modelo ${name} cargado correctamente`);
+                            resolve();
+                        },
+                        (progress) => {
+                            if (progress.total > 0) {
+                                const percent = (progress.loaded / progress.total * 100).toFixed(0);
+                                document.getElementById('loading-text').textContent = 
+                                    `Cargando ${name}: ${percent}%`;
+                            }
+                        },
+                        (error) => {
+                            console.warn(`Error cargando ${name}:`, error);
+                            loadedModels[name] = createFallbackGeometry(name);
+                            loaded++;
+                            document.getElementById('loading-text').textContent = 
+                                `${loaded}/${total} modelos (con fallback)`;
+                            resolve();
+                        }
+                    );
+                });
+            };
+            
+            await Promise.all(
+                Object.entries(modelsToLoad).map(([name, path]) => loadModel(name, path))
+            );
+            
+            console.log('=== RESUMEN DE CARGA ===');
+            console.log('Modelos:', Object.keys(loadedModels).filter(k => !k.includes('_animations')));
+        }
+        
+        // ============================================
+        // CONSTRUIR ESCENA
+        // ============================================
+        function buildScene() {
+            // Crear grupo principal
+            beachGroup = new THREE.Group();
+            scene.add(beachGroup);
+            
+            // Playa de arena
+            buildBeach(beachGroup);
+            
+            // Mar turquesa
+            buildOcean(beachGroup);
+            
+            // Palmeras
+            buildPalmTrees(beachGroup);
+            
+            // Rocas decorativas
+            buildRocks(beachGroup);
+            
+            // Tesoro
+            buildTreasure(beachGroup);
+            
+            // Animation manager (antes de personajes)
+            animationManager = new AnimationManager();
+            
+            // Personajes celebrando
+            buildCharacters(beachGroup);
+            
+            // Efectos
+            buildEffects(beachGroup);
+            
+            // Actualizar contador de personajes
+            let charCount = 0;
+            if (barbarossaModel) charCount++;
+            if (anneModel) charCount++;
+            if (henryModel) charCount++;
+            if (skeletonModel) charCount++;
+            document.getElementById('characters-loaded').textContent = charCount + '/4';
+        }
+        
+        // ============================================
+        // PLAYA
+        // ============================================
+        function buildBeach(parent) {
+            // Arena dorada
+            const beachGeo = new THREE.PlaneGeometry(100, 60);
+            const beachMat = new THREE.MeshStandardMaterial({
+                color: 0xE6C288,
+                roughness: 0.9,
+                metalness: 0.0
+            });
+            const beach = new THREE.Mesh(beachGeo, beachMat);
+            beach.rotation.x = -Math.PI / 2;
+            beach.position.z = 10;
+            beach.receiveShadow = true;
+            parent.add(beach);
+        }
+        
+        // ============================================
+        // OCÉANO
+        // ============================================
+        function buildOcean(parent) {
+            // Mar turquesa
+            const oceanGeo = new THREE.PlaneGeometry(100, 80, 50, 50);
+            const oceanMat = new THREE.MeshStandardMaterial({
+                color: 0x40E0D0,
+                roughness: 0.1,
+                metalness: 0.6,
+                transparent: true,
+                opacity: 0.85
+            });
+            waterMesh = new THREE.Mesh(oceanGeo, oceanMat);
+            waterMesh.rotation.x = -Math.PI / 2;
+            waterMesh.position.set(0, -0.2, -20);
+            waterMesh.receiveShadow = true;
+            parent.add(waterMesh);
+        }
+        
+        // ============================================
+        // PALMERAS
+        // ============================================
+        function buildPalmTrees(parent) {
+            const palmPositions = [
+                { x: -15, z: 5, scale: 1.5 },
+                { x: -12, z: 10, scale: 1.3 },
+                { x: 15, z: 5, scale: 1.5 },
+                { x: 18, z: 8, scale: 1.4 },
+                { x: -20, z: 15, scale: 1.6 },
+                { x: 20, z: 12, scale: 1.4 },
+                { x: 0, z: 20, scale: 1.5 }
+            ];
+            
+            palmPositions.forEach((pos, index) => {
+                const modelKey = index % 2 === 0 ? 'palmTree1' : 'palmTree2';
+                if (loadedModels[modelKey]) {
+                    const palm = loadedModels[modelKey].clone();
+                    palm.position.set(pos.x, 0, pos.z);
+                    palm.scale.setScalar(pos.scale);
+                    parent.add(palm);
+                }
+            });
+        }
+        
+        // ============================================
+        // ROCAS
+        // ============================================
+        function buildRocks(parent) {
+            const rockPositions = [
+                { x: -25, z: 0, scale: 2 },
+                { x: 25, z: 2, scale: 1.8 },
+                { x: -10, z: -5, scale: 1.5 },
+                { x: 10, z: -3, scale: 1.3 }
+            ];
+            
+            rockPositions.forEach((pos, index) => {
+                const modelKey = index % 2 === 0 ? 'rock1' : 'rock2';
+                if (loadedModels[modelKey]) {
+                    const rock = loadedModels[modelKey].clone();
+                    rock.position.set(pos.x, 0, pos.z);
+                    rock.scale.setScalar(pos.scale);
+                    parent.add(rock);
+                }
+            });
+        }
+        
+        // ============================================
+        // TESORO
+        // ============================================
+        function buildTreasure(parent) {
+            // Cofres de oro
+            if (loadedModels.chestGold) {
+                for (let i = 0; i < 5; i++) {
+                    const chest = loadedModels.chestGold.clone();
+                    chest.position.set(
+                        -5 + Math.random() * 10,
+                        0,
+                        5 + Math.random() * 5
+                    );
+                    chest.scale.setScalar(0.8 + Math.random() * 0.4);
+                    chest.rotation.y = Math.random() * Math.PI * 2;
+                    parent.add(chest);
+                }
+            }
+            
+            // Monedas
+            if (loadedModels.coins) {
+                for (let i = 0; i < 8; i++) {
+                    const coins = loadedModels.coins.clone();
+                    coins.position.set(
+                        -8 + Math.random() * 16,
+                        0,
+                        3 + Math.random() * 8
+                    );
+                    coins.scale.setScalar(0.6 + Math.random() * 0.3);
+                    parent.add(coins);
+                }
+            }
+            
+            // Bolsas de oro
+            if (loadedModels.goldBag) {
+                for (let i = 0; i < 4; i++) {
+                    const bag = loadedModels.goldBag.clone();
+                    bag.position.set(
+                        -6 + Math.random() * 12,
+                        0,
+                        4 + Math.random() * 6
+                    );
+                    bag.scale.setScalar(0.7);
+                    parent.add(bag);
+                }
+            }
+            
+            // Barriles
+            if (loadedModels.barrel) {
+                for (let i = 0; i < 3; i++) {
+                    const barrel = loadedModels.barrel.clone();
+                    barrel.position.set(
+                        -4 + i * 4,
+                        0,
+                        8
+                    );
+                    barrel.scale.setScalar(0.8);
+                    parent.add(barrel);
+                }
+            }
+        }
+        
+        // ============================================
+        // PERSONAJES
+        // ============================================
+        function buildCharacters(parent) {
+            // Barbarossa - celebrando con Wave
+            if (loadedModels.barbarossa) {
+                barbarossaModel = loadedModels.barbarossa;
+                barbarossaModel.position.set(0, 0, 5);
+                barbarossaModel.scale.setScalar(1);
+                parent.add(barbarossaModel);
+                
+                if (loadedModels.barbarossa_animations) {
+                    animationManager.register('barbarossa', barbarossaModel, loadedModels.barbarossa_animations);
+                    animationManager.play('barbarossa', 'Wave');
+                }
+                
+                console.log('Barbarossa posicionado en:', barbarossaModel.position);
+            }
+            
+            // Anne - celebrando
+            if (loadedModels.anne) {
+                anneModel = loadedModels.anne;
+                anneModel.position.set(-3, 0, 7);
+                anneModel.scale.setScalar(1);
+                anneModel.rotation.y = 0.5;
+                parent.add(anneModel);
+                
+                if (loadedModels.anne_animations) {
+                    animationManager.register('anne', anneModel, loadedModels.anne_animations);
+                    animationManager.play('anne', 'Yes');
+                }
+                
+                console.log('Anne posicionada en:', anneModel.position);
+            }
+            
+            // Henry - celebrando
+            if (loadedModels.henry) {
+                henryModel = loadedModels.henry;
+                henryModel.position.set(3, 0, 7);
+                henryModel.scale.setScalar(1);
+                henryModel.rotation.y = -0.5;
+                parent.add(henryModel);
+                
+                if (loadedModels.henry_animations) {
+                    animationManager.register('henry', henryModel, loadedModels.henry_animations);
+                    animationManager.play('henry', 'Wave');
+                }
+                
+                console.log('Henry posicionado en:', henryModel.position);
+            }
+            
+            // Skeleton - intentando coger oro
+            if (loadedModels.skeleton) {
+                skeletonModel = loadedModels.skeleton;
+                skeletonModel.position.set(5, 0, 6);
+                skeletonModel.scale.setScalar(1);
+                skeletonModel.rotation.y = -0.8;
+                parent.add(skeletonModel);
+                
+                if (loadedModels.skeleton_animations) {
+                    animationManager.register('skeleton', skeletonModel, loadedModels.skeleton_animations);
+                    animationManager.play('skeleton', 'Jump');
+                }
+                
+                console.log('Skeleton posicionado en:', skeletonModel.position);
+            }
+        }
+        
+        // ============================================
+        // EFECTOS
+        // ============================================
+        function buildEffects(parent) {
+            // Destellos de oro
+            createSparkles(parent);
+            
+            // Gaviotas
+            createSeagulls(parent);
+        }
+        
+        function createSparkles(parent) {
+            const count = 100;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            const phases = [];
+            
+            for (let i = 0; i < count; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 30;
+                positions[i * 3 + 1] = Math.random() * 3 + 0.5;
+                positions[i * 3 + 2] = 5 + Math.random() * 10;
+                
+                phases.push(Math.random() * Math.PI * 2);
+            }
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const material = new THREE.PointsMaterial({
+                color: 0xFFD700,
+                size: 0.2,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            sparklesParticles = new THREE.Points(geometry, material);
+            sparklesParticles.userData.phases = phases;
+            parent.add(sparklesParticles);
+        }
+        
+        function createSeagulls(parent) {
+            // Crear sprites para gaviotas
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            
+            // Dibujar silueta de gaviota
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            ctx.moveTo(32, 32);
+            ctx.lineTo(10, 28);
+            ctx.lineTo(32, 35);
+            ctx.lineTo(54, 28);
+            ctx.lineTo(32, 32);
+            ctx.fill();
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            
+            // Crear varias gaviotas
+            for (let i = 0; i < 6; i++) {
+                const material = new THREE.SpriteMaterial({
+                    map: texture,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                const sprite = new THREE.Sprite(material);
+                sprite.position.set(
+                    (Math.random() - 0.5) * 50,
+                    8 + Math.random() * 8,
+                    (Math.random() - 0.5) * 40
+                );
+                sprite.scale.set(2, 1, 1);
+                sprite.userData.speed = 0.03 + Math.random() * 0.02;
+                sprite.userData.phase = Math.random() * Math.PI * 2;
+                seagullSprites.push(sprite);
+                parent.add(sprite);
+            }
+        }
+        
+        // ============================================
+        // ANIMACIÓN
+        // ============================================
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+            
+            // Update controls
+            controls.update();
+            
+            // Update animation manager
+            if (animationManager) {
+                animationManager.update();
+            }
+            
+            // Update efectos
+            updateEffects(time);
+            
+            // FPS counter
+            frameCount++;
+            const now = performance.now();
+            if (now - lastTime >= 1000) {
+                document.getElementById('fps').textContent = frameCount;
+                frameCount = 0;
+                lastTime = now;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        function updateEffects(time) {
+            // Olas del mar
+            if (waterMesh && debugState.waves) {
+                const positions = waterMesh.geometry.attributes.position.array;
+                
+                for (let i = 0; i < positions.length; i += 3) {
+                    const x = positions[i];
+                    const y = positions[i + 1];
+                    // Olas suaves
+                    positions[i + 2] = Math.sin(x * 0.3 + time * 0.5) * 0.3 + 
+                                       Math.cos(y * 0.2 + time * 0.3) * 0.2;
+                }
+                
+                waterMesh.geometry.attributes.position.needsUpdate = true;
+            }
+            
+            // Destellos de oro
+            if (sparklesParticles && sparklesParticles.visible) {
+                const positions = sparklesParticles.geometry.attributes.position.array;
+                const phases = sparklesParticles.userData.phases;
+                
+                for (let i = 0; i < phases.length; i++) {
+                    // Movimiento flotante
+                    positions[i * 3 + 1] += Math.sin(time * 2 + phases[i]) * 0.005;
+                }
+                
+                sparklesParticles.geometry.attributes.position.needsUpdate = true;
+                
+                // Parpadeo
+                sparklesParticles.material.opacity = 0.5 + Math.sin(time * 4) * 0.3;
+            }
+            
+            // Gaviotas
+            seagullSprites.forEach((sprite, index) => {
+                if (sprite.visible) {
+                    // Movimiento ondulante
+                    sprite.position.x += sprite.userData.speed;
+                    sprite.position.y += Math.sin(time * 1.5 + sprite.userData.phase) * 0.01;
+                    
+                    // Reset si se aleja
+                    if (sprite.position.x > 30) {
+                        sprite.position.x = -30;
+                        sprite.position.z = (Math.random() - 0.5) * 40;
+                    }
+                }
+            });
+        }
+        
+        // ============================================
+        // RESIZE
+        // ============================================
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Iniciar
+        init();
+    </script>
+</body>
+</html>

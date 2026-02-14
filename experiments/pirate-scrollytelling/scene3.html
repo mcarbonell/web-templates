@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escena 3: La Jungla Maldita - El Último Pirata</title>
+    
+    <!-- Three.js moderno -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #0f291e;
+            font-family: 'Georgia', serif;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        /* Panel de información debug */
+        #debug-panel {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 100;
+            max-width: 320px;
+            border: 1px solid rgba(74, 124, 89, 0.5);
+        }
+        
+        #debug-panel h3 {
+            color: #4a7c59;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(74, 124, 89, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        #debug-panel p {
+            margin: 5px 0;
+            color: #aaa;
+        }
+        
+        #debug-panel .value {
+            color: #90EE90;
+        }
+        
+        #debug-panel .section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #debug-panel .section-title {
+            color: #4a7c59;
+            font-size: 11px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        /* Checkboxes estilo toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 6px 0;
+            padding: 4px 0;
+        }
+        
+        .toggle-row label {
+            color: #ccc;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        
+        .toggle-row input[type="checkbox"] {
+            width: 40px;
+            height: 20px;
+            appearance: none;
+            background: #333;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+        }
+        
+        .toggle-row input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #666;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        
+        .toggle-row input[type="checkbox"]:checked {
+            background: #4a7c59;
+        }
+        
+        .toggle-row input[type="checkbox"]:checked::before {
+            left: 22px;
+            background: #90EE90;
+        }
+        
+        /* Slider estilo */
+        .slider-row {
+            margin: 8px 0;
+        }
+        
+        .slider-row label {
+            display: block;
+            color: #ccc;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+        
+        .slider-row input[type="range"] {
+            width: 100%;
+            height: 6px;
+            appearance: none;
+            background: #333;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #4a7c59;
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            color: #90EE90;
+            font-size: 10px;
+            text-align: right;
+        }
+        
+        /* Panel de historia */
+        #story-panel {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            max-width: 500px;
+            width: 90%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(74, 124, 89, 0.3);
+        }
+        
+        .story-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, #4a7c59, #90EE90);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .story-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dialogue {
+            font-style: italic;
+            color: #90EE90;
+            font-size: 0.95rem;
+            margin: 0.5rem 0;
+            padding: 0.3rem 0.8rem;
+            border-left: 2px solid #4a7c59;
+        }
+        
+        .dialogue strong {
+            color: #fff;
+            font-style: normal;
+        }
+        
+        /* Loading */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px 60px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(74, 124, 89, 0.3);
+        }
+        
+        #loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(74, 124, 89, 0.3);
+            border-top-color: #4a7c59;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Controles de cámara */
+        #controls-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        
+        /* Botón reset cámara */
+        #reset-camera {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(74, 124, 89, 0.8);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            z-index: 100;
+            transition: background 0.3s;
+        }
+        
+        #reset-camera:hover {
+            background: #4a7c59;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div id="loading">
+        <div id="loading-spinner"></div>
+        <div style="color: #4a7c59; font-size: 1.2rem;">Cargando escena...</div>
+        <div id="loading-text" style="font-size: 14px; margin-top: 10px; color: #888;">Preparando la jungla</div>
+    </div>
+    
+    <!-- Panel de historia -->
+    <div id="story-panel">
+        <h1 class="story-title">La Jungla Maldita</h1>
+        <p class="story-text">
+            El interior de la isla es denso, oscuro y misterioso. Árboles gigantes forman un dosel 
+            que bloquea el sol. El aire está cargado de humedad y el sonido de criaturas desconocidas.
+        </p>
+        <div class="dialogue">
+            <strong>Anne:</strong> "Este lugar me da escalofríos..."
+        </div>
+    </div>
+    
+    <!-- Debug panel -->
+    <div id="debug-panel">
+        <h3>Debug - Escena 3: Jungla Maldita</h3>
+        
+        <p>FPS: <span id="fps" class="value">--</span></p>
+        <p>Modelos cargados: <span id="models-loaded" class="value">--</span></p>
+        <p>Personajes: <span id="characters-loaded" class="value">--</span></p>
+        
+        <div class="section">
+            <div class="section-title">Efectos</div>
+            
+            <div class="toggle-row">
+                <label for="toggle-fireflies">Luciérnagas</label>
+                <input type="checkbox" id="toggle-fireflies" checked>
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-fog">Niebla densa</label>
+                <input type="checkbox" id="toggle-fog" checked>
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-sun-rays">Rayos de sol</label>
+                <input type="checkbox" id="toggle-sun-rays" checked>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Iluminación</div>
+            
+            <div class="slider-row">
+                <label>Intensidad luz principal</label>
+                <input type="range" id="main-light-intensity" min="0" max="2" step="0.1" value="0.8">
+                <div class="slider-value"><span id="main-light-value">0.8</span></div>
+            </div>
+            
+            <div class="slider-row">
+                <label>Intensidad ambiental</label>
+                <input type="range" id="ambient-intensity" min="0" max="1" step="0.05" value="0.3">
+                <div class="slider-value"><span id="ambient-value">0.3</span></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Helpers</div>
+            
+            <div class="toggle-row">
+                <label for="toggle-axes">Ejes XYZ</label>
+                <input type="checkbox" id="toggle-axes">
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-grid">Grid suelo</label>
+                <input type="checkbox" id="toggle-grid">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reset cámara -->
+    <button id="reset-camera">Reset Cámara</button>
+    
+    <!-- Controles hint -->
+    <div id="controls-hint">
+        Arrastra para rotar | Scroll para zoom | Click derecho para panear
+    </div>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        
+        import { CONFIG, createFallbackGeometry } from './js/config.js';
+        import { AnimationManager } from './js/animations.js';
+        
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let scene, camera, renderer, controls;
+        let clock = new THREE.Clock();
+        let animationManager;
+        
+        // Modelos cargados
+        let loadedModels = {};
+        
+        // Elementos de la escena
+        let jungleGroup;
+        let barbarossaModel, anneModel, henryModel, skeletonModel;
+        
+        // Efectos
+        let fireflyParticles;
+        let sunRays = [];
+        
+        // Luces
+        let ambientLight;
+        let mainLight;
+        
+        // Helpers
+        let axesHelper, gridHelper;
+        
+        // Debug state
+        let debugState = {
+            fireflies: true,
+            fog: true,
+            sunRays: true,
+            axes: false,
+            grid: false
+        };
+        
+        // FPS counter
+        let frameCount = 0;
+        let lastTime = performance.now();
+        
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        async function init() {
+            setupThreeJS();
+            setupLights();
+            setupControls();
+            setupDebugControls();
+            setupHelpers();
+            
+            await loadModels();
+            
+            buildScene();
+            
+            // Ocultar loading
+            document.getElementById('loading').classList.add('hidden');
+            
+            // Iniciar animación
+            animate();
+        }
+        
+        // ============================================
+        // THREE.JS SETUP
+        // ============================================
+        function setupThreeJS() {
+            scene = new THREE.Scene();
+            
+            // Background verde oscuro profundo
+            scene.background = new THREE.Color(0x0f291e);
+            
+            // Niebla densa verdosa
+            scene.fog = new THREE.Fog(0x1a2f1a, 5, 25);
+            
+            camera = new THREE.PerspectiveCamera(
+                CONFIG.camera.fov,
+                window.innerWidth / window.innerHeight,
+                CONFIG.camera.near,
+                CONFIG.camera.far
+            );
+            camera.position.set(0, 5, 15);
+            
+            renderer = new THREE.WebGLRenderer({
+                antialias: CONFIG.renderer.antialias,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, CONFIG.renderer.pixelRatioLimit));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 0.8;
+            
+            document.body.appendChild(renderer.domElement);
+            
+            // Resize handler
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        // ============================================
+        // LUCES
+        // ============================================
+        function setupLights() {
+            // Luz ambiental muy tenue
+            ambientLight = new THREE.AmbientLight(0x1a2f1a, 0.3);
+            scene.add(ambientLight);
+            
+            // Luz principal filtrada por el dosel (verde bosque)
+            mainLight = new THREE.DirectionalLight(0x4a7c59, 0.8);
+            mainLight.position.set(10, 30, 10);
+            mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 2048;
+            mainLight.shadow.mapSize.height = 2048;
+            mainLight.shadow.camera.near = 0.5;
+            mainLight.shadow.camera.far = 60;
+            mainLight.shadow.camera.left = -20;
+            mainLight.shadow.camera.right = 20;
+            mainLight.shadow.camera.top = 20;
+            mainLight.shadow.camera.bottom = -20;
+            scene.add(mainLight);
+            
+            // Hemisphere light para cielo/tierra
+            const hemiLight = new THREE.HemisphereLight(0x4a7c59, 0x3d5c3d, 0.3);
+            scene.add(hemiLight);
+            
+            // Rayos de sol (SpotLights)
+            createSunRays();
+        }
+        
+        function createSunRays() {
+            const rayPositions = [
+                { x: -5, y: 20, z: -5, target: { x: -3, y: 0, z: -3 } },
+                { x: 5, y: 20, z: 0, target: { x: 3, y: 0, z: 0 } },
+                { x: 0, y: 20, z: 5, target: { x: 0, y: 0, z: 3 } },
+                { x: -8, y: 20, z: 3, target: { x: -6, y: 0, z: 2 } }
+            ];
+            
+            rayPositions.forEach(pos => {
+                const spotLight = new THREE.SpotLight(0xd4f1d4, 0.5, 30, Math.PI / 8, 0.5);
+                spotLight.position.set(pos.x, pos.y, pos.z);
+                spotLight.target.position.set(pos.target.x, pos.target.y, pos.target.z);
+                spotLight.castShadow = true;
+                scene.add(spotLight);
+                scene.add(spotLight.target);
+                sunRays.push(spotLight);
+            });
+        }
+        
+        // ============================================
+        // CONTROLES
+        // ============================================
+        function setupControls() {
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 3;
+            controls.maxDistance = 40;
+            controls.maxPolarAngle = Math.PI / 2 + 0.1;
+            controls.target.set(0, 1, 0);
+        }
+        
+        // ============================================
+        // HELPERS
+        // ============================================
+        function setupHelpers() {
+            // Ejes
+            axesHelper = new THREE.AxesHelper(10);
+            axesHelper.visible = false;
+            scene.add(axesHelper);
+            
+            // Grid
+            gridHelper = new THREE.GridHelper(50, 50, 0x3d5c3d, 0x2a4a2a);
+            gridHelper.position.y = 0.01;
+            gridHelper.visible = false;
+            scene.add(gridHelper);
+        }
+        
+        // ============================================
+        // CONTROLES DEBUG
+        // ============================================
+        function setupDebugControls() {
+            // Toggle luciérnagas
+            document.getElementById('toggle-fireflies').addEventListener('change', (e) => {
+                debugState.fireflies = e.target.checked;
+                if (fireflyParticles) {
+                    fireflyParticles.visible = debugState.fireflies;
+                }
+            });
+            
+            // Toggle niebla
+            document.getElementById('toggle-fog').addEventListener('change', (e) => {
+                debugState.fog = e.target.checked;
+                scene.fog = debugState.fog ? new THREE.Fog(0x1a2f1a, 5, 25) : null;
+            });
+            
+            // Toggle rayos de sol
+            document.getElementById('toggle-sun-rays').addEventListener('change', (e) => {
+                debugState.sunRays = e.target.checked;
+                sunRays.forEach(ray => {
+                    ray.visible = debugState.sunRays;
+                });
+            });
+            
+            // Intensidad luz principal
+            document.getElementById('main-light-intensity').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                document.getElementById('main-light-value').textContent = value.toFixed(1);
+                mainLight.intensity = value;
+            });
+            
+            // Intensidad ambiental
+            document.getElementById('ambient-intensity').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                document.getElementById('ambient-value').textContent = value.toFixed(2);
+                ambientLight.intensity = value;
+            });
+            
+            // Toggle ejes
+            document.getElementById('toggle-axes').addEventListener('change', (e) => {
+                debugState.axes = e.target.checked;
+                axesHelper.visible = debugState.axes;
+            });
+            
+            // Toggle grid
+            document.getElementById('toggle-grid').addEventListener('change', (e) => {
+                debugState.grid = e.target.checked;
+                gridHelper.visible = debugState.grid;
+            });
+            
+            // Reset cámara
+            document.getElementById('reset-camera').addEventListener('click', () => {
+                camera.position.set(0, 5, 15);
+                controls.target.set(0, 1, 0);
+                controls.update();
+            });
+        }
+        
+        // ============================================
+        // CARGA DE MODELOS
+        // ============================================
+        async function loadModels() {
+            const loader = new GLTFLoader();
+            const modelsToLoad = {
+                // Personajes
+                barbarossa: CONFIG.models.barbarossa,
+                anne: CONFIG.models.anne,
+                henry: CONFIG.models.henry,
+                skeleton: CONFIG.models.skeleton,
+                // Environment pirate-kit
+                largeBones: CONFIG.models.largeBones,
+                rock1: CONFIG.models.rock1,
+                rock2: CONFIG.models.rock2,
+                skull: CONFIG.models.skull,
+                // Nature kit
+                treeOak: CONFIG.models.treeOak,
+                treeDetailed: CONFIG.models.treeDetailed,
+                treePineTall: CONFIG.models.treePineTall,
+                rockLarge: CONFIG.models.rockLarge,
+                plantBushLarge: CONFIG.models.plantBushLarge
+            };
+            
+            const total = Object.keys(modelsToLoad).length;
+            let loaded = 0;
+            let successCount = 0;
+            
+            const loadModel = (name, path) => {
+                return new Promise((resolve) => {
+                    loader.load(
+                        path,
+                        (gltf) => {
+                            loadedModels[name] = gltf.scene;
+                            
+                            // Guardar animaciones si existen
+                            if (gltf.animations && gltf.animations.length > 0) {
+                                loadedModels[name + '_animations'] = gltf.animations;
+                                console.log(`Animaciones de ${name}:`, gltf.animations.map(a => a.name));
+                            }
+                            
+                            // Configurar sombras
+                            gltf.scene.traverse((child) => {
+                                if (child.isMesh) {
+                                    child.castShadow = true;
+                                    child.receiveShadow = true;
+                                }
+                            });
+                            
+                            loaded++;
+                            successCount++;
+                            document.getElementById('loading-text').textContent = 
+                                `${loaded}/${total} modelos cargados`;
+                            document.getElementById('models-loaded').textContent = `${successCount}/${total}`;
+                            
+                            console.log(`Modelo ${name} cargado correctamente`);
+                            resolve();
+                        },
+                        (progress) => {
+                            if (progress.total > 0) {
+                                const percent = (progress.loaded / progress.total * 100).toFixed(0);
+                                document.getElementById('loading-text').textContent = 
+                                    `Cargando ${name}: ${percent}%`;
+                            }
+                        },
+                        (error) => {
+                            console.warn(`Error cargando ${name}:`, error);
+                            loadedModels[name] = createFallbackGeometry(name);
+                            loaded++;
+                            document.getElementById('loading-text').textContent = 
+                                `${loaded}/${total} modelos (con fallback)`;
+                            resolve();
+                        }
+                    );
+                });
+            };
+            
+            await Promise.all(
+                Object.entries(modelsToLoad).map(([name, path]) => loadModel(name, path))
+            );
+            
+            console.log('=== RESUMEN DE CARGA ===');
+            console.log('Modelos:', Object.keys(loadedModels).filter(k => !k.includes('_animations')));
+        }
+        
+        // ============================================
+        // CONSTRUIR ESCENA
+        // ============================================
+        function buildScene() {
+            // Crear grupo principal
+            jungleGroup = new THREE.Group();
+            scene.add(jungleGroup);
+            
+            // Suelo de la jungla
+            buildGround(jungleGroup);
+            
+            // Árboles formando dosel
+            buildTrees(jungleGroup);
+            
+            // Rocas bloqueando caminos
+            buildRocks(jungleGroup);
+            
+            // Vegetación baja
+            buildBushes(jungleGroup);
+            
+            // Huesos y calaveras
+            buildBones(jungleGroup);
+            
+            // Animation manager (antes de personajes)
+            animationManager = new AnimationManager();
+            
+            // Personajes caminando
+            buildCharacters(jungleGroup);
+            
+            // Efectos
+            buildEffects(jungleGroup);
+            
+            // Actualizar contador de personajes
+            let charCount = 0;
+            if (barbarossaModel) charCount++;
+            if (anneModel) charCount++;
+            if (henryModel) charCount++;
+            if (skeletonModel) charCount++;
+            document.getElementById('characters-loaded').textContent = charCount + '/4';
+        }
+        
+        // ============================================
+        // SUELO
+        // ============================================
+        function buildGround(parent) {
+            // Suelo de tierra/oscuridad
+            const groundGeo = new THREE.PlaneGeometry(80, 80);
+            const groundMat = new THREE.MeshStandardMaterial({
+                color: 0x3d5c3d,
+                roughness: 0.95,
+                metalness: 0.05
+            });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            parent.add(ground);
+            
+            // Niebla baja justo encima del suelo
+            const fogPlaneGeo = new THREE.PlaneGeometry(80, 80);
+            const fogPlaneMat = new THREE.MeshBasicMaterial({
+                color: 0x1a2f1a,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+            const fogPlane = new THREE.Mesh(fogPlaneGeo, fogPlaneMat);
+            fogPlane.rotation.x = -Math.PI / 2;
+            fogPlane.position.y = 0.1;
+            parent.add(fogPlane);
+        }
+        
+        // ============================================
+        // ÁRBOLES
+        // ============================================
+        function buildTrees(parent) {
+            // Árboles grandes formando dosel
+            const treePositions = [
+                // Círculo alrededor
+                { x: -15, z: 0, scale: 2, type: 'treeOak' },
+                { x: 15, z: 0, scale: 2.2, type: 'treeDetailed' },
+                { x: 0, z: -15, scale: 2.1, type: 'treeOak' },
+                { x: 0, z: 15, scale: 1.9, type: 'treePineTall' },
+                { x: -10, z: -10, scale: 2, type: 'treeDetailed' },
+                { x: 10, z: -10, scale: 2.3, type: 'treeOak' },
+                { x: -10, z: 10, scale: 2.1, type: 'treePineTall' },
+                { x: 10, z: 10, scale: 2, type: 'treeDetailed' },
+                // Más árboles
+                { x: -20, z: -5, scale: 1.8, type: 'treeOak' },
+                { x: 20, z: 5, scale: 2, type: 'treePineTall' },
+                { x: -5, z: -20, scale: 2.2, type: 'treeDetailed' },
+                { x: 5, z: 20, scale: 1.9, type: 'treeOak' }
+            ];
+            
+            treePositions.forEach(pos => {
+                const modelKey = pos.type;
+                if (loadedModels[modelKey]) {
+                    const tree = loadedModels[modelKey].clone();
+                    tree.position.set(pos.x, 0, pos.z);
+                    tree.scale.setScalar(pos.scale);
+                    parent.add(tree);
+                }
+            });
+        }
+        
+        // ============================================
+        // ROCAS
+        // ============================================
+        function buildRocks(parent) {
+            const rockPositions = [
+                { x: -5, z: -3, scale: 1.5 },
+                { x: 6, z: 2, scale: 1.3 },
+                { x: -3, z: 5, scale: 1.7 },
+                { x: 8, z: -4, scale: 1.4 },
+                { x: -7, z: 1, scale: 1.2 },
+                { x: 3, z: 7, scale: 1.6 }
+            ];
+            
+            rockPositions.forEach((pos, index) => {
+                const modelKey = index % 2 === 0 ? 'rock1' : 'rock2';
+                if (loadedModels[modelKey]) {
+                    const rock = loadedModels[modelKey].clone();
+                    rock.position.set(pos.x, 0, pos.z);
+                    rock.scale.setScalar(pos.scale);
+                    parent.add(rock);
+                } else if (loadedModels.rockLarge) {
+                    const rock = loadedModels.rockLarge.clone();
+                    rock.position.set(pos.x, 0, pos.z);
+                    rock.scale.setScalar(pos.scale * 0.5);
+                    parent.add(rock);
+                }
+            });
+        }
+        
+        // ============================================
+        // VEGETACIÓN BAJA
+        // ============================================
+        function buildBushes(parent) {
+            if (!loadedModels.plantBushLarge) return;
+            
+            for (let i = 0; i < 15; i++) {
+                const bush = loadedModels.plantBushLarge.clone();
+                bush.position.set(
+                    (Math.random() - 0.5) * 30,
+                    0,
+                    (Math.random() - 0.5) * 30
+                );
+                bush.scale.setScalar(0.8 + Math.random() * 0.4);
+                bush.rotation.y = Math.random() * Math.PI * 2;
+                parent.add(bush);
+            }
+        }
+        
+        // ============================================
+        // HUESOS
+        // ============================================
+        function buildBones(parent) {
+            // Huesos grandes
+            if (loadedModels.largeBones) {
+                const bonesPositions = [
+                    { x: -5, z: -5, scale: 1.5 },
+                    { x: 8, z: 3, scale: 1.5 },
+                    { x: -3, z: 8, scale: 1.5 }
+                ];
+                
+                bonesPositions.forEach(pos => {
+                    const bones = loadedModels.largeBones.clone();
+                    bones.position.set(pos.x, 0, pos.z);
+                    bones.scale.setScalar(pos.scale);
+                    parent.add(bones);
+                });
+            }
+            
+            // Calaveras dispersas
+            if (loadedModels.skull) {
+                for (let i = 0; i < 10; i++) {
+                    const skull = loadedModels.skull.clone();
+                    skull.position.set(
+                        (Math.random() - 0.5) * 25,
+                        0,
+                        (Math.random() - 0.5) * 25
+                    );
+                    skull.scale.setScalar(0.3);
+                    skull.rotation.y = Math.random() * Math.PI * 2;
+                    skull.rotation.z = (Math.random() - 0.5) * 0.3;
+                    parent.add(skull);
+                }
+            }
+        }
+        
+        // ============================================
+        // PERSONAJES
+        // ============================================
+        function buildCharacters(parent) {
+            // Barbarossa - liderando
+            if (loadedModels.barbarossa) {
+                barbarossaModel = loadedModels.barbarossa;
+                barbarossaModel.position.set(0, 0, 0);
+                barbarossaModel.scale.setScalar(1);
+                parent.add(barbarossaModel);
+                
+                if (loadedModels.barbarossa_animations) {
+                    animationManager.register('barbarossa', barbarossaModel, loadedModels.barbarossa_animations);
+                    animationManager.play('barbarossa', 'Walk');
+                }
+                
+                console.log('Barbarossa posicionado en:', barbarossaModel.position);
+            }
+            
+            // Anne - a la izquierda atrás
+            if (loadedModels.anne) {
+                anneModel = loadedModels.anne;
+                anneModel.position.set(-2, 0, 2);
+                anneModel.scale.setScalar(1);
+                parent.add(anneModel);
+                
+                if (loadedModels.anne_animations) {
+                    animationManager.register('anne', anneModel, loadedModels.anne_animations);
+                    animationManager.play('anne', 'Walk');
+                }
+                
+                console.log('Anne posicionada en:', anneModel.position);
+            }
+            
+            // Henry - a la derecha atrás
+            if (loadedModels.henry) {
+                henryModel = loadedModels.henry;
+                henryModel.position.set(2, 0, 2);
+                henryModel.scale.setScalar(1);
+                parent.add(henryModel);
+                
+                if (loadedModels.henry_animations) {
+                    animationManager.register('henry', henryModel, loadedModels.henry_animations);
+                    animationManager.play('henry', 'Walk');
+                }
+                
+                console.log('Henry posicionado en:', henryModel.position);
+            }
+            
+            // Skeleton - detrás, tropezando
+            if (loadedModels.skeleton) {
+                skeletonModel = loadedModels.skeleton;
+                skeletonModel.position.set(0, 0, 4);
+                skeletonModel.scale.setScalar(1);
+                parent.add(skeletonModel);
+                
+                if (loadedModels.skeleton_animations) {
+                    animationManager.register('skeleton', skeletonModel, loadedModels.skeleton_animations);
+                    animationManager.play('skeleton', 'Walk');
+                }
+                
+                console.log('Skeleton posicionado en:', skeletonModel.position);
+            }
+        }
+        
+        // ============================================
+        // EFECTOS
+        // ============================================
+        function buildEffects(parent) {
+            // Luciérnagas
+            createFireflies(parent);
+        }
+        
+        function createFireflies(parent) {
+            const count = 50;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+            const phases = [];
+            
+            for (let i = 0; i < count; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 30;
+                positions[i * 3 + 1] = Math.random() * 5 + 0.5;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 30;
+                
+                // Color amarillo/verde
+                colors[i * 3] = 0.9 + Math.random() * 0.1;
+                colors[i * 3 + 1] = 0.9 + Math.random() * 0.1;
+                colors[i * 3 + 2] = 0.2 + Math.random() * 0.3;
+                
+                phases.push(Math.random() * Math.PI * 2);
+            }
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            const material = new THREE.PointsMaterial({
+                size: 0.15,
+                transparent: true,
+                opacity: 0.8,
+                vertexColors: true,
+                blending: THREE.AdditiveBlending
+            });
+            
+            fireflyParticles = new THREE.Points(geometry, material);
+            fireflyParticles.userData.phases = phases;
+            parent.add(fireflyParticles);
+        }
+        
+        // ============================================
+        // ANIMACIÓN
+        // ============================================
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+            
+            // Update controls
+            controls.update();
+            
+            // Update animation manager
+            if (animationManager) {
+                animationManager.update();
+            }
+            
+            // Update efectos
+            updateEffects(time);
+            
+            // FPS counter
+            frameCount++;
+            const now = performance.now();
+            if (now - lastTime >= 1000) {
+                document.getElementById('fps').textContent = frameCount;
+                frameCount = 0;
+                lastTime = now;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        function updateEffects(time) {
+            // Actualizar luciérnagas
+            if (fireflyParticles && fireflyParticles.visible) {
+                const positions = fireflyParticles.geometry.attributes.position.array;
+                const phases = fireflyParticles.userData.phases;
+                
+                for (let i = 0; i < phases.length; i++) {
+                    // Movimiento flotante
+                    positions[i * 3] += Math.sin(time * 0.5 + phases[i]) * 0.01;
+                    positions[i * 3 + 1] += Math.sin(time * 0.8 + phases[i] * 2) * 0.005;
+                    positions[i * 3 + 2] += Math.cos(time * 0.3 + phases[i]) * 0.01;
+                    
+                    // Mantener en rango
+                    if (positions[i * 3 + 1] < 0.5) positions[i * 3 + 1] = 5;
+                    if (positions[i * 3 + 1] > 5.5) positions[i * 3 + 1] = 0.5;
+                }
+                
+                fireflyParticles.geometry.attributes.position.needsUpdate = true;
+                
+                // Parpadeo de opacidad
+                fireflyParticles.material.opacity = 0.5 + Math.sin(time * 3) * 0.3;
+            }
+        }
+        
+        // ============================================
+        // RESIZE
+        // ============================================
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Iniciar
+        init();
+    </script>
+</body>
+</html>

@@ -1020,3 +1020,79 @@ python -m http.server 8000
 ---
 
 **Estado:** 🎉 ¡Capitán visible! Continuamos con el Día 3 ⚓🌊
+---
+
+## INVENTARIO DE MODELOS PIRATE-KIT
+
+> Fuente: `tools/inventory-generator/output/inventories/pirate-kit.json`
+> Total: 72 modelos
+
+### PERSONAJES (con animaciones)
+
+| Modelo | Animaciones | Altura | Notas |
+|--------|-------------|--------|-------|
+| `Characters_Captain_Barbarossa` | Death, Duck, HitReact, Idle, Jump, Jump_Idle, Jump_Land, No, Punch, Run, Sword, Walk, Wave, Yes | 1.85m | Protagonista |
+| `Characters_Anne` | Death, Duck, HitReact, Idle, Jump, Jump_Idle, Jump_Land, No, Punch, Run, Sword, Walk, Wave, Yes | 1.81m | Navegadora |
+| `Characters_Henry` | Death, Duck, HitReact, Idle, Jump, Jump_Idle, Jump_Land, No, Punch, Run, Sword, Walk, Wave, Yes | 1.76m | Artillero |
+| `Characters_Skeleton` | Death, Duck, HitReact, Idle, Jump, Jump_Idle, Jump_Idlea, Jump_Land, No, Punch, Run, Sword, Walk, Wave, Yes | 1.59m | Comicamente inmortal |
+| `Characters_Tentacle` | Tentacle_Attack, Tentacle_Attack2, Tentacle_Idle, Tentacle_Poke | - | Tentaculo animado |
+| `Characters_Shark` | Swim, Swim_Bite, Swim_Fast | 2.01m | Tiburon nadador |
+
+### ENEMIGOS
+
+| Modelo | Notas |
+|--------|-------|
+| `Enemy_Tentacle` | Tentaculo estatico |
+
+### BARCOS
+
+| Modelo | Notas |
+|--------|-------|
+| `Ship_Large` | Barco principal del capitan |
+| `Ship_Small` | Barcos secundarios |
+
+### ENVIRONMENT - CONSTRUCCION
+
+| Modelo | Categoria | Notas |
+|--------|-----------|-------|
+| `Environment_Dock` | Muelle | Seccion de muelle |
+| `Environment_Dock_Broken` | Muelle | Seccion rota |
+| `Environment_Dock_Pole` | Muelle | Poste de muelle |
+| `Environment_House1` | Edificio | Casa tipo 1 |
+| `Environment_House2` | Edificio | Casa tipo 2 |
+| `Environment_House3` | Edificio | Casa tipo 3 |
+
+### ENVIRONMENT - NATURALEZA
+
+| Modelo | Categoria | Notas |
+|--------|-----------|-------|
+| `Environment_PalmTree_1/2/3` | Vegetacion | Palmeras |
+| `Environment_Cliff1/2/3/4` | Terreno | Acantilados |
+| `Environment_Rock_1` a `Rock_5` | Terreno | Rocas variadas |
+| `Environment_LargeBones` | Decoracion | Huesos grandes (jungla) |
+| `Environment_Skulls` | Decoracion | Calaveras (cueva) |
+
+### PROPS
+
+| Modelo | Categoria | Notas |
+|--------|-----------|-------|
+| `Prop_Barrel` | Contenedor | Barril |
+| `Prop_Chest_Gold` | Contenedor | Cofre con oro |
+| `Prop_Coins` | Tesoro | Monedas |
+| `Prop_GoldBag` | Tesoro | Bolsa de oro |
+| `Prop_Skull` | Decoracion | Calavera suelta |
+| `Prop_Cannon` | Arma | Canon |
+| `Prop_Flag_Pirate` | Decoracion | Bandera pirata |
+| `Prop_Lamp` | Iluminacion | Lampara |
+| `Prop_TreasureMap` | Herramienta | Mapa del tesoro |
+
+### WEAPONS
+
+| Modelo | Notas |
+|--------|-------|
+| `Weapon_Cutlass` | Sable pirata |
+| `Weapon_Sword_1` | Espada estandar |
+
+---
+
+**Estado:** Scene1 y Scene2 completadas. Continuamos con Scene3

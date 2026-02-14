@@ -114,7 +114,7 @@ export const CONFIG = {
         DECK_LEVEL: 1.05,
         shipScale: 1.2,
         rainCount: 1500,
-        lightningProbability: 0.02,
+        lightningProbability: 0.05,  // Aumentado para debug (era 0.02)
         lightningMinDuration: 100,
         lightningMaxDuration: 250
     }

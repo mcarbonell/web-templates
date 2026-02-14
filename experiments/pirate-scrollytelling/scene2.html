@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escena 2: El Puerto Dorado - El Último Pirata</title>
+    
+    <!-- Three.js moderno -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: linear-gradient(to bottom, #ff6b35, #87CEEB);
+            font-family: 'Georgia', serif;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        /* Panel de información debug */
+        #debug-panel {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 100;
+            max-width: 320px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        #debug-panel h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        #debug-panel p {
+            margin: 5px 0;
+            color: #aaa;
+        }
+        
+        #debug-panel .value {
+            color: #4ecdc4;
+        }
+        
+        #debug-panel .section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #debug-panel .section-title {
+            color: #ffd700;
+            font-size: 11px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        /* Checkboxes estilo toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 6px 0;
+            padding: 4px 0;
+        }
+        
+        .toggle-row label {
+            color: #ccc;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        
+        .toggle-row input[type="checkbox"] {
+            width: 40px;
+            height: 20px;
+            appearance: none;
+            background: #333;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+        }
+        
+        .toggle-row input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #666;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        
+        .toggle-row input[type="checkbox"]:checked {
+            background: #ffd700;
+        }
+        
+        .toggle-row input[type="checkbox"]:checked::before {
+            left: 22px;
+            background: #fff;
+        }
+        
+        /* Slider estilo */
+        .slider-row {
+            margin: 8px 0;
+        }
+        
+        .slider-row label {
+            display: block;
+            color: #ccc;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+        
+        .slider-row input[type="range"] {
+            width: 100%;
+            height: 6px;
+            appearance: none;
+            background: #333;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            color: #4ecdc4;
+            font-size: 10px;
+            text-align: right;
+        }
+        
+        /* Panel de historia */
+        #story-panel {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            max-width: 500px;
+            width: 90%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .story-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, #ffd700, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .story-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dialogue {
+            font-style: italic;
+            color: #ffd700;
+            font-size: 0.95rem;
+            margin: 0.5rem 0;
+            padding: 0.3rem 0.8rem;
+            border-left: 2px solid #ffd700;
+        }
+        
+        .dialogue strong {
+            color: #fff;
+            font-style: normal;
+        }
+        
+        /* Loading */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px 60px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        #loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Controles de cámara */
+        #controls-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        
+        /* Botón reset cámara */
+        #reset-camera {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 215, 0, 0.8);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 100;
+            transition: background 0.3s;
+        }
+        
+        #reset-camera:hover {
+            background: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div id="loading">
+        <div id="loading-spinner"></div>
+        <div style="color: #ffd700; font-size: 1.2rem;">Cargando escena...</div>
+        <div id="loading-text" style="font-size: 14px; margin-top: 10px; color: #888;">Preparando el puerto</div>
+    </div>
+    
+    <!-- Panel de historia -->
+    <div id="story-panel">
+        <h1 class="story-title">El Puerto de Tortuga</h1>
+        <p class="story-text">
+            El amanecer ilumina el famoso puerto pirata. Barbarossa ha llegado para reclutar 
+            a una tripulación valiente... o al menos, disponible.
+        </p>
+        <div class="dialogue">
+            <strong>Barbarossa:</strong> "Aquí encontraré a los mejores marineros del Caribe..."
+        </div>
+    </div>
+    
+    <!-- Debug panel -->
+    <div id="debug-panel">
+        <h3>⚓ Debug - Escena 2: Puerto Dorado</h3>
+        
+        <p>FPS: <span id="fps" class="value">--</span></p>
+        <p>Modelos cargados: <span id="models-loaded" class="value">--</span></p>
+        <p>Personajes: <span id="characters-loaded" class="value">--</span></p>
+        
+        <div class="section">
+            <div class="section-title">Efectos</div>
+            
+            <div class="toggle-row">
+                <label for="toggle-pollen">Polen dorado</label>
+                <input type="checkbox" id="toggle-pollen" checked>
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-fog">Niebla matutina</label>
+                <input type="checkbox" id="toggle-fog" checked>
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-seagulls">Gaviotas</label>
+                <input type="checkbox" id="toggle-seagulls" checked>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Iluminación</div>
+            
+            <div class="slider-row">
+                <label>Intensidad sol</label>
+                <input type="range" id="sun-intensity" min="0" max="3" step="0.1" value="1.5">
+                <div class="slider-value"><span id="sun-value">1.5</span></div>
+            </div>
+            
+            <div class="slider-row">
+                <label>Intensidad ambiental</label>
+                <input type="range" id="ambient-intensity" min="0" max="1" step="0.05" value="0.6">
+                <div class="slider-value"><span id="ambient-value">0.6</span></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Helpers</div>
+            
+            <div class="toggle-row">
+                <label for="toggle-axes">Ejes XYZ</label>
+                <input type="checkbox" id="toggle-axes">
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-grid">Grid suelo</label>
+                <input type="checkbox" id="toggle-grid">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reset cámara -->
+    <button id="reset-camera">🔄 Reset Cámara</button>
+    
+    <!-- Controles hint -->
+    <div id="controls-hint">
+        Arrastra para rotar | Scroll para zoom | Click derecho para panear
+    </div>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        
+        import { CONFIG, createFallbackGeometry } from './js/config.js';
+        import { AnimationManager } from './js/animations.js';
+        
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let scene, camera, renderer, controls;
+        let clock = new THREE.Clock();
+        let animationManager;
+        
+        // Modelos cargados
+        let loadedModels = {};
+        
+        // Elementos de la escena
+        let portGroup;
+        let barbarossaModel, anneModel, henryModel, skeletonModel;
+        
+        // Efectos
+        let pollenParticles;
+        let seagullSprites = [];
+        
+        // Luces
+        let ambientLight;
+        let sunLight;
+        
+        // Helpers
+        let axesHelper, gridHelper;
+        
+        // Debug state
+        let debugState = {
+            pollen: true,
+            fog: true,
+            seagulls: true,
+            axes: false,
+            grid: false
+        };
+        
+        // FPS counter
+        let frameCount = 0;
+        let lastTime = performance.now();
+        
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        async function init() {
+            setupThreeJS();
+            setupLights();
+            setupControls();
+            setupDebugControls();
+            setupHelpers();
+            
+            await loadModels();
+            
+            buildScene();
+            
+            // Ocultar loading
+            document.getElementById('loading').classList.add('hidden');
+            
+            // Iniciar animación
+            animate();
+        }
+        
+        // ============================================
+        // THREE.JS SETUP
+        // ============================================
+        function setupThreeJS() {
+            scene = new THREE.Scene();
+            
+            // Gradiente de fondo (naranja a azul cielo)
+            scene.background = new THREE.Color(0xff6b35);
+            
+            // Niebla dorada ligera
+            scene.fog = new THREE.Fog(0xfff5e6, 30, 100);
+            
+            camera = new THREE.PerspectiveCamera(
+                CONFIG.camera.fov,
+                window.innerWidth / window.innerHeight,
+                CONFIG.camera.near,
+                CONFIG.camera.far
+            );
+            camera.position.set(20, 8, 25);
+            
+            renderer = new THREE.WebGLRenderer({
+                antialias: CONFIG.renderer.antialias,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, CONFIG.renderer.pixelRatioLimit));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            
+            document.body.appendChild(renderer.domElement);
+            
+            // Resize handler
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        // ============================================
+        // LUCES
+        // ============================================
+        function setupLights() {
+            // Luz ambiental cálida
+            ambientLight = new THREE.AmbientLight(0xfff5e6, 0.6);
+            scene.add(ambientLight);
+            
+            // Sol naciente (dorado, bajo en el horizonte)
+            sunLight = new THREE.DirectionalLight(0xffd700, 1.5);
+            sunLight.position.set(-20, 10, -20);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            sunLight.shadow.camera.near = 0.5;
+            sunLight.shadow.camera.far = 100;
+            sunLight.shadow.camera.left = -30;
+            sunLight.shadow.camera.right = 30;
+            sunLight.shadow.camera.top = 30;
+            sunLight.shadow.camera.bottom = -30;
+            scene.add(sunLight);
+            
+            // Luz de relleno (azul cielo)
+            const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.4);
+            fillLight.position.set(20, 15, 20);
+            scene.add(fillLight);
+            
+            // Hemisphere light para cielo/tierra
+            const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x8B4513, 0.3);
+            scene.add(hemiLight);
+        }
+        
+        // ============================================
+        // CONTROLES
+        // ============================================
+        function setupControls() {
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 5;
+            controls.maxDistance = 80;
+            controls.maxPolarAngle = Math.PI / 2 + 0.1;
+            controls.target.set(5, 0, 5);
+        }
+        
+        // ============================================
+        // HELPERS
+        // ============================================
+        function setupHelpers() {
+            // Ejes
+            axesHelper = new THREE.AxesHelper(10);
+            axesHelper.visible = false;
+            scene.add(axesHelper);
+            
+            // Grid
+            gridHelper = new THREE.GridHelper(100, 50, 0x8B4513, 0x654321);
+            gridHelper.position.y = 0.01;
+            gridHelper.visible = false;
+            scene.add(gridHelper);
+        }
+        
+        // ============================================
+        // CONTROLES DEBUG
+        // ============================================
+        function setupDebugControls() {
+            // Toggle polen
+            document.getElementById('toggle-pollen').addEventListener('change', (e) => {
+                debugState.pollen = e.target.checked;
+                if (pollenParticles) {
+                    pollenParticles.visible = debugState.pollen;
+                }
+            });
+            
+            // Toggle niebla
+            document.getElementById('toggle-fog').addEventListener('change', (e) => {
+                debugState.fog = e.target.checked;
+                scene.fog = debugState.fog ? new THREE.Fog(0xfff5e6, 30, 100) : null;
+            });
+            
+            // Toggle gaviotas
+            document.getElementById('toggle-seagulls').addEventListener('change', (e) => {
+                debugState.seagulls = e.target.checked;
+                seagullSprites.forEach(sprite => {
+                    sprite.visible = debugState.seagulls;
+                });
+            });
+            
+            // Intensidad sol
+            document.getElementById('sun-intensity').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                document.getElementById('sun-value').textContent = value.toFixed(1);
+                sunLight.intensity = value;
+            });
+            
+            // Intensidad ambiental
+            document.getElementById('ambient-intensity').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                document.getElementById('ambient-value').textContent = value.toFixed(2);
+                ambientLight.intensity = value;
+            });
+            
+            // Toggle ejes
+            document.getElementById('toggle-axes').addEventListener('change', (e) => {
+                debugState.axes = e.target.checked;
+                axesHelper.visible = debugState.axes;
+            });
+            
+            // Toggle grid
+            document.getElementById('toggle-grid').addEventListener('change', (e) => {
+                debugState.grid = e.target.checked;
+                gridHelper.visible = debugState.grid;
+            });
+            
+            // Reset cámara
+            document.getElementById('reset-camera').addEventListener('click', () => {
+                camera.position.set(20, 8, 25);
+                controls.target.set(5, 0, 5);
+                controls.update();
+            });
+        }
+        
+        // ============================================
+        // CARGA DE MODELOS
+        // ============================================
+        async function loadModels() {
+            const loader = new GLTFLoader();
+            const modelsToLoad = {
+                // Personajes
+                barbarossa: CONFIG.models.barbarossa,
+                anne: CONFIG.models.anne,
+                henry: CONFIG.models.henry,
+                skeleton: CONFIG.models.skeleton,
+                // Environment
+                dock: CONFIG.models.dock,
+                dockPole: CONFIG.models.dockPole,
+                house1: CONFIG.models.house1,
+                house2: CONFIG.models.house2,
+                // Barcos
+                shipSmall: CONFIG.models.shipSmall,
+                // Props
+                barrel: CONFIG.models.barrel,
+                chestGold: CONFIG.models.chestGold,
+                // Árboles
+                palmTree1: CONFIG.models.palmTree1,
+                palmTree2: CONFIG.models.palmTree2
+            };
+            
+            const total = Object.keys(modelsToLoad).length;
+            let loaded = 0;
+            let successCount = 0;
+            
+            const loadModel = (name, path) => {
+                return new Promise((resolve) => {
+                    loader.load(
+                        path,
+                        (gltf) => {
+                            loadedModels[name] = gltf.scene;
+                            
+                            // Guardar animaciones si existen
+                            if (gltf.animations && gltf.animations.length > 0) {
+                                loadedModels[name + '_animations'] = gltf.animations;
+                                console.log(`🎬 Animaciones de ${name}:`, gltf.animations.map(a => a.name));
+                            }
+                            
+                            // Configurar sombras
+                            gltf.scene.traverse((child) => {
+                                if (child.isMesh) {
+                                    child.castShadow = true;
+                                    child.receiveShadow = true;
+                                }
+                            });
+                            
+                            loaded++;
+                            successCount++;
+                            document.getElementById('loading-text').textContent = 
+                                `${loaded}/${total} modelos cargados`;
+                            document.getElementById('models-loaded').textContent = `${successCount}/${total}`;
+                            
+                            console.log(`✅ Modelo ${name} cargado correctamente`);
+                            resolve();
+                        },
+                        (progress) => {
+                            if (progress.total > 0) {
+                                const percent = (progress.loaded / progress.total * 100).toFixed(0);
+                                document.getElementById('loading-text').textContent = 
+                                    `Cargando ${name}: ${percent}%`;
+                            }
+                        },
+                        (error) => {
+                            console.warn(`⚠️ Error cargando ${name}:`, error);
+                            loadedModels[name] = createFallbackGeometry(name);
+                            loaded++;
+                            document.getElementById('loading-text').textContent = 
+                                `${loaded}/${total} modelos (con fallback)`;
+                            resolve();
+                        }
+                    );
+                });
+            };
+            
+            await Promise.all(
+                Object.entries(modelsToLoad).map(([name, path]) => loadModel(name, path))
+            );
+            
+            console.log('=== RESUMEN DE CARGA ===');
+            console.log('Modelos:', Object.keys(loadedModels).filter(k => !k.includes('_animations')));
+            console.log('Animaciones:', Object.keys(loadedModels).filter(k => k.includes('_animations')));
+        }
+        
+        // ============================================
+        // CONSTRUIR ESCENA
+        // ============================================
+        function buildScene() {
+            // Crear grupo principal
+            portGroup = new THREE.Group();
+            scene.add(portGroup);
+            
+            // Suelo del puerto (madera)
+            buildGround(portGroup);
+            
+            // Agua
+            buildWater(portGroup);
+            
+            // Muelle
+            buildDock(portGroup);
+            
+            // Casas de fondo
+            buildHouses(portGroup);
+            
+            // Barcos amarrados
+            buildShips(portGroup);
+            
+            // Props
+            buildProps(portGroup);
+            
+            // Palmeras de fondo
+            buildPalmTrees(portGroup);
+            
+            // Animation manager (debe inicializarse ANTES de buildCharacters)
+            animationManager = new AnimationManager();
+            
+            // Personajes
+            buildCharacters(portGroup);
+            
+            // Efectos
+            buildEffects(portGroup);
+            
+            // Actualizar contador de personajes
+            let charCount = 0;
+            if (barbarossaModel) charCount++;
+            if (anneModel) charCount++;
+            if (henryModel) charCount++;
+            if (skeletonModel) charCount++;
+            document.getElementById('characters-loaded').textContent = charCount + '/4';
+        }
+        
+        // ============================================
+        // SUELO
+        // ============================================
+        function buildGround(parent) {
+            // Suelo de tierra/arena
+            const groundGeo = new THREE.PlaneGeometry(150, 150);
+            const groundMat = new THREE.MeshStandardMaterial({
+                color: 0x8B7355,
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            parent.add(ground);
+        }
+        
+        // ============================================
+        // AGUA
+        // ============================================
+        function buildWater(parent) {
+            const waterGeo = new THREE.PlaneGeometry(200, 200, 32, 32);
+            const waterMat = new THREE.MeshStandardMaterial({
+                color: 0x40E0D0,
+                roughness: 0.1,
+                metalness: 0.8,
+                transparent: true,
+                opacity: 0.8
+            });
+            const water = new THREE.Mesh(waterGeo, waterMat);
+            water.rotation.x = -Math.PI / 2;
+            water.position.y = -0.3;
+            water.receiveShadow = true;
+            parent.add(water);
+        }
+        
+        // ============================================
+        // MUELLE
+        // ============================================
+        function buildDock(parent) {
+            // 3 secciones del muelle
+            const dockPositions = [
+                { x: -5, z: 0 },
+                { x: 0, z: 0 },
+                { x: 5, z: 0 }
+            ];
+            
+            dockPositions.forEach((pos, index) => {
+                if (loadedModels.dock) {
+                    const dock = loadedModels.dock.clone();
+                    dock.position.set(pos.x, 0, pos.z);
+                    parent.add(dock);
+                }
+            });
+            
+            // Postes del muelle
+            if (loadedModels.dockPole) {
+                const polePositions = [
+                    { x: -8, z: -2 },
+                    { x: -3, z: -2 },
+                    { x: 2, z: -2 },
+                    { x: 7, z: -2 },
+                    { x: -8, z: 4 },
+                    { x: 7, z: 4 }
+                ];
+                
+                polePositions.forEach(pos => {
+                    const pole = loadedModels.dockPole.clone();
+                    pole.position.set(pos.x, 0, pos.z);
+                    parent.add(pole);
+                });
+            }
+        }
+        
+        // ============================================
+        // CASAS
+        // ============================================
+        function buildHouses(parent) {
+            // House1 x2
+            if (loadedModels.house1) {
+                const house1a = loadedModels.house1.clone();
+                house1a.position.set(-15, 0, -10);
+                house1a.scale.setScalar(1.2);
+                parent.add(house1a);
+                
+                const house1b = loadedModels.house1.clone();
+                house1b.position.set(20, 0, -8);
+                house1b.scale.setScalar(1.2);
+                house1b.rotation.y = -0.3;
+                parent.add(house1b);
+            }
+            
+            // House2 x1
+            if (loadedModels.house2) {
+                const house2 = loadedModels.house2.clone();
+                house2.position.set(25, 0, -5);
+                house2.scale.setScalar(1.2);
+                house2.rotation.y = 0.5;
+                parent.add(house2);
+            }
+        }
+        
+        // ============================================
+        // BARCOS
+        // ============================================
+        function buildShips(parent) {
+            if (loadedModels.shipSmall) {
+                // Barco 1 (izquierda)
+                const ship1 = loadedModels.shipSmall.clone();
+                ship1.position.set(-8, -0.2, 3);
+                ship1.rotation.y = 0.8;
+                parent.add(ship1);
+                
+                // Barco 2 (derecha)
+                const ship2 = loadedModels.shipSmall.clone();
+                ship2.position.set(12, -0.2, 2);
+                ship2.rotation.y = -0.5;
+                parent.add(ship2);
+            }
+        }
+        
+        // ============================================
+        // PROPS
+        // ============================================
+        function buildProps(parent) {
+            // Barriles
+            if (loadedModels.barrel) {
+                const barrelPositions = [
+                    { x: -3, z: 3, scale: 1 },
+                    { x: -2.5, z: 3.5, scale: 1 },
+                    { x: 8, z: 6, scale: 1 },
+                    { x: 8.5, z: 5.5, scale: 0.9 },
+                    { x: 9, z: 6, scale: 1.1 },
+                    { x: 3, z: 8, scale: 1 },
+                    { x: -1, z: 7, scale: 0.8 },
+                    { x: 10, z: 3, scale: 1 }
+                ];
+                
+                barrelPositions.forEach(pos => {
+                    const barrel = loadedModels.barrel.clone();
+                    barrel.position.set(pos.x, 0, pos.z);
+                    barrel.scale.setScalar(pos.scale);
+                    barrel.rotation.y = Math.random() * Math.PI * 2;
+                    parent.add(barrel);
+                });
+            }
+            
+            // Cofres
+            if (loadedModels.chestGold) {
+                const chest1 = loadedModels.chestGold.clone();
+                chest1.position.set(6, 0, 8);
+                parent.add(chest1);
+                
+                const chest2 = loadedModels.chestGold.clone();
+                chest2.position.set(-4, 0, 5);
+                chest2.rotation.y = 0.5;
+                parent.add(chest2);
+            }
+        }
+        
+        // ============================================
+        // PALMERAS
+        // ============================================
+        function buildPalmTrees(parent) {
+            const palmPositions = [
+                { x: -20, z: -15, scale: 1.5 },
+                { x: -18, z: -12, scale: 1.3 },
+                { x: -22, z: -10, scale: 1.4 },
+                { x: 28, z: -12, scale: 1.5 },
+                { x: 30, z: -8, scale: 1.3 }
+            ];
+            
+            palmPositions.forEach((pos, index) => {
+                const modelKey = index % 2 === 0 ? 'palmTree1' : 'palmTree2';
+                if (loadedModels[modelKey]) {
+                    const palm = loadedModels[modelKey].clone();
+                    palm.position.set(pos.x, 0, pos.z);
+                    palm.scale.setScalar(pos.scale);
+                    parent.add(palm);
+                }
+            });
+        }
+        
+        // ============================================
+        // PERSONAJES
+        // ============================================
+        function buildCharacters(parent) {
+            // Barbarossa - caminando por el muelle
+            if (loadedModels.barbarossa) {
+                barbarossaModel = loadedModels.barbarossa; // NO clonar!
+                barbarossaModel.position.set(5, 0, 5);
+                barbarossaModel.scale.setScalar(1);
+                parent.add(barbarossaModel);
+                
+                // Registrar y reproducir animación Idle
+                if (loadedModels.barbarossa_animations) {
+                    animationManager.register('barbarossa', barbarossaModel, loadedModels.barbarossa_animations);
+                    animationManager.play('barbarossa', 'Idle');
+                }
+                
+                console.log('✅ Barbarossa posicionado en:', barbarossaModel.position);
+            }
+            
+            // Anne - navegadora, saludando
+            if (loadedModels.anne) {
+                anneModel = loadedModels.anne; // NO clonar!
+                anneModel.position.set(8, 0, 8);
+                anneModel.scale.setScalar(1);
+                anneModel.rotation.y = -0.8;
+                parent.add(anneModel);
+                
+                // Registrar y reproducir animación Idle
+                if (loadedModels.anne_animations) {
+                    animationManager.register('anne', anneModel, loadedModels.anne_animations);
+                    animationManager.play('anne', 'Idle');
+                }
+                
+                console.log('✅ Anne posicionada en:', anneModel.position);
+            }
+            
+            // Henry - artillero, junto a un cañón
+            if (loadedModels.henry) {
+                henryModel = loadedModels.henry; // NO clonar!
+                henryModel.position.set(10, 0, 4);
+                henryModel.scale.setScalar(1);
+                henryModel.rotation.y = -0.5;
+                parent.add(henryModel);
+                
+                // Registrar y reproducir animación Idle
+                if (loadedModels.henry_animations) {
+                    animationManager.register('henry', henryModel, loadedModels.henry_animations);
+                    animationManager.play('henry', 'Idle');
+                }
+                
+                console.log('✅ Henry posicionado en:', henryModel.position);
+            }
+            
+            // Skeleton - inicialmente oculto, aparecerá saltando
+            if (loadedModels.skeleton) {
+                skeletonModel = loadedModels.skeleton; // NO clonar!
+                skeletonModel.position.set(15, 0, 6); // Fuera de cámara inicialmente
+                skeletonModel.scale.setScalar(1);
+                skeletonModel.visible = true; // Visible para debug
+                parent.add(skeletonModel);
+                
+                // Registrar y reproducir animación Idle
+                if (loadedModels.skeleton_animations) {
+                    animationManager.register('skeleton', skeletonModel, loadedModels.skeleton_animations);
+                    animationManager.play('skeleton', 'Idle');
+                }
+                
+                console.log('✅ Skeleton posicionado en:', skeletonModel.position);
+            }
+        }
+        
+        // ============================================
+        // EFECTOS
+        // ============================================
+        function buildEffects(parent) {
+            // Partículas de polen dorado
+            createPollenParticles(parent);
+            
+            // Gaviotas (sprites simples)
+            createSeagulls(parent);
+        }
+        
+        function createPollenParticles(parent) {
+            const count = 200;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            const velocities = [];
+            
+            for (let i = 0; i < count; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 60;
+                positions[i * 3 + 1] = Math.random() * 15 + 1;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 60;
+                
+                velocities.push({
+                    x: (Math.random() - 0.5) * 0.02,
+                    y: (Math.random() - 0.5) * 0.01,
+                    z: (Math.random() - 0.5) * 0.02
+                });
+            }
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const material = new THREE.PointsMaterial({
+                color: 0xffd700,
+                size: 0.15,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+            
+            pollenParticles = new THREE.Points(geometry, material);
+            pollenParticles.userData.velocities = velocities;
+            parent.add(pollenParticles);
+        }
+        
+        function createSeagulls(parent) {
+            // Crear sprites simples para gaviotas
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            
+            // Dibujar silueta de gaviota
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            ctx.moveTo(32, 32);
+            ctx.lineTo(10, 28);
+            ctx.lineTo(32, 35);
+            ctx.lineTo(54, 28);
+            ctx.lineTo(32, 32);
+            ctx.fill();
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.7
+            });
+            
+            // Crear varias gaviotas
+            for (let i = 0; i < 5; i++) {
+                const sprite = new THREE.Sprite(material.clone());
+                sprite.position.set(
+                    (Math.random() - 0.5) * 50,
+                    10 + Math.random() * 10,
+                    (Math.random() - 0.5) * 50
+                );
+                sprite.scale.set(2, 1, 1);
+                sprite.userData.speed = 0.02 + Math.random() * 0.03;
+                sprite.userData.amplitude = 0.5 + Math.random() * 0.5;
+                sprite.userData.phase = Math.random() * Math.PI * 2;
+                seagullSprites.push(sprite);
+                parent.add(sprite);
+            }
+        }
+        
+        // ============================================
+        // ANIMACIÓN
+        // ============================================
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+            
+            // Update controls
+            controls.update();
+            
+            // Update animation manager
+            if (animationManager) {
+                animationManager.update(delta);
+            }
+            
+            // Update efectos
+            updateEffects(time);
+            
+            // FPS counter
+            frameCount++;
+            const now = performance.now();
+            if (now - lastTime >= 1000) {
+                document.getElementById('fps').textContent = frameCount;
+                frameCount = 0;
+                lastTime = now;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        function updateEffects(time) {
+            // Actualizar partículas de polen
+            if (pollenParticles && pollenParticles.visible) {
+                const positions = pollenParticles.geometry.attributes.position.array;
+                const velocities = pollenParticles.userData.velocities;
+                
+                for (let i = 0; i < velocities.length; i++) {
+                    positions[i * 3] += velocities[i].x + Math.sin(time + i) * 0.005;
+                    positions[i * 3 + 1] += velocities[i].y + Math.sin(time * 0.5 + i) * 0.002;
+                    positions[i * 3 + 2] += velocities[i].z;
+                    
+                    // Reset si se aleja demasiado
+                    if (Math.abs(positions[i * 3]) > 30 || 
+                        positions[i * 3 + 1] > 20 || 
+                        Math.abs(positions[i * 3 + 2]) > 30) {
+                        positions[i * 3] = (Math.random() - 0.5) * 60;
+                        positions[i * 3 + 1] = Math.random() * 15 + 1;
+                        positions[i * 3 + 2] = (Math.random() - 0.5) * 60;
+                    }
+                }
+                
+                pollenParticles.geometry.attributes.position.needsUpdate = true;
+            }
+            
+            // Actualizar gaviotas
+            seagullSprites.forEach((sprite, index) => {
+                if (sprite.visible) {
+                    // Movimiento ondulante
+                    sprite.position.x += sprite.userData.speed;
+                    sprite.position.y += Math.sin(time * 2 + sprite.userData.phase) * 0.02;
+                    
+                    // Reset si se aleja demasiado
+                    if (sprite.position.x > 30) {
+                        sprite.position.x = -30;
+                        sprite.position.z = (Math.random() - 0.5) * 50;
+                    }
+                }
+            });
+        }
+        
+        // ============================================
+        // RESIZE
+        // ============================================
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Iniciar
+        init();
+    </script>
+</body>
+</html>
