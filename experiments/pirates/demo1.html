@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Tesoro Maldito del Capitán Barbarossa</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', monospace;
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            z-index: 100;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffd700;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h2>🏴‍☠️ El Tesoro Maldito del Capitán Barbarossa</h2>
+        <p>Controles: Click y arrastra para rotar | Scroll para zoom</p>
+    </div>
+    <div id="loading">Cargando la maldición...</div>
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // Configuración de la escena
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050a15);
+        scene.fog = new THREE.FogExp2(0x0a1525, 0.006);
+        
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(15, 8, 15);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        document.body.appendChild(renderer.domElement);
+        
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2.1;
+        controls.minDistance = 5;
+        controls.maxDistance = 40;
+        
+        // Iluminación nocturna
+        const ambientLight = new THREE.AmbientLight(0x1a2a4a, 0.4);
+        scene.add(ambientLight);
+        
+        // Luna
+        const moonLight = new THREE.DirectionalLight(0x8899ff, 0.6);
+        moonLight.position.set(20, 30, 10);
+        moonLight.castShadow = true;
+        moonLight.shadow.camera.left = -30;
+        moonLight.shadow.camera.right = 30;
+        moonLight.shadow.camera.top = 30;
+        moonLight.shadow.camera.bottom = -30;
+        moonLight.shadow.mapSize.width = 2048;
+        moonLight.shadow.mapSize.height = 2048;
+        scene.add(moonLight);
+        
+        // Luz de relleno suave
+        const fillLight = new THREE.HemisphereLight(0x223355, 0x111122, 0.3);
+        scene.add(fillLight);
+        
+        // Cielo nocturno
+        const skyGeometry = new THREE.SphereGeometry(400, 32, 32);
+        const skyMaterial = new THREE.MeshBasicMaterial({
+            color: 0x050a15,
+            side: THREE.BackSide
+        });
+        const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+        scene.add(sky);
+        console.log('Cielo añadido:', sky);
+        
+        // Océano nocturno
+        const oceanGeometry = new THREE.BoxGeometry(800, 2, 800);
+        const oceanMaterial = new THREE.MeshPhongMaterial({
+            color: 0x003355,
+            emissive: 0x001a33,
+            emissiveIntensity: 0.2,
+            specular: 0x88aacc,
+            shininess: 80
+        });
+        const ocean = new THREE.Mesh(oceanGeometry, oceanMaterial);
+        ocean.position.y = -0.8;
+        ocean.receiveShadow = true;
+        scene.add(ocean);
+        
+        // Isla (plataforma de arena)
+        const islandGeometry = new THREE.CylinderGeometry(12, 14, 1, 32);
+        const islandMaterial = new THREE.MeshStandardMaterial({
+            color: 0xc2b280,
+            roughness: 0.9
+        });
+        const island = new THREE.Mesh(islandGeometry, islandMaterial);
+        island.position.y = -0.5;
+        island.receiveShadow = true;
+        island.castShadow = true;
+        scene.add(island);
+        
+        // Sistema de partículas (niebla)
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 1000;
+        const positions = new Float32Array(particlesCount * 3);
+        
+        for(let i = 0; i < particlesCount * 3; i++) {
+            positions[i] = (Math.random() - 0.5) * 50;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+            color: 0x88aacc,
+            size: 0.1,
+            transparent: true,
+            opacity: 0.3,
+            blending: THREE.AdditiveBlending
+        });
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        particles.position.y = 2;
+        scene.add(particles);
+        
+        // Loader para modelos GLTF
+        const loader = new GLTFLoader();
+        const models = {};
+        let loadedCount = 0;
+        const totalModels = 15;
+        
+        function updateLoading() {
+            loadedCount++;
+            const progress = Math.round((loadedCount / totalModels) * 100);
+            document.getElementById('loading').textContent = `Cargando la maldición... ${progress}%`;
+            if (loadedCount === totalModels) {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        // Función para cargar y configurar modelos
+        function loadModel(path, name, callback) {
+            loader.load(
+                `../../${path}`,
+                (gltf) => {
+                    models[name] = gltf;
+                    if (callback) callback(gltf);
+                    updateLoading();
+                },
+                undefined,
+                (error) => {
+                    console.error(`Error cargando ${name}:`, error);
+                    updateLoading();
+                }
+            );
+        }
+        
+        // Cargar todos los modelos necesarios
+        loadModel('assets/3D/pirate-kit/glTF/Characters_Captain_Barbarossa.gltf', 'captain', (gltf) => {
+            const captain = gltf.scene;
+            captain.position.set(2, 0, 2);
+            captain.scale.setScalar(1.2);
+            captain.rotation.y = Math.PI * 0.7;
+            captain.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(captain);
+            
+            // Animación del capitán
+            if (gltf.animations.length > 0) {
+                const mixer = new THREE.AnimationMixer(captain);
+                const idleAnim = gltf.animations.find(a => a.name === 'Idle');
+                if (idleAnim) {
+                    mixer.clipAction(idleAnim).play();
+                    models.captainMixer = mixer;
+                }
+            }
+            
+            // Luz de antorcha para el capitán
+            const torchLight = new THREE.PointLight(0xff6600, 2, 8);
+            torchLight.position.set(2, 2, 2);
+            torchLight.castShadow = true;
+            scene.add(torchLight);
+        });
+        
+        // Esqueletos guardianes
+        loadModel('assets/3D/pirate-kit/glTF/Characters_Skeleton.gltf', 'skeleton1', (gltf) => {
+            const skeleton = gltf.scene.clone();
+            skeleton.position.set(-3, 0, 1);
+            skeleton.rotation.y = Math.PI * 0.3;
+            skeleton.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(skeleton);
+            
+            if (gltf.animations.length > 0) {
+                const mixer = new THREE.AnimationMixer(skeleton);
+                const idleAnim = gltf.animations.find(a => a.name === 'Idle');
+                if (idleAnim) mixer.clipAction(idleAnim).play();
+                models.skeleton1Mixer = mixer;
+            }
+        });
+
+        
+        loadModel('assets/3D/pirate-kit/glTF/Characters_Skeleton.gltf', 'skeleton2', (gltf) => {
+            const skeleton = gltf.scene.clone();
+            skeleton.position.set(4, 0, -2);
+            skeleton.rotation.y = -Math.PI * 0.4;
+            skeleton.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(skeleton);
+            
+            if (gltf.animations.length > 0) {
+                const mixer = new THREE.AnimationMixer(skeleton);
+                const walkAnim = gltf.animations.find(a => a.name === 'Walk');
+                if (walkAnim) mixer.clipAction(walkAnim).play();
+                models.skeleton2Mixer = mixer;
+            }
+        });
+        
+        // Cofre del tesoro abierto con oro
+        loadModel('assets/3D/pirate-kit/glTF/Prop_Chest_Gold.gltf', 'chest', (gltf) => {
+            const chest = gltf.scene;
+            chest.position.set(0, 0, 0);
+            chest.scale.setScalar(1.5);
+            chest.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(chest);
+            
+            // Luz dorada del tesoro
+            const goldLight = new THREE.PointLight(0xffd700, 3, 10);
+            goldLight.position.set(0, 1.5, 0);
+            scene.add(goldLight);
+            models.goldLight = goldLight;
+        });
+        
+        // Monedas esparcidas
+        loadModel('assets/3D/pirate-kit/glTF/Prop_Coins.gltf', 'coins', (gltf) => {
+            for (let i = 0; i < 5; i++) {
+                const coins = gltf.scene.clone();
+                const angle = (i / 5) * Math.PI * 2;
+                coins.position.set(
+                    Math.cos(angle) * 2,
+                    0,
+                    Math.sin(angle) * 2
+                );
+                coins.rotation.y = Math.random() * Math.PI * 2;
+                coins.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                scene.add(coins);
+            }
+        });
+        
+        // Tentáculos emergiendo del agua
+        loadModel('assets/3D/pirate-kit/glTF/Characters_Tentacle.gltf', 'tentacle1', (gltf) => {
+            const tentacle = gltf.scene;
+            tentacle.position.set(-18, -1.5, 12);
+            tentacle.scale.setScalar(0.8);
+            tentacle.rotation.y = Math.PI * 0.3;
+            tentacle.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                }
+            });
+            scene.add(tentacle);
+            
+            if (gltf.animations.length > 0) {
+                const mixer = new THREE.AnimationMixer(tentacle);
+                const attackAnim = gltf.animations.find(a => a.name === 'Tentacle_Attack');
+                if (attackAnim) mixer.clipAction(attackAnim).play();
+                models.tentacle1Mixer = mixer;
+            }
+        });
+        
+        loadModel('assets/3D/pirate-kit/glTF/Characters_Tentacle.gltf', 'tentacle2', (gltf) => {
+            const tentacle = gltf.scene.clone();
+            tentacle.position.set(16, -1.5, -12);
+            tentacle.scale.setScalar(0.7);
+            tentacle.rotation.y = -Math.PI * 0.6;
+            tentacle.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                }
+            });
+            scene.add(tentacle);
+            
+            if (gltf.animations.length > 0) {
+                const mixer = new THREE.AnimationMixer(tentacle);
+                const idleAnim = gltf.animations.find(a => a.name === 'Tentacle_Idle');
+                if (idleAnim) mixer.clipAction(idleAnim).play();
+                models.tentacle2Mixer = mixer;
+            }
+        });
+        
+        // Barco pirata
+        loadModel('assets/3D/pirate-kit/glTF/Ship_Large.gltf', 'ship', (gltf) => {
+            const ship = gltf.scene;
+            ship.position.set(-15, -0.5, -10);
+            ship.rotation.y = Math.PI * 0.4;
+            ship.scale.setScalar(1.2);
+            ship.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(ship);
+            models.ship = ship;
+        });
+        
+        // Muelle roto
+        loadModel('assets/3D/pirate-kit/glTF/Environment_Dock_Broken.gltf', 'dock', (gltf) => {
+            const dock = gltf.scene;
+            dock.position.set(-8, 0, 0);
+            dock.rotation.y = Math.PI * 0.5;
+            dock.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(dock);
+        });
+        
+        // Palmeras
+        loadModel('assets/3D/pirate-kit/glTF/Environment_PalmTree_1.gltf', 'palm1', (gltf) => {
+            const palm = gltf.scene;
+            palm.position.set(-5, 0, -5);
+            palm.scale.setScalar(1.2);
+            palm.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(palm);
+        });
+        
+        loadModel('assets/3D/pirate-kit/glTF/Environment_PalmTree_2.gltf', 'palm2', (gltf) => {
+            const palm = gltf.scene;
+            palm.position.set(6, 0, 4);
+            palm.scale.setScalar(1.1);
+            palm.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(palm);
+        });
+        
+        // Rocas
+        loadModel('assets/3D/pirate-kit/glTF/Environment_Rock_3.gltf', 'rock1', (gltf) => {
+            const rock = gltf.scene;
+            rock.position.set(-7, 0, 6);
+            rock.rotation.y = Math.random() * Math.PI * 2;
+            rock.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(rock);
+        });
+        
+        loadModel('assets/3D/pirate-kit/glTF/Environment_Rock_5.gltf', 'rock2', (gltf) => {
+            const rock = gltf.scene;
+            rock.position.set(8, 0, -4);
+            rock.rotation.y = Math.random() * Math.PI * 2;
+            rock.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(rock);
+        });
+        
+        // Cráneo decorativo
+        loadModel('assets/3D/pirate-kit/glTF/Prop_Skull.gltf', 'skull', (gltf) => {
+            const skull = gltf.scene;
+            skull.position.set(-2, 0.2, -3);
+            skull.rotation.y = Math.PI * 0.3;
+            skull.scale.setScalar(1.5);
+            skull.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(skull);
+        });
+        
+        // Barril
+        loadModel('assets/3D/pirate-kit/glTF/Prop_Barrel.gltf', 'barrel', (gltf) => {
+            const barrel = gltf.scene;
+            barrel.position.set(5, 0, 5);
+            barrel.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            scene.add(barrel);
+        });
+        
+        // Variables de animación
+        const clock = new THREE.Clock();
+        let time = 0;
+        
+        // Loop de animación
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            time += delta;
+            
+            // Actualizar mixers de animación
+            if (models.captainMixer) models.captainMixer.update(delta);
+            if (models.skeleton1Mixer) models.skeleton1Mixer.update(delta);
+            if (models.skeleton2Mixer) models.skeleton2Mixer.update(delta);
+            if (models.tentacle1Mixer) models.tentacle1Mixer.update(delta);
+            if (models.tentacle2Mixer) models.tentacle2Mixer.update(delta);
+            
+            // Animación del océano (ondas)
+            const positions = ocean.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = positions[i];
+                const z = positions[i + 2];
+                positions[i + 1] = Math.sin(x * 0.1 + time) * 0.3 + Math.cos(z * 0.1 + time * 0.7) * 0.3;
+            }
+            ocean.geometry.attributes.position.needsUpdate = true;
+            ocean.geometry.computeVertexNormals();
+            
+            // Animación del barco (balanceo)
+            if (models.ship) {
+                models.ship.position.y = -0.5 + Math.sin(time * 0.5) * 0.3;
+                models.ship.rotation.z = Math.sin(time * 0.3) * 0.05;
+            }
+            
+            // Parpadeo de la luz del tesoro
+            if (models.goldLight) {
+                models.goldLight.intensity = 3 + Math.sin(time * 3) * 0.5;
+            }
+            
+            // Rotación de partículas
+            particles.rotation.y = time * 0.05;
+            
+            // Actualizar controles
+            controls.update();
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Responsive
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        animate();
+    </script>
+</body>
+</html>

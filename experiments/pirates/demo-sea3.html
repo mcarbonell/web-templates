@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barco Pirata - Alta Mar Atardecer</title>
+    <!--
+    ============================================================================
+    DOCUMENTACIÓN TÉCNICA: ESCENA 3D DE BARCO EN ALTA MAR AL ATARDECER
+    ============================================================================
+    
+    Este archivo implementa una escena 3D realista de un barco pirata navegando
+    en el océano durante el atardecer. A continuación se documentan las técnicas
+    de renderizado utilizadas.
+
+    ============================================================================
+    TÉCNICAS DE RENDERIZADO DEL CIELO
+    ============================================================================
+    
+    1. SHADER DE CIELO ATARDECER (Sky Shader)
+       -------------------------------------
+       Se utiliza un ShaderMaterial con gradiente vertical:
+       - Color cenit: Azul profundo (#0a0a2e)
+       - Color horizonte: Naranja/rojo (#ff4500)
+       - Interpolación suave con smoothstep
+       
+    2. SOL CON GLOW MULTICAPA
+       -----------------------
+       El sol se renderiza en múltiples capas:
+       - Disco solar: MeshBasicMaterial amarillo (#ffdd44)
+       - Glow interno: Esfera más grande, naranja (#ff6600), opacidad 0.25
+       - Glow externo: Esfera aún más grande, rojo (#ff4400), opacidad 0.1
+       
+    3. ILUMINACIÓN DE LA ESCENA
+       -------------------------
+       - DirectionalLight (sol): Color naranja (#ff8844), intensidad 2.0
+       - DirectionalLight (fill): Color azul (#6688aa), intensidad 0.4
+       - AmbientLight: Mezcla de azul y morado (#404060), intensidad 0.6
+       - HemisphereLight: Reflejo del mar hacia abajo
+
+    ============================================================================
+    TÉCNICAS DE RENDERIZADO DEL OCÉANO
+    ============================================================================
+    
+    1. RUIDO SIMPLEX 3D (Simplex Noise 3D)
+       ------------------------------------
+       Implementación en el vertex shader:
+       - Algoritmo de Ken Perlin optimizado para GPU
+       - Múltiples frecuencias (octavas) para detalle natural
+       - Evita artefactos direccionales del ruido Perlin clásico
+       
+    2. SISTEMA DE OLAS MULTI-CAPA
+       ---------------------------
+       Superposición de ondas sinusoidales:
+       - Onda 1 (frecuencia 0.01): Amplitud 2.5 - swell principal
+       - Onda 2 (frecuencia 0.02): Amplitud 1.2 - ondas medias
+       - Onda 3 (frecuencia 0.05): Amplitud 0.5 - detalle
+       - Onda 4 (frecuencia 0.1): Amplitud 0.25 - micro detalle
+       - Onda de viento: Interacción sin/cos desfasadas
+       
+    3. CÁLCULO DE NORMALES DINÁMICAS
+       -----------------------------
+       En vertex shader mediante diferencias finitas:
+       - Muestreo de altura en puntos adyacentes (dx, dz)
+       - Cálculo de vectores tangentes
+       - Producto cruz para normal perpendicular
+       
+    4. EFECTO FRESNEL (Fresnel Effect)
+       -------------------------------
+       Fórmula: fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), 4.0)
+       - Ángulos perpendiculares: alta transmisión (transparente)
+       - Ángulos rasantes: alta reflexión (espejo del cielo)
+       
+    5. REFLEJO ESPECULAR DEL SOL (Blinn-Phong)
+       ---------------------------------------
+       - Half-vector: normalize(viewDir + sunDir)
+       - Specular: pow(max(dot(normal, halfVector), 0.0), 256.0)
+       - Sun path: reflection + viewDir para brillo elongado
+       
+    6. COLOR DEL AGUA POR PROFUNDIDAD
+       ------------------------------
+       Mezcla basada en altura de ola:
+       - Profundo: #001030 (azul muy oscuro)
+       - Superficial: #006090 (azul medio)
+       - Crestas: mezcla con espuma #88ccff
+       
+    7. ESPUMA EN CRESTAS (Foam)
+       -------------------------
+       - threshold: smoothstep(1.5, 3.0, vHeight)
+       - Opacidad gradual en crestas más altas
+       
+    8. NIEBLA DE DISTANCIA (Distance Fog)
+       -----------------------------------
+       - fogNear: 200 unidades
+       - fogFar: 800 unidades
+       - Color: #ff6030 (naranja del atardecer)
+
+    ============================================================================
+    TÉCNICAS DE ANIMACIÓN DEL BARCO
+    ============================================================================
+    
+    1. SINCRONIZACIÓN CON LAS OLAS
+       ----------------------------
+       - Mismo algoritmo de ruido que el océano
+       - Muestreo en 5 puntos (centro, proa, popa, babor, estribor)
+       
+    2. MOVIMIENTO DE BALANCEO (Pitch y Roll)
+       ------------------------------------
+       - Pitch: diferencia altura proa/popa * 0.12
+       - Roll: diferencia altura babor/estribor * 0.15
+       - Rotación Y: oscilación sinusoidal suave (guiñada)
+       
+    3. OFFSET VERTICAL
+       ---------------
+       - Posición Y: altura_ola * 0.5 + 1.5
+       - El +1.5 evita que el casco se sumerja completamente
+
+    ============================================================================
+    MODELO 3D DEL BARCO
+    ============================================================================
+    
+    El modelo utilizado es Ship_Large.gltf del paquete pirate-kit:
+    - Formato: GLTF (GLB binario)
+    - Cargado mediante GLTFLoader de three.js
+    - Escala ajustada para la escena
+    - Sombras activadas (castShadow, receiveShadow)
+    -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            background: #000;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            z-index: 100;
+        }
+        #stats {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 14px;
+            border-radius: 6px;
+            z-index: 100;
+            pointer-events: none;
+            line-height: 1.6;
+        }
+        #controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 100;
+            min-width: 200px;
+            backdrop-filter: blur(5px);
+        }
+        #controls h3 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: #ff8844;
+            border-bottom: 1px solid #444;
+            padding-bottom: 8px;
+        }
+        #controls label {
+            display: block;
+            margin: 10px 0 5px 0;
+            font-weight: bold;
+        }
+        #controls input[type="range"] {
+            width: 100%;
+            margin: 0;
+            cursor: pointer;
+        }
+        #controls span {
+            color: #aaa;
+            font-size: 11px;
+            display: block;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">Cargando escena...</div>
+    <div id="stats">
+        FPS: --<br>
+        Time: 0.0s
+    </div>
+    <div id="controls">
+        <h3>🌊 Control del Mar</h3>
+        
+        <label>Intensidad de olas</label>
+        <input type="range" id="waveIntensity" min="0" max="2" step="0.1" value="1">
+        <span id="waveIntensityVal">1.0 - Mar normal</span>
+        
+        <label>Velocidad del mar</label>
+        <input type="range" id="seaSpeed" min="0" max="3" step="0.1" value="1">
+        <span id="seaSpeedVal">1.0x</span>
+        
+        <label>Tamaño de olas</label>
+        <input type="range" id="waveScale" min="0.2" max="3" step="0.1" value="1">
+        <span id="waveScaleVal">1.0x</span>
+        
+        <label>Niebla (distancia)</label>
+        <input type="range" id="fogDensity" min="0" max="2" step="0.1" value="1">
+        <span id="fogDensityVal">1.0x</span>
+    </div>
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 5000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 - 0.02;
+        controls.minDistance = 15;
+        controls.maxDistance = 200;
+        controls.target.set(0, 3, 0);
+
+        camera.position.set(40, 20, 60);
+
+        // === CIELO ATARDECER REALISTA ===
+        function createSky() {
+            const skyGeo = new THREE.SphereGeometry(2000, 32, 32);
+            
+            const skyMat = new THREE.ShaderMaterial({
+                uniforms: {
+                    topColor: { value: new THREE.Color(0x0a0a2e) },
+                    horizonColor: { value: new THREE.Color(0xff4500) },
+                    sunColor: { value: new THREE.Color(0xffaa00) },
+                    sunPosition: { value: new THREE.Vector3(0, 10, -500) },
+                    offset: { value: 20 }
+                },
+                vertexShader: `
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                        vWorldPosition = worldPosition.xyz;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 topColor;
+                    uniform vec3 horizonColor;
+                    uniform vec3 sunColor;
+                    uniform vec3 sunPosition;
+                    uniform float offset;
+                    varying vec3 vWorldPosition;
+                    
+                    void main() {
+                        vec3 viewDir = normalize(vWorldPosition);
+                        float h = viewDir.y;
+                        
+                        // Gradiente vertical
+                        float t = max(0.0, h + 0.1);
+                        float horizonBlend = 1.0 - smoothstep(0.0, 0.3, abs(h));
+                        
+                        vec3 skyColor = mix(horizonColor, topColor, pow(t, 0.5));
+                        
+                        // Sol
+                        vec3 sunDir = normalize(sunPosition);
+                        float sunDot = max(0.0, dot(viewDir, sunDir));
+                        
+                        // Disco solar
+                        float sun = pow(sunDot, 800.0) * 3.0;
+                        // Brillo suave
+                        float glow = pow(sunDot, 8.0) * 0.6;
+                        // Reflejo en atmósfera
+                        float atmosphericGlow = pow(sunDot, 2.0) * 0.3;
+                        
+                        skyColor += sunColor * sun;
+                        skyColor += vec3(1.0, 0.6, 0.3) * glow;
+                        skyColor += vec3(1.0, 0.4, 0.2) * atmosphericGlow;
+                        
+                        // More orange/red at horizon
+                        skyColor = mix(skyColor, horizonColor * 1.2, horizonBlend * 0.5);
+                        
+                        gl_FragColor = vec4(skyColor, 1.0);
+                    }
+                `,
+                side: THREE.BackSide
+            });
+            
+            const sky = new THREE.Mesh(skyGeo, skyMat);
+            scene.add(sky);
+            
+            // Sol
+            const sunGeo = new THREE.SphereGeometry(20, 32, 32);
+            const sunMat = new THREE.MeshBasicMaterial({ 
+                color: 0xffdd44,
+                transparent: true,
+                opacity: 0.95
+            });
+            const sun = new THREE.Mesh(sunGeo, sunMat);
+            sun.position.set(0, 10, -15000);
+            scene.add(sun);
+            
+            // Glow del sol
+            const glowGeo = new THREE.SphereGeometry(45, 32, 32);
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: 0xff6600,
+                transparent: true,
+                opacity: 0.25
+            });
+            const sunGlow = new THREE.Mesh(glowGeo, glowMat);
+            sunGlow.position.copy(sun.position);
+            scene.add(sunGlow);
+            
+            // Segundo glow más grande
+            const glow2Geo = new THREE.SphereGeometry(80, 32, 32);
+            const glow2Mat = new THREE.MeshBasicMaterial({
+                color: 0xff4400,
+                transparent: true,
+                opacity: 0.1
+            });
+            const sunGlow2 = new THREE.Mesh(glow2Geo, glow2Mat);
+            sunGlow2.position.copy(sun.position);
+            scene.add(sunGlow2);
+            
+            return { sky, sun, sunGlow, sunGlow2 };
+        }
+        
+        const skyData = createSky();
+
+        // === MAR REALISTA CON OLAS ===
+        function createOcean() {
+            const oceanGeo = new THREE.PlaneGeometry(2000, 2000, 256, 256);
+            oceanGeo.rotateX(-Math.PI / 2);
+            
+            const oceanMat = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uWaveIntensity: { value: 1.0 },
+                    uWaveScale: { value: 1.0 },
+                    uSeaSpeed: { value: 1.0 },
+                    uDeepColor: { value: new THREE.Color(0x001030) },
+                    uShallowColor: { value: new THREE.Color(0x006090) },
+                    uFoamColor: { value: new THREE.Color(0x88ccff) },
+                    sunPosition: { value: new THREE.Vector3(0, 10, -500) },
+                    sunColor: { value: new THREE.Color(0xffaa44) },
+                    fogColor: { value: new THREE.Color(0xff6030) },
+                    fogNear: { value: 200 },
+                    fogFar: { value: 800 }
+                },
+                vertexShader: `
+                    uniform float uTime;
+                    uniform float uWaveIntensity;
+                    uniform float uWaveScale;
+                    uniform float uSeaSpeed;
+                    varying vec3 vWorldPos;
+                    varying vec3 vNormal;
+                    varying float vHeight;
+                    varying float vFogDepth;
+                    
+                    // Simplex noise
+                    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                    vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                    vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+                    vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+                    
+                    float snoise(vec3 v) {
+                        const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+                        const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+                        vec3 i = floor(v + dot(v, C.yyy));
+                        vec3 x0 = v - i + dot(i, C.xxx);
+                        vec3 g = step(x0.yzx, x0.xyz);
+                        vec3 l = 1.0 - g;
+                        vec3 i1 = min(g.xyz, l.zxy);
+                        vec3 i2 = max(g.xyz, l.zxy);
+                        vec3 x1 = x0 - i1 + C.xxx;
+                        vec3 x2 = x0 - i2 + C.yyy;
+                        vec3 x3 = x0 - D.yyy;
+                        i = mod289(i);
+                        vec4 p = permute(permute(permute(
+                            i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                            + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                            + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+                        float n_ = 0.142857142857;
+                        vec3 ns = n_ * D.wyz - D.xzx;
+                        vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+                        vec4 x_ = floor(j * ns.z);
+                        vec4 y_ = floor(j - 7.0 * x_);
+                        vec4 x = x_ *ns.x + ns.yyyy;
+                        vec4 y = y_ *ns.x + ns.yyyy;
+                        vec4 h = 1.0 - abs(x) - abs(y);
+                        vec4 b0 = vec4(x.xy, y.xy);
+                        vec4 b1 = vec4(x.zw, y.zw);
+                        vec4 s0 = floor(b0)*2.0 + 1.0;
+                        vec4 s1 = floor(b1)*2.0 + 1.0;
+                        vec4 sh = -step(h, vec4(0.0));
+                        vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+                        vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+                        vec3 p0 = vec3(a0.xy, h.x);
+                        vec3 p1 = vec3(a0.zw, h.y);
+                        vec3 p2 = vec3(a1.xy, h.z);
+                        vec3 p3 = vec3(a1.zw, h.w);
+                        vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+                        p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+                        vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                        m = m * m;
+                        return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+                    }
+                    
+                    void main() {
+                        vec3 pos = position;
+                        float t = uTime * 0.4 * uSeaSpeed;
+                        float intensity = uWaveIntensity;
+                        float scale = uWaveScale;
+                        
+                        // Olas principales
+                        float wave1 = snoise(vec3(pos.x * 0.01 * scale, pos.z * 0.01 * scale, t * 0.5)) * 2.5 * intensity;
+                        float wave2 = snoise(vec3(pos.x * 0.02 * scale + 100.0, pos.z * 0.015 * scale, t * 0.7)) * 1.2 * intensity;
+                        float wave3 = snoise(vec3(pos.x * 0.05 * scale, pos.z * 0.05 * scale, t * 1.0)) * 0.5 * intensity;
+                        float wave4 = snoise(vec3(pos.x * 0.1 * scale, pos.z * 0.1 * scale, t * 1.5)) * 0.25 * intensity;
+                        
+                        // Olas de viento
+                        float windWave = sin(pos.x * 0.03 * scale + t * 2.0) * cos(pos.z * 0.02 * scale + t * 1.5) * 0.8 * intensity;
+                        
+                        float totalWave = wave1 + wave2 + wave3 + wave4 + windWave;
+                        
+                        pos.y += totalWave;
+                        vHeight = totalWave;
+                        
+                        // Calcular normales
+                        float eps = 0.5;
+                        float hL = snoise(vec3((pos.x - eps) * 0.01 * scale, pos.z * 0.01 * scale, t * 0.5)) * 2.5 * intensity;
+                        float hR = snoise(vec3((pos.x + eps) * 0.01 * scale, pos.z * 0.01 * scale, t * 0.5)) * 2.5 * intensity;
+                        float hD = snoise(vec3(pos.x * 0.01 * scale, (pos.z - eps) * 0.01 * scale, t * 0.5)) * 2.5 * intensity;
+                        float hU = snoise(vec3(pos.x * 0.01 * scale, (pos.z + eps) * 0.01 * scale, t * 0.5)) * 2.5 * intensity;
+                        
+                        vec3 normal = normalize(vec3(hL - hR, 2.0 * eps, hD - hU));
+                        vNormal = normalMatrix * normal;
+                        
+                        vec4 worldPos = modelMatrix * vec4(pos, 1.0);
+                        vWorldPos = worldPos.xyz;
+                        vFogDepth = length(worldPos.xyz - cameraPosition);
+                        
+                        gl_Position = projectionMatrix * viewMatrix * worldPos;
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 uDeepColor;
+                    uniform vec3 uShallowColor;
+                    uniform vec3 uFoamColor;
+                    uniform vec3 sunPosition;
+                    uniform vec3 sunColor;
+                    uniform vec3 fogColor;
+                    uniform float fogNear;
+                    uniform float fogFar;
+                    
+                    varying vec3 vWorldPos;
+                    varying vec3 vNormal;
+                    varying float vHeight;
+                    varying float vFogDepth;
+                    
+                    void main() {
+                        vec3 viewDir = normalize(cameraPosition - vWorldPos);
+                        vec3 normal = normalize(vNormal);
+                        vec3 sunDir = normalize(sunPosition - vWorldPos);
+                        
+                        // Color base según altura
+                        float heightFactor = smoothstep(-2.0, 3.0, vHeight);
+                        vec3 waterColor = mix(uDeepColor, uShallowColor, heightFactor);
+                        
+                        // Reflejo del cielo (Fresnel)
+                        float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), 4.0);
+                        vec3 skyReflection = vec3(0.6, 0.4, 0.3) * fresnel * 0.7;
+                        
+                        // Reflejo especular del sol
+                        vec3 reflectDir = reflect(-sunDir, normal);
+                        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 256.0);
+                        vec3 specular = sunColor * spec * 2.0;
+                        
+                        // Brillo del sol en el agua (sun path)
+                        float sunPath = pow(max(dot(reflect(-sunDir, normal), viewDir), 0.0), 32.0);
+                        vec3 sunReflection = sunColor * sunPath * 0.8;
+                        
+                        // Far specular (brillo concentrado)
+                        float farSpec = pow(max(dot(reflect(-sunDir, normal), viewDir), 0.0), 512.0);
+                        specular += sunColor * farSpec * 3.0;
+                        
+                        // Color final
+                        vec3 finalColor = waterColor + skyReflection + specular + sunReflection;
+                        
+                        // Añadir espuma en crestas
+                        float foam = smoothstep(1.5, 3.0, vHeight) * 0.3;
+                        finalColor = mix(finalColor, uFoamColor, foam);
+                        
+                        // Fog
+                        float fogFactor = smoothstep(fogNear, fogFar, vFogDepth);
+                        finalColor = mix(finalColor, fogColor, fogFactor);
+                        
+                        gl_FragColor = vec4(finalColor, 1.0);
+                    }
+                `,
+                side: THREE.DoubleSide
+            });
+            
+            const ocean = new THREE.Mesh(oceanGeo, oceanMat);
+            ocean.receiveShadow = true;
+            scene.add(ocean);
+            
+            return { mesh: ocean, material: oceanMat };
+        }
+        
+        const oceanData = createOcean();
+
+        // === BARCO PIRATA PROCEDURAL ===
+        function createPirateShip() {
+            const shipGroup = new THREE.Group();
+            
+            // Materiales
+            const woodMaterial = new THREE.MeshStandardMaterial({
+                color: 0x4a3728,
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            
+            const darkWoodMaterial = new THREE.MeshStandardMaterial({
+                color: 0x2d1f14,
+                roughness: 0.95,
+                metalness: 0.05
+            });
+            
+            const sailMaterial = new THREE.MeshStandardMaterial({
+                color: 0xd4c4a8,
+                roughness: 0.8,
+                side: THREE.DoubleSide
+            });
+            
+            const ropeMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8b7355,
+                roughness: 1.0
+            });
+            
+            // Casco del barco (parte inferior)
+            const hullShape = new THREE.Shape();
+            hullShape.moveTo(0, 0);
+            hullShape.quadraticCurveTo(2.5, 0.5, 2.5, 2);
+            hullShape.lineTo(2.5, 3);
+            hullShape.lineTo(-2.5, 3);
+            hullShape.lineTo(-2.5, 2);
+            hullShape.quadraticCurveTo(-2.5, 0.5, 0, 0);
+            
+            const hullGeo = new THREE.LatheGeometry([
+                new THREE.Vector2(0.8, -2),
+                new THREE.Vector2(1.5, -1),
+                new THREE.Vector2(2.2, 0),
+                new THREE.Vector2(2.5, 1),
+                new THREE.Vector2(2.6, 2),
+                new THREE.Vector2(2.4, 3),
+                new THREE.Vector2(2.0, 4),
+                new THREE.Vector2(0, 4.5)
+            ], 32);
+            
+            const hull = new THREE.Mesh(hullGeo, woodMaterial);
+            hull.rotation.x = Math.PI;
+            hull.position.y = 1;
+            hull.castShadow = true;
+            hull.receiveShadow = true;
+            shipGroup.add(hull);
+            
+            // Cubierta
+            const deckGeo = new THREE.BoxGeometry(5, 0.3, 9);
+            const deck = new THREE.Mesh(deckGeo, woodMaterial);
+            deck.position.y = 3.5;
+            deck.castShadow = true;
+            deck.receiveShadow = true;
+            shipGroup.add(deck);
+            
+            // Mástil principal
+            const mastGeo = new THREE.CylinderGeometry(0.2, 0.3, 12, 8);
+            const mast = new THREE.Mesh(mastGeo, darkWoodMaterial);
+            mast.position.set(0, 9, 1);
+            mast.castShadow = true;
+            shipGroup.add(mast);
+            
+            // Mástil de proa
+            const foremastGeo = new THREE.CylinderGeometry(0.15, 0.2, 8, 8);
+            const foremast = new THREE.Mesh(foremastGeo, darkWoodMaterial);
+            foremast.position.set(0, 6.5, -3);
+            foremast.castShadow = true;
+            shipGroup.add(foremast);
+            
+            // Mástil de popa
+            const rearMastGeo = new THREE.CylinderGeometry(0.12, 0.18, 6, 8);
+            const rearMast = new THREE.Mesh(rearMastGeo, darkWoodMaterial);
+            rearMast.position.set(0, 5.5, 4);
+            rearMast.castShadow = true;
+            shipGroup.add(rearMast);
+            
+            // Vela principal (cuadrada)
+            const mainSailGeo = new THREE.PlaneGeometry(5, 6);
+            const mainSail = new THREE.Mesh(mainSailGeo, sailMaterial);
+            mainSail.position.set(0, 9, 1);
+            mainSail.rotation.x = Math.PI * 0.05;
+            shipGroup.add(mainSail);
+            
+            // Vela de proa
+            const foresailGeo = new THREE.PlaneGeometry(3.5, 4);
+            const foresail = new THREE.Mesh(foresailGeo, sailMaterial);
+            foresail.position.set(0, 6.5, -3);
+            foresail.rotation.x = Math.PI * 0.08;
+            shipGroup.add(foresail);
+            
+            // Vela de popa
+            const rearSailGeo = new THREE.PlaneGeometry(2.5, 3.5);
+            const rearSail = new THREE.Mesh(rearSailGeo, sailMaterial);
+            rearSail.position.set(0, 5.5, 4);
+            shipGroup.add(rearSail);
+            
+            // Vela cangreja (triangular)
+            const jibShape = new THREE.Shape();
+            jibShape.moveTo(0, 0);
+            jibShape.lineTo(2, -3);
+            jibShape.lineTo(-2, -3);
+            jibShape.lineTo(0, 0);
+            
+            const jibGeo = new THREE.ShapeGeometry(jibShape);
+            const jib = new THREE.Mesh(jibGeo, sailMaterial);
+            jib.position.set(0, 4, -4.5);
+            jib.rotation.x = Math.PI * 0.1;
+            shipGroup.add(jib);
+            
+            // Timón
+            const rudderGeo = new THREE.BoxGeometry(0.2, 3, 1);
+            const rudder = new THREE.Mesh(rudderGeo, darkWoodMaterial);
+            rudder.position.set(0, 2, 5);
+            rudder.rotation.x = Math.PI * 0.15;
+            shipGroup.add(rudder);
+            
+            // Botes en la cubierta
+            const boatGeo = new THREE.BoxGeometry(1.2, 0.5, 2.5);
+            const boat1 = new THREE.Mesh(boatGeo, woodMaterial);
+            boat1.position.set(-1.8, 3.9, 1);
+            boat1.castShadow = true;
+            shipGroup.add(boat1);
+            
+            // Cañas de madera (barandillas)
+            const railingGeo = new THREE.CylinderGeometry(0.05, 0.05, 5, 6);
+            for (let i = 0; i < 8; i++) {
+                const railing = new THREE.Mesh(railingGeo, darkWoodMaterial);
+                railing.position.set(2.3, 4, -4 + i);
+                railing.rotation.x = Math.PI / 2;
+                shipGroup.add(railing);
+                
+                const railing2 = new THREE.Mesh(railingGeo, darkWoodMaterial);
+                railing2.position.set(-2.3, 4, -4 + i);
+                railing2.rotation.x = Math.PI / 2;
+                shipGroup.add(railing2);
+            }
+            
+            // Cabañas/estructuras en cubierta
+            const cabinGeo = new THREE.BoxGeometry(2, 1.5, 2.5);
+            const cabin = new THREE.Mesh(cabinGeo, darkWoodMaterial);
+            cabin.position.set(0, 4.5, 2.5);
+            cabin.castShadow = true;
+            shipGroup.add(cabin);
+            
+            // Cañón
+            const cannonGeo = new THREE.CylinderGeometry(0.15, 0.2, 1.2, 8);
+            for (let i = 0; i < 3; i++) {
+                const cannon = new THREE.Mesh(cannonGeo, darkWoodMaterial);
+                cannon.position.set(-1.8, 3.7, -2 + i * 2);
+                cannon.rotation.x = Math.PI / 2;
+                shipGroup.add(cannon);
+                
+                const cannon2 = new THREE.Mesh(cannonGeo, darkWoodMaterial);
+                cannon2.position.set(1.8, 3.7, -2 + i * 2);
+                cannon2.rotation.x = Math.PI / 2;
+                shipGroup.add(cannon2);
+            }
+            
+            // Escaleras
+            const stepGeo = new THREE.BoxGeometry(0.8, 0.1, 0.3);
+            for (let i = 0; i < 4; i++) {
+                const step = new THREE.Mesh(stepGeo, darkWoodMaterial);
+                step.position.set(0, 3.6 - i * 0.15, -1.5 - i * 0.2);
+                shipGroup.add(step);
+            }
+            
+            // Posicionar el barco
+            shipGroup.scale.setScalar(0.5);
+            shipGroup.position.set(0, 0, 0);
+            
+            return shipGroup;
+        }
+        
+        const ship = createPirateShip();
+        scene.add(ship);
+
+        // === CARGAR MODELO GLTF DEL BARCO ===
+        let shipModel = null;
+        const gltfLoader = new GLTFLoader();
+        
+        gltfLoader.load(
+            '../../assets/3D/pirate-kit/glTF/Ship_Large.gltf',
+            (gltf) => {
+                shipModel = gltf.scene;
+                shipModel.scale.setScalar(1.3);
+                shipModel.position.set(0, -0.5, 0);
+                shipModel.rotation.y = Math.PI;
+                shipModel.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                        if (child.material) {
+                            child.material.needsUpdate = true;
+                        }
+                    }
+                });
+                scene.remove(ship);
+                scene.add(shipModel);
+                document.getElementById('loading').style.display = 'none';
+            },
+            undefined,
+            (error) => {
+                console.error('Error cargando el barco:', error);
+                document.getElementById('loading').textContent = 'Error cargando el modelo';
+            }
+        );
+
+        // === ILUMINACIÓN ===
+        const ambientLight = new THREE.AmbientLight(0x404060, 0.6);
+        scene.add(ambientLight);
+
+        // Sol (luz principal)
+        const sunLight = new THREE.DirectionalLight(0xff8844, 2.0);
+        sunLight.position.set(50, 30, -200);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.camera.near = 1;
+        sunLight.shadow.camera.far = 500;
+        sunLight.shadow.camera.left = -50;
+        sunLight.shadow.camera.right = 50;
+        sunLight.shadow.camera.top = 50;
+        sunLight.shadow.camera.bottom = -50;
+        scene.add(sunLight);
+
+        // Luz fill (cielo)
+        const fillLight = new THREE.DirectionalLight(0x6688aa, 0.4);
+        fillLight.position.set(-30, 20, 50);
+        scene.add(fillLight);
+
+        // Luz ambiental desde abajo (reflejo del mar)
+        const seaReflection = new THREE.HemisphereLight(0xffaa66, 0x001030, 0.3);
+        scene.add(seaReflection);
+
+        // === ANIMACIÓN ===
+        const clock = new THREE.Clock();
+        
+        // === PARÁMETROS DEL MAR (controles) ===
+        const seaParams = {
+            waveIntensity: 1.0,
+            seaSpeed: 1.0,
+            waveScale: 1.0,
+            fogDensity: 1.0
+        };
+        
+        // FPS counter
+        let frameCount = 0;
+        let lastFpsUpdate = 0;
+        let currentFps = 0;
+        const statsEl = document.getElementById('stats');
+        
+        // Event listeners para controles
+        document.getElementById('waveIntensity').addEventListener('input', (e) => {
+            seaParams.waveIntensity = parseFloat(e.target.value);
+            const labels = ['Calma', 'Normal', 'Fuerte', 'Tormenta'];
+            const idx = Math.min(3, Math.floor(seaParams.waveIntensity * 1.5));
+            document.getElementById('waveIntensityVal').textContent = 
+                `${seaParams.waveIntensity.toFixed(1)} - ${labels[idx]}`;
+        });
+        
+        document.getElementById('seaSpeed').addEventListener('input', (e) => {
+            seaParams.seaSpeed = parseFloat(e.target.value);
+            document.getElementById('seaSpeedVal').textContent = `${seaParams.seaSpeed.toFixed(1)}x`;
+        });
+        
+        document.getElementById('waveScale').addEventListener('input', (e) => {
+            seaParams.waveScale = parseFloat(e.target.value);
+            document.getElementById('waveScaleVal').textContent = `${seaParams.waveScale.toFixed(1)}x`;
+        });
+        
+        document.getElementById('fogDensity').addEventListener('input', (e) => {
+            seaParams.fogDensity = parseFloat(e.target.value);
+            document.getElementById('fogDensityVal').textContent = `${seaParams.fogDensity.toFixed(1)}x`;
+        });
+
+        function getWaveHeight(x, z, time) {
+            const t = time * 0.4 * seaParams.seaSpeed;
+            const scale = seaParams.waveScale * seaParams.waveIntensity;
+            
+            // Simplex noise approximation
+            const noise = (x, z, t) => {
+                return (Math.sin(x * 0.01 + t * 0.5) * Math.cos(z * 0.01 + t * 0.3) * 2.5 +
+                       Math.sin(x * 0.02 + t * 0.7) * Math.cos(z * 0.015 + t * 0.4) * 1.2 +
+                       Math.sin(x * 0.05 + t) * Math.cos(z * 0.05 + t * 0.8) * 0.5 +
+                       Math.sin(x * 0.1 + t * 1.5) * Math.cos(z * 0.1 + t * 1.2) * 0.25) * scale;
+            };
+            
+            return noise(x, z, t) + 
+                   Math.sin(x * 0.03 + t * 2.0) * Math.cos(z * 0.02 + t * 1.5) * 0.8 * scale;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const elapsedTime = clock.getElapsedTime();
+            
+            // Calcular FPS
+            frameCount++;
+            if (elapsedTime - lastFpsUpdate >= 0.5) {
+                currentFps = Math.round(frameCount / (elapsedTime - lastFpsUpdate));
+                frameCount = 0;
+                lastFpsUpdate = elapsedTime;
+                statsEl.innerHTML = `FPS: ${currentFps}<br>Time: ${elapsedTime.toFixed(1)}s`;
+            }
+            
+            // Actualizar mar
+            oceanData.material.uniforms.uTime.value = elapsedTime;
+            oceanData.material.uniforms.uWaveIntensity.value = seaParams.waveIntensity;
+            oceanData.material.uniforms.uWaveScale.value = seaParams.waveScale;
+            oceanData.material.uniforms.uSeaSpeed.value = seaParams.seaSpeed;
+            
+            // Actualizar niebla según parámetro
+            oceanData.material.uniforms.fogNear.value = 200 / seaParams.fogDensity;
+            oceanData.material.uniforms.fogFar.value = 800 / seaParams.fogDensity;
+            
+            // Usar modelo GLTF si está cargado, sino usar barco procedural
+            const activeShip = shipModel || ship;
+            
+            // Posición del barco
+            const shipX = activeShip.position.x;
+            const shipZ = activeShip.position.z;
+            
+            // Alturas en diferentes puntos del barco
+            const waveCenter = getWaveHeight(shipX, shipZ, elapsedTime);
+            const waveFront = getWaveHeight(shipX - 2, shipZ - 1, elapsedTime);
+            const waveBack = getWaveHeight(shipX + 2, shipZ + 1, elapsedTime);
+            const waveLeft = getWaveHeight(shipX - 1, shipZ + 2, elapsedTime);
+            const waveRight = getWaveHeight(shipX + 1, shipZ - 2, elapsedTime);
+            
+            // Movimiento vertical
+            activeShip.position.y = waveCenter * 0.5 + 1.5;
+            
+            // Inclinación (balanceo)
+            const pitchAngle = (waveBack - waveFront) * 0.12;
+            const rollAngle = (waveLeft - waveRight) * 0.15;
+            
+            activeShip.rotation.x = pitchAngle;
+            activeShip.rotation.z = rollAngle;
+            
+            // Movimiento de guiñada suave
+            activeShip.rotation.y = Math.sin(elapsedTime * 0.15) * 0.08;
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        document.getElementById('loading').style.display = 'none';
+        animate();
+    </script>
+</body>
+</html>

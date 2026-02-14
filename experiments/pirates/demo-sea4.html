@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barco Pirata en Alta Mar - Atardecer Realista</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #ui {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            transition: opacity 1s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas-container"></div>
+    <div id="ui">
+        <h1>Atardecer en Alta Mar</h1>
+    </div>
+    <div class="loading" id="loader">Cargando Escena...</div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/examples/jsm/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        /**
+         * TÉCNICAS UTILIZADAS:
+         * 1. Shaders de Agua Avanzados: Uso de la clase 'Water' de Three.js que emplea 
+         *    Normal Maps dinámicos para simular la reflexión y refracción realista del mar.
+         * 2. Simulación Atmosférica (Sky): Un shader de atmósfera física que calcula la 
+         *    dispersión de Rayleigh y Mie para recrear un atardecer realista basado en la 
+         *    posición del sol.
+         * 3. Movimiento de Boyantez: El barco combina múltiples ondas senoidales para el 
+         *    cabeceo (pitch) y balanceo (roll), simulando la respuesta física a un mar agitado.
+         * 4. Gestión de Iluminación: Uso de ACESFilmicToneMapping para un rango dinámico 
+         *    más cinematográfico y una luz direccional cálida para los reflejos solares.
+         * 5. Difuminado del Horizonte: Uso de CircleGeometry de gran escala y FogExp2 
+         *    ajustada al tono cromático del horizonte para eliminar bordes afilados.
+         */
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+        import { Water } from 'three/examples/jsm/objects/Water.js';
+        import { Sky } from 'three/examples/jsm/objects/Sky.js';
+        import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+        import Stats from 'three/examples/jsm/libs/stats.module.js';
+        import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+
+        let container, stats;
+        let camera, scene, renderer;
+        let controls, water, sun, sky;
+        let ship;
+        let gui;
+        let directionalLight;
+
+        const seaParams = {
+            waveHeight: 0.5,
+            distortion: 3.7,
+            elevation: 0.7,
+            azimuth: 180,
+            speed: 1.0
+        };
+
+        const loaderElement = document.getElementById('loader');
+
+        init();
+        animate();
+
+        function init() {
+            container = document.getElementById('canvas-container');
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 0.5;
+            container.appendChild(renderer.domElement);
+
+            // Stats
+            stats = new Stats();
+            container.appendChild(stats.dom);
+
+            // Scene
+            scene = new THREE.Scene();
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 20000);
+            camera.position.set(30, 30, 100);
+
+            // Sun
+            sun = new THREE.Vector3();
+
+            // Water - Usamos CircleGeometry para evitar esquinas en el horizonte
+            const waterGeometry = new THREE.CircleGeometry(20000, 32);
+
+            water = new Water(
+                waterGeometry,
+                {
+                    textureWidth: 512,
+                    textureHeight: 512,
+                    waterNormals: new THREE.TextureLoader().load('https://threejs.org/examples/textures/waternormals.jpg', function (texture) {
+                        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    }),
+                    sunDirection: new THREE.Vector3(),
+                    sunColor: 0xffffff,
+                    waterColor: 0x00123e, // Deep navy blue
+                    distortionScale: 3.7,
+                    fog: true
+                }
+            );
+
+            water.rotation.x = -Math.PI / 2;
+            scene.add(water);
+
+            // Sky
+            sky = new Sky();
+            sky.scale.setScalar(20000); // Aumentamos escala
+            scene.add(sky);
+
+            const skyUniforms = sky.material.uniforms;
+            skyUniforms['turbidity'].value = 10;
+            skyUniforms['rayleigh'].value = 2;
+            skyUniforms['mieCoefficient'].value = 0.005;
+            skyUniforms['mieDirectionalG'].value = 0.8;
+
+            const parameters = {
+                elevation: 0.7, // Sol bajo para el atardecer
+                azimuth: 180
+            };
+
+            const pmremGenerator = new THREE.PMREMGenerator(renderer);
+            let renderTarget;
+
+            function updateSun() {
+                const phi = THREE.MathUtils.degToRad(90 - seaParams.elevation);
+                const theta = THREE.MathUtils.degToRad(seaParams.azimuth);
+
+                sun.setFromSphericalCoords(1, phi, theta);
+
+                sky.material.uniforms['sunPosition'].value.copy(sun);
+                water.material.uniforms['sunDirection'].value.copy(sun).normalize();
+
+                if (directionalLight) {
+                    directionalLight.position.copy(sun).multiplyScalar(100);
+                }
+
+                if (renderTarget !== undefined) renderTarget.dispose();
+
+                renderTarget = pmremGenerator.fromScene(sky);
+                scene.environment = renderTarget.texture;
+            }
+
+            updateSun();
+
+            // Niebla: El color debe aproximarse al tono del horizonte para difuminarlo
+            scene.fog = new THREE.FogExp2(0xeaa08e, 0.0003);
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+            scene.add(ambientLight);
+
+            directionalLight = new THREE.DirectionalLight(0xffaa44, 3); // Warmer sun light
+            directionalLight.position.copy(sun).multiplyScalar(100);
+            scene.add(directionalLight);
+
+            // Ship Loader
+            const loader = new GLTFLoader();
+            loader.load('../../assets/3D/pirate-kit/glTF/Ship_Large.gltf', function (gltf) {
+                ship = gltf.scene;
+                ship.scale.set(12, 12, 12); // Slightly larger ship
+                ship.position.y = -1; // Lower slightly into the water
+
+                // Add shadows if possible, though simple for now
+                ship.traverse(function (node) {
+                    if (node.isMesh) {
+                        node.castShadow = true;
+                        node.receiveShadow = true;
+                    }
+                });
+
+                scene.add(ship);
+
+                loaderElement.style.opacity = '0';
+                setTimeout(() => loaderElement.style.display = 'none', 1000);
+            }, undefined, function (error) {
+                console.error(error);
+            });
+
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.maxPolarAngle = Math.PI * 0.495;
+            controls.target.set(0, 10, 0);
+            controls.minDistance = 40.0;
+            controls.maxDistance = 600.0;
+            controls.enableDamping = true; // Smoother controls
+            controls.update();
+
+            // GUI
+            gui = new GUI();
+            const folderSea = gui.addFolder('Estado del Mar');
+            folderSea.add(seaParams, 'waveHeight', 0.1, 5.0).name('Altura Olas');
+            folderSea.add(seaParams, 'distortion', 0.1, 20.0).name('Agitación').onChange((v) => {
+                water.material.uniforms['distortionScale'].value = v;
+            });
+            folderSea.add(seaParams, 'speed', 0.1, 5.0).name('Velocidad');
+
+            const folderSun = gui.addFolder('Sol');
+            folderSun.add(seaParams, 'elevation', -1, 10).name('Elevación').onChange(() => updateSun());
+            folderSun.add(seaParams, 'azimuth', 0, 360).name('Azimut').onChange(() => updateSun());
+            folderSun.open();
+
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            render();
+        }
+
+        function render() {
+            const time = performance.now() * 0.001;
+
+            water.material.uniforms['time'].value += (1.0 / 60.0) * seaParams.speed;
+
+            if (ship) {
+                // Movimiento dinámico según la altura de las olas configurada
+                const slowWave = Math.sin(time * 0.3 * seaParams.speed) * 0.3 * seaParams.waveHeight;
+                const fastWave = Math.sin(time * 0.8 * seaParams.speed) * 0.2 * seaParams.waveHeight;
+
+                ship.position.y = -1 + slowWave + fastWave;
+
+                // Balanceo proporcional a la agitación/altura
+                const intensity = (seaParams.waveHeight + seaParams.distortion * 0.1) * 0.5;
+
+                ship.rotation.z = (Math.sin(time * 0.45 * seaParams.speed) * 0.04 + Math.sin(time * 0.9 * seaParams.speed) * 0.02) * intensity;
+                ship.rotation.x = (Math.cos(time * 0.35 * seaParams.speed) * 0.03 + Math.cos(time * 0.75 * seaParams.speed) * 0.015) * intensity;
+                ship.rotation.y = Math.sin(time * 0.1 * seaParams.speed) * 0.05;
+            }
+
+            controls.update();
+            stats.update();
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+
+</html>

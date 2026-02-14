@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Cala del Contrabandista — Escena 3D Pirata</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English+SC&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'IM Fell English SC', serif;
+        }
+
+        /* --- Loading Screen --- */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center bottom, #1a0a00 0%, #0a0500 40%, #000 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 1.5s ease, visibility 1.5s ease;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #loading-screen h1 {
+            font-family: 'Cinzel Decorative', cursive;
+            color: #d4a44a;
+            font-size: clamp(24px, 5vw, 48px);
+            text-shadow: 0 0 30px rgba(212, 164, 74, 0.4), 0 4px 8px rgba(0, 0, 0, 0.6);
+            margin-bottom: 8px;
+            letter-spacing: 3px;
+        }
+
+        #loading-screen p {
+            color: #8a7a5a;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+        }
+
+        .progress-container {
+            width: min(400px, 80vw);
+            height: 4px;
+            background: rgba(212, 164, 74, 0.15);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        #loading-text {
+            color: #6a5a3a;
+            font-size: 12px;
+            margin-top: 16px;
+            letter-spacing: 1px;
+        }
+
+        .skull-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* --- HUD Cinematico --- */
+        #hud {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        #hud.visible {
+            opacity: 1;
+        }
+
+        .hud-title {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            color: #d4a44a;
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: clamp(16px, 3vw, 28px);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+            letter-spacing: 2px;
+        }
+
+        .hud-subtitle {
+            position: absolute;
+            top: 68px;
+            left: 40px;
+            color: rgba(200, 180, 140, 0.6);
+            font-size: clamp(10px, 1.5vw, 13px);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .hud-narrative {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(212, 196, 160, 0.8);
+            font-size: clamp(12px, 1.8vw, 16px);
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.7;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        .hud-narrative.visible {
+            opacity: 1;
+        }
+
+        /* Cinematic bars */
+        .cine-bar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #000;
+            transition: height 1s ease;
+        }
+
+        .cine-bar.top {
+            top: 0;
+        }
+
+        .cine-bar.bottom {
+            bottom: 0;
+        }
+
+        /* Corner decorations */
+        .corner-deco {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 1px solid rgba(212, 164, 74, 0.15);
+        }
+
+        .corner-deco.tl {
+            top: 70px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-deco.tr {
+            top: 70px;
+            right: 20px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-deco.bl {
+            bottom: 70px;
+            left: 20px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-deco.br {
+            bottom: 70px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* Controls hint */
+        .controls-hint {
+            position: absolute;
+            bottom: 75px;
+            right: 30px;
+            color: rgba(200, 180, 140, 0.35);
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-align: right;
+            line-height: 1.8;
+        }
+
+        /* Compass */
+        .compass {
+            position: absolute;
+            top: 80px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(212, 164, 74, 0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d4a44a;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .compass-needle {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to top, transparent, #d4a44a);
+            transform-origin: bottom center;
+            bottom: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="skull-icon">☠️</div>
+        <h1>La Cala del Contrabandista</h1>
+        <p>Una historia de piratas y tesoros</p>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div id="loading-text">Preparando la escena...</div>
+    </div>
+
+    <!-- Cinematic HUD -->
+    <div id="hud">
+        <div class="cine-bar top"></div>
+        <div class="cine-bar bottom"></div>
+        <div class="corner-deco tl"></div>
+        <div class="corner-deco tr"></div>
+        <div class="corner-deco bl"></div>
+        <div class="corner-deco br"></div>
+        <div class="hud-title">🏴‍☠️ La Cala del Contrabandista</div>
+        <div class="hud-subtitle">Mar del Caribe · 1692</div>
+        <div class="compass">
+            <div class="compass-needle" id="compass-needle"></div>
+            <span style="position:absolute;top:4px;font-size:9px;color:rgba(212,164,74,0.5)">N</span>
+        </div>
+        <div class="hud-narrative" id="narrative"></div>
+        <div class="controls-hint">
+            Arrastra para orbitar<br>
+            Scroll para zoom<br>
+            Doble click: vista cenital
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // =====================================================
+        // SCENE SETUP
+        // =====================================================
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 800);
+        camera.position.set(25, 12, 30);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.3;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.04;
+        controls.maxPolarAngle = Math.PI / 2.05;
+        controls.minPolarAngle = 0.2;
+        controls.minDistance = 8;
+        controls.maxDistance = 60;
+        controls.target.set(0, 1, 0);
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.3;
+
+        // Double-click for top-down view
+        renderer.domElement.addEventListener('dblclick', () => {
+            gsapTo(camera.position, { x: 0, y: 40, z: 0.1 }, 2000);
+        });
+
+        function gsapTo(obj, target, duration) {
+            const start = { x: obj.x, y: obj.y, z: obj.z };
+            const startTime = performance.now();
+            function update() {
+                const elapsed = performance.now() - startTime;
+                const t = Math.min(elapsed / duration, 1);
+                const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                obj.x = start.x + (target.x - start.x) * ease;
+                obj.y = start.y + (target.y - start.y) * ease;
+                obj.z = start.z + (target.z - start.z) * ease;
+                if (t < 1) requestAnimationFrame(update);
+            }
+            update();
+        }
+
+        // =====================================================
+        // SKY & ATMOSPHERE — GOLDEN SUNSET
+        // =====================================================
+        // Gradient sky dome
+        const skyGeo = new THREE.SphereGeometry(350, 32, 32);
+        const skyVertShader = `
+            varying vec3 vWorldPos;
+            void main() {
+                vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                vWorldPos = worldPos.xyz;
+                gl_Position = projectionMatrix * viewMatrix * worldPos;
+            }
+        `;
+        const skyFragShader = `
+            varying vec3 vWorldPos;
+            void main() {
+                float h = normalize(vWorldPos).y;
+                // Sunset gradient
+                vec3 sunsetLow = vec3(0.85, 0.35, 0.15);
+                vec3 sunsetMid = vec3(0.95, 0.6, 0.25);
+                vec3 sunsetHigh = vec3(0.25, 0.35, 0.65);
+                vec3 zenith = vec3(0.12, 0.18, 0.45);
+
+                vec3 col;
+                if (h < 0.0) {
+                    col = sunsetLow;
+                } else if (h < 0.15) {
+                    col = mix(sunsetLow, sunsetMid, h / 0.15);
+                } else if (h < 0.4) {
+                    col = mix(sunsetMid, sunsetHigh, (h - 0.15) / 0.25);
+                } else {
+                    col = mix(sunsetHigh, zenith, (h - 0.4) / 0.6);
+                }
+                gl_FragColor = vec4(col, 1.0);
+            }
+        `;
+        const skyMat = new THREE.ShaderMaterial({
+            vertexShader: skyVertShader,
+            fragmentShader: skyFragShader,
+            side: THREE.BackSide,
+            depthWrite: false
+        });
+        scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+        // Sun disc
+        const sunGeo = new THREE.SphereGeometry(8, 32, 32);
+        const sunMat = new THREE.MeshBasicMaterial({ color: 0xffcc44 });
+        const sun = new THREE.Mesh(sunGeo, sunMat);
+        sun.position.set(-120, 30, -200);
+        scene.add(sun);
+
+        // Sun glow
+        const glowGeo = new THREE.SphereGeometry(15, 32, 32);
+        const glowMat = new THREE.MeshBasicMaterial({
+            color: 0xff9933, transparent: true, opacity: 0.15
+        });
+        const sunGlow = new THREE.Mesh(glowGeo, glowMat);
+        sunGlow.position.copy(sun.position);
+        scene.add(sunGlow);
+
+        // Fog
+        scene.fog = new THREE.FogExp2(0xcc7744, 0.0035);
+
+        // =====================================================
+        // LIGHTING — WARM SUNSET
+        // =====================================================
+        const ambientLight = new THREE.AmbientLight(0xffeedd, 0.35);
+        scene.add(ambientLight);
+
+        // Main sunlight
+        const sunLight = new THREE.DirectionalLight(0xffaa55, 1.8);
+        sunLight.position.set(-40, 30, -60);
+        sunLight.castShadow = true;
+        sunLight.shadow.camera.left = -40;
+        sunLight.shadow.camera.right = 40;
+        sunLight.shadow.camera.top = 40;
+        sunLight.shadow.camera.bottom = -40;
+        sunLight.shadow.camera.near = 0.5;
+        sunLight.shadow.camera.far = 120;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.bias = -0.001;
+        scene.add(sunLight);
+
+        // Fill light (sky)
+        const fillLight = new THREE.HemisphereLight(0x8899cc, 0x443322, 0.4);
+        scene.add(fillLight);
+
+        // Warm bounce light from the sand
+        const bounceLight = new THREE.DirectionalLight(0xddaa66, 0.3);
+        bounceLight.position.set(10, -5, 10);
+        scene.add(bounceLight);
+
+        // =====================================================
+        // OCEAN — Custom Animated Water
+        // =====================================================
+        const waterGeo = new THREE.PlaneGeometry(500, 500, 200, 200);
+        const waterVertShader = `
+            uniform float uTime;
+            varying vec2 vUv;
+            varying vec3 vWorldPos;
+            varying vec3 vNormal;
+            varying float vWaveHeight;
+
+            // Gerstner wave: returns displacement and accumulates normal
+            // dir = wave direction, steepness Q, amplitude A, frequency w, speed phi
+            vec3 gerstnerWave(vec2 pos, vec2 dir, float steepness, float amplitude, float freq, float speed, inout vec3 tangent, inout vec3 binormal) {
+                float phase = dot(dir, pos) * freq + uTime * speed;
+                float s = sin(phase);
+                float c = cos(phase);
+                float QA = steepness * amplitude;
+
+                // Displacement
+                vec3 disp;
+                disp.x = QA * dir.x * c;
+                disp.y = amplitude * s;
+                disp.z = QA * dir.y * c;
+
+                // Tangent/binormal contributions for normal calculation
+                float WA = freq * amplitude;
+                float QWA = steepness * WA;
+                tangent += vec3(
+                    -QWA * dir.x * dir.x * s,
+                    WA * dir.x * c,
+                    -QWA * dir.x * dir.y * s
+                );
+                binormal += vec3(
+                    -QWA * dir.x * dir.y * s,
+                    WA * dir.y * c,
+                    -QWA * dir.y * dir.y * s
+                );
+                return disp;
+            }
+
+            void main() {
+                vUv = uv;
+                vec3 pos = position;
+                vec2 p = pos.xy; // PlaneGeometry XY before rotation
+
+                vec3 tangent = vec3(1.0, 0.0, 0.0);
+                vec3 binormal = vec3(0.0, 0.0, 1.0);
+
+                // 6 Gerstner waves with different directions, frequencies, amplitudes
+                // Directions carefully chosen to avoid axis alignment
+                vec3 d = vec3(0.0);
+                d += gerstnerWave(p, normalize(vec2(0.7, 0.3)),  0.35, 0.12, 0.18, 0.9,  tangent, binormal);
+                d += gerstnerWave(p, normalize(vec2(-0.4, 0.6)), 0.3,  0.08, 0.25, 1.1,  tangent, binormal);
+                d += gerstnerWave(p, normalize(vec2(0.1, -0.8)), 0.25, 0.06, 0.35, 1.4,  tangent, binormal);
+                d += gerstnerWave(p, normalize(vec2(0.9, -0.2)), 0.2,  0.04, 0.5,  1.8,  tangent, binormal);
+                d += gerstnerWave(p, normalize(vec2(-0.6, -0.5)),0.15, 0.03, 0.7,  2.2,  tangent, binormal);
+                d += gerstnerWave(p, normalize(vec2(0.3, 0.9)),  0.12, 0.02, 1.0,  2.8,  tangent, binormal);
+
+                pos.x += d.x;
+                pos.y += d.z; // PlaneGeometry Y maps to world Z after rotation
+                pos.z += d.y; // Height (will become world Y after -90° X rotation)
+
+                vWaveHeight = d.y; // Pass height to fragment shader
+
+                // Compute normal from cross product of tangent and binormal
+                vNormal = normalize(cross(binormal, tangent));
+
+                vec4 worldPos = modelMatrix * vec4(pos, 1.0);
+                vWorldPos = worldPos.xyz;
+                gl_Position = projectionMatrix * viewMatrix * worldPos;
+            }
+        `;
+        const waterFragShader = `
+            uniform float uTime;
+            uniform vec3 uSunDir;
+            varying vec2 vUv;
+            varying vec3 vWorldPos;
+            varying vec3 vNormal;
+            varying float vWaveHeight;
+
+            // Hash-based pseudo-noise (no texture needed)
+            float hash(vec2 p) {
+                vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+                p3 += dot(p3, p3.yzx + 33.33);
+                return fract((p3.x + p3.y) * p3.z);
+            }
+
+            float noise(vec2 p) {
+                vec2 i = floor(p);
+                vec2 f = fract(p);
+                f = f * f * (3.0 - 2.0 * f); // smoothstep
+                float a = hash(i);
+                float b = hash(i + vec2(1.0, 0.0));
+                float c = hash(i + vec2(0.0, 1.0));
+                float d = hash(i + vec2(1.0, 1.0));
+                return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+            }
+
+            // Fractal Brownian motion for organic detail
+            float fbm(vec2 p) {
+                float val = 0.0;
+                float amp = 0.5;
+                float freq = 1.0;
+                for (int i = 0; i < 5; i++) {
+                    val += noise(p * freq) * amp;
+                    amp *= 0.5;
+                    freq *= 2.1;
+                    // Rotate each octave to break grid alignment
+                    p = mat2(0.8, 0.6, -0.6, 0.8) * p;
+                }
+                return val;
+            }
+
+            void main() {
+                vec3 N = normalize(vNormal);
+                vec3 viewDir = normalize(cameraPosition - vWorldPos);
+                vec3 sunDir = normalize(uSunDir);
+
+                // --- Water colors ---
+                vec3 deepColor = vec3(0.01, 0.08, 0.18);
+                vec3 midColor = vec3(0.03, 0.22, 0.35);
+                vec3 shallowColor = vec3(0.06, 0.38, 0.42);
+                vec3 sunReflectColor = vec3(1.0, 0.78, 0.4);
+
+                // Color varies with wave height + noise for organic look
+                float heightFactor = smoothstep(-0.15, 0.15, vWaveHeight);
+                float noiseTex = fbm(vWorldPos.xz * 0.3 + uTime * 0.05);
+                vec3 waterColor = mix(deepColor, midColor, heightFactor);
+                waterColor = mix(waterColor, shallowColor, noiseTex * 0.4);
+
+                // --- Fresnel (Schlick approximation) ---
+                float NdotV = max(dot(N, viewDir), 0.0);
+                float F0 = 0.02; // water IOR
+                float fresnel = F0 + (1.0 - F0) * pow(1.0 - NdotV, 5.0);
+
+                // --- Sun specular ---
+                vec3 halfDir = normalize(sunDir + viewDir);
+                float NdotH = max(dot(N, halfDir), 0.0);
+                float specTight = pow(NdotH, 512.0);   // sharp sun highlight
+                float specWide = pow(NdotH, 32.0);     // broad glow around sun
+                float specMed = pow(NdotH, 80.0);      // medium sparkle
+
+                // --- Foam / whitecaps (noise-based, on wave crests, near island) ---
+                float distToIsland = length(vWorldPos.xz); // island is at origin
+                float proximity = 1.0 - smoothstep(12.0, 35.0, distToIsland); // strong near shore, fades out
+                float foamNoise1 = fbm(vWorldPos.xz * 1.8 + uTime * vec2(0.3, 0.2));
+                float foamNoise2 = noise(vWorldPos.xz * 4.0 - uTime * 0.5);
+                float foamMask = smoothstep(0.06, 0.14, vWaveHeight) * proximity;
+                float foam = foamMask * smoothstep(0.35, 0.65, foamNoise1) * 0.6;
+                foam += foamMask * foamNoise2 * 0.15;
+                foam = clamp(foam, 0.0, 1.0);
+
+                // --- Subsurface scattering (light through wave crests) ---
+                float sss = pow(max(dot(viewDir, -sunDir + N * 0.3), 0.0), 3.0);
+                sss *= smoothstep(0.0, 0.12, vWaveHeight) * 0.25;
+                vec3 sssColor = vec3(0.1, 0.5, 0.4) * sss;
+
+                // --- Compose ---
+                vec3 col = waterColor;
+
+                // Sky reflection color (approximation)
+                vec3 skyReflect = vec3(0.3, 0.45, 0.65);
+                col = mix(col, skyReflect, fresnel * 0.5);
+
+                // Sun reflections
+                col += sunReflectColor * specTight * 3.0;
+                col += sunReflectColor * specMed * 0.3;
+                col += sunReflectColor * specWide * 0.08;
+
+                // Subsurface
+                col += sssColor;
+
+                // Foam
+                col = mix(col, vec3(0.85, 0.9, 0.95), foam);
+
+                // --- Distance fog + edge fade ---
+                float dist = length(vWorldPos.xz);
+                vec3 fogColor = vec3(0.8, 0.5, 0.3);
+                float fogFactor = smoothstep(60.0, 180.0, dist);
+                col = mix(col, fogColor, fogFactor * 0.6);
+
+                float edgeFade = 1.0 - smoothstep(150.0, 245.0, dist);
+                gl_FragColor = vec4(col, 0.94 * edgeFade);
+            }
+        `;
+        const waterMat = new THREE.ShaderMaterial({
+            vertexShader: waterVertShader,
+            fragmentShader: waterFragShader,
+            uniforms: {
+                uTime: { value: 0 },
+                uSunDir: { value: new THREE.Vector3(-0.5, 0.3, -0.8).normalize() }
+            },
+            transparent: true,
+            side: THREE.DoubleSide
+        });
+        const water = new THREE.Mesh(waterGeo, waterMat);
+        water.rotation.x = -Math.PI / 2;
+        water.position.y = -0.8;
+        water.receiveShadow = true;
+        scene.add(water);
+
+        // =====================================================
+        // TERRAIN — Sandy Cove & Beach
+        // =====================================================
+        // Main island
+        const islandGeo = new THREE.CylinderGeometry(16, 19, 1.5, 48, 4);
+        // Distort vertices for organic shape
+        const islandPos = islandGeo.attributes.position;
+        for (let i = 0; i < islandPos.count; i++) {
+            const x = islandPos.getX(i);
+            const z = islandPos.getZ(i);
+            const dist = Math.sqrt(x * x + z * z);
+            const angle = Math.atan2(z, x);
+            const noise = Math.sin(angle * 3) * 1.5 + Math.cos(angle * 5) * 0.8 + Math.sin(angle * 7) * 0.4;
+            if (dist > 5) {
+                islandPos.setX(i, x + (x / dist) * noise * 0.15);
+                islandPos.setZ(i, z + (z / dist) * noise * 0.15);
+            }
+        }
+        islandGeo.computeVertexNormals();
+        const islandMat = new THREE.MeshStandardMaterial({
+            color: 0xd4b87a,
+            roughness: 0.95,
+            metalness: 0.0
+        });
+        const island = new THREE.Mesh(islandGeo, islandMat);
+        island.position.y = -0.5;
+        island.receiveShadow = true;
+        island.castShadow = true;
+        scene.add(island);
+
+        // Beach border (darker wet sand)
+        const wetSandGeo = new THREE.RingGeometry(14, 17, 48);
+        const wetSandMat = new THREE.MeshStandardMaterial({
+            color: 0x9a8560,
+            roughness: 0.7,
+            metalness: 0.05,
+            transparent: true,
+            opacity: 0.6
+        });
+        const wetSand = new THREE.Mesh(wetSandGeo, wetSandMat);
+        wetSand.rotation.x = -Math.PI / 2;
+        wetSand.position.y = 0.01;
+        scene.add(wetSand);
+
+        // =====================================================
+        // GOLDEN DUST PARTICLES
+        // =====================================================
+        const dustCount = 2000;
+        const dustGeo = new THREE.BufferGeometry();
+        const dustPositions = new Float32Array(dustCount * 3);
+        const dustSizes = new Float32Array(dustCount);
+        const dustSpeeds = new Float32Array(dustCount);
+        const dustWindDirs = new Float32Array(dustCount); // per-particle wind variation
+        for (let i = 0; i < dustCount; i++) {
+            dustPositions[i * 3] = (Math.random() - 0.5) * 250;
+            dustPositions[i * 3 + 1] = Math.random() * 12 + 0.3;
+            dustPositions[i * 3 + 2] = (Math.random() - 0.5) * 250;
+            dustSizes[i] = Math.random() * 1.2 + 0.3;
+            dustSpeeds[i] = Math.random() * 0.5 + 0.2;
+            dustWindDirs[i] = (Math.random() - 0.5) * 0.4; // slight cross-wind variation
+        }
+        dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+        dustGeo.setAttribute('aSize', new THREE.BufferAttribute(dustSizes, 1));
+
+        const dustVertShader = `
+            attribute float aSize;
+            varying float vAlpha;
+            void main() {
+                vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+                gl_PointSize = aSize * (100.0 / -mvPos.z);
+                gl_Position = projectionMatrix * mvPos;
+                vAlpha = smoothstep(0.0, 5.0, position.y) * smoothstep(15.0, 8.0, position.y);
+            }
+        `;
+        const dustFragShader = `
+            varying float vAlpha;
+            void main() {
+                float d = length(gl_PointCoord - 0.5);
+                if (d > 0.5) discard;
+                float glow = smoothstep(0.5, 0.0, d);
+                vec3 col = mix(vec3(1.0, 0.85, 0.4), vec3(1.0, 0.95, 0.75), glow);
+                gl_FragColor = vec4(col, glow * vAlpha * 0.5);
+            }
+        `;
+        const dustMat = new THREE.ShaderMaterial({
+            vertexShader: dustVertShader,
+            fragmentShader: dustFragShader,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+        const dustParticles = new THREE.Points(dustGeo, dustMat);
+        scene.add(dustParticles);
+
+        // =====================================================
+        // FIREFLIES near the cove (individual lights, desynchronized)
+        // =====================================================
+        const fireflyCount = 10;
+        const fireflyData = [];
+        const fireflyGroup = new THREE.Group();
+        for (let i = 0; i < fireflyCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 10 + 3;
+            const x = Math.cos(angle) * radius;
+            const y = Math.random() * 3 + 1.2;
+            const z = Math.sin(angle) * radius;
+
+            // Small glowing sphere
+            const ffGeo = new THREE.SphereGeometry(0.06, 8, 8);
+            const ffMat = new THREE.MeshBasicMaterial({ color: 0xffee44, transparent: true, opacity: 0.9 });
+            const ffMesh = new THREE.Mesh(ffGeo, ffMat);
+            ffMesh.position.set(x, y, z);
+            fireflyGroup.add(ffMesh);
+
+            // Each firefly gets its own small point light
+            const ffLight = new THREE.PointLight(0xffdd33, 0.6, 4);
+            ffLight.position.copy(ffMesh.position);
+            fireflyGroup.add(ffLight);
+
+            fireflyData.push({
+                mesh: ffMesh,
+                light: ffLight,
+                baseX: x,
+                baseY: y,
+                baseZ: z,
+                speed: Math.random() * 1.5 + 0.5,
+                phase: Math.random() * Math.PI * 2,       // desynchronized movement
+                glowPhase: Math.random() * Math.PI * 2,   // desynchronized glow
+                glowSpeed: Math.random() * 2.5 + 1.0,     // different pulse rates
+                radius: Math.random() * 1.5 + 0.5
+            });
+        }
+        scene.add(fireflyGroup);
+
+        // =====================================================
+        // MODEL LOADING
+        // =====================================================
+        const loader = new GLTFLoader();
+        const BASE = '../../assets/3D/pirate-kit/glTF/';
+        const mixers = [];
+        const sceneObjects = {};
+        const characterAnimators = []; // For humanoid animation state machine
+
+        // Humanoid characters that get the random animation system
+        const humanoidNames = ['barbarossa', 'anne', 'henry', 'skeleton', 'skeletonHeadless', 'sharky', 'mako'];
+
+        const modelsToLoad = [
+            // Characters
+            { file: 'Characters_Captain_Barbarossa.gltf', name: 'barbarossa', pos: [-2, 0.25, 5], scale: 1.15, rotY: Math.PI * 0.1, anim: 'Idle' },
+            { file: 'Characters_Anne.gltf', name: 'anne', pos: [5, 0.25, 3], scale: 1.0, rotY: -Math.PI * 0.4, anim: 'Walk' },
+            { file: 'Characters_Henry.gltf', name: 'henry', pos: [7, 0.25, 1], scale: 1.0, rotY: -Math.PI * 0.5, anim: 'Run' },
+            { file: 'Characters_Skeleton.gltf', name: 'skeleton', pos: [10, 1.2, -8], scale: 1.0, rotY: Math.PI * 0.8, anim: 'Idle' },
+            { file: 'Characters_Skeleton_Headless.gltf', name: 'skeletonHeadless', pos: [-8, 0.25, -6], scale: 1.0, rotY: Math.PI * 0.2, anim: 'Walk' },
+            { file: 'Characters_Sharky.gltf', name: 'sharky', pos: [-4, 0.25, -3], scale: 1.0, rotY: Math.PI * 0.6, anim: 'Sword' },
+            { file: 'Characters_Shark.gltf', name: 'shark', pos: [25, -1.7, 15], scale: 1.2, rotY: Math.PI * 0.3, anim: 'Swim' },
+            { file: 'Characters_Tentacle.gltf', name: 'tentacle1', pos: [-22, -2.5, 10], scale: 0.12, rotY: 0, anim: 'Tentacle_Attack' },
+            { file: 'Characters_Tentacle.gltf', name: 'tentacle2', pos: [20, -2.5, -18], scale: 0.1, rotY: Math.PI, anim: 'Tentacle_Idle' },
+            { file: 'Characters_Mako.gltf', name: 'mako', pos: [0, 0.25, 8], scale: 1.0, rotY: Math.PI, anim: 'Wave' },
+
+            // Ships
+            { file: 'Ship_Large.gltf', name: 'shipLarge', pos: [-25, -0.8, -15], scale: 1.0, rotY: Math.PI * 0.3 },
+            { file: 'Ship_Small.gltf', name: 'shipSmall', pos: [22, -0.7, -25], scale: 1.0, rotY: -Math.PI * 0.2 },
+
+            // Environment
+            { file: 'Environment_Cliff2.gltf', name: 'cliff1', pos: [-14, -1, -12], scale: 1.0, rotY: 0 },
+            { file: 'Environment_Cliff3.gltf', name: 'cliff2', pos: [14, -1, -10], scale: 0.9, rotY: Math.PI * 0.5 },
+            { file: 'Environment_Dock.gltf', name: 'dock', pos: [-8, 0.3, 10], scale: 1.3, rotY: Math.PI * 0.5 },
+            { file: 'Environment_Dock_Broken.gltf', name: 'dockBroken', pos: [-12, 0.3, 8], scale: 1.2, rotY: Math.PI * 0.4 },
+            { file: 'Environment_Dock_Pole.gltf', name: 'dockPole1', pos: [-6, 0.3, 11], scale: 1.3, rotY: 0 },
+            { file: 'Environment_Dock_Pole.gltf', name: 'dockPole2', pos: [-10, 0.3, 11.5], scale: 1.3, rotY: 0.3 },
+            { file: 'Environment_House1.gltf', name: 'house1', pos: [8, 0.25, -5], scale: 1.0, rotY: Math.PI * 0.7 },
+            { file: 'Environment_House2.gltf', name: 'house2', pos: [-5, 0.25, -8], scale: 1.0, rotY: -Math.PI * 0.3 },
+            { file: 'Environment_PalmTree_1.gltf', name: 'palm1', pos: [-6, 0.2, 4], scale: 1.3, rotY: 0 },
+            { file: 'Environment_PalmTree_2.gltf', name: 'palm2', pos: [9, 0.2, 6], scale: 1.4, rotY: 1 },
+            { file: 'Environment_PalmTree_3.gltf', name: 'palm3', pos: [-10, 0.2, -3], scale: 1.2, rotY: 2 },
+            { file: 'Environment_PalmTree_1.gltf', name: 'palm4', pos: [3, 0.2, -9], scale: 1.1, rotY: 3 },
+            { file: 'Environment_Rock_1.gltf', name: 'rock1', pos: [12, 0.1, 3], scale: 2.0, rotY: 0 },
+            { file: 'Environment_Rock_2.gltf', name: 'rock2', pos: [-12, 0.1, 1], scale: 1.5, rotY: 1 },
+            { file: 'Environment_Rock_3.gltf', name: 'rock3', pos: [6, 0.1, -10], scale: 2.5, rotY: 2 },
+            { file: 'Environment_Rock_4.gltf', name: 'rock4', pos: [-3, 0.1, 12], scale: 2.0, rotY: 3 },
+            { file: 'Environment_Rock_5.gltf', name: 'rock5', pos: [14, 0.1, -6], scale: 1.8, rotY: 4 },
+            { file: 'Environment_LargeBones.gltf', name: 'bones', pos: [11, 0.1, 8], scale: 0.6, rotY: 0.5 },
+            { file: 'Environment_Skulls.gltf', name: 'skulls', pos: [-8, 0.1, 2], scale: 1.0, rotY: 1.5 },
+            { file: 'Environment_Sawmill.gltf', name: 'sawmill', pos: [4, 0.25, -6], scale: 1.3, rotY: 0.8 },
+
+            // Props
+            { file: 'Prop_Chest_Gold.gltf', name: 'chestGold', pos: [0, 0.25, 3], scale: 1.8, rotY: Math.PI * 0.2 },
+            { file: 'Prop_Chest_Closed.gltf', name: 'chestClosed', pos: [3, 0.25, 5], scale: 1.2, rotY: -0.3 },
+            { file: 'Prop_Coins.gltf', name: 'coins1', pos: [-1, 0.25, 4], scale: 1.5, rotY: 0 },
+            { file: 'Prop_Coins.gltf', name: 'coins2', pos: [1.5, 0.25, 2.5], scale: 1.2, rotY: 1 },
+            { file: 'Prop_GoldBag.gltf', name: 'goldBag', pos: [2, 0.25, 4], scale: 1.3, rotY: 0.5 },
+            { file: 'Prop_Barrel.gltf', name: 'barrel1', pos: [-7, 0.25, 6], scale: 1.2, rotY: 0 },
+            { file: 'Prop_Barrel.gltf', name: 'barrel2', pos: [-6.5, 0.25, 7], scale: 1.2, rotY: 0.8 },
+            { file: 'Prop_Barrel.gltf', name: 'barrel3', pos: [-7.5, 0.25, 6.5], scale: 1.2, rotY: 0.3 },
+            { file: 'Prop_Bucket_Fishes.gltf', name: 'bucketFish', pos: [-5, 0.25, 8], scale: 1.5, rotY: 0 },
+            { file: 'Prop_Anchor.gltf', name: 'anchor', pos: [-9, 0.25, 9], scale: 1.5, rotY: 0.5 },
+            { file: 'Prop_Cannon.gltf', name: 'cannon', pos: [12, 0.25, -3], scale: 1.5, rotY: Math.PI * 0.8 },
+            { file: 'Prop_CannonBall.gltf', name: 'cannonBall1', pos: [11, 0.25, -2], scale: 1.5, rotY: 0 },
+            { file: 'Prop_CannonBall.gltf', name: 'cannonBall2', pos: [11.5, 0.25, -2.5], scale: 1.5, rotY: 0 },
+            { file: 'Prop_Bomb.gltf', name: 'bomb', pos: [10.5, 0.25, -3.5], scale: 1.5, rotY: 0 },
+            { file: 'Prop_Bottle_1.gltf', name: 'bottle1', pos: [-3.5, 0.25, 6], scale: 1.2, rotY: 1.2 },
+            { file: 'Prop_Bottle_2.gltf', name: 'bottle2', pos: [-3, 0.25, 6.5], scale: 1.2, rotY: 0.5 },
+            { file: 'Prop_Skull.gltf', name: 'skull', pos: [0.5, 0.25, 5.5], scale: 1.5, rotY: 2.1 },
+
+            // Weapons scattered
+            { file: 'Weapon_Cutlass.gltf', name: 'cutlass', pos: [-1.5, 0.3, 6], scale: 1.0, rotY: 0.7, rotX: Math.PI * 0.5 },
+            { file: 'Weapon_Pistol.gltf', name: 'pistol', pos: [1, 0.3, 6], scale: 1.0, rotY: 1.2, rotX: Math.PI * 0.5 },
+        ];
+
+        let loadedCount = 0;
+        const totalModels = modelsToLoad.length;
+        const loadingBar = document.getElementById('progress-bar');
+        const loadingText = document.getElementById('loading-text');
+
+        const narrativeTexts = [
+            "El sol desciende sobre la Cala del Contrabandista...",
+            "El Capitán Barbarossa supervisa la descarga del botín.",
+            "Anne y Henry transportan el tesoro hacia la casa de contrabandistas.",
+            "Un guardián esqueleto vigila desde los acantilados...",
+            "Bajo las aguas, criaturas ancestrales acechan en las profundidades.",
+            "Las monedas de oro brillan bajo la última luz del día.",
+            "El aserradero trabaja sin descanso para reparar el barco antes de zarpar.",
+            "La cala oculta ha protegido a los piratas durante generaciones...",
+        ];
+        let currentNarrative = 0;
+
+        function updateLoading(name) {
+            loadedCount++;
+            const pct = Math.round((loadedCount / totalModels) * 100);
+            loadingBar.style.width = pct + '%';
+            loadingText.textContent = `Cargando: ${name}`;
+
+            if (loadedCount >= totalModels) {
+                setTimeout(() => {
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('hud').classList.add('visible');
+                    startNarrative();
+                }, 800);
+            }
+        }
+
+        function startNarrative() {
+            const narrativeEl = document.getElementById('narrative');
+            function showNext() {
+                narrativeEl.classList.remove('visible');
+                setTimeout(() => {
+                    narrativeEl.textContent = narrativeTexts[currentNarrative % narrativeTexts.length];
+                    narrativeEl.classList.add('visible');
+                    currentNarrative++;
+                    setTimeout(() => {
+                        narrativeEl.classList.remove('visible');
+                        setTimeout(showNext, 2000);
+                    }, 6000);
+                }, 1000);
+            }
+            setTimeout(showNext, 2000);
+        }
+
+        // Load all models — promise-based cache for deduplication
+        const loadPromises = {};
+
+        function loadGLTF(file) {
+            if (!loadPromises[file]) {
+                loadPromises[file] = new Promise((resolve, reject) => {
+                    loader.load(BASE + file, resolve, undefined, reject);
+                });
+            }
+            return loadPromises[file];
+        }
+
+        let isFirstUse = {}; // Track first use of each file
+
+        modelsToLoad.forEach(cfg => {
+            loadGLTF(cfg.file).then(gltf => {
+                let model;
+                if (isFirstUse[cfg.file]) {
+                    // Clone for subsequent uses
+                    model = gltf.scene.clone();
+                } else {
+                    // First use gets the original scene
+                    isFirstUse[cfg.file] = true;
+                    model = gltf.scene;
+                }
+
+                model.position.set(...cfg.pos);
+                model.scale.setScalar(cfg.scale);
+                model.rotation.y = cfg.rotY || 0;
+                if (cfg.rotX) model.rotation.x = cfg.rotX;
+
+                model.traverse(child => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                scene.add(model);
+                sceneObjects[cfg.name] = model;
+
+                // Setup animation
+                if (gltf.animations && gltf.animations.length > 0) {
+                    const mixer = new THREE.AnimationMixer(model);
+                    mixers.push(mixer);
+
+                    if (humanoidNames.includes(cfg.name)) {
+                        // Humanoid: setup animation state machine
+                        const idleClip = gltf.animations.find(a => a.name === 'Idle');
+                        const actionAnims = ['Wave', 'Sword', 'Walk', 'Punch'];
+                        const availableActions = [];
+                        actionAnims.forEach(animName => {
+                            const clip = gltf.animations.find(a => a.name === animName);
+                            if (clip) availableActions.push(clip);
+                        });
+
+                        if (idleClip) {
+                            const idleAction = mixer.clipAction(idleClip);
+                            idleAction.play();
+
+                            characterAnimators.push({
+                                name: cfg.name,
+                                mixer,
+                                idleClip,
+                                idleAction,
+                                availableActions,
+                                state: 'idle',        // 'idle' or 'action'
+                                currentAction: null,   // the THREE.AnimationAction currently playing
+                                cyclesRemaining: 0,
+                                cycleCount: 0,
+                                actionDuration: 0
+                            });
+                        }
+                    } else {
+                        // Non-humanoid (shark, tentacles): play their fixed animation
+                        const clip = gltf.animations.find(a => a.name === cfg.anim);
+                        if (clip) {
+                            const action = mixer.clipAction(clip);
+                            action.play();
+                        }
+                    }
+                }
+
+                updateLoading(cfg.name);
+            }).catch(err => {
+                console.warn(`Error loading ${cfg.file}:`, err);
+                updateLoading(cfg.name);
+            });
+        });
+
+        // =====================================================
+        // TREASURE GLOW — Point light at treasure area
+        // =====================================================
+        const treasureLight = new THREE.PointLight(0xffd700, 3, 12);
+        treasureLight.position.set(0, 2, 3);
+        treasureLight.castShadow = true;
+        scene.add(treasureLight);
+
+        // Campfire-like light near barrels
+        const campfireLight = new THREE.PointLight(0xff6622, 2, 8);
+        campfireLight.position.set(-7, 2, 6.5);
+        scene.add(campfireLight);
+
+        // =====================================================
+        // CAMPFIRE GEOMETRY (near barrels)
+        // =====================================================
+        // Fire base (logs)
+        const logGeo = new THREE.CylinderGeometry(0.08, 0.1, 1.2, 8);
+        const logMat = new THREE.MeshStandardMaterial({ color: 0x3a2510, roughness: 1.0 });
+        for (let i = 0; i < 5; i++) {
+            const log = new THREE.Mesh(logGeo, logMat);
+            log.position.set(-7 + Math.cos(i * 1.26) * 0.3, 0.35, 6.5 + Math.sin(i * 1.26) * 0.3);
+            log.rotation.x = Math.PI / 2;
+            log.rotation.z = i * 1.26;
+            log.castShadow = true;
+            scene.add(log);
+        }
+
+        // Fire particles
+        const fireCount = 100;
+        const fireGeo = new THREE.BufferGeometry();
+        const firePositions = new Float32Array(fireCount * 3);
+        const fireVelocities = [];
+        for (let i = 0; i < fireCount; i++) {
+            firePositions[i * 3] = -7 + (Math.random() - 0.5) * 0.5;
+            firePositions[i * 3 + 1] = 0.4 + Math.random() * 1.5;
+            firePositions[i * 3 + 2] = 6.5 + (Math.random() - 0.5) * 0.5;
+            fireVelocities.push({
+                vy: Math.random() * 2 + 1,
+                life: Math.random(),
+                maxLife: Math.random() * 0.8 + 0.4
+            });
+        }
+        fireGeo.setAttribute('position', new THREE.BufferAttribute(firePositions, 3));
+        const fireMat = new THREE.PointsMaterial({
+            color: 0xff6622,
+            size: 0.2,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+        const fireParticles = new THREE.Points(fireGeo, fireMat);
+        scene.add(fireParticles);
+
+        // =====================================================
+        // SMOKE from campfire
+        // =====================================================
+        const smokeCount = 40;
+        const smokeGeo = new THREE.BufferGeometry();
+        const smokePositions = new Float32Array(smokeCount * 3);
+        const smokeData = [];
+        for (let i = 0; i < smokeCount; i++) {
+            smokePositions[i * 3] = -7 + (Math.random() - 0.5) * 0.3;
+            smokePositions[i * 3 + 1] = 2 + Math.random() * 3;
+            smokePositions[i * 3 + 2] = 6.5 + (Math.random() - 0.5) * 0.3;
+            smokeData.push({
+                baseX: -7,
+                baseZ: 6.5,
+                vy: Math.random() * 0.5 + 0.3,
+                phase: Math.random() * Math.PI * 2,
+                life: Math.random()
+            });
+        }
+        smokeGeo.setAttribute('position', new THREE.BufferAttribute(smokePositions, 3));
+        const smokeMat = new THREE.PointsMaterial({
+            color: 0x888888,
+            size: 0.6,
+            transparent: true,
+            opacity: 0.15,
+            depthWrite: false
+        });
+        const smokeParticles = new THREE.Points(smokeGeo, smokeMat);
+        scene.add(smokeParticles);
+
+        // =====================================================
+        // SEAGULLS (simple geometry birds)
+        // =====================================================
+        const birdGroup = new THREE.Group();
+        const birdMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.8 });
+        const birds = [];
+        for (let i = 0; i < 6; i++) {
+            const bird = new THREE.Group();
+            const bodyGeo = new THREE.ConeGeometry(0.1, 0.5, 4);
+            const body = new THREE.Mesh(bodyGeo, birdMat);
+            body.rotation.x = -Math.PI / 2; // Cone tip points toward -Z (local forward)
+            bird.add(body);
+
+            const wingGeo = new THREE.PlaneGeometry(0.6, 0.15);
+            const wingL = new THREE.Mesh(wingGeo, birdMat);
+            wingL.position.set(-0.3, 0, 0);
+            bird.add(wingL);
+            const wingR = new THREE.Mesh(wingGeo, birdMat);
+            wingR.position.set(0.3, 0, 0);
+            bird.add(wingR);
+
+            const angle = (i / 6) * Math.PI * 2;
+            const radius = 25 + Math.random() * 10;
+            bird.position.set(
+                Math.cos(angle) * radius,
+                12 + Math.random() * 8,
+                Math.sin(angle) * radius
+            );
+            birdGroup.add(bird);
+            birds.push({
+                mesh: bird,
+                wingL, wingR,
+                angle: angle,
+                radius: radius,
+                height: bird.position.y,
+                speed: 0.15 + Math.random() * 0.1,
+                wingSpeed: 3 + Math.random() * 2
+            });
+        }
+        scene.add(birdGroup);
+
+        // =====================================================
+        // ANIMATION LOOP
+        // =====================================================
+        const clock = new THREE.Clock();
+        let elapsedTime = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            elapsedTime += delta;
+
+            // Update model animation mixers
+            mixers.forEach(m => m.update(delta));
+
+            // Character animation state machine
+            characterAnimators.forEach(ca => {
+                if (ca.state === 'idle') {
+                    // Small random chance to trigger an action (~0.3% per frame ≈ every ~5-6 seconds at 60fps)
+                    if (ca.availableActions.length > 0 && Math.random() < 0.003) {
+                        // Pick a random action clip
+                        const clip = ca.availableActions[Math.floor(Math.random() * ca.availableActions.length)];
+                        const cycles = Math.floor(Math.random() * 5) + 1; // 1-5 cycles
+
+                        const action = ca.mixer.clipAction(clip);
+                        action.reset();
+                        action.setLoop(THREE.LoopRepeat, cycles);
+                        action.clampWhenFinished = false;
+                        action.play();
+
+                        // Crossfade from idle to action
+                        ca.idleAction.crossFadeTo(action, 0.4, true);
+
+                        ca.state = 'action';
+                        ca.currentAction = action;
+                        ca.actionDuration = clip.duration * cycles;
+                        ca.cycleCount = 0;
+                    }
+                } else if (ca.state === 'action') {
+                    ca.cycleCount += delta;
+                    // Check if the action has finished its cycles
+                    if (ca.cycleCount >= ca.actionDuration) {
+                        // Crossfade back to idle
+                        ca.currentAction.crossFadeTo(ca.idleAction, 0.4, true);
+                        ca.idleAction.reset();
+                        ca.idleAction.play();
+
+                        ca.state = 'idle';
+                        ca.currentAction = null;
+                        ca.cycleCount = 0;
+                    }
+                }
+            });
+
+            // Water shader
+            waterMat.uniforms.uTime.value = elapsedTime;
+
+            // Ship bobbing
+            if (sceneObjects.shipLarge) {
+                sceneObjects.shipLarge.position.y = -0.8 + Math.sin(elapsedTime * 0.5) * 0.2;
+                sceneObjects.shipLarge.rotation.z = Math.sin(elapsedTime * 0.3) * 0.04;
+                sceneObjects.shipLarge.rotation.x = Math.sin(elapsedTime * 0.4 + 1) * 0.02;
+            }
+            if (sceneObjects.shipSmall) {
+                sceneObjects.shipSmall.position.y = -0.7 + Math.sin(elapsedTime * 0.6 + 2) * 0.15;
+                sceneObjects.shipSmall.rotation.z = Math.sin(elapsedTime * 0.35 + 1) * 0.05;
+            }
+
+            // Treasure light flicker
+            treasureLight.intensity = 3 + Math.sin(elapsedTime * 4) * 0.5 + Math.sin(elapsedTime * 7) * 0.3;
+
+            // Campfire light flicker
+            campfireLight.intensity = 2 + Math.sin(elapsedTime * 5) * 0.4 + Math.cos(elapsedTime * 8) * 0.3;
+
+            // Dust particles — wind drift effect
+            const windSpeed = 1.5; // main wind along X
+            const dustArr = dustGeo.attributes.position.array;
+            for (let i = 0; i < dustCount; i++) {
+                // Main wind direction + per-particle variation
+                dustArr[i * 3] += (windSpeed + dustWindDirs[i]) * delta + Math.sin(elapsedTime * dustSpeeds[i] * 0.5 + i) * 0.005;
+                dustArr[i * 3 + 1] += dustSpeeds[i] * 0.003;
+                dustArr[i * 3 + 2] += dustWindDirs[i] * 0.3 * delta + Math.cos(elapsedTime * dustSpeeds[i] * 0.3 + i) * 0.004;
+                // Wrap around when beyond bounds
+                if (dustArr[i * 3] > 125) dustArr[i * 3] = -125;
+                if (dustArr[i * 3] < -125) dustArr[i * 3] = 125;
+                if (dustArr[i * 3 + 2] > 125) dustArr[i * 3 + 2] = -125;
+                if (dustArr[i * 3 + 2] < -125) dustArr[i * 3 + 2] = 125;
+                if (dustArr[i * 3 + 1] > 12) dustArr[i * 3 + 1] = 0.3;
+            }
+            dustGeo.attributes.position.needsUpdate = true;
+
+            // Fireflies — individual desynchronized movement & glow
+            for (let i = 0; i < fireflyCount; i++) {
+                const fd = fireflyData[i];
+                const nx = fd.baseX + Math.sin(elapsedTime * fd.speed + fd.phase) * fd.radius;
+                const ny = fd.baseY + Math.sin(elapsedTime * fd.speed * 0.7 + fd.phase * 2) * 0.5;
+                const nz = fd.baseZ + Math.cos(elapsedTime * fd.speed + fd.phase) * fd.radius;
+                fd.mesh.position.set(nx, ny, nz);
+                fd.light.position.set(nx, ny, nz);
+
+                // Each firefly pulses at its own rate and phase
+                const glow = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(elapsedTime * fd.glowSpeed + fd.glowPhase));
+                fd.mesh.material.opacity = glow;
+                fd.light.intensity = glow * 0.8;
+            }
+
+            // Fire particles
+            const fpArr = fireGeo.attributes.position.array;
+            for (let i = 0; i < fireCount; i++) {
+                const fv = fireVelocities[i];
+                fv.life += delta;
+                if (fv.life > fv.maxLife) {
+                    fpArr[i * 3] = -7 + (Math.random() - 0.5) * 0.4;
+                    fpArr[i * 3 + 1] = 0.4;
+                    fpArr[i * 3 + 2] = 6.5 + (Math.random() - 0.5) * 0.4;
+                    fv.life = 0;
+                    fv.vy = Math.random() * 2 + 1;
+                } else {
+                    fpArr[i * 3 + 1] += fv.vy * delta;
+                    fpArr[i * 3] += (Math.random() - 0.5) * 0.02;
+                    fpArr[i * 3 + 2] += (Math.random() - 0.5) * 0.02;
+                }
+            }
+            fireGeo.attributes.position.needsUpdate = true;
+
+            // Smoke particles
+            const spArr = smokeGeo.attributes.position.array;
+            for (let i = 0; i < smokeCount; i++) {
+                const sd = smokeData[i];
+                sd.life += delta * 0.3;
+                if (sd.life > 1) {
+                    spArr[i * 3] = sd.baseX + (Math.random() - 0.5) * 0.2;
+                    spArr[i * 3 + 1] = 2;
+                    spArr[i * 3 + 2] = sd.baseZ + (Math.random() - 0.5) * 0.2;
+                    sd.life = 0;
+                } else {
+                    spArr[i * 3 + 1] += sd.vy * delta;
+                    spArr[i * 3] += Math.sin(elapsedTime + sd.phase) * 0.01;
+                    spArr[i * 3 + 2] += Math.cos(elapsedTime * 0.7 + sd.phase) * 0.01;
+                }
+            }
+            smokeGeo.attributes.position.needsUpdate = true;
+
+            // Birds — orient along movement tangent
+            birds.forEach(b => {
+                const prevX = b.mesh.position.x;
+                const prevZ = b.mesh.position.z;
+                b.angle += b.speed * delta;
+                b.mesh.position.x = Math.cos(b.angle) * b.radius;
+                b.mesh.position.z = Math.sin(b.angle) * b.radius;
+                b.mesh.position.y = b.height + Math.sin(elapsedTime * 0.5 + b.angle) * 1;
+
+                // Face the direction of movement (tangent)
+                const dx = b.mesh.position.x - prevX;
+                const dz = b.mesh.position.z - prevZ;
+                b.mesh.rotation.y = Math.atan2(dx, dz);
+
+                // Wing flap
+                const wingAngle = Math.sin(elapsedTime * b.wingSpeed) * 0.4;
+                b.wingL.rotation.z = wingAngle;
+                b.wingR.rotation.z = -wingAngle;
+            });
+
+            // Shark patrol — orient along movement tangent
+            if (sceneObjects.shark) {
+                const sharkAngle = elapsedTime * 0.2;
+                const sharkRadius = 25;
+                const sx = Math.cos(sharkAngle) * sharkRadius;
+                const sz = Math.sin(sharkAngle) * sharkRadius;
+                // Tangent of circular path: derivative of (cos θ, sin θ) = (-sin θ, cos θ)
+                const tx = -Math.sin(sharkAngle);
+                const tz = Math.cos(sharkAngle);
+                sceneObjects.shark.position.x = sx;
+                sceneObjects.shark.position.z = sz;
+                sceneObjects.shark.position.y = -1.7 + Math.sin(elapsedTime * 0.8) * 0.2;
+                sceneObjects.shark.rotation.y = Math.atan2(tx, tz);
+            }
+
+            // Compass needle
+            const compassNeedle = document.getElementById('compass-needle');
+            if (compassNeedle) {
+                const cameraAngle = Math.atan2(camera.position.x, camera.position.z);
+                compassNeedle.style.transform = `rotate(${cameraAngle * (180 / Math.PI)}deg)`;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // =====================================================
+        // RESPONSIVE
+        // =====================================================
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+
+</html>
