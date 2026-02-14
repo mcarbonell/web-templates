@@ -3,31 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debug - Capitan Barbarossa</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: #1a1a2e;
-        }
-        canvas {
-            display: block;
-        }
-        #info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            font-family: monospace;
-            background: rgba(0,0,0,0.7);
-            padding: 10px;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div id="info">Cargando capitán...</div>
+    <title>Escena 1: La Tormenta - El Último Pirata</title>
     
+    <!-- Three.js moderno -->
     <script type="importmap">
     {
         "imports": {
@@ -36,170 +14,978 @@
         }
     }
     </script>
-
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #1a1a2e;
+            font-family: 'Georgia', serif;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        /* Panel de información debug */
+        #debug-panel {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 100;
+            max-width: 320px;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        #debug-panel h3 {
+            color: #f39c12;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(243, 156, 18, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        #debug-panel p {
+            margin: 5px 0;
+            color: #aaa;
+        }
+        
+        #debug-panel .value {
+            color: #4ecdc4;
+        }
+        
+        #debug-panel .section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #debug-panel .section-title {
+            color: #f39c12;
+            font-size: 11px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        /* Checkboxes estilo toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 6px 0;
+            padding: 4px 0;
+        }
+        
+        .toggle-row label {
+            color: #ccc;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        
+        .toggle-row input[type="checkbox"] {
+            width: 40px;
+            height: 20px;
+            appearance: none;
+            background: #333;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+        }
+        
+        .toggle-row input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #666;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        
+        .toggle-row input[type="checkbox"]:checked {
+            background: #f39c12;
+        }
+        
+        .toggle-row input[type="checkbox"]:checked::before {
+            left: 22px;
+            background: #fff;
+        }
+        
+        /* Slider estilo */
+        .slider-row {
+            margin: 8px 0;
+        }
+        
+        .slider-row label {
+            display: block;
+            color: #ccc;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+        
+        .slider-row input[type="range"] {
+            width: 100%;
+            height: 6px;
+            appearance: none;
+            background: #333;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #f39c12;
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            color: #4ecdc4;
+            font-size: 10px;
+            text-align: right;
+        }
+        
+        /* Panel de historia */
+        #story-panel {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            max-width: 500px;
+            width: 90%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .story-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .story-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dialogue {
+            font-style: italic;
+            color: #f39c12;
+            font-size: 0.95rem;
+            margin: 0.5rem 0;
+            padding: 0.3rem 0.8rem;
+            border-left: 2px solid #f39c12;
+        }
+        
+        .dialogue strong {
+            color: #fff;
+            font-style: normal;
+        }
+        
+        /* Loading */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px 60px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        #loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(243, 156, 18, 0.3);
+            border-top-color: #f39c12;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Controles de cámara */
+        #controls-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        
+        /* Botón reset cámara */
+        #reset-camera {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(243, 156, 18, 0.8);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            z-index: 100;
+            transition: background 0.3s;
+        }
+        
+        #reset-camera:hover {
+            background: #f39c12;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div id="loading">
+        <div id="loading-spinner"></div>
+        <div style="color: #f39c12; font-size: 1.2rem;">Cargando escena...</div>
+        <div id="loading-text" style="font-size: 14px; margin-top: 10px; color: #888;">Preparando la tormenta</div>
+    </div>
+    
+    <!-- Panel de historia -->
+    <div id="story-panel">
+        <h1 class="story-title">El Último Pirata</h1>
+        <p class="story-text">
+            En medio del océano infinito, el Capitán Barbarossa navegaba solo. 
+            Una tormenta furiosa amenazaba con tragar su barco.
+        </p>
+        <div class="dialogue">
+            <strong>Barbarossa:</strong> "¡Maldita sea esta tormenta! ¿Dónde encontraré ahora una tripulación valiente?"
+        </div>
+    </div>
+    
+    <!-- Debug panel -->
+    <div id="debug-panel">
+        <h3> pirate Debug - Escena 1</h3>
+        
+        <p>FPS: <span id="fps" class="value">--</span></p>
+        <p>Barco Y: <span id="ship-y" class="value">--</span></p>
+        <p>Barco Rot: <span id="ship-rot" class="value">--</span></p>
+        <p>Capitán pos: <span id="captain-pos" class="value">--</span></p>
+        <p>Modelos cargados: <span id="models-loaded" class="value">--</span></p>
+        
+        <div class="section">
+            <div class="section-title">Efectos</div>
+            
+            <div class="toggle-row">
+                <label for="toggle-rain">Lluvia</label>
+                <input type="checkbox" id="toggle-rain" checked>
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-lightning">Relámpagos</label>
+                <input type="checkbox" id="toggle-lightning" checked>
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-ship-motion">Movimiento barco</label>
+                <input type="checkbox" id="toggle-ship-motion" checked>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Iluminación Debug</div>
+            
+            <div class="toggle-row">
+                <label for="toggle-debug-light">Luz global debug</label>
+                <input type="checkbox" id="toggle-debug-light">
+            </div>
+            
+            <div class="slider-row">
+                <label>Intensidad luz debug</label>
+                <input type="range" id="debug-light-intensity" min="0" max="2" step="0.1" value="1">
+                <div class="slider-value"><span id="intensity-value">1.0</span></div>
+            </div>
+            
+            <div class="slider-row">
+                <label>Intensidad ambiental</label>
+                <input type="range" id="ambient-intensity" min="0" max="1" step="0.05" value="0.3">
+                <div class="slider-value"><span id="ambient-value">0.3</span></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Helpers</div>
+            
+            <div class="toggle-row">
+                <label for="toggle-axes">Ejes XYZ</label>
+                <input type="checkbox" id="toggle-axes">
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-grid">Grid suelo</label>
+                <input type="checkbox" id="toggle-grid">
+            </div>
+            
+            <div class="toggle-row">
+                <label for="toggle-captain-box">Box capitán</label>
+                <input type="checkbox" id="toggle-captain-box">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reset cámara -->
+    <button id="reset-camera"> Reset Cámara</button>
+    
+    <!-- Controles hint -->
+    <div id="controls-hint">
+        Arrastra para rotar | Scroll para zoom | Click derecho para panear
+    </div>
+    
     <script type="module">
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-        // Scene setup
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87CEEB);
         
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 3, 8);
+        import { CONFIG, createFallbackGeometry } from './js/config.js';
+        import { RainSystem, LightningSystem, createWater, animateWater } from './js/effects.js';
+        import { AnimationManager, playIdleAnimation } from './js/animations.js';
         
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        document.body.appendChild(renderer.domElement);
-
-        // Controls
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-
-        // Lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        dirLight.position.set(5, 10, 5);
-        dirLight.castShadow = true;
-        scene.add(dirLight);
-
-        // Ground
-        const ground = new THREE.Mesh(
-            new THREE.PlaneGeometry(20, 20),
-            new THREE.MeshStandardMaterial({ color: 0x5a8f3a })
-        );
-        ground.rotation.x = -Math.PI / 2;
-        ground.receiveShadow = true;
-        scene.add(ground);
-
-        // Grid helper
-        const grid = new THREE.GridHelper(20, 20);
-        scene.add(grid);
-
-        // Load captain
-        const loader = new GLTFLoader();
-        let mixer = null;
-        let captainModel = null;
-
-        loader.load(
-            '../../assets/3D/pirate-kit/glTF/Characters_Captain_Barbarossa.gltf',
-            (gltf) => {
-                console.log('=== CAPITÁN CARGADO ===');
-                console.log('Escena:', gltf.scene);
-                console.log('Animaciones:', gltf.animations);
-                
-                captainModel = gltf.scene;
-                
-                // Position
-                captainModel.position.set(0, 0, 0);
-                captainModel.scale.set(1, 1, 1);
-                
-                // Inspect all children
-                console.log('\n=== HIJOS DEL MODELO ===');
-                let meshCount = 0;
-                let skinnedMeshCount = 0;
-                
-                captainModel.traverse((child) => {
-                    console.log(`- ${child.name || 'sin nombre'} | Tipo: ${child.type}`);
-                    
-                    if (child.isMesh || child.isSkinnedMesh) {
-                        meshCount++;
-                        console.log(`  -> Mesh #${meshCount}: ${child.name}`);
-                        console.log(`  -> Visible: ${child.visible}`);
-                        console.log(`  -> Material: ${child.material ? 'SÍ' : 'NO'}`);
-                        
-                        if (child.isSkinnedMesh) {
-                            skinnedMeshCount++;
-                            console.log(`  -> ES SKINNEDMESH!`);
-                            console.log(`  -> Skeleton huesos: ${child.skeleton ? child.skeleton.bones.length : 'N/A'}`);
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let scene, camera, renderer, controls;
+        let clock = new THREE.Clock();
+        let animationManager;
+        
+        // Modelos cargados
+        let loadedModels = {};
+        
+        // Elementos de la escena
+        let stormGroup;
+        let shipInStorm;
+        let captainModel;
+        let waterMesh;
+        
+        // Efectos
+        let rainSystem;
+        let lightningSystem;
+        
+        // Luces
+        let ambientLight;
+        let debugLight;
+        
+        // Helpers
+        let axesHelper;
+        let gridHelper;
+        let captainBox;
+        
+        // Debug state
+        let debugState = {
+            rain: true,
+            lightning: true,
+            shipMotion: true,
+            debugLight: false,
+            axes: false,
+            grid: false,
+            captainBox: false
+        };
+        
+        // Debug
+        let frameCount = 0;
+        let lastTime = performance.now();
+        
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        async function init() {
+            setupThreeJS();
+            setupLights();
+            setupControls();
+            setupDebugControls();
+            setupHelpers();
+            
+            await loadModels();
+            
+            buildScene();
+            
+            // Ocultar loading
+            document.getElementById('loading').classList.add('hidden');
+            
+            // Iniciar animación
+            animate();
+        }
+        
+        // ============================================
+        // THREE.JS SETUP
+        // ============================================
+        function setupThreeJS() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(CONFIG.colors.storm.background);
+            scene.fog = new THREE.FogExp2(CONFIG.colors.storm.fog, 0.015);
+            
+            camera = new THREE.PerspectiveCamera(
+                CONFIG.camera.fov,
+                window.innerWidth / window.innerHeight,
+                CONFIG.camera.near,
+                CONFIG.camera.far
+            );
+            camera.position.set(0, 8, 20);
+            
+            renderer = new THREE.WebGLRenderer({
+                antialias: CONFIG.renderer.antialias,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, CONFIG.renderer.pixelRatioLimit));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = CONFIG.renderer.toneMappingExposure;
+            
+            document.body.appendChild(renderer.domElement);
+            
+            // Resize handler
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        // ============================================
+        // LUCES
+        // ============================================
+        function setupLights() {
+            // Luz ambiental (muy oscura para tormenta)
+            ambientLight = new THREE.AmbientLight(CONFIG.colors.storm.ambient, 0.3);
+            scene.add(ambientLight);
+            
+            // Luz de luna (fría, azulada)
+            const moon = new THREE.DirectionalLight(CONFIG.colors.storm.moon, 0.4);
+            moon.position.set(20, 30, -20);
+            moon.castShadow = true;
+            moon.shadow.mapSize.width = 2048;
+            moon.shadow.mapSize.height = 2048;
+            scene.add(moon);
+            
+            // Luz de relleno
+            const fill = new THREE.DirectionalLight(0x2d3561, 0.3);
+            fill.position.set(-20, 10, 20);
+            scene.add(fill);
+            
+            // Luz de debug (inicialmente apagada)
+            debugLight = new THREE.DirectionalLight(0xffffff, 0);
+            debugLight.position.set(10, 20, 10);
+            scene.add(debugLight);
+            
+            // Hemisphere light para iluminación más natural
+            const hemi = new THREE.HemisphereLight(0x87CEEB, 0x3d5c3d, 0.1);
+            scene.add(hemi);
+        }
+        
+        // ============================================
+        // CONTROLES
+        // ============================================
+        function setupControls() {
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 5;
+            controls.maxDistance = 50;
+            controls.maxPolarAngle = Math.PI / 2 + 0.3;
+            controls.target.set(0, 2, 0);
+        }
+        
+        // ============================================
+        // HELPERS
+        // ============================================
+        function setupHelpers() {
+            // Ejes
+            axesHelper = new THREE.AxesHelper(10);
+            axesHelper.visible = false;
+            scene.add(axesHelper);
+            
+            // Grid
+            gridHelper = new THREE.GridHelper(50, 50, 0x444444, 0x222222);
+            gridHelper.position.y = 0.01;
+            gridHelper.visible = false;
+            scene.add(gridHelper);
+        }
+        
+        // ============================================
+        // CONTROLES DEBUG
+        // ============================================
+        function setupDebugControls() {
+            // Toggle lluvia
+            document.getElementById('toggle-rain').addEventListener('change', (e) => {
+                debugState.rain = e.target.checked;
+                if (rainSystem) {
+                    rainSystem.points.visible = debugState.rain;
+                }
+            });
+            
+            // Toggle relámpagos
+            document.getElementById('toggle-lightning').addEventListener('change', (e) => {
+                debugState.lightning = e.target.checked;
+            });
+            
+            // Toggle movimiento barco
+            document.getElementById('toggle-ship-motion').addEventListener('change', (e) => {
+                debugState.shipMotion = e.target.checked;
+            });
+            
+            // Toggle luz debug
+            document.getElementById('toggle-debug-light').addEventListener('change', (e) => {
+                debugState.debugLight = e.target.checked;
+                const intensity = parseFloat(document.getElementById('debug-light-intensity').value);
+                debugLight.intensity = debugState.debugLight ? intensity : 0;
+            });
+            
+            // Intensidad luz debug
+            document.getElementById('debug-light-intensity').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                document.getElementById('intensity-value').textContent = value.toFixed(1);
+                if (debugState.debugLight) {
+                    debugLight.intensity = value;
+                }
+            });
+            
+            // Intensidad ambiental
+            document.getElementById('ambient-intensity').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                document.getElementById('ambient-value').textContent = value.toFixed(2);
+                ambientLight.intensity = value;
+            });
+            
+            // Toggle ejes
+            document.getElementById('toggle-axes').addEventListener('change', (e) => {
+                debugState.axes = e.target.checked;
+                axesHelper.visible = debugState.axes;
+            });
+            
+            // Toggle grid
+            document.getElementById('toggle-grid').addEventListener('change', (e) => {
+                debugState.grid = e.target.checked;
+                gridHelper.visible = debugState.grid;
+            });
+            
+            // Toggle box capitán
+            document.getElementById('toggle-captain-box').addEventListener('change', (e) => {
+                debugState.captainBox = e.target.checked;
+                if (captainBox) {
+                    captainBox.visible = debugState.captainBox;
+                }
+            });
+            
+            // Reset cámara
+            document.getElementById('reset-camera').addEventListener('click', () => {
+                camera.position.set(0, 8, 20);
+                controls.target.set(0, 2, 0);
+                controls.update();
+            });
+        }
+        
+        // ============================================
+        // CARGA DE MODELOS
+        // ============================================
+        async function loadModels() {
+            const loader = new GLTFLoader();
+            const modelsToLoad = {
+                shipLarge: CONFIG.models.shipLarge,
+                barbarossa: CONFIG.models.barbarossa,
+                barrel: CONFIG.models.barrel,
+                palmTree1: CONFIG.models.palmTree1
+            };
+            
+            const total = Object.keys(modelsToLoad).length;
+            let loaded = 0;
+            let successCount = 0;
+            
+            const loadModel = (name, path) => {
+                return new Promise((resolve) => {
+                    loader.load(
+                        path,
+                        (gltf) => {
+                            loadedModels[name] = gltf.scene;
                             
-                            if (child.skeleton) {
-                                console.log(`  -> Huesos:`);
-                                child.skeleton.bones.forEach((bone, i) => {
-                                    console.log(`     [${i}] ${bone.name}`);
-                                });
+                            // Guardar animaciones si existen
+                            if (gltf.animations && gltf.animations.length > 0) {
+                                loadedModels[name + '_animations'] = gltf.animations;
+                                console.log(` Animaciones de ${name}:`, gltf.animations.map(a => a.name));
                             }
+                            
+                            // Configurar sombras
+                            gltf.scene.traverse((child) => {
+                                if (child.isMesh) {
+                                    child.castShadow = true;
+                                    child.receiveShadow = true;
+                                }
+                            });
+                            
+                            loaded++;
+                            successCount++;
+                            document.getElementById('loading-text').textContent = 
+                                `${loaded}/${total} modelos cargados`;
+                            document.getElementById('models-loaded').textContent = `${successCount}/${total}`;
+                            
+                            console.log(` Modelo ${name} cargado correctamente`);
+                            resolve();
+                        },
+                        (progress) => {
+                            if (progress.total > 0) {
+                                const percent = (progress.loaded / progress.total * 100).toFixed(0);
+                                document.getElementById('loading-text').textContent = 
+                                    `Cargando ${name}: ${percent}%`;
+                            }
+                        },
+                        (error) => {
+                            console.warn(` Error cargando ${name}:`, error);
+                            loadedModels[name] = createFallbackGeometry(name);
+                            loaded++;
+                            document.getElementById('loading-text').textContent = 
+                                `${loaded}/${total} modelos (con fallback)`;
+                            resolve();
                         }
-                        
-                        // Ensure visible
-                        child.visible = true;
-                        if (child.material) {
-                            child.material = child.material.clone();
-                        }
+                    );
+                });
+            };
+            
+            await Promise.all(
+                Object.entries(modelsToLoad).map(([name, path]) => loadModel(name, path))
+            );
+            
+            console.log('=== RESUMEN DE CARGA ===');
+            console.log('Modelos:', Object.keys(loadedModels).filter(k => !k.includes('_animations')));
+            console.log('Animaciones:', Object.keys(loadedModels).filter(k => k.includes('_animations')));
+        }
+        
+        // ============================================
+        // CONSTRUIR ESCENA
+        // ============================================
+        function buildScene() {
+            // Crear grupo principal
+            stormGroup = new THREE.Group();
+            scene.add(stormGroup);
+            
+            // Agua tormentosa
+            waterMesh = createWater(300, 300, CONFIG.colors.storm.water, {
+                roughness: 0.1,
+                metalness: 0.8,
+                segments: 64
+            });
+            waterMesh.position.y = -1;
+            stormGroup.add(waterMesh);
+            
+            // Barco
+            buildShip(stormGroup);
+            
+            // Capitán
+            buildCaptain();
+            
+            // Islas lejanas (siluetas)
+            buildDistantIslands(stormGroup);
+            
+            // Efectos
+            buildEffects(stormGroup);
+            
+            // Animation manager
+            animationManager = new AnimationManager();
+        }
+        
+        function buildShip(parent) {
+            if (!loadedModels.shipLarge) {
+                console.warn(' No hay modelo de barco');
+                return;
+            }
+            
+            shipInStorm = loadedModels.shipLarge.clone();
+            shipInStorm.position.set(0, 0, 0);
+            shipInStorm.scale.setScalar(CONFIG.scene1.shipScale);
+            shipInStorm.rotation.y = 0.3;
+            parent.add(shipInStorm);
+            
+            // Debug: mostrar dimensiones del barco
+            const box = new THREE.Box3().setFromObject(shipInStorm);
+            const size = box.getSize(new THREE.Vector3());
+            const center = box.getCenter(new THREE.Vector3());
+            console.log('=== DIMENSIONES DEL BARCO ===');
+            console.log('Tamaño:', size.x.toFixed(2), 'x', size.y.toFixed(2), 'x', size.z.toFixed(2));
+            console.log('Centro:', center.x.toFixed(2), ',', center.y.toFixed(2), ',', center.z.toFixed(2));
+            console.log('Altura máxima:', box.max.y.toFixed(2));
+            console.log('Altura mínima:', box.min.y.toFixed(2));
+            
+            // Barriles en cubierta
+            const DECK_LEVEL = CONFIG.scene1.DECK_LEVEL;
+            
+            if (loadedModels.barrel) {
+                const barrelPositions = [
+                    { x: -1, y: DECK_LEVEL, z: -1, rotX: 0.0, rotZ: 0.0 },
+                    { x: 1.5, y: DECK_LEVEL + 0.3, z: -1.5, rotX: 1.5, rotZ: 0.0 },
+                    { x: -1, y: DECK_LEVEL, z: 1, rotX: 0, rotZ: -0.0 }
+                ];
+                
+                barrelPositions.forEach((pos, i) => {
+                    const barrel = loadedModels.barrel.clone();
+                    barrel.position.set(pos.x, pos.y, pos.z);
+                    barrel.rotation.set(pos.rotX, 0, pos.rotZ);
+                    barrel.visible = true;
+                    barrel.traverse(child => child.visible = true);
+                    shipInStorm.add(barrel);
+                    console.log(` Barril ${i+1} posicionado en (${pos.x}, ${DECK_LEVEL}, ${pos.z})`);
+                });
+                
+                console.log(' Barriles añadidos:', barrelPositions.length);
+            } else {
+                console.warn(' No hay modelo de barril');
+            }
+            
+            console.log(' Barco creado con', shipInStorm.children.length, 'elementos hijos');
+        }
+        
+        function buildCaptain() {
+            if (!loadedModels.barbarossa) {
+                console.warn(' No hay modelo del capitán');
+                return;
+            }
+            
+            if (!shipInStorm) {
+                console.warn(' No hay barco para añadir el capitán');
+                return;
+            }
+            
+            const DECK_LEVEL = CONFIG.scene1.DECK_LEVEL;
+            
+            // IMPORTANTE: Usar el modelo directamente SIN clonar
+            // El modelo GLTF tiene una estructura jerárquica (espada -> capitán -> loro)
+            // Al clonar se rompe la relación y los meshes se desplazan
+            captainModel = loadedModels.barbarossa;
+            
+            // Posicionar en el centro del barco, a nivel de cubierta
+            captainModel.position.set(0.9, DECK_LEVEL, 0);
+            captainModel.rotation.y = -0.5;
+            captainModel.visible = true;
+            
+            // Asegurar que todos los hijos son visibles
+            let meshCount = 0;
+            captainModel.traverse((child) => {
+                child.visible = true;
+                if (child.isMesh || child.isSkinnedMesh) {
+                    meshCount++;
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            
+            console.log('=== CAPITÁN BARBAROSSA (sin clonar) ===');
+            console.log('Meshes encontrados:', meshCount);
+            console.log('Posición local:', captainModel.position);
+            
+            // Añadir al barco
+            shipInStorm.add(captainModel);
+            
+            // Crear box helper para debug
+            const box = new THREE.Box3().setFromObject(captainModel);
+            const size = box.getSize(new THREE.Vector3());
+            captainBox = new THREE.Mesh(
+                new THREE.BoxGeometry(size.x, size.y, size.z),
+                new THREE.MeshBasicMaterial({ 
+                    color: 0x00ff00, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.5
+                })
+            );
+            const center = box.getCenter(new THREE.Vector3());
+            captainBox.position.copy(center);
+            captainBox.visible = false;
+            scene.add(captainBox); // Añadir a la escena, no al capitán
+            
+            console.log('Dimensiones capitán:', size.x.toFixed(2), 'x', size.y.toFixed(2), 'x', size.z.toFixed(2));
+            
+            // Obtener posición mundial para verificar
+            const worldPos = new THREE.Vector3();
+            captainModel.getWorldPosition(worldPos);
+            console.log('Posición mundial inicial:', worldPos);
+            
+            // Animación Idle
+            const animations = loadedModels['barbarossa_animations'];
+            if (animations && animations.length > 0) {
+                const mixer = new THREE.AnimationMixer(captainModel);
+                
+                const idleAnim = animations.find(a => a.name === 'Idle');
+                if (idleAnim) {
+                    mixer.clipAction(idleAnim).play();
+                    console.log(' Animación Idle iniciada');
+                } else {
+                    // Reproducir primera animación disponible
+                    mixer.clipAction(animations[0]).play();
+                    console.log(' Animación', animations[0].name, 'iniciada');
+                }
+                
+                // Guardar referencia
+                captainModel.userData.mixer = mixer;
+            } else {
+                console.warn(' No hay animaciones para el capitán');
+            }
+        }
+        
+        function buildDistantIslands(parent) {
+            if (!loadedModels.palmTree1) return;
+            
+            for (let i = 0; i < 5; i++) {
+                const palm = loadedModels.palmTree1.clone();
+                palm.position.set(
+                    (Math.random() - 0.5) * 100,
+                    -1,
+                    -60 - Math.random() * 30
+                );
+                palm.scale.setScalar(0.6 + Math.random() * 0.4);
+                palm.rotation.y = Math.random() * Math.PI * 2;
+                
+                // Oscurecer para efecto silueta
+                palm.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        child.material = child.material.clone();
+                        child.material.color.setHex(0x0a0a15);
                     }
                 });
                 
-                console.log(`\nTotal meshes: ${meshCount}`);
-                console.log(`Total SkinnedMesh: ${skinnedMeshCount}`);
-                
-                scene.add(captainModel);
-                
-                // Animation
-                if (gltf.animations && gltf.animations.length > 0) {
-                    console.log('\n=== INICIANDO ANIMACIONES ===');
-                    mixer = new THREE.AnimationMixer(captainModel);
-                    
-                    gltf.animations.forEach((anim, i) => {
-                        console.log(`[${i}] ${anim.name}`);
-                    });
-                    
-                    const idleAction = mixer.clipAction(gltf.animations.find(a => a.name === 'Idle'));
-                    if (idleAction) {
-                        idleAction.play();
-                        console.log('Animación Idle iniciada');
-                    }
-                }
-                
-                // Add debug box
-                const box = new THREE.Box3().setFromObject(captainModel);
-                const size = box.getSize(new THREE.Vector3());
-                console.log('\nDimensiones:', size);
-                console.log('Centro:', box.getCenter(new THREE.Vector3()));
-                
-                const debugBox = new THREE.Mesh(
-                    new THREE.BoxGeometry(size.x, size.y, size.z),
-                    new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
-                );
-                debugBox.position.copy(box.getCenter(new THREE.Vector3()));
-                scene.add(debugBox);
-                
-                document.getElementById('info').textContent = 'Capitán cargado! Usa el ratón para rotar/zoom';
-            },
-            (progress) => {
-                const percent = (progress.loaded / progress.total * 100).toFixed(0);
-                document.getElementById('info').textContent = `Cargando: ${percent}%`;
-            },
-            (error) => {
-                console.error('Error cargando:', error);
-                document.getElementById('info').textContent = 'Error al cargar';
+                parent.add(palm);
             }
-        );
-
-        // Animation loop
-        const clock = new THREE.Clock();
+        }
         
+        function buildEffects(parent) {
+            // Sistema de lluvia
+            rainSystem = new RainSystem(parent, CONFIG.scene1.rainCount);
+            console.log(' Sistema de lluvia creado:', CONFIG.scene1.rainCount, 'partículas');
+            
+            // Sistema de relámpagos
+            lightningSystem = new LightningSystem(scene, {
+                probability: CONFIG.scene1.lightningProbability,
+                minDuration: CONFIG.scene1.lightningMinDuration,
+                maxDuration: CONFIG.scene1.lightningMaxDuration
+            });
+            console.log(' Sistema de relámpagos creado');
+        }
+        
+        // ============================================
+        // ANIMACIÓN PRINCIPAL
+        // ============================================
         function animate() {
             requestAnimationFrame(animate);
             
             const delta = clock.getDelta();
-            if (mixer) mixer.update(delta);
+            const time = clock.getElapsedTime();
             
+            // Actualizar controles
             controls.update();
+            
+            // Actualizar animación del capitán
+            if (captainModel && captainModel.userData.mixer) {
+                captainModel.userData.mixer.update(delta);
+            }
+            
+            // Animar barco (mecerse con las olas)
+            if (shipInStorm && debugState.shipMotion) {
+                shipInStorm.rotation.z = Math.sin(time * 0.8) * 0.08;
+                shipInStorm.rotation.x = Math.sin(time * 1.2) * 0.05;
+                shipInStorm.position.y = Math.sin(time * 0.6) * 0.3;
+            }
+            
+            // Actualizar efectos
+            if (rainSystem && debugState.rain) {
+                rainSystem.update();
+            }
+            
+            if (lightningSystem && debugState.lightning) {
+                lightningSystem.update();
+            }
+            
+            // Animar agua
+            if (waterMesh) {
+                waterMesh.position.y = -1 + Math.sin(time * 0.5) * 0.1;
+            }
+            
+            // Actualizar box del capitán si está visible
+            if (captainBox && captainModel && captainBox.visible) {
+                const box = new THREE.Box3().setFromObject(captainModel);
+                const center = box.getCenter(new THREE.Vector3());
+                captainBox.position.copy(center);
+            }
+            
+            // Actualizar debug
+            updateDebug(time);
+            
+            // Renderizar
             renderer.render(scene, camera);
         }
-
-        animate();
-
-        // Resize
-        window.addEventListener('resize', () => {
+        
+        // ============================================
+        // DEBUG
+        // ============================================
+        function updateDebug(time) {
+            frameCount++;
+            const now = performance.now();
+            
+            if (now - lastTime >= 1000) {
+                document.getElementById('fps').textContent = frameCount;
+                frameCount = 0;
+                lastTime = now;
+            }
+            
+            if (shipInStorm) {
+                document.getElementById('ship-y').textContent = shipInStorm.position.y.toFixed(2);
+                document.getElementById('ship-rot').textContent = 
+                    `${(shipInStorm.rotation.z * 180 / Math.PI).toFixed(1)}°`;
+            }
+            
+            if (captainModel && shipInStorm) {
+                const worldPos = new THREE.Vector3();
+                captainModel.getWorldPosition(worldPos);
+                document.getElementById('captain-pos').textContent = 
+                    `(${worldPos.x.toFixed(1)}, ${worldPos.y.toFixed(1)}, ${worldPos.z.toFixed(1)})`;
+            }
+        }
+        
+        // ============================================
+        // RESIZE
+        // ============================================
+        function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        }
+        
+        // Iniciar
+        init();
     </script>
 </body>
 </html>
