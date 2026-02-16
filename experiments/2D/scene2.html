@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escena Mágica - Atardecer en el Reino</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .scene {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(
+                to bottom,
+                #1a0a2e 0%,
+                #2d1b4e 15%,
+                #5c3d6e 30%,
+                #a14d5a 45%,
+                #d4735a 60%,
+                #f4a259 75%,
+                #ffd166 90%,
+                #fff3b0 100%
+            );
+            overflow: hidden;
+        }
+
+        /* Estrellas en el cielo superior */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, white, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, white, transparent),
+                radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 160px 120px, white, transparent),
+                radial-gradient(2px 2px at 200px 50px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(1px 1px at 250px 90px, white, transparent),
+                radial-gradient(2px 2px at 300px 60px, rgba(255,255,255,0.5), transparent);
+            background-size: 350px 200px;
+            animation: twinkle 4s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Sol */
+        .sun {
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            animation: sunGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes sunGlow {
+            0%, 100% { filter: drop-shadow(0 0 30px rgba(255, 200, 100, 0.8)); }
+            50% { filter: drop-shadow(0 0 50px rgba(255, 150, 50, 1)); }
+        }
+
+        /* Nubes */
+        .cloud {
+            position: absolute;
+            opacity: 0.9;
+            filter: brightness(1.2) saturate(0.8);
+        }
+
+        .cloud-1 {
+            top: 8%;
+            left: -200px;
+            width: 180px;
+            animation: floatCloud1 35s linear infinite;
+        }
+
+        .cloud-2 {
+            top: 15%;
+            left: -250px;
+            width: 150px;
+            animation: floatCloud2 45s linear infinite;
+            animation-delay: -10s;
+        }
+
+        .cloud-3 {
+            top: 5%;
+            left: -180px;
+            width: 200px;
+            animation: floatCloud3 55s linear infinite;
+            animation-delay: -20s;
+        }
+
+        .cloud-4 {
+            top: 20%;
+            left: -220px;
+            width: 160px;
+            animation: floatCloud1 40s linear infinite;
+            animation-delay: -5s;
+        }
+
+        .cloud-5 {
+            top: 12%;
+            left: -190px;
+            width: 140px;
+            animation: floatCloud2 50s linear infinite;
+            animation-delay: -15s;
+        }
+
+        @keyframes floatCloud1 {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 400px)); }
+        }
+
+        @keyframes floatCloud2 {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 500px)); }
+        }
+
+        @keyframes floatCloud3 {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 400px)); }
+        }
+
+        /* Montañas del fondo */
+        .mountains {
+            position: absolute;
+            bottom: 20%;
+            width: 100%;
+            height: 200px;
+        }
+
+        .mountain {
+            position: absolute;
+            bottom: 0;
+        }
+
+        .mountain-1 {
+            left: 5%;
+            width: 250px;
+            filter: brightness(0.6) saturate(0.5);
+        }
+
+        .mountain-2 {
+            left: 60%;
+            width: 300px;
+            filter: brightness(0.5) saturate(0.4);
+        }
+
+        /* Suelo/Césped */
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 25%;
+            background: linear-gradient(
+                to bottom,
+                #2d5a27 0%,
+                #1e3d1a 50%,
+                #152d12 100%
+            );
+            border-top: 4px solid #3d7a35;
+        }
+
+        /* Castillo principal */
+        .castle {
+            position: absolute;
+            bottom: 22%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+        }
+
+        .castle-wall {
+            position: absolute;
+            bottom: 22%;
+            left: calc(50% - 180px);
+            width: 100px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
+        }
+
+        .castle-wall-2 {
+            position: absolute;
+            bottom: 22%;
+            left: calc(50% + 80px);
+            width: 100px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
+        }
+
+        /* Torres */
+        .tower-left {
+            position: absolute;
+            bottom: 22%;
+            left: 20%;
+            width: 80px;
+            filter: drop-shadow(0 8px 20px rgba(0,0,0,0.4));
+        }
+
+        .tower-right {
+            position: absolute;
+            bottom: 22%;
+            right: 20%;
+            width: 80px;
+            filter: drop-shadow(0 8px 20px rgba(0,0,0,0.4));
+        }
+
+        /* Casas */
+        .house {
+            position: absolute;
+            bottom: 22%;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+
+        .house-1 {
+            left: 8%;
+            width: 90px;
+        }
+
+        .house-2 {
+            left: 15%;
+            width: 70px;
+        }
+
+        .house-3 {
+            right: 10%;
+            width: 85px;
+        }
+
+        .house-4 {
+            right: 18%;
+            width: 65px;
+        }
+
+        /* Árboles */
+        .tree {
+            position: absolute;
+            bottom: 22%;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+        }
+
+        .tree-1 {
+            left: 3%;
+            width: 100px;
+        }
+
+        .tree-2 {
+            left: 25%;
+            width: 80px;
+        }
+
+        .tree-3 {
+            right: 25%;
+            width: 90px;
+        }
+
+        .tree-4 {
+            right: 5%;
+            width: 110px;
+        }
+
+        .tree-5 {
+            left: 35%;
+            width: 70px;
+        }
+
+        .tree-6 {
+            right: 35%;
+            width: 75px;
+        }
+
+        /* Palmeras */
+        .palm {
+            position: absolute;
+            bottom: 22%;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+        }
+
+        .palm-1 {
+            left: 42%;
+            width: 100px;
+        }
+
+        .palm-2 {
+            right: 42%;
+            width: 90px;
+        }
+
+        /* Arbustos */
+        .bush {
+            position: absolute;
+            bottom: 22%;
+            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.2));
+        }
+
+        .bush-1 { left: 5%; width: 50px; }
+        .bush-2 { left: 12%; width: 45px; }
+        .bush-3 { left: 22%; width: 55px; }
+        .bush-4 { right: 22%; width: 50px; }
+        .bush-5 { right: 12%; width: 48px; }
+        .bush-6 { right: 5%; width: 52px; }
+        .bush-7 { left: 38%; width: 45px; }
+        .bush-8 { right: 38%; width: 50px; }
+
+        /* Vallas */
+        .fence {
+            position: absolute;
+            bottom: 23%;
+            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.2));
+        }
+
+        .fence-1 {
+            left: 28%;
+            width: 120px;
+        }
+
+        .fence-2 {
+            right: 28%;
+            width: 120px;
+        }
+
+        /* Pinos nevados en el fondo */
+        .pine {
+            position: absolute;
+            bottom: 22%;
+            filter: brightness(0.7) drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+        }
+
+        .pine-1 {
+            left: 45%;
+            width: 60px;
+        }
+
+        .pine-2 {
+            right: 45%;
+            width: 55px;
+        }
+
+        /* Animación de elementos */
+        .floating {
+            animation: gentleFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Título */
+        .title {
+            position: absolute;
+            top: 3%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 2.5rem;
+            font-weight: 300;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Brillo del sol reflejado */
+        .sun-reflection {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 100px;
+            background: linear-gradient(
+                to top,
+                rgba(255, 200, 100, 0.3),
+                transparent
+            );
+            border-radius: 50% 50% 0 0;
+        }
+
+        /* Pájaros volando */
+        .birds {
+            position: absolute;
+            top: 25%;
+            left: -100px;
+            font-size: 20px;
+            color: rgba(30, 20, 40, 0.6);
+            animation: flyBirds 20s linear infinite;
+        }
+
+        @keyframes flyBirds {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 200px)); }
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <!-- Estrellas -->
+        <div class="stars"></div>
+
+        <!-- Título -->
+        <h1 class="title">Atardecer en el Reino</h1>
+
+        <!-- Sol -->
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/sun.png" alt="Sol" class="sun">
+
+        <!-- Nubes -->
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud1.png" alt="Nube" class="cloud cloud-1">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud2.png" alt="Nube" class="cloud cloud-2">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud3.png" alt="Nube" class="cloud cloud-3">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud4.png" alt="Nube" class="cloud cloud-4">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud5.png" alt="Nube" class="cloud cloud-5">
+
+        <!-- Pájaros -->
+        <div class="birds">🐦 🐦 🐦</div>
+
+        <!-- Montañas/Pirámides del fondo -->
+        <div class="mountains">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/pyramid.png" alt="Montaña" class="mountain mountain-1">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/pyramidMayan.png" alt="Montaña" class="mountain mountain-2">
+        </div>
+
+        <!-- Suelo -->
+        <div class="ground"></div>
+
+        <!-- Reflejo del sol -->
+        <div class="sun-reflection"></div>
+
+        <!-- Castillo -->
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/castleSmall.png" alt="Castillo" class="castle floating">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/castleWall.png" alt="Muralla" class="castle-wall">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/castleWallAlt.png" alt="Muralla" class="castle-wall-2">
+
+        <!-- Torres -->
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/tower.png" alt="Torre" class="tower-left">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/towerAlt.png" alt="Torre" class="tower-right">
+
+        <!-- Casas -->
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/house1.png" alt="Casa" class="house house-1">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/houseSmall1.png" alt="Casa" class="house house-2">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/house2.png" alt="Casa" class="house house-3">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/houseSmall2.png" alt="Casa" class="house house-4">
+
+        <!-- Árboles -->
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/tree.png" alt="Árbol" class="tree tree-1">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeOrange.png" alt="Árbol" class="tree tree-2">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeOrange.png" alt="Árbol" class="tree tree-3">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/tree.png" alt="Árbol" class="tree tree-4">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeLong.png" alt="Árbol" class="tree tree-5">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeLong.png" alt="Árbol" class="tree tree-6">
+
+        <!-- Palmeras -->
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treePalm.png" alt="Palmera" class="palm palm-1">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treePalm.png" alt="Palmera" class="palm palm-2">
+
+        <!-- Pinos -->
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treePine.png" alt="Pino" class="pine pine-1">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treePineOrange.png" alt="Pino" class="pine pine-2">
+
+        <!-- Arbustos -->
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bush1.png" alt="Arbusto" class="bush bush-1">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bush2.png" alt="Arbusto" class="bush bush-2">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bushOrange1.png" alt="Arbusto" class="bush bush-3">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bushOrange2.png" alt="Arbusto" class="bush bush-4">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bush3.png" alt="Arbusto" class="bush bush-5">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bush4.png" alt="Arbusto" class="bush bush-6">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bushAlt1.png" alt="Arbusto" class="bush bush-7">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bushAlt2.png" alt="Arbusto" class="bush bush-8">
+
+        <!-- Vallas -->
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/fence.png" alt="Valla" class="fence fence-1">
+        <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/fenceIron.png" alt="Valla" class="fence fence-2">
+    </div>
+</body>
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paisaje Encantado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #1a1a2e;
+        }
+        
+        .scene {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sky {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 65%;
+            background: linear-gradient(to bottom, #0f0c29 0%, #302b63 30%, #24243e 60%, #f39c12 100%);
+        }
+        
+        .ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35%;
+            background: linear-gradient(to bottom, #134e5e 0%, #0d2b30 100%);
+        }
+        
+        .ground::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+        }
+        
+        .sun {
+            position: absolute;
+            top: 8%;
+            right: 15%;
+            width: 8vw;
+            height: 8vw;
+            max-width: 100px;
+            max-height: 100px;
+        }
+        
+        .sun img {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 40px #f39c12);
+            animation: sunPulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes sunPulse {
+            0%, 100% { filter: drop-shadow(0 0 40px #f39c12); }
+            50% { filter: drop-shadow(0 0 70px #f1c40f); }
+        }
+        
+        .moon {
+            position: absolute;
+            top: 6%;
+            left: 10%;
+            width: 5vw;
+            height: 5vw;
+            max-width: 60px;
+            max-height: 60px;
+            opacity: 0.8;
+        }
+        
+        .moon img {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .moon-full {
+            position: absolute;
+            top: 12%;
+            left: 20%;
+            width: 4vw;
+            height: 4vw;
+            max-width: 45px;
+            max-height: 45px;
+            opacity: 0.6;
+        }
+        
+        .moon-full img {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .cloud {
+            position: absolute;
+            animation: float 25s ease-in-out infinite;
+        }
+        
+        .cloud img {
+            width: 100%;
+            height: 100%;
+            opacity: 0.7;
+            filter: brightness(1.2);
+        }
+        
+        .cloud:nth-child(1) { top: 8%; left: 15%; animation-delay: 0s; width: 12vw; }
+        .cloud:nth-child(2) { top: 12%; left: 35%; animation-delay: -6s; width: 10vw; }
+        .cloud:nth-child(3) { top: 5%; left: 55%; animation-delay: -12s; width: 14vw; }
+        .cloud:nth-child(4) { top: 15%; left: 75%; animation-delay: -18s; width: 11vw; }
+        .cloud:nth-child(5) { top: 10%; left: 5%; animation-delay: -3s; width: 8vw; }
+        .cloud:nth-child(6) { top: 18%; left: 50%; animation-delay: -9s; width: 9vw; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5vw); }
+        }
+        
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+        
+        .star:nth-child(1) { width: 4px; height: 4px; top: 5%; left: 8%; animation-delay: 0s; }
+        .star:nth-child(2) { width: 3px; height: 3px; top: 12%; left: 25%; animation-delay: 0.3s; }
+        .star:nth-child(3) { width: 5px; height: 5px; top: 8%; left: 42%; animation-delay: 0.7s; }
+        .star:nth-child(4) { width: 3px; height: 3px; top: 15%; left: 60%; animation-delay: 1.1s; }
+        .star:nth-child(5) { width: 4px; height: 4px; top: 10%; left: 78%; animation-delay: 0.5s; }
+        .star:nth-child(6) { width: 3px; height: 3px; top: 18%; left: 90%; animation-delay: 0.9s; }
+        .star:nth-child(7) { width: 2px; height: 2px; top: 3%; left: 55%; animation-delay: 1.3s; }
+        .star:nth-child(8) { width: 4px; height: 4px; top: 20%; left: 35%; animation-delay: 0.2s; }
+        .star:nth-child(9) { width: 3px; height: 3px; top: 7%; left: 68%; animation-delay: 1.5s; }
+        .star:nth-child(10) { width: 2px; height: 2px; top: 22%; left: 15%; animation-delay: 0.8s; }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+        
+        .castle {
+            position: absolute;
+            bottom: 32%;
+            left: 5%;
+            width: 12vw;
+            max-width: 150px;
+        }
+        
+        .castle img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .castle-small {
+            position: absolute;
+            bottom: 33%;
+            left: 18%;
+            width: 8vw;
+            max-width: 100px;
+        }
+        
+        .castle-small img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .tower {
+            position: absolute;
+            bottom: 31%;
+            right: 12%;
+            width: 8vw;
+            max-width: 90px;
+            transform: scaleX(-1);
+        }
+        
+        .tower img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .tower-small {
+            position: absolute;
+            bottom: 32%;
+            right: 5%;
+            width: 6vw;
+            max-width: 70px;
+        }
+        
+        .tower-small img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .pyramid {
+            position: absolute;
+            bottom: 32%;
+            left: 45%;
+            transform: translateX(-50%);
+            width: 15vw;
+            max-width: 180px;
+        }
+        
+        .pyramid img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .pyramid-mayan {
+            position: absolute;
+            bottom: 32%;
+            right: 30%;
+            width: 12vw;
+            max-width: 140px;
+        }
+        
+        .pyramid-mayan img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .tree-back {
+            position: absolute;
+            bottom: 33%;
+        }
+        
+        .tree-back img {
+            height: 18vh;
+            width: auto;
+        }
+        
+        .tree-back:nth-of-type(1) { left: 25%; }
+        .tree-back:nth-of-type(2) { left: 38%; }
+        .tree-back:nth-of-type(3) { right: 25%; }
+        .tree-back:nth-of-type(4) { left: 65%; }
+        
+        .tree-mid {
+            position: absolute;
+            bottom: 30%;
+        }
+        
+        .tree-mid img {
+            height: 14vh;
+            width: auto;
+        }
+        
+        .tree-mid:nth-of-type(1) { left: 8%; }
+        .tree-mid:nth-of-type(2) { left: 55%; }
+        .tree-mid:nth-of-type(3) { right: 8%; }
+        
+        .house {
+            position: absolute;
+            bottom: 32%;
+        }
+        
+        .house img {
+            height: 10vh;
+            width: auto;
+        }
+        
+        .house:nth-of-type(1) { left: 30%; }
+        .house:nth-of-type(2) { left: 42%; }
+        .house:nth-of-type(3) { right: 22%; }
+        
+        .house-small {
+            position: absolute;
+            bottom: 33%;
+        }
+        
+        .house-small img {
+            height: 7vh;
+            width: auto;
+        }
+        
+        .house-small:nth-of-type(1) { left: 35%; }
+        .house-small:nth-of-type(2) { right: 35%; }
+        
+        .tree-front {
+            position: absolute;
+            bottom: 30%;
+        }
+        
+        .tree-front img {
+            height: 12vh;
+            width: auto;
+        }
+        
+        .tree-front:nth-of-type(1) { left: 2%; }
+        .tree-front:nth-of-type(2) { left: 12%; }
+        .tree-front:nth-of-type(3) { right: 2%; }
+        .tree-front:nth-of-type(4) { right: 12%; }
+        .tree-front:nth-of-type(5) { right: 42%; }
+        
+        .tree-small {
+            position: absolute;
+            bottom: 31%;
+        }
+        
+        .tree-small img {
+            height: 8vh;
+            width: auto;
+        }
+        
+        .tree-small:nth-of-type(1) { left: 20%; }
+        .tree-small:nth-of-type(2) { left: 48%; }
+        .tree-small:nth-of-type(3) { right: 18%; }
+        
+        .bush {
+            position: absolute;
+            bottom: 31%;
+        }
+        
+        .bush img {
+            height: 4vh;
+            width: auto;
+        }
+        
+        .bush:nth-of-type(1) { left: 5%; }
+        .bush:nth-of-type(2) { left: 15%; }
+        .bush:nth-of-type(3) { left: 28%; }
+        .bush:nth-of-type(4) { right: 28%; }
+        .bush:nth-of-type(5) { right: 15%; }
+        .bush:nth-of-type(6) { right: 5%; }
+        
+        .bush-alt {
+            position: absolute;
+            bottom: 31%;
+        }
+        
+        .bush-alt img {
+            height: 4.5vh;
+            width: auto;
+        }
+        
+        .bush-alt:nth-of-type(1) { left: 10%; }
+        .bush-alt:nth-of-type(2) { left: 60%; }
+        .bush-alt:nth-of-type(3) { right: 10%; }
+        
+        .cactus {
+            position: absolute;
+            bottom: 31%;
+        }
+        
+        .cactus img {
+            height: 6vh;
+            width: auto;
+        }
+        
+        .cactus:nth-of-type(1) { left: 70%; }
+        .cactus:nth-of-type(2) { left: 75%; }
+        .cactus:nth-of-type(3) { right: 32%; }
+        
+        .fence {
+            position: absolute;
+            bottom: 31%;
+            width: 20vw;
+        }
+        
+        .fence img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .fence:nth-of-type(1) { left: 0; }
+        .fence:nth-of-type(2) { right: 0; transform: scaleX(-1); }
+        
+        .castle-wall {
+            position: absolute;
+            bottom: 31%;
+            width: 25vw;
+        }
+        
+        .castle-wall img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .castle-wall:nth-of-type(1) { left: 0; }
+        .castle-wall:nth-of-type(2) { right: 0; transform: scaleX(-1); }
+        
+        @keyframes shoot {
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            70% { opacity: 1; }
+            100% { transform: translateX(30vw) translateY(-20vh); opacity: 0; }
+        }
+        
+        .shooting-star {
+            position: absolute;
+            top: 10%;
+            left: 30%;
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(to right, white, transparent);
+            transform: rotate(-30deg);
+            animation: shootStar 4s ease-in-out infinite;
+            opacity: 0;
+        }
+        
+        @keyframes shootStar {
+            0% { opacity: 0; left: 10%; }
+            10% { opacity: 1; }
+            40% { opacity: 1; left: 40%; }
+            50%, 100% { opacity: 0; left: 50%; }
+        }
+        
+        .shooting-star:nth-child(2) {
+            animation-delay: 2s;
+            top: 15%;
+            left: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <div class="sky">
+            <div class="stars">
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+            </div>
+            <div class="shooting-star"></div>
+            <div class="shooting-star"></div>
+            <div class="moon">
+                <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/moon.png" alt="Luna">
+            </div>
+            <div class="moon-full">
+                <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/moonFull.png" alt="Luna llena">
+            </div>
+            <div class="sun">
+                <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/sun.png" alt="Sol">
+            </div>
+            <div class="cloud">
+                <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud1.png" alt="Nube">
+            </div>
+            <div class="cloud">
+                <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud2.png" alt="Nube">
+            </div>
+            <div class="cloud">
+                <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud3.png" alt="Nube">
+            </div>
+            <div class="cloud">
+                <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud4.png" alt="Nube">
+            </div>
+            <div class="cloud">
+                <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud5.png" alt="Nube">
+            </div>
+            <div class="cloud">
+                <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cloud6.png" alt="Nube">
+            </div>
+        </div>
+        
+        <div class="ground"></div>
+        
+        <div class="castle-wall">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/castleWall.png" alt="Muro">
+        </div>
+        <div class="castle-wall">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/castleWallAlt.png" alt="Muro">
+        </div>
+        
+        <div class="castle">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/castleSmall.png" alt="Castillo">
+        </div>
+        
+        <div class="castle-small">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/castleSmallAlt.png" alt="Castillo">
+        </div>
+        
+        <div class="pyramid">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/pyramid.png" alt="Pirámide">
+        </div>
+        
+        <div class="pyramid-mayan">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/pyramidMayan.png" alt="Pirámide Maya">
+        </div>
+        
+        <div class="tower">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/tower.png" alt="Torre">
+        </div>
+        
+        <div class="tower-small">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/towerSmall.png" alt="Torre">
+        </div>
+        
+        <div class="tree-back">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treePine.png" alt="Árbol">
+        </div>
+        <div class="tree-back">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeLong.png" alt="Árbol">
+        </div>
+        <div class="tree-back">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treePineOrange.png" alt="Árbol">
+        </div>
+        <div class="tree-back">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treePineSnow.png" alt="Árbol">
+        </div>
+        
+        <div class="tree-mid">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/tree.png" alt="Árbol">
+        </div>
+        <div class="tree-mid">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeOrange.png" alt="Árbol">
+        </div>
+        <div class="tree-mid">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeFrozen.png" alt="Árbol">
+        </div>
+        
+        <div class="house">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/house1.png" alt="Casa">
+        </div>
+        <div class="house">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/house2.png" alt="Casa">
+        </div>
+        <div class="house">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/houseAlt1.png" alt="Casa">
+        </div>
+        
+        <div class="house-small">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/houseSmall1.png" alt="Casa">
+        </div>
+        <div class="house-small">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/houseSmallAlt1.png" alt="Casa">
+        </div>
+        
+        <div class="fence">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/fence.png" alt="Valla">
+        </div>
+        <div class="fence">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/fenceIron.png" alt="Valla">
+        </div>
+        
+        <div class="tree-front">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treePalm.png" alt="Árbol">
+        </div>
+        <div class="tree-front">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeDead.png" alt="Árbol">
+        </div>
+        <div class="tree-front">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeLongOrange.png" alt="Árbol">
+        </div>
+        <div class="tree-front">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeLongFrozen.png" alt="Árbol">
+        </div>
+        <div class="tree-front">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeSnow.png" alt="Árbol">
+        </div>
+        
+        <div class="tree-small">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeSmall_green1.png" alt="Árbol">
+        </div>
+        <div class="tree-small">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeSmall_green2.png" alt="Árbol">
+        </div>
+        <div class="tree-small">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/treeSmall_orange1.png" alt="Árbol">
+        </div>
+        
+        <div class="bush">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bush1.png" alt="Arbusto">
+        </div>
+        <div class="bush">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bush2.png" alt="Arbusto">
+        </div>
+        <div class="bush">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bush3.png" alt="Arbusto">
+        </div>
+        <div class="bush">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bush4.png" alt="Arbusto">
+        </div>
+        <div class="bush">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bushOrange1.png" alt="Arbusto">
+        </div>
+        <div class="bush">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bushOrange2.png" alt="Arbusto">
+        </div>
+        
+        <div class="bush-alt">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bushAlt1.png" alt="Arbusto">
+        </div>
+        <div class="bush-alt">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bushAlt2.png" alt="Arbusto">
+        </div>
+        <div class="bush-alt">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/bushAlt3.png" alt="Arbusto">
+        </div>
+        
+        <div class="cactus">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cactus1.png" alt="Cactus">
+        </div>
+        <div class="cactus">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cactus2.png" alt="Cactus">
+        </div>
+        <div class="cactus">
+            <img src="../../assets/2D/kenney_background-elements-redux/PNG/Default/cactus3.png" alt="Cactus">
+        </div>
+    </div>
+</body>
+</html>
