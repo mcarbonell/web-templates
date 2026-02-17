@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURORA - Digital Experience</title>
+    <style>
+        /* Design Philosophy: Seed 739284651
+         * 739: Purple-Blue Aurora color scheme
+         * 284: Medium-fast animation timing (284ms base)
+         * 651: High-intensity WebGL distortion effects
+         * Asymmetric bento grid with kinetic typography
+         * Glassmorphism meets brutalist aesthetics
+         */
+
+        :root {
+            --primary-1: #6B46C1;
+            --primary-2: #4C1D95;
+            --accent-1: #EC4899;
+            --accent-2: #8B5CF6;
+            --glow-1: rgba(139, 92, 246, 0.5);
+            --glow-2: rgba(236, 72, 153, 0.3);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --transition-base: 284ms;
+            --distortion: 0.651;
+        }
+
+        [data-theme="light"] {
+            --primary-1: #8B5CF6;
+            --primary-2: #A78BFA;
+            --accent-1: #F472B6;
+            --accent-2: #C084FC;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        [data-theme="light"] body {
+            background: #fafafa;
+            color: #1a1a1a;
+        }
+
+        /* WebGL Canvas Background */
+        #aurora-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all var(--transition-base) cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--glow-1);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            padding: 2rem;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+        }
+
+        [data-theme="light"] nav {
+            background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, transparent 100%);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary-1), var(--accent-1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+            max-width: 1200px;
+        }
+
+        .glitch-text {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-text::before {
+            animation: glitch-1 0.5s infinite;
+            color: var(--accent-1);
+            z-index: -1;
+        }
+
+        .glitch-text::after {
+            animation: glitch-2 0.5s infinite;
+            color: var(--primary-1);
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+            20% { clip-path: inset(20% 0 30% 0); transform: translate(-2px, 2px); }
+            40% { clip-path: inset(50% 0 20% 0); transform: translate(2px, -2px); }
+            60% { clip-path: inset(10% 0 60% 0); transform: translate(-2px, 0); }
+            80% { clip-path: inset(80% 0 5% 0); transform: translate(1px, 0); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+            20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
+            40% { clip-path: inset(20% 0 50% 0); transform: translate(-2px, 1px); }
+            60% { clip-path: inset(30% 0 40% 0); transform: translate(1px, -1px); }
+            80% { clip-path: inset(5% 0 80% 0); transform: translate(-1px, 2px); }
+        }
+
+        .subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.8;
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 0.8;
+                transform: translateY(0);
+            }
+        }
+
+        /* Magnetic Button */
+        .magnetic-btn {
+            display: inline-block;
+            padding: 1.5rem 3rem;
+            background: linear-gradient(135deg, var(--primary-1), var(--accent-1));
+            border: none;
+            border-radius: 100px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-base) cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .magnetic-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .magnetic-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Bento Grid */
+        .bento-section {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            grid-auto-flow: dense;
+        }
+
+        .bento-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-base) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bento-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px var(--glow-1);
+            border-color: var(--accent-1);
+        }
+
+        .bento-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-item.wide {
+            grid-column: span 2;
+        }
+
+        .bento-item h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-1), var(--accent-1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bento-item p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* ASCII Art Canvas */
+        #ascii-canvas {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            width: 200px;
+            height: 100px;
+            opacity: 0.3;
+            z-index: 5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .bento-item.large,
+            .bento-item.wide {
+                grid-column: span 1;
+            }
+            
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+            
+            nav {
+                padding: 1rem;
+            }
+            
+            .glitch-text {
+                font-size: clamp(2rem, 8vw, 4rem);
+            }
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .loader-text {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-text">AURORA</div>
+        </div>
+    </div>
+
+    <!-- WebGL Aurora Background -->
+    <canvas id="aurora-canvas"></canvas>
+
+    <!-- ASCII Art Canvas -->
+    <canvas id="ascii-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">AURORA</div>
+        </div>
+    </nav>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="theme-toggle">Light Mode</button>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="glitch-text" data-text="AURORA">AURORA</h1>
+            <p class="subtitle">Digital Experience Reimagined</p>
+            <a href="#features" class="magnetic-btn">Explore The Future</a>
+        </div>
+    </section>
+
+    <!-- Bento Grid Section -->
+    <section class="bento-section" id="features">
+        <div class="bento-grid">
+            <div class="bento-item large">
+                <h3>Neural Design</h3>
+                <p>Experience the fusion of artificial intelligence and creative design. Our adaptive interfaces learn and evolve with user interactions, creating personalized digital journeys that respond to your needs in real-time.</p>
+            </div>
+            <div class="bento-item">
+                <h3>Fluid Dynamics</h3>
+                <p>Immerse yourself in liquid-smooth transitions and physics-based animations that blur the line between digital and physical reality.</p>
+            </div>
+            <div class="bento-item wide">
+                <h3>Quantum Performance</h3>
+                <p>Optimized for 60fps across all devices, our WebGL-powered experiences deliver stunning visuals without compromising performance, even on mid-range mobile hardware.</p>
+            </div>
+            <div class="bento-item">
+                <h3>Adaptive UI</h3>
+                <p>Smart interfaces that reshape themselves based on context, time, and user behavior patterns.</p>
+            </div>
+            <div class="bento-item">
+                <h3>Generative Art</h3>
+                <p>Every visit creates unique visual experiences through algorithmic design and real-time rendering.</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // WebGL Aurora Background
+        class AuroraBackground {
+            constructor() {
+                this.canvas = document.getElementById('aurora-canvas');
+                this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+                this.time = 0;
+                this.init();
+            }
+
+            init() {
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                if (!this.gl) {
+                    console.log('WebGL not supported, falling back to CSS animation');
+                    this.fallbackAnimation();
+                    return;
+                }
+
+                this.setupShaders();
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                if (this.gl) {
+                    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+                }
+            }
+
+            setupShaders() {
+                const vertexShaderSource = `
+                    attribute vec2 position;
+                    void main() {
+                        gl_Position = vec4(position, 0.0, 1.0);
+                    }
+                `;
+
+                const fragmentShaderSource = `
+                    precision mediump float;
+                    uniform float time;
+                    uniform vec2 resolution;
+                    
+                    vec3 hsv2rgb(vec3 c) {
+                        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+                        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+                    }
+                    
+                    void main() {
+                        vec2 uv = gl_FragCoord.xy / resolution.xy;
+                        vec2 center = vec2(0.5, 0.5);
+                        
+                        float dist = distance(uv, center);
+                        float angle = atan(uv.y - center.y, uv.x - center.x);
+                        
+                        float wave1 = sin(dist * 10.0 - time * 2.0) * 0.5 + 0.5;
+                        float wave2 = sin(angle * 3.0 + time * 1.5) * 0.5 + 0.5;
+                        float wave3 = sin(dist * 5.0 + angle * 2.0 - time * 1.0) * 0.5 + 0.5;
+                        
+                        float intensity = (wave1 * wave2 * wave3) * 0.651;
+                        
+                        vec3 color1 = hsv2rgb(vec3(0.75 + sin(time) * 0.1, 0.8, intensity));
+                        vec3 color2 = hsv2rgb(vec3(0.85 + cos(time * 0.7) * 0.1, 0.9, intensity * 0.7));
+                        
+                        vec3 finalColor = mix(color1, color2, wave3);
+                        
+                        gl_FragColor = vec4(finalColor, intensity * 0.8);
+                    }
+                `;
+
+                const vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderSource);
+                const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+                this.program = this.gl.createProgram();
+                this.gl.attachShader(this.program, vertexShader);
+                this.gl.attachShader(this.program, fragmentShader);
+                this.gl.linkProgram(this.program);
+
+                if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
+                    console.error('Unable to initialize shader program');
+                    return;
+                }
+
+                this.gl.useProgram(this.program);
+
+                const vertices = new Float32Array([
+                    -1, -1,
+                     1, -1,
+                    -1,  1,
+                     1,  1,
+                ]);
+
+                const buffer = this.gl.createBuffer();
+                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+                this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+
+                const positionLocation = this.gl.getAttribLocation(this.program, 'position');
+                this.gl.enableVertexAttribArray(positionLocation);
+                this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 0, 0);
+
+                this.timeLocation = this.gl.getUniformLocation(this.program, 'time');
+                this.resolutionLocation = this.gl.getUniformLocation(this.program, 'resolution');
+            }
+
+            createShader(type, source) {
+                const shader = this.gl.createShader(type);
+                this.gl.shaderSource(shader, source);
+                this.gl.compileShader(shader);
+
+                if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+                    console.error('Shader compilation error:', this.gl.getShaderInfoLog(shader));
+                    this.gl.deleteShader(shader);
+                    return null;
+                }
+
+                return shader;
+            }
+
+            animate() {
+                if (!this.gl) return;
+
+                this.time += 0.01;
+                this.gl.uniform1f(this.timeLocation, this.time);
+                this.gl.uniform2f(this.resolutionLocation, this.canvas.width, this.canvas.height);
+
+                this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
+                requestAnimationFrame(() => this.animate());
+            }
+
+            fallbackAnimation() {
+                this.canvas.style.background = 'linear-gradient(45deg, #6B46C1, #EC4899, #8B5CF6)';
+                this.canvas.style.backgroundSize = '400% 400%';
+                this.canvas.style.animation = 'gradientShift 10s ease infinite';
+                
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes gradientShift {
+                        0% { background-position: 0% 50%; }
+                        50% { background-position: 100% 50%; }
+                        100% { background-position: 0% 50%; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // ASCII Art Effect
+        class ASCIIArt {
+            constructor() {
+                this.canvas = document.getElementById('ascii-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.chars = '░▒▓█';
+                this.init();
+            }
+
+            init() {
+                this.canvas.width = 200;
+                this.canvas.height = 100;
+                this.animate();
+            }
+
+            animate() {
+                this.ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.ctx.fillStyle = '#8B5CF6';
+                this.ctx.font = '8px monospace';
+
+                for (let i = 0; i < 5; i++) {
+                    const char = this.chars[Math.floor(Math.random() * this.chars.length)];
+                    const x = Math.random() * this.canvas.width;
+                    const y = Math.random() * this.canvas.height;
+                    this.ctx.fillText(char, x, y);
+                }
+
+                setTimeout(() => this.animate(), 100);
+            }
+        }
+
+        // Theme Toggle
+        class ThemeManager {
+            constructor() {
+                this.toggle = document.getElementById('theme-toggle');
+                this.body = document.body;
+                this.currentTheme = 'dark';
+                this.init();
+            }
+
+            init() {
+                this.toggle.addEventListener('click', () => this.toggleTheme());
+            }
+
+            toggleTheme() {
+                this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+                this.body.setAttribute('data-theme', this.currentTheme);
+                this.toggle.textContent = this.currentTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+            }
+        }
+
+        // Magnetic Button Effect
+        class MagneticButton {
+            constructor(button) {
+                this.button = button;
+                this.init();
+            }
+
+            init() {
+                this.button.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                this.button.addEventListener('mouseleave', () => this.handleMouseLeave());
+            }
+
+            handleMouseMove(e) {
+                const rect = this.button.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+
+                this.button.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+            }
+
+            handleMouseLeave() {
+                this.button.style.transform = 'translate(0, 0)';
+            }
+        }
+
+        // Scramble Text Effect
+        class ScrambleText {
+            constructor(element) {
+                this.element = element;
+                this.originalText = element.textContent;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                this.init();
+            }
+
+            init() {
+                this.element.addEventListener('mouseenter', () => this.scramble());
+            }
+
+            scramble() {
+                let iterations = 0;
+                const maxIterations = 10;
+
+                const interval = setInterval(() => {
+                    this.element.textContent = this.originalText
+                        .split('')
+                        .map((letter, index) => {
+                            if (index < iterations) {
+                                return this.originalText[index];
+                            }
+                            return this.chars[Math.floor(Math.random() * this.chars.length)];
+                        })
+                        .join('');
+
+                    if (iterations >= this.originalText.length) {
+                        clearInterval(interval);
+                    }
+
+                    iterations += 1 / 3;
+                }, 30);
+            }
+        }
+
+        // Initialize Everything
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hide loader
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+
+            // Initialize components
+            new AuroraBackground();
+            new ASCIIArt();
+            new ThemeManager();
+
+            // Initialize magnetic buttons
+            document.querySelectorAll('.magnetic-btn').forEach(btn => {
+                new MagneticButton(btn);
+            });
+
+            // Initialize scramble text
+            document.querySelectorAll('.glitch-text').forEach(text => {
+                new ScrambleText(text);
+            });
+
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -9,22 +9,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        :root{--bg:#0A0A0A;--accent:#CCFF00;--white:#FFFFFF;--muted:#666;--card:#111;--border:#1e1e1e}
+        :root{
+            --bg:#0A0A0A;
+            --accent:#CCFF00;
+            --white:#FFFFFF;
+            --muted:#666;
+            --card:#111;
+            --border:#1e1e1e;
+            --text-muted:#666;
+            --hero-geo-border: var(--accent);
+        }
+        :root[data-theme="light"]{
+            --bg:#FFFFFF;
+            --accent:#8B5CF6;
+            --white:#0A0A0A;
+            --muted:#9CA3AF;
+            --card:#F5F5F5;
+            --border:#E5E5E5;
+            --text-muted:#6B7280;
+            --hero-geo-border: var(--white);
+        }
         html{scroll-behavior:smooth}
-        body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+        body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background-color 0.3s ease,color 0.3s ease}
         body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:256px 256px}
         ::selection{background:var(--accent);color:var(--bg)}
         a{color:inherit;text-decoration:none}
         .mono{font-family:'Space Mono',monospace}
 
         /* NAV */
-        nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.5rem 2rem;display:flex;justify-content:space-between;align-items:center;mix-blend-mode:difference}
+        nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.5rem 2rem;display:flex;justify-content:space-between;align-items:center;background:var(--bg);transition:background-color 0.3s ease}
+        :root[data-theme="dark"] nav{background:transparent;mix-blend-mode:difference}
         .nav-logo{font-family:'Space Mono',monospace;font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
+        .nav-right{display:flex;align-items:center;gap:2rem}
         .nav-links{display:flex;gap:2rem;list-style:none;font-size:.8rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase}
         .nav-links a{position:relative;padding:.25rem 0}
         .nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--accent);transition:width .3s}
         .nav-links a:hover::after{width:100%}
         .nav-menu-btn{display:none;background:0;border:0;color:var(--white);cursor:pointer;font-family:'Space Mono',monospace;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em}
+        .theme-toggle{background:transparent;border:1px solid var(--white);color:var(--white);width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-size:1.1rem}
+        .theme-toggle:hover{background:var(--white);color:var(--bg)}
 
         /* HERO */
         .hero{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:2rem;padding-bottom:4rem;position:relative}
@@ -34,11 +57,11 @@
         .hero-title .outline{-webkit-text-stroke:2px var(--white);color:transparent}
         .hero-title .accent{color:var(--accent)}
         .hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:3rem}
-        .hero-desc{max-width:360px;font-size:.95rem;line-height:1.75;color:var(--muted);font-weight:300}
-        .hero-scroll{font-family:'Space Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.25em;color:var(--muted);writing-mode:vertical-rl;animation:bdwn 2s ease-in-out infinite}
+        .hero-desc{max-width:360px;font-size:.95rem;line-height:1.75;color:var(--text-muted);font-weight:300}
+        .hero-scroll{font-family:'Space Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.25em;color:var(--text-muted);writing-mode:vertical-rl;animation:bdwn 2s ease-in-out infinite}
         @keyframes bdwn{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
 
-        .hero-geo{position:absolute;top:18%;right:6%;width:180px;height:180px;border:2px solid var(--accent);transform:rotate(45deg);animation:gspin 25s linear infinite;pointer-events:none}
+        .hero-geo{position:absolute;top:18%;right:6%;width:180px;height:180px;border:2px solid var(--hero-geo-border);transform:rotate(45deg);animation:gspin 25s linear infinite;pointer-events:none}
         .hero-geo::before{content:'';position:absolute;inset:22%;border:1px solid var(--border);transform:rotate(15deg)}
         .hero-geo::after{content:'';position:absolute;inset:40%;border:1px solid var(--border);transform:rotate(-10deg)}
         @keyframes gspin{to{transform:rotate(405deg)}}
@@ -59,10 +82,10 @@
         .section-num{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--accent);letter-spacing:.2em;margin-bottom:1.5rem}
         .about-title{font-size:clamp(2rem,5vw,4rem);font-weight:700;line-height:1.08;letter-spacing:-.03em}
         .about-right{padding-top:3rem}
-        .about-text{font-size:1.05rem;line-height:1.8;color:var(--muted);font-weight:300;margin-bottom:1.5rem}
+        .about-text{font-size:1.05rem;line-height:1.8;color:var(--text-muted);font-weight:300;margin-bottom:1.5rem}
         .about-stats{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem;padding-top:3rem;border-top:1px solid var(--border)}
         .stat-num{font-family:'Space Mono',monospace;font-size:2.25rem;font-weight:700;color:var(--accent)}
-        .stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-top:.4rem}
+        .stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.15em;color:var(--text-muted);margin-top:.4rem}
 
         /* SERVICES */
         .services{padding:4rem 2rem 8rem}
@@ -73,7 +96,7 @@
         .svc:hover{padding-left:1.5rem}
         .svc:hover .svc-n{color:var(--accent)}
         .svc:hover .svc-arrow{transform:rotate(-45deg);color:var(--accent)}
-        .svc-n{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--muted);transition:color .3s}
+        .svc-n{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--text-muted);transition:color .3s}
         .svc-name{font-size:clamp(1.3rem,3vw,2.25rem);font-weight:600;letter-spacing:-.02em}
         .svc-arrow{font-size:1.5rem;transition:all .3s;color:var(--muted)}
 
@@ -90,13 +113,13 @@
         .work-card-n{position:absolute;top:1.5rem;right:2rem;font-family:'Space Mono',monospace;font-size:4.5rem;font-weight:700;color:var(--border);line-height:1}
         .work-tag{font-family:'Space Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;border:1px solid var(--border);padding:.35rem .7rem;display:inline-block;width:fit-content;margin-bottom:.8rem;transition:all .3s}
         .work-card-title{font-size:1.4rem;font-weight:600;letter-spacing:-.015em}
-        .work-card-desc{font-size:.8rem;color:var(--muted);margin-top:.35rem}
+        .work-card-desc{font-size:.8rem;color:var(--text-muted);margin-top:.35rem}
 
         /* TESTIMONIAL */
         .testimonial{padding:8rem 2rem;text-align:center;position:relative}
         .testimonial-quote{font-size:clamp(1.4rem,3.5vw,3rem);font-weight:300;line-height:1.35;max-width:860px;margin:0 auto;letter-spacing:-.015em}
         .testimonial-quote em{font-style:italic;color:var(--accent)}
-        .testimonial-author{margin-top:2.5rem;font-family:'Space Mono',monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.2em;color:var(--muted)}
+        .testimonial-author{margin-top:2.5rem;font-family:'Space Mono',monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.2em;color:var(--text-muted)}
         .tq-big{font-size:clamp(8rem,18vw,16rem);position:absolute;top:0;left:50%;transform:translateX(-50%);color:var(--border);font-family:Georgia,serif;line-height:1;pointer-events:none;opacity:.45}
 
         /* CTA */
@@ -111,12 +134,12 @@
         /* FOOTER */
         footer{padding:4rem 2rem;border-top:1px solid var(--border);display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:2rem}
         .f-brand{font-family:'Space Mono',monospace;font-weight:700;font-size:1.2rem;margin-bottom:.8rem}
-        .f-text{color:var(--muted);font-size:.85rem;line-height:1.7;max-width:280px}
+        .f-text{color:var(--text-muted);font-size:.85rem;line-height:1.7;max-width:280px}
         .f-heading{font-family:'Space Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);margin-bottom:1.3rem}
         .f-links{list-style:none;display:flex;flex-direction:column;gap:.6rem}
-        .f-links a{color:var(--muted);font-size:.85rem;transition:color .3s}
+        .f-links a{color:var(--text-muted);font-size:.85rem;transition:color .3s}
         .f-links a:hover{color:var(--white)}
-        .f-bottom{padding:2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+        .f-bottom{padding:2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em}
 
         /* REVEAL */
         .reveal{opacity:0;transform:translateY(50px);transition:all .9s cubic-bezier(.16,1,.3,1)}
@@ -131,7 +154,7 @@
         .cursor.hov{width:50px;height:50px;margin-left:-25px;margin-top:-25px;background:var(--accent);opacity:.25}
 
         /* MOBILE MENU */
-        .mob-menu{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;justify-content:center;padding:2rem;transform:translateX(100%);transition:transform .5s cubic-bezier(.16,1,.3,1)}
+        .mob-menu{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;justify-content:center;padding:2rem;transform:translateX(100%);transition:transform .5s cubic-bezier(.16,1,.3,1),background-color 0.3s ease}
         .mob-menu.open{transform:translateX(0)}
         .mob-menu-links{list-style:none;display:flex;flex-direction:column;gap:1.25rem}
         .mob-menu-links a{font-size:2.2rem;font-weight:700;text-transform:uppercase;letter-spacing:-.02em;transition:color .3s}
@@ -171,13 +194,18 @@
 
 <nav>
     <a href="#" class="nav-logo">VEXEL®</a>
-    <ul class="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#work">Work</a></li>
-        <li><a href="#contact">Contact</a></li>
-    </ul>
-    <button class="nav-menu-btn" id="menuOpen">Menu</button>
+    <div class="nav-right">
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+            <span id="themeIcon">☀</span>
+        </button>
+        <button class="nav-menu-btn" id="menuOpen">Menu</button>
+    </div>
 </nav>
 
 <div class="mob-menu" id="mobMenu">
@@ -368,6 +396,28 @@ const mob=document.getElementById('mobMenu');
 document.getElementById('menuOpen').onclick=()=>mob.classList.add('open');
 document.getElementById('menuClose').onclick=()=>mob.classList.remove('open');
 function closeMenu(){mob.classList.remove('open')}
+
+// Theme Toggle
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const root = document.documentElement;
+
+// Check for saved theme preference or default to 'dark'
+const savedTheme = localStorage.getItem('theme') || 'dark';
+root.setAttribute('data-theme', savedTheme);
+updateThemeIcon(savedTheme);
+
+themeToggle.addEventListener('click', () => {
+    const currentTheme = root.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+});
+
+function updateThemeIcon(theme) {
+    themeIcon.textContent = theme === 'dark' ? '☀' : '☾';
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS — Experimental Design</title>
+    
+    <!--
+    ╔══════════════════════════════════════════════════════════════════════════════╗
+    ║                         DISEÑO GENERADO CON SEED: 338224932                    ║
+    ╠══════════════════════════════════════════════════════════════════════════════╣
+    ║  DECOMPOSICIÓN DEL SEED PARA DECISIONES DE DISEÑO:                             ║
+    ║                                                                                  ║
+    ║  • Dígito 1 (3): Técnica principal → WebGL ASCII Shader Canvas                ║
+    ║  • Dígito 2 (3): Técnica secundaria → Tipografía Cinética                     ║
+    ║  • Dígito 3 (8): Columnas Bento Grid → 8 columnas (escalable móvil)           ║
+    ║  • Dígito 4 (2): Paleta de colores → Océano profundo + coral                    ║
+    ║  • Dígito 5 (2): Intensidad animación → Media-suave                            ║
+    ║  • Dígito 6 (4): Estilo tipográfico → Serif geométrica bold                     ║
+    ║  • Dígito 7 (9): Nivel Glassmorphism → Alto (blur 24px)                        ║
+    ║  • Dígito 8 (3): Comportamiento scroll → Scroll Snapping                        ║
+    ║  • Dígito 9 (3): Estilo botones → Magnéticos con scramble text                 ║
+    ║  • Dígito 10 (2): Variante layout → Asimétrico                                  ║
+    ║                                                                                  ║
+    ║  TÉCNICAS EMPLEADAS:                                                            ║
+    ║  ✓ Custom WebGL Shaders (ASCII Art Rendering)                                  ║
+    ║  ✓ Kinetic Typography con gradiente animado                                     ║
+    ║  ✓ Bento Grid Layout                                                            ║
+    ║  ✓ Texto con gradiente animado                                                 ║
+    ║  ✓ Glassmorphism avanzado                                                       ║
+    ║  ✓ Scroll-Driven Animations                                                     ║
+    ║  ✓ Scroll Snapping                                                              ║
+    ║  ✓ Magnetic Buttons                                                             ║
+    ║  ✓ Scramble Text hover effect                                                   ║
+    ║  ✓ Light/Dark Mode Toggle                                                       ║
+    ║                                                                                  ║
+    ╚══════════════════════════════════════════════════════════════════════════════╝
+    -->
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Modo Claro */
+            --bg-primary: #f8f6f3;
+            --bg-secondary: #ede9e4;
+            --bg-tertiary: #e2ddd6;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a68;
+            --text-muted: #8a8aa3;
+            --accent-primary: #ff6b6b;
+            --accent-secondary: #4ecdc4;
+            --accent-tertiary: #ffe66d;
+            --accent-gradient: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #ffe66d 100%);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.06);
+            --shadow-medium: 0 8px 40px rgba(0, 0, 0, 0.1);
+            --blob-color-1: rgba(255, 107, 107, 0.15);
+            --blob-color-2: rgba(78, 205, 196, 0.15);
+            --blob-color-3: rgba(255, 230, 109, 0.15);
+            --canvas-opacity: 0.03;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0d0d12;
+            --bg-secondary: #151520;
+            --bg-tertiary: #1e1e2e;
+            --text-primary: #f0f0f5;
+            --text-secondary: #b0b0c0;
+            --text-muted: #606080;
+            --glass-bg: rgba(30, 30, 50, 0.25);
+            --glass-border: rgba(80, 80, 120, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --card-bg: rgba(30, 30, 50, 0.5);
+            --card-border: rgba(100, 100, 150, 0.15);
+            --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 8px 40px rgba(0, 0, 0, 0.5);
+            --blob-color-1: rgba(255, 107, 107, 0.12);
+            --blob-color-2: rgba(78, 205, 196, 0.12);
+            --blob-color-3: rgba(255, 230, 109, 0.08);
+            --canvas-opacity: 0.05;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* WebGL Canvas Background */
+        #ascii-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: var(--canvas-opacity);
+            pointer-events: none;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .theme-toggle svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+            transition: transform 0.5s ease;
+        }
+
+        .theme-toggle .sun-icon { display: none; }
+        .theme-toggle .moon-icon { display: block; }
+
+        [data-theme="dark"] .theme-toggle .sun-icon { display: block; }
+        [data-theme="dark"] .theme-toggle .moon-icon { display: none; }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Sections */
+        section {
+            min-height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 6rem 3rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            z-index: 10;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 12vw, 8rem);
+            font-weight: 900;
+            line-height: 0.95;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .hero-title .word {
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .hero-title .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100%);
+            animation: charReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes charReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gradient-text {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            color: var(--text-secondary);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease 1.2s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                transform: translateY(20px);
+            }
+        }
+
+        /* Magnetic Button */
+        .magnetic-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 3rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--bg-primary);
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 24px rgba(255, 107, 107, 0.3);
+            opacity: 0;
+            animation: fadeInUp 1s ease 1.5s forwards;
+        }
+
+        .magnetic-btn:hover {
+            box-shadow: 0 8px 40px rgba(255, 107, 107, 0.5);
+        }
+
+        .magnetic-btn .btn-text {
+            position: relative;
+            z-index: 2;
+            transition: color 0.3s ease;
+        }
+
+        .magnetic-btn .btn-bg {
+            position: absolute;
+            inset: 0;
+            background: var(--text-primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1;
+        }
+
+        .magnetic-btn:hover .btn-bg {
+            transform: scaleX(1);
+        }
+
+        .magnetic-btn:hover .btn-text {
+            color: var(--bg-primary);
+        }
+
+        /* Bento Grid Section */
+        .bento-section {
+            position: relative;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .bento-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--accent-primary);
+        }
+
+        .bento-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Bento card sizes */
+        .bento-card.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-card.wide {
+            grid-column: span 2;
+        }
+
+        .bento-card.tall {
+            grid-row: span 2;
+        }
+
+        .bento-card .card-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1.5rem;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bento-card .card-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .bento-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .bento-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .bento-card .card-number {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--text-muted);
+            opacity: 0.15;
+        }
+
+        /* Features Section */
+        .features-section {
+            position: relative;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            transition: transform 0.4s ease, background 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-12px) scale(1.02);
+        }
+
+        .feature-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .feature-icon::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon::after {
+            opacity: 1;
+        }
+
+        .feature-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent-primary);
+        }
+
+        .feature-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            min-height: 80vh;
+        }
+
+        .contact-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .contact-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .contact-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        textarea.form-input {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        /* Animated blob background */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: blobFloat 20s ease-in-out infinite;
+        }
+
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--blob-color-1);
+            top: 10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--blob-color-2);
+            top: 50%;
+            right: -5%;
+            animation-delay: -7s;
+        }
+
+        .blob-3 {
+            width: 350px;
+            height: 350px;
+            background: var(--blob-color-3);
+            bottom: 10%;
+            left: 20%;
+            animation-delay: -14s;
+        }
+
+        @keyframes blobFloat {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.6;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .scroll-indicator span {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .scroll-indicator .arrow {
+            width: 20px;
+            height: 20px;
+            border-right: 2px solid var(--text-primary);
+            border-bottom: 2px solid var(--text-primary);
+            transform: rotate(45deg);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .bento-card.large {
+                grid-column: span 2;
+                grid-row: span 1;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            section {
+                padding: 4rem 1.5rem;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bento-card.large,
+            .bento-card.wide,
+            .bento-card.tall {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+                width: 44px;
+                height: 44px;
+            }
+        }
+
+        /* Scramble text effect */
+        .scramble-text {
+            display: inline-block;
+        }
+
+        /* Stroke text effect for hero */
+        .stroke-text {
+            -webkit-text-stroke: 2px var(--text-primary);
+            color: transparent;
+            position: relative;
+        }
+
+        .stroke-text::before {
+            content: attr(data-text);
+            position: absolute;
+            -webkit-text-stroke: 0;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .hero-title:hover .stroke-text::before {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- WebGL ASCII Canvas Background -->
+    <canvas id="ascii-canvas"></canvas>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+        <svg class="moon-icon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="sun-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"/>
+            <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"/>
+            <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"/>
+        </svg>
+    </button>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">NEXUS</div>
+        <ul class="nav-links">
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#proyectos">Proyectos</a></li>
+            <li><a href="#servicios">Servicios</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="word" id="titleWord1"></span>
+                <span class="word gradient-text" id="titleWord2"></span>
+                <span class="word" id="titleWord3"></span>
+            </h1>
+            <p class="hero-subtitle">Donde la tecnología encuentra su forma más bella</p>
+            <button class="magnetic-btn" id="ctaBtn">
+                <span class="btn-bg"></span>
+                <span class="btn-text scramble-text">Comenzar Viaje</span>
+            </button>
+        </div>
+        
+        <div class="scroll-indicator">
+            <span>Explorar</span>
+            <div class="arrow"></div>
+        </div>
+    </section>
+
+    <!-- Bento Grid Section -->
+    <section class="bento-section" id="proyectos">
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        
+        <h2 class="section-title">Proyectos <span class="gradient-text">Destacados</span></h2>
+        
+        <div class="bento-grid">
+            <div class="bento-card large">
+                <span class="card-number">01</span>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <h3>Experiencias Inmersivas</h3>
+                <p>Creamos mundos digitales que cautivan los sentidos. Cada píxel cuenta una historia, cada interacción despierta emociones.</p>
+            </div>
+            
+            <div class="bento-card">
+                <span class="card-number">02</span>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6a6 6 0 1 0 6 6 6 6 0 0 0-6-6zm0 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg>
+                </div>
+                <h3>Identidad Visual</h3>
+                <p>Diseñamos identidades que trascienden lo ordinario.</p>
+            </div>
+            
+            <div class="bento-card">
+                <span class="card-number">03</span>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 4v16h16"/></svg>
+                </div>
+                <h3>UI/UX Design</h3>
+                <p>Interfaces que fluyen como agua.</p>
+            </div>
+            
+            <div class="bento-card wide">
+                <span class="card-number">04</span>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <h3>Diseño Experimental & Artes Digitales</h3>
+                <p>Donde las reglas se rompen y nacen nuevas formas de expresión. Exploramos los límites entre arte y tecnología.</p>
+            </div>
+            
+            <div class="bento-card">
+                <span class="card-number">05</span>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                </div>
+                <h3>Desarrollo Web</h3>
+                <p>Código que cobra vida.</p>
+            </div>
+            
+            <div class="bento-card">
+                <span class="card-number">06</span>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <h3>Branding Global</h3>
+                <p>Marcas sin fronteras.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="features-section" id="servicios">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        
+        <h2 class="section-title">Nuestros <span class="gradient-text">Servicios</span></h2>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-10 10c0 5.523 4.477 10 10 10s10-4.477 10-10A10 10 0 0 0 12 2zm0 18a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8z"/></svg>
+                </div>
+                <h3>Dirección de Arte</h3>
+                <p>Visiones creativas que transforman ideas en experiencias visuales memorables.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3>Equipo Creativo</h3>
+                <p>Artistas, diseñadores y desarrolladores trabajando en armonía.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                </div>
+                <h3>Producción Digital</h3>
+                <p>Desde el concepto hasta la entrega, cada detalle pulido a la perfección.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                </div>
+                <h3>Fotografía & Video</h3>
+                <p>Capturamos momentos que se convierten en leyendas visuales.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                </div>
+                <h3>Consultoría</h3>
+                <p>Guiamos marcas hacia su máximo potencial creativo y estratégico.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                </div>
+                <h3>Innovación</h3>
+                <p>Siempre un paso adelante, explorando lo que viene next.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contacto">
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        
+        <div class="contact-container">
+            <h2 class="contact-title">Creemos Algo <span class="gradient-text">Increíble</span> Juntos</h2>
+            <p class="contact-subtitle">Cuéntanos tu visión y transformémosla en realidad. Cada gran proyecto comienza con una conversación.</p>
+            
+            <form class="contact-form">
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="Tu Nombre" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-input" placeholder="Tu Email" required>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-input" placeholder="Cuéntanos sobre tu proyecto..."></textarea>
+                </div>
+                <button type="submit" class="magnetic-btn" style="opacity: 1; animation: none;">
+                    <span class="btn-bg"></span>
+                    <span class="btn-text">Enviar Mensaje</span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SEED: 338224932 - WebGL ASCII Shader Implementation
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        (function() {
+            'use strict';
+
+            // ═══════════════════════════════════════════════════════════════════════
+            // WEBGL ASCII SHADER CANVAS
+            // ═══════════════════════════════════════════════════════════════════════
+            
+            const canvas = document.getElementById('ascii-canvas');
+            const gl = canvas.getContext('webgl', { 
+                alpha: true, 
+                antialias: false,
+                powerPreference: 'high-performance'
+            });
+
+            if (!gl) {
+                console.warn('WebGL not supported, falling back to CSS animation');
+                return;
+            }
+
+            // Vertex Shader
+            const vertexShaderSource = `
+                attribute vec2 a_position;
+                varying vec2 v_texCoord;
+                void main() {
+                    gl_Position = vec4(a_position, 0.0, 1.0);
+                    v_texCoord = (a_position + 1.0) * 0.5;
+                }
+            `;
+
+            // Fragment Shader - ASCII Art Effect
+            const fragmentShaderSource = `
+                precision highp float;
+                
+                varying vec2 v_texCoord;
+                uniform float u_time;
+                uniform vec2 u_resolution;
+                uniform float u_seed;
+                
+                // Pseudo-random function
+                float random(vec2 st) {
+                    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+                }
+                
+                // Noise function
+                float noise(vec2 st) {
+                    vec2 i = floor(st);
+                    vec2 f = fract(st);
+                    float a = random(i);
+                    float b = random(i + vec2(1.0, 0.0));
+                    float c = random(i + vec2(0.0, 1.0));
+                    float d = random(i + vec2(1.0, 1.0));
+                    vec2 u = f * f * (3.0 - 2.0 * f);
+                    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+                }
+                
+                void main() {
+                    vec2 uv = v_texCoord;
+                    
+                    // Create flowing noise pattern
+                    float t = u_time * 0.15;
+                    vec2 p = uv * 8.0;
+                    
+                    float n1 = noise(p + vec2(t, t * 0.7));
+                    float n2 = noise(p * 1.5 - vec2(t * 0.8, t));
+                    float n3 = noise(p * 0.5 + vec2(t * 0.3, -t * 0.5));
+                    
+                    float combined = (n1 + n2 + n3) / 3.0;
+                    
+                    // ASCII character selection based on value
+                    float charIndex = floor(combined * 12.0);
+                    float charValue = 0.0;
+                    
+                    // Characters: .:-=+*#%@
+                    if (charIndex < 1.0) charValue = 0.1;
+                    else if (charIndex < 2.0) charValue = 0.15;
+                    else if (charIndex < 3.0) charValue = 0.2;
+                    else if (charIndex < 4.0) charValue = 0.25;
+                    else if (charIndex < 5.0) charValue = 0.35;
+                    else if (charIndex < 6.0) charValue = 0.45;
+                    else if (charIndex < 7.0) charValue = 0.55;
+                    else if (charIndex < 8.0) charValue = 0.65;
+                    else if (charIndex < 9.0) charValue = 0.75;
+                    else if (charIndex < 10.0) charValue = 0.85;
+                    else if (charIndex < 11.0) charValue = 0.92;
+                    else charValue = 1.0;
+                    
+                    // Scanline effect
+                    float scanline = sin(uv.y * u_resolution.y * 0.5) * 0.1 + 0.9;
+                    
+                    // Combine effects
+                    float final = charValue * scanline;
+                    
+                    // Add subtle color variation
+                    vec3 color = vec3(final);
+                    color += vec3(0.02, 0.01, 0.03) * sin(uv.x * 10.0 + t);
+                    
+                    gl_FragColor = vec4(color, final * 0.3);
+                }
+            `;
+
+            // Compile shader
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                return shader;
+            }
+
+            // Create program
+            function createProgram(gl, vertexShader, fragmentShader) {
+                const program = gl.createProgram();
+                gl.attachShader(program, vertexShader);
+                gl.attachShader(program, fragmentShader);
+                gl.linkProgram(program);
+                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                    console.error('Program link error:', gl.getProgramInfoLog(program));
+                    gl.deleteProgram(program);
+                    return null;
+                }
+                return program;
+            }
+
+            // Initialize WebGL
+            const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+            const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+            const program = createProgram(gl, vertexShader, fragmentShader);
+
+            // Set up geometry (fullscreen quad)
+            const positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                -1, -1, 1, -1, -1, 1,
+                -1, 1, 1, -1, 1, 1
+            ]), gl.STATIC_DRAW);
+
+            // Get attribute and uniform locations
+            const positionLocation = gl.getAttribLocation(program, 'a_position');
+            const timeLocation = gl.getUniformLocation(program, 'u_time');
+            const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+            const seedLocation = gl.getUniformLocation(program, 'u_seed');
+
+            // Resize handler
+            function resize() {
+                const dpr = Math.min(window.devicePixelRatio, 1.5); // Limit DPR for performance
+                canvas.width = window.innerWidth * dpr;
+                canvas.height = window.innerHeight * dpr;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Animation loop with frame limiting for 60fps
+            let lastTime = 0;
+            const targetFPS = 60;
+            const frameInterval = 1000 / targetFPS;
+
+            function render(currentTime) {
+                requestAnimationFrame(render);
+
+                const elapsed = currentTime - lastTime;
+                if (elapsed < frameInterval) return;
+                lastTime = currentTime - (elapsed % frameInterval);
+
+                gl.useProgram(program);
+
+                // Set attributes
+                gl.enableVertexAttribArray(positionLocation);
+                gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+                // Set uniforms
+                gl.uniform1f(timeLocation, currentTime * 0.001);
+                gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+                gl.uniform1f(seedLocation, 338224932.0);
+
+                // Draw
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+            }
+
+            requestAnimationFrame(render);
+
+            // ═══════════════════════════════════════════════════════════════════════
+            // THEME TOGGLE
+            // ═══════════════════════════════════════════════════════════════════════
+
+            const themeToggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            
+            // Check for saved theme preference or default to light
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            html.setAttribute('data-theme', savedTheme);
+
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════════
+            // KINETIC TYPOGRAPHY - Animated Character Reveal
+            // ═══════════════════════════════════════════════════════════════════════
+
+            function animateTitle() {
+                const words = [
+                    { el: document.getElementById('titleWord1'), text: 'Diseño' },
+                    { el: document.getElementById('titleWord2'), text: 'Sin' },
+                    { el: document.getElementById('titleWord3'), text: 'Límites' }
+                ];
+
+                words.forEach((wordObj, wordIndex) => {
+                    const word = wordObj.text;
+                    const el = wordObj.el;
+                    el.innerHTML = '';
+
+                    for (let i = 0; i < word.length; i++) {
+                        const span = document.createElement('span');
+                        span.className = 'char';
+                        span.textContent = word[i];
+                        span.style.animationDelay = `${wordIndex * 0.3 + i * 0.08}s`;
+                        el.appendChild(span);
+                    }
+                });
+            }
+
+            animateTitle();
+
+            // ═══════════════════════════════════════════════════════════════════════
+            // MAGNETIC BUTTONS
+            // ═══════════════════════════════════════════════════════════════════════
+
+            const magneticButtons = document.querySelectorAll('.magnetic-btn');
+
+            magneticButtons.forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                });
+
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translate(0px, 0px)';
+                });
+            });
+
+            // ═══════════════════════════════════════════════════════════════════════
+            // SCRAMBLE TEXT EFFECT
+            // ═══════════════════════════════════════════════════════════════════════
+
+            const scrambleTexts = document.querySelectorAll('.scramble-text');
+
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+
+            function scrambleText(el) {
+                const originalText = el.textContent;
+                const length = originalText.length;
+                let iteration = 0;
+                const maxIterations = 15;
+
+                const interval = setInterval(() => {
+                    el.textContent = originalText
+                        .split('')
+                        .map((char, index) => {
+                            if (index < iteration) {
+                                return originalText[index];
+                            }
+                            return chars[Math.floor(Math.random() * chars.length)];
+                        })
+                        .join('');
+
+                    if (iteration >= length) {
+                        clearInterval(interval);
+                    }
+
+                    iteration += 1 / 3;
+                }, 30);
+            }
+
+            scrambleTexts.forEach(el => {
+                el.addEventListener('mouseenter', () => scrambleText(el));
+            });
+
+            // ═══════════════════════════════════════════════════════════════════════
+            // SCROLL-DRIVEN ANIMATIONS
+            // ═══════════════════════════════════════════════════════════════════════
+
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe bento cards
+            document.querySelectorAll('.bento-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(40px)';
+                card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+                observer.observe(card);
+            });
+
+            // Observe feature cards
+            document.querySelectorAll('.feature-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(40px)';
+                card.style.transition = `opacity 0.6s ease ${index * 0.15}s, transform 0.6s ease ${index * 0.15}s`;
+                observer.observe(card);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════════
+            // PARALLAX EFFECT ON SCROLL
+            // ═══════════════════════════════════════════════════════════════════════
+
+            let ticking = false;
+
+            function updateParallax() {
+                const scrolled = window.pageYOffset;
+                const blobs = document.querySelectorAll('.blob');
+                
+                blobs.forEach((blob, index) => {
+                    const speed = (index + 1) * 0.05;
+                    blob.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+                
+                ticking = false;
+            }
+
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(updateParallax);
+                    ticking = true;
+                }
+            });
+
+            // ═══════════════════════════════════════════════════════════════════════
+            // SMOOTH SCROLL FOR NAV LINKS
+            // ═══════════════════════════════════════════════════════════════════════
+
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+        })();
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // PERFORMANCE OPTIMIZATION
+        // ═══════════════════════════════════════════════════════════════════════════
+        
+        // Reduce animations on mobile for better performance
+        if (window.innerWidth < 768) {
+            document.documentElement.style.setProperty('--canvas-opacity', '0.01');
+        }
+
+        // Respect user's motion preferences
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (prefersReducedMotion.matches) {
+            document.documentElement.style.setProperty('--canvas-opacity', '0');
+        }
+    </script>
+</body>
+</html>

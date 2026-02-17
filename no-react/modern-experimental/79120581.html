@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEXUS — Digital Experience Bureau</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --accent-cyan: #00ffff;
+            --accent-pink: #ff0066;
+            --accent-purple: #8b5cf6;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: 20px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8f8fc;
+            --bg-secondary: #eeeef5;
+            --bg-tertiary: #e0e0e8;
+            --text-primary: #0a0a15;
+            --text-secondary: #555566;
+            --glass-bg: rgba(0, 0, 0, 0.02);
+            --glass-border: rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        /* WebGL Canvas */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Aurora Blobs */
+        .aurora {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: auroraFloat 20s ease-in-out infinite;
+        }
+
+        .aurora-blob-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--accent-cyan);
+            top: -200px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .aurora-blob-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-pink);
+            top: 50%;
+            right: -150px;
+            animation-delay: -7s;
+        }
+
+        .aurora-blob-3 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-purple);
+            bottom: -100px;
+            left: 30%;
+            animation-delay: -14s;
+        }
+
+        @keyframes auroraFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -30px) scale(1.1); }
+            50% { transform: translate(-30px, 50px) scale(0.9); }
+            75% { transform: translate(40px, 20px) scale(1.05); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(10, 10, 15, 0.5);
+            border-bottom: 1px solid var(--glass-border);
+            transition: background 0.5s ease;
+        }
+
+        [data-theme="light"] nav {
+            background: rgba(248, 248, 252, 0.7);
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .theme-toggle {
+            width: 48px;
+            height: 28px;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        [data-theme="light"] .theme-toggle::before {
+            transform: translateX(20px);
+            background: var(--accent-pink);
+            box-shadow: 0 0 10px var(--accent-pink);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 12vw, 10rem);
+            font-weight: 800;
+            line-height: 0.9;
+            text-align: center;
+            letter-spacing: -0.04em;
+            position: relative;
+        }
+
+        .hero-title .word {
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .hero-title .char {
+            display: inline-block;
+            transform: translateY(100%);
+            opacity: 0;
+            animation: charReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes charReveal {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .hero-title .outline {
+            -webkit-text-stroke: 2px var(--text-primary);
+            color: transparent;
+            position: relative;
+        }
+
+        .hero-title .gradient {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            color: var(--text-secondary);
+            margin-top: 2rem;
+            text-align: center;
+            max-width: 500px;
+            line-height: 1.6;
+            opacity: 0;
+            animation: fadeIn 1s ease 1.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 2s forwards;
+        }
+
+        .scroll-indicator span {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-secondary);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, var(--accent-cyan), transparent);
+            animation: scrollPulse 2s ease infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { transform: scaleY(1); opacity: 1; }
+            50% { transform: scaleY(0.5); opacity: 0.5; }
+        }
+
+        /* Bento Grid Section */
+        .bento-section {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: minmax(200px, auto);
+            gap: 1.5rem;
+        }
+
+        .bento-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .bento-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .bento-item:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.1);
+        }
+
+        .bento-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-item.wide {
+            grid-column: span 2;
+        }
+
+        .bento-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bento-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .bento-desc {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .bento-number {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--glass-border);
+            line-height: 1;
+        }
+
+        /* Kinetic Typography Ticker */
+        .ticker-section {
+            padding: 6rem 0;
+            overflow: hidden;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .ticker-track {
+            display: flex;
+            animation: tickerScroll 30s linear infinite;
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            flex-shrink: 0;
+            padding: 0 3rem;
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            white-space: nowrap;
+            background: linear-gradient(90deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+
+        .ticker-item:hover {
+            color: var(--accent-cyan);
+            -webkit-text-stroke: 2px var(--accent-cyan);
+        }
+
+        /* Features with Kinetic Text */
+        .features-section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            padding: 4rem 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .feature-text h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .feature-text p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .feature-visual {
+            aspect-ratio: 1;
+            border-radius: 24px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-visual::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, var(--accent-cyan), transparent, var(--accent-pink), transparent);
+            animation: rotate 8s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes rotate {
+            to { transform: rotate(360deg); }
+        }
+
+        .feature-visual .inner {
+            width: 80%;
+            height: 80%;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-visual .icon {
+            font-size: 4rem;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 8rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 800;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+
+        .cta-title span {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 3rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--bg-primary);
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .cta-button:hover::before {
+            opacity: 1;
+        }
+
+        .cta-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-button .arrow {
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover .arrow {
+            transform: translateX(5px);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .footer-logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .bento-item.large {
+                grid-column: span 2;
+                grid-row: span 1;
+            }
+            
+            .feature-item {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            nav {
+                padding: 1rem 1.25rem;
+            }
+            
+            .hero {
+                padding: 6rem 1.25rem 3rem;
+            }
+            
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .bento-item.large,
+            .bento-item.wide {
+                grid-column: span 1;
+            }
+            
+            .bento-section {
+                padding: 2rem 1.25rem;
+            }
+            
+            .ticker-section {
+                padding: 4rem 0;
+            }
+            
+            .features-section {
+                padding: 3rem 1.25rem;
+            }
+            
+            .feature-item {
+                padding: 2rem 0;
+            }
+            
+            .cta-section {
+                padding: 4rem 1.25rem;
+            }
+            
+            .cta-button {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Scroll Animations */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .scroll-animate.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger delays for bento items */
+        .bento-item:nth-child(1) { transition-delay: 0s; }
+        .bento-item:nth-child(2) { transition-delay: 0.1s; }
+        .bento-item:nth-child(3) { transition-delay: 0.2s; }
+        .bento-item:nth-child(4) { transition-delay: 0.3s; }
+        .bento-item:nth-child(5) { transition-delay: 0.4s; }
+        .bento-item:nth-child(6) { transition-delay: 0.5s; }
+
+        /* Kinetic Text Effect */
+        .kinetic-text {
+            display: inline-block;
+        }
+
+        .kinetic-text span {
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .kinetic-text:hover span {
+            transform: translateY(-10px);
+        }
+
+        /* Magnetic Button Effect */
+        .magnetic-btn {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <canvas id="webgl-canvas"></canvas>
+    
+    <div class="aurora">
+        <div class="aurora-blob aurora-blob-1"></div>
+        <div class="aurora-blob aurora-blob-2"></div>
+        <div class="aurora-blob aurora-blob-3"></div>
+    </div>
+
+    <nav>
+        <div class="logo">NEXUS</div>
+        <div class="nav-right">
+            <button class="theme-toggle" aria-label="Toggle theme"></button>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="hero-title">
+            <span class="word"><span class="char" style="animation-delay: 0.1s">W</span><span class="char" style="animation-delay: 0.15s">E</span><span class="char" style="animation-delay: 0.2s"> </span><span class="char" style="animation-delay: 0.25s">C</span><span class="char" style="animation-delay: 0.3s">R</span><span class="char" style="animation-delay: 0.35s">A</span><span class="char" style="animation-delay: 0.4s">F</span><span class="char" style="animation-delay: 0.45s">T</span></span>
+            <span class="word"><span class="char gradient" style="animation-delay: 0.6s">D</span><span class="char gradient" style="animation-delay: 0.65s">I</span><span class="char gradient" style="animation-delay: 0.7s">G</span><span class="char gradient" style="animation-delay: 0.75s">I</span><span class="char gradient" style="animation-delay: 0.8s">T</span><span class="char gradient" style="animation-delay: 0.85s">A</span><span class="char gradient" style="animation-delay: 0.9s">L</span></span>
+            <span class="word"><span class="char outline" style="animation-delay: 1.05s">E</span><span class="char outline" style="animation-delay: 1.1s">X</span><span class="char outline" style="animation-delay: 1.15s">P</span><span class="char outline" style="animation-delay: 1.2s">E</span><span class="char outline" style="animation-delay: 1.25s">R</span><span class="char outline" style="animation-delay: 1.3s">I</span><span class="char outline" style="animation-delay: 1.35s">E</span><span class="char outline" style="animation-delay: 1.4s">N</span><span class="char outline" style="animation-delay: 1.45s">C</span><span class="char outline" style="animation-delay: 1.5s">E</span><span class="char outline" style="animation-delay: 1.55s">S</span></span>
+        </h1>
+        <p class="hero-subtitle">We blend art and technology to create immersive digital experiences that captivate, engage, and transform brands.</p>
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <section class="ticker-section">
+        <div class="ticker-track">
+            <span class="ticker-item">STRATEGY</span>
+            <span class="ticker-item">DESIGN</span>
+            <span class="ticker-item">DEVELOPMENT</span>
+            <span class="ticker-item">INNOVATION</span>
+            <span class="ticker-item">CREATIVITY</span>
+            <span class="ticker-item">TECHNOLOGY</span>
+            <span class="ticker-item">STRATEGY</span>
+            <span class="ticker-item">DESIGN</span>
+            <span class="ticker-item">DEVELOPMENT</span>
+            <span class="ticker-item">INNOVATION</span>
+            <span class="ticker-item">CREATIVITY</span>
+            <span class="ticker-item">TECHNOLOGY</span>
+        </div>
+    </section>
+
+    <section class="bento-section">
+        <div class="section-header">
+            <p class="section-label scroll-animate">What We Do</p>
+            <h2 class="section-title scroll-animate">Services that drive<br>results</h2>
+        </div>
+        
+        <div class="bento-grid">
+            <div class="bento-item large scroll-animate">
+                <span class="bento-number">01</span>
+                <div class="bento-icon">&#9672;</div>
+                <h3 class="bento-title">Brand Strategy</h3>
+                <p class="bento-desc">We craft compelling brand narratives that resonate with your audience and differentiate you in the market.</p>
+            </div>
+            
+            <div class="bento-item scroll-animate">
+                <span class="bento-number">02</span>
+                <div class="bento-icon">&#9670;</div>
+                <h3 class="bento-title">UI/UX Design</h3>
+                <p class="bento-desc">Beautiful, intuitive interfaces that delight users and drive engagement.</p>
+            </div>
+            
+            <div class="bento-item scroll-animate">
+                <span class="bento-number">03</span>
+                <div class="bento-icon">&#9651;</div>
+                <h3 class="bento-title">WebGL Magic</h3>
+                <p class="bento-desc">Custom shaders and 3D experiences that push the boundaries of web.</p>
+            </div>
+            
+            <div class="bento-item wide scroll-animate">
+                <span class="bento-number">04</span>
+                <div class="bento-icon">&#9673;</div>
+                <h3 class="bento-title">Development</h3>
+                <p class="bento-desc">Full-stack development with modern frameworks, optimized for performance and scalability.</p>
+            </div>
+            
+            <div class="bento-item scroll-animate">
+                <span class="bento-number">05</span>
+                <div class="bento-icon">&#9677;</div>
+                <h3 class="bento-title">Motion</h3>
+                <p class="bento-desc">Cinematic animations and interactions that bring your digital presence to life.</p>
+            </div>
+            
+            <div class="bento-item scroll-animate">
+                <span class="bento-number">06</span>
+                <div class="bento-icon">&#9679;</div>
+                <h3 class="bento-title">3D Assets</h3>
+                <p class="bento-desc">Stunning 3D modeling and rendering for product showcases and immersive experiences.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="feature-item scroll-animate">
+            <div class="feature-text">
+                <h3 class="kinetic-text">
+                    <span>P</span><span>U</span><span>S</span><span>H</span><span> </span><span>T</span><span>H</span><span>E</span><span> </span><span>B</span><span>O</span><span>U</span><span>N</span><span>D</span><span>A</span><span>R</span><span>I</span><span>E</span><span>S</span>
+                </h3>
+                <p>We don't just follow trends—we set them. Our experimental approach combines cutting-edge technology with artistic vision to create experiences that no one else can replicate.</p>
+            </div>
+            <div class="feature-visual">
+                <div class="inner">
+                    <span class="icon">&#9733;</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feature-item scroll-animate">
+            <div class="feature-visual">
+                <div class="inner">
+                    <span class="icon">&#9830;</span>
+                </div>
+            </div>
+            <div class="feature-text">
+                <h3 class="kinetic-text">
+                    <span>P</span><span>E</span><span>R</span><span>F</span><span>O</span><span>R</span><span>M</span><span>A</span><span>N</span><span>C</span><span>E</span><span> </span><span>F</span><span>I</span><span>R</span><span>S</span><span>T</span>
+                </h3>
+                <p>Stunning visuals mean nothing if they don't perform. We optimize every pixel and animation to ensure silky-smooth 60fps experiences across all devices.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2 class="cta-title scroll-animate">Ready to create<br><span>something extraordinary?</span></h2>
+        <button class="cta-button magnetic-btn">
+            <span>Start a Project</span>
+            <span class="arrow">&#8594;</span>
+        </button>
+    </section>
+
+    <footer>
+        <div class="footer-logo">NEXUS</div>
+        <p>© 2026 NEXUS Digital Experience Bureau. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        body.setAttribute('data-theme', savedTheme);
+
+        // WebGL Dithering Shader
+        const canvas = document.getElementById('webgl-canvas');
+        const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+
+        if (gl) {
+            function resizeCanvas() {
+                canvas.width = window.innerWidth * window.devicePixelRatio;
+                canvas.height = window.innerHeight * window.devicePixelRatio;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const vertexShaderSource = `
+                attribute vec2 position;
+                void main() {
+                    gl_Position = vec4(position, 0.0, 1.0);
+                }
+            `;
+
+            const fragmentShaderSource = `
+                precision highp float;
+                uniform vec2 resolution;
+                uniform float time;
+                
+                float random(vec2 st) {
+                    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+                }
+                
+                void main() {
+                    vec2 uv = gl_FragCoord.xy / resolution;
+                    
+                    // Dithering pattern
+                    float dither = random(floor(gl_FragCoord.xy / 2.0) + floor(time * 10.0));
+                    
+                    // Subtle noise overlay
+                    float noise = random(uv + time * 0.1) * 0.02;
+                    
+                    // Color tint based on theme
+                    vec3 tint = vec3(0.0, 1.0, 1.0); // Cyan tint
+                    
+                    // Apply subtle dithering effect
+                    vec3 color = vec3(0.0);
+                    color += tint * dither * 0.03;
+                    color += noise;
+                    
+                    gl_FragColor = vec4(color, 0.15);
+                }
+            `;
+
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                return shader;
+            }
+
+            const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+            const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+            const program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            gl.useProgram(program);
+
+            const positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                -1, -1, 1, -1, -1, 1,
+                -1, 1, 1, -1, 1, 1
+            ]), gl.STATIC_DRAW);
+
+            const positionLocation = gl.getAttribLocation(program, 'position');
+            gl.enableVertexAttribArray(positionLocation);
+            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+            const resolutionLocation = gl.getUniformLocation(program, 'resolution');
+            const timeLocation = gl.getUniformLocation(program, 'time');
+
+            let startTime = performance.now();
+
+            function render() {
+                const time = (performance.now() - startTime) / 1000;
+                
+                gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+                gl.uniform1f(timeLocation, time);
+                
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                
+                requestAnimationFrame(render);
+            }
+
+            render();
+        }
+
+        // Scroll Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-animate, .bento-item').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Magnetic Button Effect
+        const magneticBtn = document.querySelector('.magnetic-btn');
+        
+        magneticBtn.addEventListener('mousemove', (e) => {
+            const rect = magneticBtn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            
+            magneticBtn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+        });
+
+        magneticBtn.addEventListener('mouseleave', () => {
+            magneticBtn.style.transform = 'translate(0, 0)';
+        });
+
+        // Kinetic Text Hover Effect
+        document.querySelectorAll('.kinetic-text').forEach(text => {
+            const spans = text.querySelectorAll('span');
+            text.addEventListener('mouseenter', () => {
+                spans.forEach((span, i) => {
+                    span.style.transform = `translateY(-15px)`;
+                    span.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+                    span.style.transitionDelay = `${i * 0.03}s`;
+                });
+            });
+            
+            text.addEventListener('mouseleave', () => {
+                spans.forEach((span, i) => {
+                    span.style.transform = 'translateY(0)';
+                    span.style.transitionDelay = `${i * 0.02}s`;
+                });
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

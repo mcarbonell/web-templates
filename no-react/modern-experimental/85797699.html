@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA — Award-Winning Design Agency</title>
+    
+    <!--
+    ============================================================
+    DESIGN SEED: 85797699
+    ============================================================
+    This landing page uses the following design techniques derived from the seed:
+    
+    DECOMPOSITION:
+    - Digit 1 (8) → Kinetic Typography
+    - Digit 2 (5) → Bento Grids  
+    - Digit 3 (7) → Aurora/gradient blobs
+    - Digit 4 (9) → Scroll-Driven Animations
+    - Digit 5 (7) → Glassmorphism
+    - Digit 6 (6) → Custom Shaders (WebGL) - MANDATORY
+    - Digit 7 (6) → Magnetic buttons
+    - Digit 8 (9) → Gradient animated text
+    
+    TECHNIQUES USED:
+    1. WebGL Custom Shader: Fluid gradient mesh with dithering effect
+    2. Kinetic Typography: Animated hero text with scroll-based transforms
+    3. Bento Grid: Services section with bento-box style layout
+    4. Aurora/Gradient Blobs: CSS-animated gradient background
+    5. Scroll-Driven Animations: Elements animate on scroll
+    6. Glassmorphism: Frosted glass card effects
+    7. Magnetic Buttons: Buttons that magnetically attract cursor
+    8. Gradient Animated Text: Headlines with flowing gradient fills
+    9. Light/Dark Mode: Theme toggle with smooth transitions
+    
+    TARGET: 60fps on mid-range mobile devices
+    BROWSERS: Chrome, Edge, Firefox, Safari (modern)
+    ============================================================
+    -->
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #121214;
+            --bg-tertiary: #1a1a1f;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #ec4899;
+            --accent-tertiary: #06b6d4;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: rgba(0, 0, 0, 0.4);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #f4f4f5;
+            --bg-tertiary: #e4e4e7;
+            --text-primary: #09090b;
+            --text-secondary: #52525b;
+            --text-muted: #a1a1aa;
+            --glass-bg: rgba(0, 0, 0, 0.02);
+            --glass-border: rgba(0, 0, 0, 0.06);
+            --glass-shadow: rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        /* WebGL Canvas Background */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* Aurora/Gradient Blobs Background */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .blob-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--accent-primary);
+            top: -200px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-secondary);
+            top: 50%;
+            right: -150px;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-tertiary);
+            bottom: -100px;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(1.1); }
+            50% { transform: translate(-30px, 30px) scale(0.9); }
+            75% { transform: translate(-50px, -30px) scale(1.05); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: transparent;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            width: 48px;
+            height: 28px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            transition: transform 0.3s ease;
+        }
+
+        [data-theme="light"] .theme-toggle::before {
+            transform: translateX(20px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .hero-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 12vw, 10rem);
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 50%, var(--accent-tertiary) 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientFlow 4s ease infinite;
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+
+        /* Kinetic Typography - Animated Letters */
+        .kinetic-text {
+            display: flex;
+            justify-content: center;
+            gap: 0.05em;
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .kinetic-char {
+            display: inline-block;
+            transform-origin: center bottom;
+            animation: kineticChar 3s ease-in-out infinite;
+            animation-delay: calc(var(--char-index) * 0.1s);
+        }
+
+        @keyframes kineticChar {
+            0%, 100% { 
+                transform: translateY(0) rotateX(0);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateY(-20px) rotateX(10deg);
+                opacity: 0.8;
+            }
+        }
+
+        /* Magnetic Button */
+        .magnetic-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .magnetic-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .magnetic-btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .magnetic-btn:hover .btn-arrow {
+            transform: translateX(5px);
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator::after {
+            content: '';
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--accent-primary), transparent);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* Bento Grid Section */
+        .bento-section {
+            padding: 8rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, minmax(200px, auto));
+            gap: 1.5rem;
+        }
+
+        /* Glassmorphism Cards */
+        .bento-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), var(--accent-secondary), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .bento-card:hover::before {
+            opacity: 1;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px var(--glass-shadow);
+            border-color: var(--accent-primary);
+        }
+
+        .bento-card.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-card.wide {
+            grid-column: span 2;
+        }
+
+        .bento-card.tall {
+            grid-row: span 2;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-desc {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .card-number {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--glass-border);
+            line-height: 1;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 6rem 2rem;
+            background: var(--bg-secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 2rem;
+        }
+
+        .stat-number {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Scroll-driven animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: auto;
+            }
+
+            .bento-card.large,
+            .bento-card.wide,
+            .bento-card.tall {
+                grid-column: span 2;
+                grid-row: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 4rem 1.5rem;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bento-card.large,
+            .bento-card.wide,
+            .bento-card.tall {
+                grid-column: span 1;
+            }
+
+            .bento-section {
+                padding: 4rem 1.5rem;
+            }
+        }
+
+        /* Staggered animation delays for bento cards */
+        .bento-card:nth-child(1) { animation-delay: 0s; }
+        .bento-card:nth-child(2) { animation-delay: 0.1s; }
+        .bento-card:nth-child(3) { animation-delay: 0.2s; }
+        .bento-card:nth-child(4) { animation-delay: 0.3s; }
+        .bento-card:nth-child(5) { animation-delay: 0.4s; }
+        .bento-card:nth-child(6) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <!-- WebGL Canvas Background -->
+    <canvas id="webgl-canvas"></canvas>
+    
+    <!-- Aurora Background -->
+    <div class="aurora-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div class="blobdiv>
+        < blob-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">AURA</div>
+        <div class="nav-right">
+            <ul class="nav-links">
+                <li><a href="#work">Work</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title">
+            <span class="kinetic-text" id="kineticTitle">
+                <!-- Letters will be injected by JS -->
+            </span>
+        </h1>
+        <p class="hero-subtitle reveal">
+            We craft <span class="gradient-text">unforgettable digital experiences</span> that push the boundaries of design and technology.
+        </p>
+        <button class="magnetic-btn" id="heroBtn">
+            <span>Start Your Project</span>
+            <span class="btn-arrow">→</span>
+        </button>
+        
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+        </div>
+    </section>
+
+    <!-- Bento Grid Services Section -->
+    <section class="bento-section" id="services">
+        <h2 class="section-title reveal">Our <span class="gradient-text">Services</span></h2>
+        
+        <div class="bento-grid">
+            <!-- Large Card -->
+            <div class="bento-card large reveal">
+                <div class="card-icon">🎨</div>
+                <h3 class="card-title">Brand Identity</h3>
+                <p class="card-desc">We create distinctive brand identities that resonate with your audience and stand the test of time. From logo design to complete brand guidelines.</p>
+                <span class="card-number">01</span>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="bento-card reveal">
+                <div class="card-icon">✨</div>
+                <h3 class="card-title">UI/UX Design</h3>
+                <p class="card-desc">Intuitive interfaces that delight users.</p>
+                <span class="card-number">02</span>
+            </div>
+            
+            <!-- Card 3 -->
+            <div class="bento-card reveal">
+                <div class="card-icon">🚀</div>
+                <h3 class="card-title">Web Development</h3>
+                <p class="card-desc">Cutting-edge websites built for performance.</p>
+                <span class="card-number">03</span>
+            </div>
+            
+            <!-- Wide Card -->
+            <div class="bento-card wide reveal">
+                <div class="card-icon">📱</div>
+                <h3 class="card-title">Mobile Experiences</h3>
+                <p class="card-desc">Native and cross-platform mobile apps that deliver seamless experiences across all devices.</p>
+                <span class="card-number">04</span>
+            </div>
+            
+            <!-- Tall Card -->
+            <div class="bento-card tall reveal">
+                <div class="card-icon">🎬</div>
+                <h3 class="card-title">Motion Design</h3>
+                <p class="card-desc">Bring your brand to life with stunning animations, micro-interactions, and immersive motion experiences that captivate your audience.</p>
+                <span class="card-number">05</span>
+            </div>
+            
+            <!-- Card 6 -->
+            <div class="bento-card reveal">
+                <div class="card-icon">🔮</div>
+                <h3 class="card-title">3D & WebGL</h3>
+                <p class="card-desc">Immersive 3D experiences.</p>
+                <span class="card-number">06</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item reveal">
+                <div class="stat-number" data-target="150">0</div>
+                <div class="stat-label">Projects Delivered</div>
+            </div>
+            <div class="stat-item reveal">
+                <div class="stat-number" data-target="12">0</div>
+                <div class="stat-label">Years Experience</div>
+            </div>
+            <div class="stat-item reveal">
+                <div class="stat-number" data-target="40">0</div>
+                <div class="stat-label">Team Members</div>
+            </div>
+            <div class="stat-item reveal">
+                <div class="stat-number" data-target="25">0</div>
+                <div class="stat-label">Awards Won</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-logo">AURA</div>
+        <p class="footer-text">© 2024 Aura Design Agency. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // ============================================================
+        // WEBGL SHADER - Fluid Gradient Mesh with Dithering Effect
+        // ============================================================
+        
+        const canvas = document.getElementById('webgl-canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+        if (!gl) {
+            console.warn('WebGL not supported, falling back to CSS animation');
+            canvas.style.display = 'none';
+        } else {
+            // Vertex shader
+            const vertexShaderSource = `
+                attribute vec2 a_position;
+                varying vec2 v_texCoord;
+                void main() {
+                    v_texCoord = a_position * 0.5 + 0.5;
+                    gl_Position = vec4(a_position, 0.0, 1.0);
+                }
+            `;
+
+            // Fragment shader with dithering and color banding
+            const fragmentShaderSource = `
+                precision mediump float;
+                varying vec2 v_texCoord;
+                uniform float u_time;
+                uniform vec2 u_resolution;
+                uniform float u_seed;
+
+                // Dithering function
+                float dither(vec2 position, float brightness) {
+                    int x = int(mod(position.x, 4.0));
+                    int y = int(mod(position.y, 4.0));
+                    int index = x + y * 4;
+                    float limit = 0.0;
+                    
+                    if (index == 0) limit = 0.0625;
+                    else if (index == 1) limit = 0.5625;
+                    else if (index == 2) limit = 0.1875;
+                    else if (index == 3) limit = 0.6875;
+                    else if (index == 4) limit = 0.8125;
+                    else if (index == 5) limit = 0.3125;
+                    else if (index == 6) limit = 0.9375;
+                    else if (index == 7) limit = 0.4375;
+                    else if (index == 8) limit = 0.25;
+                    else if (index == 9) limit = 0.75;
+                    else if (index == 10) limit = 0.125;
+                    else if (index == 11) limit = 0.625;
+                    else if (index == 12) limit = 1.0;
+                    else if (index == 13) limit = 0.5;
+                    else if (index == 14) limit = 0.875;
+                    else limit = 0.375;
+                    
+                    return brightness < limit ? 0.0 : 1.0;
+                }
+
+                // Noise function
+                float noise(vec2 st) {
+                    return fract(sin(dot(st.xy, vec2(12.9898, 78.233) + u_seed)) * 43758.5453123);
+                }
+
+                // Smooth noise
+                float smoothNoise(vec2 st) {
+                    vec2 i = floor(st);
+                    vec2 f = fract(st);
+                    float a = noise(i);
+                    float b = noise(i + vec2(1.0, 0.0));
+                    float c = noise(i + vec2(0.0, 1.0));
+                    float d = noise(i + vec2(1.0, 1.0));
+                    vec2 u = f * f * (3.0 - 2.0 * f);
+                    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+                }
+
+                // FBM (Fractal Brownian Motion)
+                float fbm(vec2 st) {
+                    float value = 0.0;
+                    float amplitude = 0.5;
+                    for (int i = 0; i < 5; i++) {
+                        value += amplitude * smoothNoise(st);
+                        st *= 2.0;
+                        amplitude *= 0.5;
+                    }
+                    return value;
+                }
+
+                void main() {
+                    vec2 st = v_texCoord;
+                    float aspect = u_resolution.x / u_resolution.y;
+                    st.x *= aspect;
+                    
+                    // Animated fluid-like distortion
+                    float t = u_time * 0.15;
+                    vec2 q = vec2(
+                        fbm(st + vec2(0.0, 0.0) + t),
+                        fbm(st + vec2(5.2, 1.3) + t)
+                    );
+                    
+                    vec2 r = vec2(
+                        fbm(st + 4.0 * q + vec2(1.7, 9.2) + 0.15 * t),
+                        fbm(st + 4.0 * q + vec2(8.3, 2.8) + 0.126 * t)
+                    );
+                    
+                    float f = fbm(st + 4.0 * r);
+                    
+                    // Color palette based on seed
+                    vec3 color1 = vec3(0.545, 0.361, 0.965); // Purple #8b5cf6
+                    vec3 color2 = vec3(0.925, 0.282, 0.6);   // Pink #ec4899
+                    vec3 color3 = vec3(0.024, 0.714, 0.831); // Cyan #06b6d4
+                    vec3 color4 = vec3(0.1, 0.1, 0.12);      // Dark
+                    
+                    // Mix colors based on noise
+                    vec3 color = mix(color4, color1, clamp(f * f * 4.0, 0.0, 1.0));
+                    color = mix(color, color2, clamp(length(q), 0.0, 1.0));
+                    color = mix(color, color3, clamp(length(r.x), 0.0, 1.0));
+                    
+                    // Apply dithering for retro effect (reduce for mobile performance)
+                    float pixelSize = 3.0;
+                    vec2 pixelCoord = floor(v_texCoord * u_resolution / pixelSize);
+                    float luminance = dot(color, vec3(0.299, 0.587, 0.114));
+                    
+                    // Reduced dithering on mobile
+                    if (u_resolution.x > 400.0) {
+                        color = mix(color, vec3(dither(pixelCoord, luminance)), 0.08);
+                    }
+                    
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `;
+
+            // Compile shader
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                return shader;
+            }
+
+            // Create program
+            function createProgram(gl, vertexShader, fragmentShader) {
+                const program = gl.createProgram();
+                gl.attachShader(program, vertexShader);
+                gl.attachShader(program, fragmentShader);
+                gl.linkProgram(program);
+                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                    console.error('Program link error:', gl.getProgramInfoLog(program));
+                    return null;
+                }
+                return program;
+            }
+
+            const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+            const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+            const program = createProgram(gl, vertexShader, fragmentShader);
+
+            // Set up geometry (fullscreen quad)
+            const positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                -1, -1, 1, -1, -1, 1,
+                -1, 1, 1, -1, 1, 1
+            ]), gl.STATIC_DRAW);
+
+            // Get attribute and uniform locations
+            const positionLocation = gl.getAttribLocation(program, 'a_position');
+            const timeLocation = gl.getUniformLocation(program, 'u_time');
+            const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+            const seedLocation = gl.getUniformLocation(program, 'u_seed');
+
+            // Resize handler
+            function resize() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = window.innerWidth * dpr;
+                canvas.height = window.innerHeight * dpr;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Animation loop
+            let startTime = Date.now();
+            const seed = 85797699;
+
+            function render() {
+                const time = (Date.now() - startTime) / 1000;
+
+                gl.useProgram(program);
+                
+                gl.enableVertexAttribArray(positionLocation);
+                gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+                gl.uniform1f(timeLocation, time);
+                gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+                gl.uniform1f(seedLocation, seed);
+
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+                requestAnimationFrame(render);
+            }
+
+            render();
+        }
+
+        // ============================================================
+        // KINETIC TYPOGRAPHY
+        // ============================================================
+        
+        const kineticTitle = document.getElementById('kineticTitle');
+        const titleText = 'AURA';
+        
+        titleText.split('').forEach((char, index) => {
+            const span = document.createElement('span');
+            span.className = 'kinetic-char';
+            span.textContent = char === ' ' ? '\u00A0' : char;
+            span.style.setProperty('--char-index', index);
+            kineticTitle.appendChild(span);
+        });
+
+        // ============================================================
+        // MAGNETIC BUTTONS
+        // ============================================================
+        
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e
