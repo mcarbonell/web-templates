@@ -1,0 +1,1368 @@
+<!doctype html>
+<html lang="en" class="theme-dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>NOIR•AURORA — Experimental Landing</title>
+    <meta
+      name="description"
+      content="A striking, modern landing page with a custom WebGL shader aurora, kinetic type, bento grids, and a light/dark toggle—optimized for mobile."
+    />
+
+    <!--
+      DESIGN NOTES (seed: 348645611)
+      ------------------------------------------------------------
+      Prompt goals: novel, striking, modern, mobile-first, single-file, semantic HTML, no React/Tailwind, no style attributes.
+      Mandatory technique satisfied: Custom Shader (WebGL) background + in-shader dithering (Bayer) for a tactile, posterized look.
+
+      Randomness: this file uses a seeded RNG (Mulberry32) so the visual identity is reproducible.
+      We "decompose" the seed into deterministic picks:
+        - Palette family: seed % 5
+        - Accent hue: rng() * 360
+        - Bento card highlights + motion timings: rng()-driven
+        - Kinetic typography jitter amplitude: rng()-driven
+
+      Aesthetic decisions:
+        - "Aurora glass": a low-res WebGL shader renders animated gradient blobs with grain + dithering.
+          It runs at a capped internal resolution and only animates while visible to preserve 60fps on mid-range mobile.
+        - Kinetic typography: hero headline subtly re-times letter spacing and vertical offset based on scroll.
+        - Scramble text: micro-interactions on key words and nav items.
+        - Bento grid: product/value blocks arranged for thumb-friendly scanning.
+        - Stroke + gradient animated text: bold headline treatment with subtle motion.
+        - Scroll snapping: section-to-section cadence on mobile.
+        - Magnetic buttons: CTA buttons "lean" toward pointer for a premium feel (falls back gracefully on touch).
+
+      Accessibility:
+        - Respects prefers-reduced-motion (disables shader animation + kinetic effects).
+        - Theme toggle persists in localStorage and follows system preference by default.
+    -->
+
+    <style>
+      :root {
+        --bg: hsl(230 30% 6%);
+        --bg2: hsl(235 28% 9%);
+        --panel: hsl(225 22% 10% / 0.55);
+        --panel2: hsl(225 22% 12% / 0.7);
+        --text: hsl(0 0% 98%);
+        --muted: hsl(220 12% 74%);
+        --hair: hsl(220 16% 70% / 0.18);
+        --shadow: 0 12px 40px hsl(0 0% 0% / 0.35);
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --maxw: 1120px;
+
+        --accent-h: 282;
+        --accent-s: 92%;
+        --accent-l: 64%;
+        --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+        --accent2: hsl(calc(var(--accent-h) + 68) 92% 62%);
+        --accent3: hsl(calc(var(--accent-h) + 150) 88% 62%);
+
+        --grad: linear-gradient(
+          110deg,
+          var(--accent) 0%,
+          var(--accent2) 35%,
+          var(--accent3) 70%,
+          var(--accent) 100%
+        );
+        --grad2: radial-gradient(
+          1200px 700px at 18% 12%,
+          hsl(var(--accent-h) 100% 60% / 0.22),
+          transparent 55%
+        );
+        --grad3: radial-gradient(
+          1000px 700px at 88% 18%,
+          hsl(calc(var(--accent-h) + 120) 100% 62% / 0.18),
+          transparent 58%
+        );
+
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
+          "Segoe UI Emoji";
+      }
+
+      html.theme-light {
+        --bg: hsl(0 0% 98%);
+        --bg2: hsl(210 30% 96%);
+        --panel: hsl(0 0% 100% / 0.58);
+        --panel2: hsl(0 0% 100% / 0.72);
+        --text: hsl(230 25% 12%);
+        --muted: hsl(230 10% 38%);
+        --hair: hsl(230 16% 25% / 0.12);
+        --shadow: 0 14px 50px hsl(230 30% 14% / 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--sans);
+        color: var(--text);
+        background: var(--bg);
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      :focus-visible {
+        outline: 2px solid hsl(var(--accent-h) 100% 65% / 0.75);
+        outline-offset: 3px;
+        border-radius: 10px;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        pointer-events: none;
+        background: var(--bg);
+      }
+
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--grad2), var(--grad3);
+        opacity: 0.9;
+        filter: saturate(1.2);
+      }
+
+      canvas#shader {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        opacity: 0.82;
+        transform: translateZ(0);
+      }
+
+      .grain {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0.12;
+        mix-blend-mode: overlay;
+        background-image:
+          radial-gradient(circle at 20% 10%, hsl(0 0% 100% / 0.14) 0 1px, transparent 2px),
+          radial-gradient(circle at 80% 30%, hsl(0 0% 100% / 0.12) 0 1px, transparent 2px),
+          radial-gradient(circle at 40% 70%, hsl(0 0% 100% / 0.10) 0 1px, transparent 2px),
+          radial-gradient(circle at 70% 85%, hsl(0 0% 100% / 0.08) 0 1px, transparent 2px);
+        background-size: 110px 110px, 140px 140px, 160px 160px, 190px 190px;
+      }
+
+      .wrap {
+        position: relative;
+        min-height: 100%;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--hair);
+        background: linear-gradient(to bottom, hsl(0 0% 0% / 0.28), transparent);
+      }
+
+      html.theme-light .topbar {
+        background: linear-gradient(to bottom, hsl(0 0% 100% / 0.68), transparent);
+      }
+
+      .topbar-inner {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 180px;
+      }
+
+      .brand > span {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: var(--grad);
+        box-shadow: 0 10px 30px hsl(var(--accent-h) 90% 55% / 0.24);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .mark::after {
+        content: "";
+        position: absolute;
+        inset: -40%;
+        background: conic-gradient(from 90deg, transparent, hsl(0 0% 100% / 0.7), transparent 45%);
+        animation: sweep 2.2s linear infinite;
+        opacity: 0.55;
+      }
+
+      @keyframes sweep {
+        to {
+          transform: rotate(1turn);
+        }
+      }
+
+      .brand-name {
+        font-weight: 750;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 12px;
+        line-height: 1;
+        opacity: 0.92;
+      }
+
+      .brand-sub {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+
+      nav[aria-label="Primary"] {
+        display: none;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .navlink {
+        font-size: 13px;
+        color: var(--muted);
+        padding: 10px 10px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+      }
+
+      .navlink:hover {
+        color: var(--text);
+        border-color: var(--hair);
+        background: hsl(0 0% 100% / 0.04);
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .toggle {
+        appearance: none;
+        border: 1px solid var(--hair);
+        background: hsl(0 0% 100% / 0.06);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 10px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 120ms ease, background 160ms ease, border-color 160ms ease;
+      }
+
+      html.theme-light .toggle {
+        background: hsl(230 30% 14% / 0.04);
+      }
+
+      .toggle:active {
+        transform: translateY(1px);
+      }
+
+      .toggle svg {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 auto;
+      }
+
+      main {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 18px 16px 72px;
+      }
+
+      .snap {
+        scroll-snap-type: y mandatory;
+      }
+
+      section {
+        scroll-snap-align: start;
+        scroll-margin-top: 64px;
+      }
+
+      .hero {
+        padding: 36px 0 28px;
+      }
+
+      .hero-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .chipbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--hair);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .chip .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--grad);
+        box-shadow: 0 0 0 4px hsl(var(--accent-h) 100% 65% / 0.14);
+      }
+
+      .chip code {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .headline {
+        margin: 18px 0 12px;
+        font-size: clamp(38px, 10vw, 74px);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+      }
+
+      .headline .stroke {
+        display: inline-block;
+        color: transparent;
+        -webkit-text-stroke: 1px hsl(var(--accent-h) 90% 80% / 0.9);
+        text-stroke: 1px hsl(var(--accent-h) 90% 80% / 0.9);
+        filter: drop-shadow(0 20px 40px hsl(var(--accent-h) 100% 55% / 0.14));
+      }
+
+      .headline .grad {
+        display: inline-block;
+        background: var(--grad);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        background-size: 220% 220%;
+        animation: gradmove 6.8s ease-in-out infinite;
+      }
+
+      @keyframes gradmove {
+        0%,
+        100% {
+          background-position: 0% 55%;
+        }
+        50% {
+          background-position: 100% 45%;
+        }
+      }
+
+      .subhead {
+        margin: 0 0 18px;
+        max-width: 60ch;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin: 18px 0 18px;
+      }
+
+      .btn {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--hair);
+        background: var(--panel2);
+        box-shadow: var(--shadow);
+        color: var(--text);
+        font-weight: 650;
+        letter-spacing: 0.01em;
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+        transform: translateZ(0);
+        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+        will-change: transform;
+      }
+
+      .btn.primary {
+        border-color: hsl(var(--accent-h) 100% 70% / 0.22);
+        background: linear-gradient(135deg, hsl(var(--accent-h) 100% 62% / 0.22), hsl(0 0% 100% / 0.06));
+      }
+
+      .btn .arrow {
+        width: 18px;
+        height: 18px;
+      }
+
+      .btn:hover {
+        border-color: hsl(var(--accent-h) 100% 70% / 0.34);
+      }
+
+      .btn:active {
+        transform: translateY(1px) scale(0.99);
+      }
+
+      .ascii {
+        margin: 16px 0 0;
+        padding: 14px 16px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--hair);
+        background: hsl(0 0% 100% / 0.04);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .ascii pre {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 1.35;
+        letter-spacing: 0.02em;
+        color: hsl(0 0% 100% / 0.86);
+        white-space: pre;
+      }
+
+      html.theme-light .ascii pre {
+        color: hsl(230 25% 14% / 0.86);
+      }
+
+      .bento {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr;
+        margin: 18px 0 0;
+      }
+
+      .card {
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--hair);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        background: radial-gradient(
+          700px 220px at var(--hx, 20%) var(--hy, 20%),
+          hsl(var(--accent-h) 100% 64% / 0.22),
+          transparent 60%
+        );
+        opacity: 0.9;
+        pointer-events: none;
+      }
+
+      .card-inner {
+        position: relative;
+        padding: 18px 16px 16px;
+      }
+
+      .kicker {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: hsl(var(--accent-h) 100% 70% / 0.92);
+      }
+
+      .card h3 {
+        margin: 10px 0 8px;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .mini {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .pill {
+        border-radius: 999px;
+        border: 1px solid var(--hair);
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: hsl(0 0% 100% / 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .pill strong {
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .section {
+        padding: 26px 0 6px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+
+      .section-head p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        max-width: 60ch;
+      }
+
+      .stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      .quote {
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--hair);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        padding: 16px;
+      }
+
+      .quote blockquote {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.55;
+        letter-spacing: -0.01em;
+      }
+
+      .quote footer {
+        margin-top: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 12px;
+        font-family: var(--mono);
+      }
+
+      .quote .sig {
+        color: hsl(var(--accent-h) 100% 70% / 0.88);
+      }
+
+      .footer {
+        margin-top: 34px;
+        padding: 18px 0 8px;
+        border-top: 1px solid var(--hair);
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .footer a {
+        border-bottom: 1px dashed var(--hair);
+        padding-bottom: 2px;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      @media (min-width: 820px) {
+        nav[aria-label="Primary"] {
+          display: inline-flex;
+        }
+
+        .hero-grid {
+          grid-template-columns: 1.2fr 0.8fr;
+          align-items: start;
+          gap: 18px;
+        }
+
+        .bento {
+          grid-template-columns: 1.2fr 0.8fr;
+          grid-auto-rows: minmax(160px, auto);
+        }
+
+        .bento .card:nth-child(1) {
+          grid-row: span 2;
+        }
+
+        .stack {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+        canvas#shader {
+          opacity: 0.45;
+        }
+      }
+    </style>
+  </head>
+  <body class="snap">
+    <div class="bg" aria-hidden="true">
+      <canvas id="shader"></canvas>
+    </div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <div class="wrap">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <a class="brand" href="#top">
+            <span class="mark" aria-hidden="true"></span>
+            <span>
+              <span class="brand-name">Noir•Aurora</span>
+              <span class="brand-sub" data-scramble="seed://348645611">seed://348645611</span>
+            </span>
+          </a>
+
+          <nav aria-label="Primary">
+            <a class="navlink" href="#bento" data-scramble="Capabilities">Capabilities</a>
+            <a class="navlink" href="#process" data-scramble="Process">Process</a>
+            <a class="navlink" href="#proof" data-scramble="Proof">Proof</a>
+          </nav>
+
+          <div class="actions">
+            <button class="toggle" type="button" id="themeToggle" aria-pressed="true">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M12 3.2v2.2M12 18.6v2.2M3.2 12h2.2M18.6 12h2.2M5.3 5.3l1.55 1.55M17.15 17.15l1.55 1.55M18.7 5.3l-1.55 1.55M6.85 17.15 5.3 18.7"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M15.6 12a3.6 3.6 0 1 1-7.2 0 3.6 3.6 0 0 1 7.2 0Z"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+              </svg>
+              <span id="themeLabel">Dark</span>
+              <span class="sr-only">Toggle theme</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main id="top">
+        <section class="hero" aria-label="Hero">
+          <div class="hero-grid">
+            <div>
+              <div class="chipbar">
+                <span class="chip">
+                  <span class="dot" aria-hidden="true"></span>
+                  <code data-scramble="WebGL shader + dithering">WebGL shader + dithering</code>
+                </span>
+                <span class="chip">
+                  <code data-scramble="Kinetic type + scroll snap">Kinetic type + scroll snap</code>
+                </span>
+                <span class="chip">
+                  <code data-scramble="Glass bento">Glass bento</code>
+                </span>
+              </div>
+
+              <h1 class="headline" id="headline">
+                <span class="stroke" data-scramble="Design">Design</span>
+                <span> that feels </span>
+                <span class="grad" data-scramble="alive">alive</span>
+                <span> on glass.</span>
+              </h1>
+
+              <p class="subhead">
+                A landing page concept with a custom shader aurora, tactile dithering, bold type, and premium micro-interactions.
+                Optimized for mobile: low-res GPU render, minimal layout thrash, and motion that respects your settings.
+              </p>
+
+              <div class="cta-row">
+                <a class="btn primary" href="#bento" data-magnetic="true">
+                  <span data-scramble="Explore the system">Explore the system</span>
+                  <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M5 12h12m-4-6 6 6-6 6"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </a>
+                <a class="btn" href="#process" data-magnetic="true">
+                  <span data-scramble="See the process">See the process</span>
+                </a>
+              </div>
+            </div>
+
+            <aside class="ascii" aria-label="ASCII panel">
+              <pre aria-hidden="true">
+   _   _   ___   _  _    ___   _   _   ___    _   _
+  | \ | | / _ \ | \| |  / _ \ | | | | / _ \  | \ | |
+  |  \| || (_) || .  | | (_) || |_| || (_) | |  \| |
+  |_|\__| \___/ |_|\_|  \___/  \___/  \___/  |_|\__|
+      A U R O R A  ·  G L A S S  ·  K I N E T I C
+              </pre>
+              <pre id="telemetry" role="status" aria-live="polite"></pre>
+            </aside>
+          </div>
+        </section>
+
+        <section id="bento" class="section" aria-label="Capabilities">
+          <div class="section-head">
+            <h2 data-scramble="Bento capabilities">Bento capabilities</h2>
+            <p>Thumb-first blocks with big contrast, airy rhythm, and a shader-backed identity.</p>
+          </div>
+
+          <div class="bento">
+            <article class="card" data-halo>
+              <div class="card-inner">
+                <div class="kicker">01 / Shader identity</div>
+                <h3><span data-scramble="Aurora that stays fast">Aurora that stays fast</span></h3>
+                <p>
+                  A lightweight fragment shader paints moving gradients. We dither in-shader to add texture without expensive
+                  postprocessing passes.
+                </p>
+                <div class="mini" aria-label="Shader specs">
+                  <div class="pill"><span>Render scale</span><strong id="specScale">0.66×</strong></div>
+                  <div class="pill"><span>FPS target</span><strong>60</strong></div>
+                  <div class="pill"><span>Dither</span><strong>4×4</strong></div>
+                  <div class="pill"><span>Motion</span><strong id="specMotion">adaptive</strong></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="card" data-halo>
+              <div class="card-inner">
+                <div class="kicker">02 / Kinetic type</div>
+                <h3><span data-scramble="Letters with momentum">Letters with momentum</span></h3>
+                <p>Subtle scroll-driven offsets give the headline a living cadence—without causing reflow.</p>
+              </div>
+            </article>
+
+            <article class="card" data-halo>
+              <div class="card-inner">
+                <div class="kicker">03 / Micro-interactions</div>
+                <h3><span data-scramble="Magnetic buttons">Magnetic buttons</span></h3>
+                <p>CTAs lean toward the pointer and snap back with springy easing. Touch devices simply get clean buttons.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="process" class="section" aria-label="Process">
+          <div class="section-head">
+            <h2 data-scramble="Process">Process</h2>
+            <p>Designed like a product: fast path to “wow”, then refinements that keep it usable and accessible.</p>
+          </div>
+
+          <div class="stack">
+            <article class="card" data-halo>
+              <div class="card-inner">
+                <div class="kicker">Step A</div>
+                <h3><span data-scramble="Pick a vibe with a seed">Pick a vibe with a seed</span></h3>
+                <p>Palette, accents, and timings are seeded so prototypes remain reproducible while still feeling fresh.</p>
+              </div>
+            </article>
+
+            <article class="card" data-halo>
+              <div class="card-inner">
+                <div class="kicker">Step B</div>
+                <h3><span data-scramble="Build the shader first">Build the shader first</span></h3>
+                <p>We anchor identity in GPU visuals, then layer typography + bento layouts that read well on small screens.</p>
+              </div>
+            </article>
+
+            <article class="card" data-halo>
+              <div class="card-inner">
+                <div class="kicker">Step C</div>
+                <h3><span data-scramble="Add motion responsibly">Add motion responsibly</span></h3>
+                <p>Motion is gated by visibility and reduced-motion preferences. The shader runs at a capped internal resolution.</p>
+              </div>
+            </article>
+
+            <article class="card" data-halo>
+              <div class="card-inner">
+                <div class="kicker">Step D</div>
+                <h3><span data-scramble="Polish micro-interactions">Polish micro-interactions</span></h3>
+                <p>Scramble text, magnetism, and gentle highlight halos create “novel” without harming performance.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="proof" class="section" aria-label="Proof">
+          <div class="section-head">
+            <h2 data-scramble="Proof">Proof</h2>
+            <p>Short, punchy lines with high contrast. Looks like a concept; behaves like a product.</p>
+          </div>
+
+          <div class="stack">
+            <figure class="quote" data-halo>
+              <blockquote>
+                “The background feels like a living material, not a video. The dithering makes it tactile—like printed light.”
+              </blockquote>
+              <footer>
+                <span class="sig" data-scramble="Studio Review">Studio Review</span>
+                <span data-scramble="Mobile-first, 60fps">Mobile-first, 60fps</span>
+              </footer>
+            </figure>
+            <figure class="quote" data-halo>
+              <blockquote>“Every section snaps into place like an album track. Bold, legible, and weird in the right way.”</blockquote>
+              <footer>
+                <span class="sig" data-scramble="Client Notes">Client Notes</span>
+                <span data-scramble="Scroll-snapped cadence">Scroll-snapped cadence</span>
+              </footer>
+            </figure>
+          </div>
+        </section>
+
+        <footer class="footer" aria-label="Footer">
+          <span>© <span id="year"></span> Noir•Aurora — single-file experimental</span>
+          <span><a href="#top" data-scramble="Back to top">Back to top</a></span>
+        </footer>
+      </main>
+    </div>
+    <script>
+      "use strict";
+
+      const SEED = 348645611;
+      function mulberry32(seed) {
+        let t = seed >>> 0;
+        return function () {
+          t += 0x6d2b79f5;
+          let x = Math.imul(t ^ (t >>> 15), 1 | t);
+          x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+          return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const rng = mulberry32(SEED);
+
+      const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const canHover = window.matchMedia && window.matchMedia("(hover: hover)").matches;
+
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+      // Theme
+      const themeToggle = $("#themeToggle");
+      const themeLabel = $("#themeLabel");
+      const rootEl = document.documentElement;
+      const storedTheme = localStorage.getItem("theme");
+      const systemPrefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+
+      function setTheme(theme) {
+        rootEl.classList.toggle("theme-light", theme === "light");
+        rootEl.classList.toggle("theme-dark", theme === "dark");
+        themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+        themeLabel.textContent = theme === "dark" ? "Dark" : "Light";
+        localStorage.setItem("theme", theme);
+      }
+
+      setTheme(storedTheme || (systemPrefersLight ? "light" : "dark"));
+      themeToggle.addEventListener("click", () => {
+        const nowLight = rootEl.classList.contains("theme-light");
+        setTheme(nowLight ? "dark" : "light");
+      });
+
+      // Seeded identity
+      const paletteFamily = SEED % 5;
+      const accentHueBase = Math.floor(rng() * 360);
+      const accentHue = (accentHueBase + paletteFamily * 27 + 8) % 360;
+      rootEl.style.setProperty("--accent-h", String(accentHue));
+
+      // Footer year
+      $("#year").textContent = String(new Date().getFullYear());
+
+      // Scramble text
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      function scrambleTo(el, target, durationMs = 520) {
+        if (!el || !target) return;
+        if (reduceMotion) {
+          el.textContent = target;
+          return;
+        }
+        const start = performance.now();
+        const from = el.textContent || "";
+        const maxLen = Math.max(from.length, target.length);
+        const revealSpeed = 1.6 + rng() * 1.6;
+
+        function frame(t) {
+          const p = Math.min(1, (t - start) / durationMs);
+          const reveal = Math.floor(maxLen * Math.pow(p, revealSpeed));
+          let out = "";
+          for (let i = 0; i < maxLen; i++) {
+            if (i < reveal) out += target[i] || "";
+            else out += alphabet[(alphabet.length * rng()) | 0];
+          }
+          el.textContent = out;
+          if (p < 1) requestAnimationFrame(frame);
+          else el.textContent = target;
+        }
+        requestAnimationFrame(frame);
+      }
+
+      $$("[data-scramble]").forEach((el) => {
+        const target = el.getAttribute("data-scramble");
+        if (!target) return;
+        el.addEventListener("mouseenter", () => scrambleTo(el, target, 420 + rng() * 280));
+        el.addEventListener("focus", () => scrambleTo(el, target, 520 + rng() * 320));
+        if (!el.textContent || !el.textContent.trim()) el.textContent = target;
+      });
+
+      // Magnetic buttons
+      if (canHover && !reduceMotion) {
+        $$("[data-magnetic='true']").forEach((el) => {
+          const strength = 10 + rng() * 12;
+          el.addEventListener("pointermove", (e) => {
+            const r = el.getBoundingClientRect();
+            const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+            const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+            const tx = Math.max(-1, Math.min(1, dx)) * strength;
+            const ty = Math.max(-1, Math.min(1, dy)) * strength;
+            el.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px)`;
+          });
+          el.addEventListener("pointerleave", () => {
+            el.style.transform = "";
+          });
+        });
+      }
+
+      // Halo follow
+      if (canHover) {
+        $$("[data-halo]").forEach((card) => {
+          card.addEventListener("pointermove", (e) => {
+            const r = card.getBoundingClientRect();
+            const hx = ((e.clientX - r.left) / r.width) * 100;
+            const hy = ((e.clientY - r.top) / r.height) * 100;
+            card.style.setProperty("--hx", `${hx.toFixed(1)}%`);
+            card.style.setProperty("--hy", `${hy.toFixed(1)}%`);
+          });
+        });
+      }
+
+      // Kinetic typography (scroll-driven offsets)
+      const headline = $("#headline");
+      let lastKinetic = 0;
+      function updateKinetic(now) {
+        if (reduceMotion) return;
+        if (now - lastKinetic < 32) return;
+        lastKinetic = now;
+        const y = window.scrollY || 0;
+        const v = Math.min(1, y / 520);
+        const wobble = (Math.sin(now / (940 + rng() * 220)) * 0.5 + 0.5) * (0.5 + rng() * 0.6);
+        const ls = (-0.04 + v * 0.02 + wobble * 0.01).toFixed(3);
+        const ty = (v * 4.5).toFixed(2);
+        headline.style.letterSpacing = `${ls}em`;
+        headline.style.transform = `translateY(${ty}px)`;
+      }
+
+      // Scroll snap is fun on mobile, harsh on desktop
+      const mqWide = window.matchMedia && window.matchMedia("(min-width: 980px)");
+      function updateSnap() {
+        document.body.classList.toggle("snap", !(mqWide && mqWide.matches));
+      }
+      if (mqWide) {
+        mqWide.addEventListener("change", updateSnap);
+        updateSnap();
+      }
+
+      // WebGL shader (custom fragment shader + dithering)
+      const telemetry = $("#telemetry");
+      const specScale = $("#specScale");
+      const specMotion = $("#specMotion");
+
+      const canvas = $("#shader");
+      const gl = canvas.getContext("webgl", {
+        antialias: false,
+        alpha: true,
+        depth: false,
+        stencil: false,
+        preserveDrawingBuffer: false,
+      });
+
+      const shaderState = {
+        running: false,
+        program: null,
+        uTime: null,
+        uRes: null,
+        uTheme: null,
+        uAccent: null,
+        scale: 0.66,
+        dpr: Math.min(1.5, window.devicePixelRatio || 1),
+      };
+
+      function compile(glc, type, src) {
+        const s = glc.createShader(type);
+        glc.shaderSource(s, src);
+        glc.compileShader(s);
+        if (!glc.getShaderParameter(s, glc.COMPILE_STATUS)) {
+          const msg = glc.getShaderInfoLog(s) || "shader error";
+          glc.deleteShader(s);
+          throw new Error(msg);
+        }
+        return s;
+      }
+
+      function link(glc, vs, fs) {
+        const p = glc.createProgram();
+        glc.attachShader(p, vs);
+        glc.attachShader(p, fs);
+        glc.linkProgram(p);
+        if (!glc.getProgramParameter(p, glc.LINK_STATUS)) {
+          const msg = glc.getProgramInfoLog(p) || "link error";
+          glc.deleteProgram(p);
+          throw new Error(msg);
+        }
+        return p;
+      }
+
+      function clamp(n, a, b) {
+        return Math.max(a, Math.min(b, n));
+      }
+
+      function fitCanvas() {
+        if (!gl) return;
+        const rect = canvas.getBoundingClientRect();
+        const base = Math.min(rect.width, rect.height);
+
+        const baseScale = 0.58 + clamp((base - 360) / 900, 0, 1) * 0.18; // 0.58..0.76
+        const seededNudge = (rng() - 0.5) * 0.06; // +/- 0.03
+        const scale = clamp(baseScale + seededNudge, 0.56, 0.78);
+        shaderState.scale = scale;
+
+        const w = Math.max(2, Math.floor(rect.width * shaderState.dpr * scale));
+        const h = Math.max(2, Math.floor(rect.height * shaderState.dpr * scale));
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+          gl.viewport(0, 0, w, h);
+        }
+        specScale.textContent = `${scale.toFixed(2)}×`;
+      }
+
+      function hslToRgb(h, s, l) {
+        h = ((h % 360) + 360) % 360;
+        const c = (1 - Math.abs(2 * l - 1)) * s;
+        const hp = h / 60;
+        const x = c * (1 - Math.abs((hp % 2) - 1));
+        let r = 0,
+          g = 0,
+          b = 0;
+        if (hp >= 0 && hp < 1) (r = c), (g = x);
+        else if (hp < 2) (r = x), (g = c);
+        else if (hp < 3) (g = c), (b = x);
+        else if (hp < 4) (g = x), (b = c);
+        else if (hp < 5) (r = x), (b = c);
+        else (r = c), (b = x);
+        const m = l - c / 2;
+        return [r + m, g + m, b + m];
+      }
+
+      function initGL() {
+        if (!gl) {
+          telemetry.textContent = "WebGL unavailable — background falls back to CSS gradients.";
+          specMotion.textContent = "off";
+          return false;
+        }
+
+        const vsSrc = `
+          attribute vec2 aPos;
+          varying vec2 vUv;
+          void main() {
+            vUv = aPos * 0.5 + 0.5;
+            gl_Position = vec4(aPos, 0.0, 1.0);
+          }
+        `;
+
+        const fsSrc = `
+          precision mediump float;
+          varying vec2 vUv;
+          uniform float uTime;
+          uniform vec2 uRes;
+          uniform float uTheme; // 0 dark, 1 light
+          uniform vec3 uAccent; // rgb 0..1
+
+          float hash21(vec2 p) {
+            p = fract(p * vec2(123.34, 456.21));
+            p += dot(p, p + 45.32);
+            return fract(p.x * p.y);
+          }
+
+          float noise(vec2 p) {
+            vec2 i = floor(p);
+            vec2 f = fract(p);
+            float a = hash21(i);
+            float b = hash21(i + vec2(1.0, 0.0));
+            float c = hash21(i + vec2(0.0, 1.0));
+            float d = hash21(i + vec2(1.0, 1.0));
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+          }
+
+          float fbm(vec2 p) {
+            float v = 0.0;
+            float a = 0.55;
+            mat2 m = mat2(1.6, -1.2, 1.2, 1.6);
+            for (int i = 0; i < 4; i++) {
+              v += a * noise(p);
+              p = m * p;
+              a *= 0.55;
+            }
+            return v;
+          }
+
+          float bayer4(vec2 frag) {
+            int x = int(mod(frag.x, 4.0));
+            int y = int(mod(frag.y, 4.0));
+            int idx = x + y * 4;
+            float b = 0.0;
+            if (idx == 0) b = 0.0;
+            else if (idx == 1) b = 8.0;
+            else if (idx == 2) b = 2.0;
+            else if (idx == 3) b = 10.0;
+            else if (idx == 4) b = 12.0;
+            else if (idx == 5) b = 4.0;
+            else if (idx == 6) b = 14.0;
+            else if (idx == 7) b = 6.0;
+            else if (idx == 8) b = 3.0;
+            else if (idx == 9) b = 11.0;
+            else if (idx == 10) b = 1.0;
+            else if (idx == 11) b = 9.0;
+            else if (idx == 12) b = 15.0;
+            else if (idx == 13) b = 7.0;
+            else if (idx == 14) b = 13.0;
+            else b = 5.0;
+            return (b + 0.5) / 16.0;
+          }
+
+          vec3 tonemap(vec3 c) {
+            c = max(c, 0.0);
+            return c / (1.0 + c);
+          }
+
+          void main() {
+            vec2 frag = vUv * uRes;
+            vec2 p = (frag - 0.5 * uRes) / min(uRes.x, uRes.y);
+
+            float t = uTime * 0.25;
+            vec2 drift = vec2(sin(t * 1.2), cos(t * 0.9)) * 0.12;
+
+            float field = fbm(p * 1.35 + drift) + 0.55 * fbm(p * 2.4 - drift * 1.3);
+            float ribbons = smoothstep(0.35, 0.92, field);
+
+            vec3 a = uAccent;
+            vec3 b = vec3(a.g, a.b, a.r);
+            vec3 c = vec3(a.b, a.r, a.g);
+            vec3 col = mix(b, c, 0.5 + 0.5 * sin(t + p.x * 2.4));
+            col = mix(col, a, 0.5 + 0.5 * sin(t * 0.9 + p.y * 1.8));
+
+            vec3 baseDark = vec3(0.03, 0.04, 0.07);
+            vec3 baseLight = vec3(0.96, 0.97, 0.99);
+            vec3 base = mix(baseDark, baseLight, uTheme);
+
+            float vign = smoothstep(1.2, 0.05, dot(p, p));
+            vec3 aur = col * (0.35 + 0.65 * ribbons) * vign;
+
+            float n = noise(p * 6.0 + t * 0.8);
+            float sparks = smoothstep(0.88, 1.0, n) * 0.08;
+
+            vec3 outCol = base + aur + sparks;
+            outCol = tonemap(outCol);
+
+            float d = bayer4(frag);
+            float levels = mix(22.0, 28.0, uTheme);
+            outCol = floor(outCol * levels + d) / levels;
+
+            float alpha = mix(0.92, 0.72, uTheme);
+            gl_FragColor = vec4(outCol, alpha);
+          }
+        `;
+
+        const vs = compile(gl, gl.VERTEX_SHADER, vsSrc);
+        const fs = compile(gl, gl.FRAGMENT_SHADER, fsSrc);
+        const program = link(gl, vs, fs);
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
+
+        gl.useProgram(program);
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+        const aPos = gl.getAttribLocation(program, "aPos");
+        gl.enableVertexAttribArray(aPos);
+        gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+        shaderState.program = program;
+        shaderState.uTime = gl.getUniformLocation(program, "uTime");
+        shaderState.uRes = gl.getUniformLocation(program, "uRes");
+        shaderState.uTheme = gl.getUniformLocation(program, "uTheme");
+        shaderState.uAccent = gl.getUniformLocation(program, "uAccent");
+
+        gl.disable(gl.DEPTH_TEST);
+        gl.disable(gl.CULL_FACE);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.enable(gl.BLEND);
+
+        fitCanvas();
+        return true;
+      }
+
+      let rafId = 0;
+      let frames = 0;
+      let lastFpsTime = performance.now();
+      let fps = 60;
+
+      function draw(now) {
+        if (!shaderState.running || !gl) return;
+
+        frames++;
+        if (now - lastFpsTime > 650) {
+          fps = Math.round((frames * 1000) / (now - lastFpsTime));
+          frames = 0;
+          lastFpsTime = now;
+          telemetry.textContent = `fps:${String(fps).padStart(2, " ")}  theme:${rootEl.classList.contains("theme-light") ? "light" : "dark"}  hue:${String(accentHue).padStart(3, " ")}`;
+        }
+
+        updateKinetic(now);
+
+        const isLight = rootEl.classList.contains("theme-light");
+        const [r, g, b] = hslToRgb(accentHue, 0.92, isLight ? 0.55 : 0.62);
+        gl.useProgram(shaderState.program);
+        gl.uniform1f(shaderState.uTime, now * 0.001);
+        gl.uniform2f(shaderState.uRes, canvas.width, canvas.height);
+        gl.uniform1f(shaderState.uTheme, isLight ? 1.0 : 0.0);
+        gl.uniform3f(shaderState.uAccent, r, g, b);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        rafId = requestAnimationFrame(draw);
+      }
+
+      function start() {
+        if (reduceMotion) {
+          shaderState.running = false;
+          specMotion.textContent = "reduced";
+          telemetry.textContent = "reduced motion — shader paused.";
+          return;
+        }
+        shaderState.running = true;
+        specMotion.textContent = "on";
+        cancelAnimationFrame(rafId);
+        frames = 0;
+        lastFpsTime = performance.now();
+        rafId = requestAnimationFrame(draw);
+      }
+
+      function stop() {
+        shaderState.running = false;
+        cancelAnimationFrame(rafId);
+        specMotion.textContent = "paused";
+      }
+
+      let glOk = false;
+      try {
+        glOk = initGL();
+      } catch (e) {
+        telemetry.textContent = "Shader init failed — CSS gradient fallback.";
+        specMotion.textContent = "off";
+        glOk = false;
+      }
+      if (glOk) start();
+
+      document.addEventListener("visibilitychange", () => {
+        if (!glOk) return;
+        if (document.hidden) stop();
+        else start();
+      });
+
+      let resizeTimer = 0;
+      window.addEventListener("resize", () => {
+        if (!glOk) return;
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => fitCanvas(), 120);
+      });
+    </script>
+  </body>
+</html>

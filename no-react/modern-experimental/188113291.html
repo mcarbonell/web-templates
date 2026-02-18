@@ -1,0 +1,470 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aether Fold - Experimental Landing</title>
+  <!--
+    Design Notes (seed-driven):
+    Seed: 188113291
+    Decomposition:
+    - blockA = 188
+    - blockB = 113
+    - blockC = 291
+    - digits sum = 34
+
+    Seed-to-style mapping:
+    - Primary hue = (blockA % 360) = 188 (cyan-leaning)
+    - Secondary hue = (blockC % 360) = 291 (magenta-leaning)
+    - Motion factor = 0.45 + ((blockB % 40) / 100) = 0.58
+    - Corner radius scale = 14 + (digits sum % 10) = 18
+    - Grid asymmetry preset = blockB % 3 = 2 (offset bento weighting)
+
+    Techniques used:
+    - Custom WebGL shader background (animated aurora field)
+    - Bento grid layout
+    - Gradient animated text + stroke headline treatment
+    - Glassmorphism cards
+    - Scroll snapping sections
+    - Magnetic CTA behavior
+    - Scramble text interaction
+
+    Performance strategy for 60fps on mid-range mobile:
+    - Lightweight single-pass fragment shader
+    - Canvas pixel ratio capped to 1.5
+    - Minimized DOM animations; transform/opacity only
+    - Reduced visual effects under prefers-reduced-motion
+  -->
+  <style>
+    :root {
+      --h1: 188;
+      --h2: 291;
+      --bg: hsl(205 35% 97%);
+      --fg: hsl(220 22% 11%);
+      --muted: hsl(220 12% 40%);
+      --glass: hsla(0 0% 100% / 0.45);
+      --line: hsla(220 20% 20% / 0.12);
+      --radius: 18px;
+      --shadow: 0 10px 40px hsla(var(--h1) 70% 20% / 0.18);
+      --hero-size: clamp(2.2rem, 9vw, 5.5rem);
+    }
+
+    [data-theme="dark"] {
+      --bg: hsl(220 24% 7%);
+      --fg: hsl(210 24% 94%);
+      --muted: hsl(210 14% 72%);
+      --glass: hsla(220 30% 16% / 0.48);
+      --line: hsla(210 30% 88% / 0.14);
+      --shadow: 0 14px 44px hsla(var(--h2) 70% 30% / 0.28);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    html { scroll-snap-type: y mandatory; }
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      color: var(--fg);
+      background: var(--bg);
+      overflow-x: hidden;
+      transition: background-color 0.35s ease, color 0.35s ease;
+    }
+
+    canvas#fx {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      opacity: 0.82;
+      pointer-events: none;
+    }
+
+    .veil {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(60vw 55vh at 10% 10%, hsla(var(--h1) 85% 55% / .15), transparent 60%),
+        radial-gradient(60vw 55vh at 90% 90%, hsla(var(--h2) 85% 55% / .14), transparent 60%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    header, section {
+      min-height: 100svh;
+      scroll-snap-align: start;
+      display: grid;
+      place-items: center;
+      padding: 1.2rem;
+    }
+
+    .topbar {
+      position: fixed;
+      top: .9rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(980px, calc(100vw - 1.2rem));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .6rem .8rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      backdrop-filter: blur(10px) saturate(1.1);
+      background: var(--glass);
+      z-index: 10;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: .8rem;
+    }
+
+    .theme-toggle {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: .5rem .8rem;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .hero-wrap { width: min(1050px, 100%); }
+
+    h1 {
+      margin: .4rem 0 1rem;
+      line-height: .95;
+      font-size: var(--hero-size);
+      text-transform: uppercase;
+      letter-spacing: .02em;
+      color: transparent;
+      -webkit-text-stroke: 1px color-mix(in oklab, var(--fg), transparent 35%);
+      background: linear-gradient(110deg,
+        hsl(var(--h1) 90% 58%),
+        hsl(var(--h2) 90% 62%),
+        hsl(calc((var(--h1) + var(--h2)) / 2) 95% 62%));
+      background-size: 220% 220%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      animation: hueSlide 7s linear infinite;
+    }
+
+    .lead {
+      max-width: 62ch;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      margin: 0 0 1.2rem;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: .8rem;
+      flex-wrap: wrap;
+    }
+
+    .magnetic {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: .82rem 1.15rem;
+      text-decoration: none;
+      color: inherit;
+      background: var(--glass);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+      transition: transform .15s ease, border-color .25s ease;
+      will-change: transform;
+    }
+
+    .magnetic:hover { border-color: hsl(var(--h1) 80% 58% / .65); }
+
+    .bento {
+      width: min(1050px, 100%);
+      display: grid;
+      gap: .8rem;
+      grid-template-columns: repeat(6, 1fr);
+      grid-auto-rows: minmax(100px, auto);
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: var(--glass);
+      backdrop-filter: blur(8px) saturate(1.08);
+      border-radius: var(--radius);
+      padding: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 { margin: 0 0 .4rem; font-size: 1.08rem; }
+    .card p { margin: 0; color: var(--muted); line-height: 1.5; }
+
+    .a { grid-column: span 4; }
+    .b { grid-column: span 2; }
+    .c { grid-column: span 2; }
+    .d { grid-column: span 4; }
+
+    .scramble {
+      display: inline-block;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: hsl(var(--h2) 88% 58%);
+    }
+
+    .stat {
+      font-size: clamp(1.7rem, 6vw, 3.4rem);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: .4rem;
+      background: linear-gradient(120deg, hsl(var(--h1) 88% 62%), hsl(var(--h2) 88% 62%));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .footer-note {
+      font-size: .85rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @keyframes hueSlide {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @media (max-width: 760px) {
+      .a, .b, .c, .d { grid-column: span 6; }
+      .topbar { padding: .45rem .6rem; }
+      .theme-toggle { padding: .45rem .68rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div class="veil" aria-hidden="true"></div>
+
+  <nav class="topbar" aria-label="Primary">
+    <div class="brand">AETHER FOLD</div>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light and dark mode">Toggle Theme</button>
+  </nav>
+
+  <header>
+    <div class="hero-wrap">
+      <p class="scramble" data-text="Experimental Systems">Experimental Systems</p>
+      <h1>Light That Feels Alive</h1>
+      <p class="lead">
+        A mobile-first landing experience with shader-driven atmosphere, asymmetrical bento storytelling,
+        and high-contrast kinetic typography tuned for speed.
+      </p>
+      <div class="cta-row">
+        <a href="#grid" class="magnetic">Enter Prototype</a>
+        <a href="#metrics" class="magnetic">View Metrics</a>
+      </div>
+    </div>
+  </header>
+
+  <section id="grid" aria-label="Highlights">
+    <div class="bento">
+      <article class="card a">
+        <h2>Aurora Shader Layer</h2>
+        <p>Single-pass WebGL fragment field creates continuous atmospheric motion while preserving battery and frame consistency.</p>
+      </article>
+      <article class="card b">
+        <h2>Scroll Snap Rhythm</h2>
+        <p>Each viewport panel lands with deliberate pacing and strong visual hierarchy.</p>
+      </article>
+      <article class="card c">
+        <h2>Magnetic CTAs</h2>
+        <p>Pointer-proximal movement creates tactile intent without layout shift.</p>
+      </article>
+      <article class="card d">
+        <h2>Glass + Stroke Typography</h2>
+        <p>Layered transparency and stroked gradient type produce a distinctive, editorial digital identity.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="metrics" aria-label="Performance and stats">
+    <div class="bento">
+      <article class="card b">
+        <div class="stat">60fps</div>
+        <p>Targeted on mid-range mobile devices.</p>
+      </article>
+      <article class="card b">
+        <div class="stat">1.5x</div>
+        <p>Max shader pixel ratio cap for smooth rendering.</p>
+      </article>
+      <article class="card a">
+        <h2>Built for modern engines</h2>
+        <p>Chrome, Edge, Firefox, and Safari compatible architecture using standards-based HTML, CSS, and WebGL.</p>
+      </article>
+      <article class="card d">
+        <p class="footer-note">Seed 188113291 • handcrafted experimental layout</p>
+      </article>
+    </div>
+  </section>
+
+  <script>
+    (() => {
+      const root = document.body;
+      const toggle = document.getElementById("themeToggle");
+      toggle.addEventListener("click", () => {
+        const current = root.getAttribute("data-theme");
+        root.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+      });
+
+      const scrambleEl = document.querySelector(".scramble");
+      const target = scrambleEl.dataset.text;
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let frame = 0;
+      function scramble() {
+        frame += 1;
+        const reveal = Math.floor(frame / 3);
+        scrambleEl.textContent = target
+          .split("")
+          .map((ch, i) => {
+            if (ch === " ") return " ";
+            if (i < reveal) return ch;
+            return chars[Math.floor(Math.random() * chars.length)];
+          })
+          .join("");
+        if (reveal <= target.length) requestAnimationFrame(scramble);
+      }
+      scramble();
+
+      const magnets = document.querySelectorAll(".magnetic");
+      magnets.forEach((el) => {
+        el.addEventListener("pointermove", (e) => {
+          const r = el.getBoundingClientRect();
+          const dx = (e.clientX - (r.left + r.width / 2)) / r.width;
+          const dy = (e.clientY - (r.top + r.height / 2)) / r.height;
+          el.style.transform = `translate(${dx * 10}px, ${dy * 10}px)`;
+        });
+        el.addEventListener("pointerleave", () => {
+          el.style.transform = "translate(0,0)";
+        });
+      });
+
+      const canvas = document.getElementById("fx");
+      const gl = canvas.getContext("webgl", { antialias: false, alpha: true, powerPreference: "high-performance" });
+      if (!gl) return;
+
+      const vertex = `
+        attribute vec2 aPos;
+        void main() {
+          gl_Position = vec4(aPos, 0.0, 1.0);
+        }
+      `;
+
+      const fragment = `
+        precision mediump float;
+        uniform vec2 uRes;
+        uniform float uTime;
+        uniform vec3 uC1;
+        uniform vec3 uC2;
+
+        float hash(vec2 p){
+          return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+        }
+
+        float noise(vec2 p){
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          float a = hash(i);
+          float b = hash(i + vec2(1.0,0.0));
+          float c = hash(i + vec2(0.0,1.0));
+          float d = hash(i + vec2(1.0,1.0));
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix(a, b, u.x) +
+                 (c - a) * u.y * (1.0 - u.x) +
+                 (d - b) * u.x * u.y;
+        }
+
+        void main() {
+          vec2 uv = (gl_FragCoord.xy - 0.5 * uRes.xy) / min(uRes.x, uRes.y);
+          float t = uTime * 0.12;
+          float n1 = noise(uv * 2.4 + vec2(t, -t * 0.8));
+          float n2 = noise(uv * 3.2 + vec2(-t * 0.6, t));
+          float wave = sin((uv.x + uv.y) * 2.5 + t * 5.0) * 0.5 + 0.5;
+          float m = smoothstep(0.15, 0.95, 0.55 * n1 + 0.35 * n2 + 0.25 * wave);
+          vec3 col = mix(uC1, uC2, m);
+          float vignette = smoothstep(1.3, 0.2, length(uv));
+          gl_FragColor = vec4(col * vignette, 0.38);
+        }
+      `;
+
+      function compile(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return s;
+      }
+
+      const p = gl.createProgram();
+      gl.attachShader(p, compile(gl.VERTEX_SHADER, vertex));
+      gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fragment));
+      gl.linkProgram(p);
+      gl.useProgram(p);
+
+      const quad = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1, -1,
+         1, -1,
+        -1,  1,
+         1,  1
+      ]), gl.STATIC_DRAW);
+
+      const aPos = gl.getAttribLocation(p, "aPos");
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+      const uRes = gl.getUniformLocation(p, "uRes");
+      const uTime = gl.getUniformLocation(p, "uTime");
+      const uC1 = gl.getUniformLocation(p, "uC1");
+      const uC2 = gl.getUniformLocation(p, "uC2");
+
+      function hslToRgb(h, s, l) {
+        s /= 100; l /= 100;
+        const k = n => (n + h / 30) % 12;
+        const a = s * Math.min(l, 1 - l);
+        const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+        return [f(0), f(8), f(4)];
+      }
+
+      const c1 = hslToRgb(188, 88, 57);
+      const c2 = hslToRgb(291, 90, 62);
+      gl.uniform3f(uC1, c1[0], c1[1], c1[2]);
+      gl.uniform3f(uC2, c2[0], c2[1], c2[2]);
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        canvas.width = Math.floor(innerWidth * dpr);
+        canvas.height = Math.floor(innerHeight * dpr);
+        canvas.style.width = innerWidth + "px";
+        canvas.style.height = innerHeight + "px";
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+      }
+
+      window.addEventListener("resize", resize, { passive: true });
+      resize();
+
+      let start = performance.now();
+      function tick(now) {
+        gl.uniform1f(uTime, (now - start) * 0.001);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>
