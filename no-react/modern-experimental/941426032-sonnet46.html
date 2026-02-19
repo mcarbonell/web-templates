@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOID.STUDIO — Award-Winning Design</title>
+
+  <!--
+  =============================================================
+  VOID.STUDIO — Landing Page
+  =============================================================
+  DESIGN PHILOSOPHY (seed: 941426032):
+  
+  9 → Dark-first aesthetic with pure blacks
+  4 → Bento grid 4-column layout
+  1 → Single accent: Electric Yellow #FFE500
+  4 → 4 main content sections
+  2 → Dual type system: "Courier Prime" (mono) + "Space Grotesk" (sans)
+  6 → Retro-dithered WebGL post-processing layer
+  0 → Borderless / frameless card philosophy
+  3 → Subtle 3D perspective transforms on scroll
+  2 → 2-tone base palette: #0A0A0A ↔ #F5F0E8
+
+  TECHNIQUES USED:
+  ─────────────────────────────────────────────────────────────
+  ✦ MANDATORY: WebGL Dithering post-process shader overlay
+      - Ordered Bayer matrix dithering on a fullscreen canvas
+      - Runs at 60fps, samples DOM snapshot via Canvas2D trick
+      - Applied as semi-transparent screen pass on hero
+  
+  ✦ ASCII-to-Canvas rendering
+      - Logo / hero visual rendered as live ASCII art on canvas
+      - Characters change based on luminance sampling
+  
+  ✦ Scramble Text (kinetic typography)
+      - Hero headline randomizes chars → resolves to final text
+      - Triggered on load and on section enter
+  
+  ✦ Scroll-Driven Animations
+      - IntersectionObserver + CSS custom properties
+      - Cards slide/fade/rotate on scroll entry
+  
+  ✦ Bento Grid Layout
+      - Asymmetric grid cells, mobile-first responsive
+  
+  ✦ Magnetic Buttons
+      - JS mouse-tracking on CTA buttons for pull effect
+  
+  ✦ Stroke Text
+      - Large display text uses -webkit-text-stroke
+  
+  ✦ Light / Dark Theme Toggle
+      - CSS custom properties swapped via data-theme attr
+  
+  DARING CHOICES:
+  ─────────────────────────────────────────────────────────────
+  • The dithering WebGL layer sits OVER the hero section,
+    giving it a raw, lo-fi zine aesthetic that's unexpected
+    from a "premium" studio — the contrast is intentional.
+  • Electric yellow on pure black: high-voltage, no apologies.
+  • Mono typeface for EVERYTHING except the stroke display text.
+  • The ASCII canvas replaces a conventional logo animation.
+  • Zero rounded corners anywhere. All hard edges. Uncompromising.
+  • The bento grid breaks layout conventions by spanning cells
+    across both axes asymmetrically.
+  =============================================================
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* =====================================================
+       CSS CUSTOM PROPERTIES — THEME SYSTEM
+    ===================================================== */
+    :root {
+      --bg: #0a0a0a;
+      --fg: #f5f0e8;
+      --accent: #ffe500;
+      --accent-dim: #b3a000;
+      --muted: #2a2a2a;
+      --muted-fg: #888;
+      --card-bg: #111111;
+      --card-border: #222;
+      --font-mono: "Courier Prime", monospace;
+      --font-sans: "Space Grotesk", sans-serif;
+      --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="light"] {
+      --bg: #f5f0e8;
+      --fg: #0a0a0a;
+      --accent: #cc9900;
+      --accent-dim: #997300;
+      --muted: #e0dbd2;
+      --muted-fg: #666;
+      --card-bg: #ebe6dd;
+      --card-border: #ccc8be;
+    }
+
+    /* =====================================================
+       RESET & BASE
+    ===================================================== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y proximity;
+      font-size: 16px;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-mono);
+      overflow-x: hidden;
+      transition: background-color var(--transition), color var(--transition);
+      cursor: none;
+    }
+
+    /* =====================================================
+       CUSTOM CURSOR
+    ===================================================== */
+    #cursor {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: difference;
+    }
+
+    #cursor-ring {
+      position: fixed;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--fg);
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.12s ease, width 0.3s, height 0.3s;
+      mix-blend-mode: difference;
+    }
+
+    body:has(a:hover) #cursor,
+    body:has(button:hover) #cursor {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* =====================================================
+       NAVIGATION
+    ===================================================== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--card-border);
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--fg);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+
+    .nav-logo span {
+      color: var(--accent);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    /* Theme Toggle */
+    #theme-toggle {
+      background: none;
+      border: 1px solid var(--card-border);
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.8rem;
+      cursor: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    #theme-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Mobile nav */
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+      }
+
+      nav {
+        padding: 1rem 1.25rem;
+      }
+    }
+
+    /* =====================================================
+       SECTIONS — SCROLL SNAP
+    ===================================================== */
+    section {
+      scroll-snap-align: start;
+    }
+
+    /* =====================================================
+       HERO SECTION
+    ===================================================== */
+    #hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 2rem 3rem;
+      overflow: hidden;
+      padding-top: 5rem;
+    }
+
+    /* WebGL Dithering Canvas — sits over the hero BG */
+    #dither-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.18;
+    }
+
+    /* ASCII Canvas — decorative background element */
+    #ascii-canvas {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 55%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.3;
+      font-size: 0.55rem;
+      line-height: 1.15;
+      overflow: hidden;
+    }
+
+    #ascii-output {
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      line-height: 1.2;
+      white-space: pre;
+      letter-spacing: 0.05em;
+      transition: color var(--transition);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+    }
+
+    .hero-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hero-tag::before {
+      content: "";
+      display: inline-block;
+      width: 2rem;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .hero-headline {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: clamp(3rem, 10vw, 8rem);
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+      color: var(--fg);
+      transition: color var(--transition);
+    }
+
+    .hero-headline .stroke-line {
+      -webkit-text-stroke: 1.5px var(--fg);
+      color: transparent;
+      display: block;
+      transition: -webkit-text-stroke-color var(--transition);
+    }
+
+    .hero-headline .accent-line {
+      color: var(--accent);
+      display: block;
+      transition: color var(--transition);
+    }
+
+    .hero-sub {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: var(--muted-fg);
+      max-width: 460px;
+      margin-bottom: 3rem;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Magnetic Button */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--accent);
+      color: #0a0a0a;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 1rem 2rem;
+      border: none;
+      cursor: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 6px 6px 0 var(--fg);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: none;
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.2rem;
+      cursor: none;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .hero-counter {
+      position: absolute;
+      right: 2rem;
+      bottom: 3rem;
+      z-index: 2;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--muted-fg);
+      text-align: right;
+      line-height: 2;
+    }
+
+    .hero-counter strong {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--fg);
+      display: block;
+      font-family: var(--font-sans);
+      letter-spacing: -0.04em;
+    }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      left: 2rem;
+      bottom: 3rem;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 3rem;
+      background: var(--card-border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scroll-line::after {
+      content: "";
+      position: absolute;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--accent);
+      animation: scrollDown 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollDown {
+      0% { top: -100%; }
+      100% { top: 100%; }
+    }
+
+    /* =====================================================
+       MARQUEE TICKER
+    ===================================================== */
+    .ticker-wrap {
+      background: var(--accent);
+      overflow: hidden;
+      padding: 0.75rem 0;
+      border-top: 1px solid transparent;
+      border-bottom: 1px solid transparent;
+    }
+
+    .ticker-track {
+      display: flex;
+      gap: 0;
+      animation: ticker 20s linear infinite;
+      width: max-content;
+    }
+
+    .ticker-item {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #0a0a0a;
+      white-space: nowrap;
+      padding: 0 2rem;
+    }
+
+    .ticker-item span {
+      margin: 0 1rem;
+      opacity: 0.5;
+    }
+
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* =====================================================
+       WORK / BENTO GRID SECTION
+    ===================================================== */
+    #work {
+      padding: 6rem 2rem;
+      scroll-snap-align: start;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+      gap: 1rem;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: var(--fg);
+      transition: color var(--transition);
+    }
+
+    .section-title .stroke {
+      -webkit-text-stroke: 1px var(--fg);
+      color: transparent;
+      transition: -webkit-text-stroke-color var(--transition);
+    }
+
+    .section-link {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      text-decoration: none;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.15rem;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .section-link:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Bento Grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto;
+      gap: 1rem;
+    }
+
+    .bento-cell {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background var(--transition),
+                  border-color var(--transition);
+      opacity: 0;
+      transform: translateY(2rem);
+    }
+
+    .bento-cell.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .bento-cell:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      z-index: 2;
+    }
+
+    /* Grid placement */
+    .bento-cell:nth-child(1) { grid-column: span 2; grid-row: span 2; min-height: 400px; }
+    .bento-cell:nth-child(2) { grid-column: span 2; min-height: 192px; }
+    .bento-cell:nth-child(3) { grid-column: span 2; min-height: 192px; }
+    .bento-cell:nth-child(4) { grid-column: span 1; min-height: 240px; }
+    .bento-cell:nth-child(5) { grid-column: span 1; min-height: 240px; }
+    .bento-cell:nth-child(6) { grid-column: span 2; min-height: 240px; }
+
+    .cell-inner {
+      padding: 1.5rem;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cell-tag {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .cell-num {
+      font-family: var(--font-sans);
+      font-size: 5rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      color: var(--card-border);
+      -webkit-text-stroke: 1px var(--card-border);
+      color: transparent;
+      transition: -webkit-text-stroke-color var(--transition);
+    }
+
+    .cell-title {
+      font-family: var(--font-sans);
+      font-size: 1.3rem;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--fg);
+      margin-bottom: 0.5rem;
+      transition: color var(--transition);
+    }
+
+    .cell-desc {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      line-height: 1.7;
+      color: var(--muted-fg);
+    }
+
+    /* Large cell visual fill */
+    .cell-visual {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      margin: 0 -1.5rem;
+      margin-top: 1rem;
+    }
+
+    .cell-visual-canvas {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .cell-arrow {
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+
+    /* Color accent cells */
+    .bento-cell.accent-cell {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .accent-cell .cell-title,
+    .accent-cell .cell-desc,
+    .accent-cell .cell-tag {
+      color: #0a0a0a;
+    }
+
+    .accent-cell .cell-num {
+      -webkit-text-stroke-color: rgba(0,0,0,0.15);
+    }
+
+    /* =====================================================
+       SERVICES / ABOUT SECTION
+    ===================================================== */
+    #services {
+      padding: 6rem 2rem;
+      border-top: 1px solid var(--card-border);
+      scroll-snap-align: start;
+      transition: border-color var(--transition);
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      margin-top: 4rem;
+    }
+
+    .service-item {
+      border-top: 1px solid var(--card-border);
+      padding-top: 1.5rem;
+      opacity: 0;
+      transform: translateX(-1rem);
+      transition: opacity 0.6s ease, transform 0.6s ease, border-color var(--transition);
+    }
+
+    .service-item.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .service-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .service-name {
+      font-family: var(--font-sans);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+      transition: color var(--transition);
+    }
+
+    .service-desc {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      line-height: 1.8;
+      color: var(--muted-fg);
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid var(--card-border);
+      margin: 4rem 0;
+      transition: border-color var(--transition);
+    }
+
+    .stat-item {
+      padding: 2rem;
+      border-right: 1px solid var(--card-border);
+      transition: border-color var(--transition);
+    }
+
+    .stat-item:last-child {
+      border-right: none;
+    }
+
+    .stat-number {
+      font-family: var(--font-sans);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--fg);
+      display: block;
+      transition: color var(--transition);
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      margin-top: 0.25rem;
+      display: block;
+    }
+
+    /* =====================================================
+       PROCESS SECTION — SCROLLYTELLING
+    ===================================================== */
+    #process {
+      padding: 6rem 2rem;
+      border-top: 1px solid var(--card-border);
+      scroll-snap-align: start;
+      transition: border-color var(--transition);
+    }
+
+    .process-list {
+      margin-top: 4rem;
+      counter-reset: process;
+    }
+
+    .process-step {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      border-top: 1px solid var(--card-border);
+      padding: 2.5rem 0;
+      opacity: 0;
+      transform: translateY(1.5rem);
+      transition: opacity 0.7s ease, transform 0.7s ease, border-color var(--transition);
+    }
+
+    .process-step.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .process-step-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+
+    .process-step-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      padding-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .process-step-name {
+      font-family: var(--font-sans);
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--fg);
+      transition: color var(--transition);
+    }
+
+    .process-step-desc {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      line-height: 1.9;
+      color: var(--muted-fg);
+      padding-top: 0.4rem;
+    }
+
+    /* =====================================================
+       CTA / FOOTER SECTION
+    ===================================================== */
+    #cta {
+      padding: 8rem 2rem 6rem;
+      border-top: 1px solid var(--card-border);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      scroll-snap-align: start;
+      transition: border-color var(--transition);
+    }
+
+    .cta-bg-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-sans);
+      font-size: clamp(5rem, 18vw, 16rem);
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      -webkit-text-stroke: 1px var(--card-border);
+      color: transparent;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      transition: -webkit-text-stroke-color var(--transition);
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-headline {
+      font-family: var(--font-sans);
+      font-size: clamp(2.5rem, 7vw, 6rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+      color: var(--fg);
+      margin-bottom: 2.5rem;
+      transition: color var(--transition);
+    }
+
+    .cta-headline .stroke {
+      -webkit-text-stroke: 1.5px var(--fg);
+      color: transparent;
+      display: block;
+      transition: -webkit-text-stroke-color var(--transition);
+    }
+
+    .cta-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: var(--font-mono);
+      font-size: clamp(0.85rem, 2.5vw, 1.2rem);
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px solid var(--fg);
+      padding-bottom: 0.25rem;
+      margin-bottom: 3rem;
+      transition: color var(--transition), border-color var(--transition);
+    }
+
+    .cta-email:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* =====================================================
+       FOOTER
+    ===================================================== */
+    footer {
+      padding: 2rem;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: border-color var(--transition);
+    }
+
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--muted-fg);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    /* =====================================================
+       ANIMATIONS & UTILITIES
+    ===================================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(1.5rem);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Noise overlay */
+    .noise {
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      pointer-events: none;
+      z-index: 9997;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 200px 200px;
+    }
+
+    [data-theme="light"] .noise {
+      opacity: 0.025;
+    }
+
+    /* =====================================================
+       RESPONSIVE — MOBILE
+    ===================================================== */
+    @media (max-width: 768px) {
+      #hero {
+        padding: 5rem 1.25rem 2.5rem;
+      }
+
+      .hero-counter {
+        display: none;
+      }
+
+      .scroll-indicator {
+        display: none;
+      }
+
+      .bento-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem;
+      }
+
+      .bento-cell:nth-child(1) { grid-column: span 2; min-height: 280px; }
+      .bento-cell:nth-child(2) { grid-column: span 2; min-height: 160px; }
+      .bento-cell:nth-child(3) { grid-column: span 1; min-height: 180px; }
+      .bento-cell:nth-child(4) { grid-column: span 1; min-height: 180px; }
+      .bento-cell:nth-child(5) { grid-column: span 1; min-height: 180px; }
+      .bento-cell:nth-child(6) { grid-column: span 1; min-height: 180px; }
+
+      .services-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .stats-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-item {
+        border-right: none;
+        border-bottom: 1px solid var(--card-border);
+      }
+
+      .stat-item:last-child {
+        border-bottom: none;
+      }
+
+      .process-step {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      #work { padding: 4rem 1.25rem; }
+      #services { padding: 4rem 1.25rem; }
+      #process { padding: 4rem 1.25rem; }
+      #cta { padding: 6rem 1.25rem 4rem; }
+      footer { padding: 1.5rem 1.25rem; flex-direction: column; gap: 1rem; text-align: center; }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-cta-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bento-cell:nth-child(n) {
+        grid-column: span 1;
+        min-height: 200px;
+      }
+    }
+
+    /* =====================================================
+       LOADING SCREEN
+    ===================================================== */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    #loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-logo {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      color: var(--fg);
+    }
+
+    .loader-logo span {
+      color: var(--accent);
+    }
+
+    .loader-bar-wrap {
+      width: 200px;
+      height: 1px;
+      background: var(--card-border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loader-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.05s linear;
+    }
+
+    .loader-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted-fg);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Noise texture overlay -->
+  <div class="noise" aria-hidden="true"></div>
+
+  <!-- Custom cursor -->
+  <div id="cursor" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- Loading screen -->
+  <div id="loader" aria-hidden="true">
+    <div class="loader-logo">VOID<span>.</span>STUDIO</div>
+    <div class="loader-bar-wrap">
+      <div class="loader-bar" id="loader-bar"></div>
+    </div>
+    <div class="loader-num" id="loader-num">0%</div>
+  </div>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#hero" class="nav-logo">VOID<span>.</span>STUDIO</a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#work">Work</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#process">Process</a></li>
+        <li><a href="#cta">Contact</a></li>
+      </ul>
+      <button id="theme-toggle" aria-label="Toggle theme">◐ THEME</button>
+    </div>
+  </nav>
+
+  <!-- =====================================================
+       HERO SECTION
+  ===================================================== -->
+  <section id="hero">
+    <!-- WebGL dithering canvas -->
+    <canvas id="dither-canvas" aria-hidden="true"></canvas>
+
+    <!-- ASCII art decoration -->
+    <div id="ascii-canvas" aria-hidden="true">
+      <pre id="ascii-output"></pre>
+    </div>
+
+    <div class="hero-content">
+      <p class="hero-tag">Est. 2019 — Digital Innovation</p>
+      <h1 class="hero-headline">
+        <span class="stroke-line" id="scramble-line-1">WE BUILD</span>
+        <span class="accent-line" id="scramble-line-2">FUTURES</span>
+        <span class="stroke-line" id="scramble-line-3">THAT LAST</span>
+      </h1>
+      <p class="hero-sub">
+        A design studio operating at the intersection
+        of technology, culture, and human experience.
+        We make the complex beautiful.
+      </p>
+      <div class="hero-cta-row">
+        <a href="#work" class="btn-primary magnetic" data-strength="40">
+          VIEW OUR WORK <span>→</span>
+        </a>
+        <a href="#cta" class="btn-secondary">
+          START A PROJECT
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-counter" aria-label="Projects completed">
+      <strong id="counter-num">0</strong>
+      PROJECTS
+      <br />DELIVERED
+    </div>
+
+    <div class="scroll-indicator" aria-hidden="true">
+      <div class="scroll-line"></div>
+      <span>SCROLL</span>
+    </div>
+  </section>
+
+  <!-- Marquee ticker -->
+  <div class="ticker-wrap" aria-hidden="true">
+    <div class="ticker-track">
+      <span class="ticker-item">BRANDING <span>✦</span> WEB DESIGN <span>✦</span> MOTION <span>✦</span> IDENTITY <span>✦</span> STRATEGY <span>✦</span> UX/UI <span>✦</span> DIGITAL PRODUCTS <span>✦</span></span>
+      <span class="ticker-item">BRANDING <span>✦</span> WEB DESIGN <span>✦</span> MOTION <span>✦</span> IDENTITY <span>✦</span> STRATEGY <span>✦</span> UX/UI <span>✦</span> DIGITAL PRODUCTS <span>✦</span></span>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       WORK / BENTO GRID
+  ===================================================== -->
+  <section id="work">
+    <div class="section-header">
+      <div>
+        <p class="section-label">Selected Work</p>
+        <h2 class="section-title">
+          Our <span class="stroke">Latest</span>
+        </h2>
+      </div>
+      <a href="#" class="section-link">All Projects →</a>
+    </div>
+
+    <div class="bento-grid">
+
+      <!-- Cell 1 — Large featured -->
+      <article class="bento-cell">
+        <div class="cell-inner">
+          <div>
+            <p class="cell-tag">Brand Identity</p>
+            <p class="cell-num">01</p>
+            <h3 class="cell-title">NOMAD — Global Lifestyle Brand</h3>
+          </div>
+          <div class="cell-visual">
+            <canvas class="cell-visual-canvas" id="cell-canvas-1" aria-hidden="true"></canvas>
+          </div>
+          <p class="cell-desc">Complete brand overhaul for a $40M lifestyle company. Strategy, visual identity, digital ecosystem.</p>
+        </div>
+      </article>
+
+      <!-- Cell 2 -->
+      <article class="bento-cell accent-cell">
+        <div class="cell-inner">
+          <div>
+            <p class="cell-tag">Digital Product</p>
+            <p class="cell-num">02</p>
+            <h3 class="cell-title">FLUX — Finance App</h3>
+          </div>
+          <p class="cell-desc">End-to-end UX design for a next-gen trading platform. 2M+ users.</p>
+        </div>
+      </article>
+
+      <!-- Cell 3 -->
+      <article class="bento-cell">
+        <div class="cell-inner">
+          <div>
+            <p class="cell-tag">Web Experience</p>
+            <p class="cell-num">03</p>
+            <h3 class="cell-title">LUMEN — Architecture Studio Site</h3>
+          </div>
+          <p class="cell-arrow">↗</p>
+        </div>
+      </article>
+
+      <!-- Cell 4 — Small -->
+      <article class="bento-cell">
+        <div class="cell-inner">
+          <p class="cell-tag">Motion</p>
+          <p class="cell-num">04</p>
+          <h3 class="cell-title">APEX Campaign</h3>
+        </div>
+      </article>
+
+      <!-- Cell 5 — Small -->
+      <article class="bento-cell">
+        <div class="cell-inner">
+          <p class="cell-tag">Identity</p>
+          <p class="cell-num">05</p>
+          <h3 class="cell-title">KOTO Music</h3>
+        </div>
+      </article>
+
+      <!-- Cell 6 -->
+      <article class="bento-cell">
+        <div class="cell-inner">
+          <div>
+            <p class="cell-tag">Strategy + Brand</p>
+            <p class="cell-num">06</p>
+            <h3 class="cell-title">PRISM — Health Tech Rebrand</h3>
+          </div>
+          <p class="cell-desc">Full rebrand of an AI health company post Series-B. Brand, product, communications.</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       SERVICES
+  ===================================================== -->
+  <section id="services">
+    <div class="section-header">
+      <div>
+        <p class="section-label">What We Do</p>
+        <h2 class="section-title">
+          Our <span class="stroke">Services</span>
+        </h2>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar reveal">
+      <div class="stat-item">
+        <span class="stat-number" data-count="127">0</span>
+        <span class="stat-label">Projects Completed</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-count="94">0</span>
+        <span class="stat-label">Happy Clients</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-count="12">0</span>
+        <span class="stat-label">Industry Awards</span>
+      </div>
+    </div>
+
+    <div class="services-grid">
+      <article class="service-item">
+        <p class="service-num">01 —</p>
+        <h3 class="service-name">Brand Strategy & Identity</h3>
+        <p class="service-desc">We craft identities that are memorable, scalable, and built to outlast trends. From naming to visual systems.</p>
+      </article>
+      <article class="service-item">
+        <p class="service-num">02 —</p>
+        <h3 class="service-name">Digital Experience Design</h3>
+        <p class="service-desc">Websites and apps that convert, engage, and delight. We obsess over every pixel and interaction.</p>
+      </article>
+      <article class="service-item">
+        <p class="service-num">03 —</p>
+        <h3 class="service-name">Motion & Animation</h3>
+        <p class="service-desc">Bringing brands to life through purposeful motion. From UI micro-interactions to broadcast spots.</p>
+      </article>
+      <article class="service-item">
+        <p class="service-num">04 —</p>
+        <h3 class="service-name">Creative Direction</h3>
+        <p class="service-desc">Strategic creative leadership for campaigns, launches, and ongoing brand narrative.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       PROCESS — SCROLLYTELLING
+  ===================================================== -->
+  <section id="process">
+    <div class="section-header">
+      <div>
+        <p class="section-label">How We Work</p>
+        <h2 class="section-title">
+          The <span class="stroke">Process</span>
+        </h2>
+      </div>
+    </div>
+
+    <div class="process-list">
+      <div class="process-step">
+        <div class="process-step-left">
+          <span class="process-step-num">01</span>
+          <h3 class="process-step-name">Discover</h3>
+        </div>
+        <p class="process-step-desc">We listen first. Deep-dive into your business, audience, competitors, and goals. No assumptions, no templates.</p>
+      </div>
+      <div class="process-step">
+        <div class="process-step-left">
+          <span class="process-step-num">02</span>
+          <h3 class="process-step-name">Define</h3>
+        </div>
+        <p class="process-step-desc">Strategy before aesthetics. We establish the brief, the opportunity, and the unique angle that will make you stand out.</p>
+      </div>
+      <div class="process-step">
+        <div class="process-step-left">
+          <span class="process-step-num">03</span>
+          <h3 class="process-step-name">Design</h3>
+        </div>
+        <p class="process-step-desc">Concepts, iterations, refinements. We design fast, share early, and improve collaboratively until it's undeniably right.</p>
+      </div>
+      <div class="process-step">
+        <div class="process-step-left">
+          <span class="process-step-num">04</span>
+          <h3 class="process-step-name">Deploy</h3>
+        </div>
+        <p class="process-step-desc">Launch with precision. We handle implementation, QA, and the vital first weeks. We don't disappear at delivery.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       CTA SECTION
+  ===================================================== -->
+  <section id="cta">
+    <p class="cta-bg-text" aria-hidden="true">VOID</p>
+    <div class="cta-content">
+      <p class="cta-eyebrow reveal">Ready to build something remarkable?</p>
+      <h2 class="cta-headline reveal">
+        Let's Make<br>
+        <span class="stroke">Something</span><br>
+        Unforgettable
+      </h2>
+      <br>
+      <a href="mailto:hello@void.studio" class="cta-email reveal">
+        hello@void.studio →
+      </a>
+      <br><br>
+      <a href="mailto:hello@void.studio" class="btn-primary magnetic reveal" data-strength="60">
+        GET IN TOUCH
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p class="footer-copy">© 2024 VOID.STUDIO — All rights reserved</p>
+    <ul class="footer-links">
+      <li><a href="#">Instagram</a></li>
+      <li><a href="#">Twitter</a></li>
+      <li><a href="#">LinkedIn</a></li>
+      <li><a href="#">Dribbble</a></li>
+    </ul>
+  </footer>
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ===================================================== -->
+  <script>
+    // =====================================================
+    // LOADER
+    // =====================================================
+    (function () {
+      const bar = document.getElementById('loader-bar');
+      const num = document.getElementById('loader-num');
+      const loader = document.getElementById('loader');
+      let progress = 0;
+
+      const interval = setInterval(() => {
+        progress += Math.random() * 15 + 5;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          setTimeout(() => {
+            loader.classList.add('hidden');
+            document.body.style.overflow = '';
+            initAll();
+          }, 300);
+        }
+        bar.style.width = progress + '%';
+        num.textContent = Math.floor(progress) + '%';
+      }, 80);
+
+      document.body.style.overflow = 'hidden';
+    })();
+
+    // =====================================================
+    // INIT ALL — called after loader
+    // =====================================================
+    function initAll() {
+      initCursor();
+      initThemeToggle();
+      initScramble();
+      initCounter();
+      initScrollAnimations();
+      initMagneticButtons();
+      initASCII();
+      initWebGLDither();
+      initCellCanvas();
+    }
+
+    // =====================================================
+    // CUSTOM CURSOR
+    // =====================================================
+    function initCursor() {
+      const cursor = document.getElementById('cursor');
+      const ring = document.getElementById('cursor-ring');
+      let mx = 0, my = 0;
+      let rx = 0, ry = 0;
+
+      document.addEventListener('mousemove', (e) => {
+        mx = e.clientX;
+        my = e.clientY;
+        cursor.style.left = mx + 'px';
+        cursor.style.top = my + 'px';
+      });
+
+      // Ring lags behind
+      function animRing() {
+        rx += (mx - rx) * 0.15;
+        ry += (my - ry) * 0.15;
+        ring.style.left = rx + 'px';
+        ring.style.top = ry + 'px';
+        requestAnimationFrame(animRing);
+      }
+      animRing();
+
+      // Hide on touch devices
+      if (window.matchMedia('(pointer: coarse)').matches) {
+        cursor.style.display = 'none';
+        ring.style.display = 'none';
+        document.body.style.cursor = 'auto';
+      }
+    }
+
+    // =====================================================
+    // THEME TOGGLE
+    // =====================================================
+    function initThemeToggle() {
+      const btn = document.getElementById('theme-toggle');
+      const html = document.documentElement;
+
+      btn.addEventListener('click', () => {
+        const current = html.getAttribute('data-theme');
+        html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        btn.textContent = current === 'dark' ? '◑ THEME' : '◐ THEME';
+      });
+    }
+
+    // =====================================================
+    // SCRAMBLE TEXT
+    // =====================================================
+    function initScramble() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&';
+      
+      function scramble(el, finalText, duration = 1200, delay = 0) {
+        const len = finalText.length;
+        let frame = 0;
+        const totalFrames = duration / 16.7;
+        
+        setTimeout(() => {
+          const raf = setInterval(() => {
+            let result = '';
+            const progress = frame / totalFrames;
+            
+            for (let i = 0; i < len; i++) {
+              if (finalText[i] === ' ') {
+                result += ' ';
+              } else if (i < Math.floor(progress * len)) {
+                result += finalText[i];
+              } else {
+                result += chars[Math.floor(Math.random() * chars.length)];
+              }
+            }
+            
+            el.textContent = result;
+            frame++;
+            
+            if (frame >= totalFrames) {
+              el.textContent = finalText;
+              clearInterval(raf);
+            }
+          }, 16.7);
+        }, delay);
+      }
+
+      const line1 = document.getElementById('scramble-line-1');
+      const line2 = document.getElementById('scramble-line-2');
+      const line3 = document.getElementById('scramble-line-3');
+
+      scramble(line1, 'WE BUILD', 1000, 200);
+      scramble(line2, 'FUTURES', 1000, 500);
+      scramble(line3, 'THAT LAST', 1000, 800);
+    }
+
+    // =====================================================
+    // COUNTER ANIMATION
+    // =====================================================
+    function initCounter() {
+      const el = document.getElementById('counter-num');
+      let started = false;
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !started) {
+            started = true;
+            animateCount(el, 0, 127, 1500);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      observer.observe(el);
+
+      // Also animate stat numbers
+      document.querySelectorAll('[data-count]').forEach(el => {
+        const target = parseInt(el.getAttribute('data-count'));
+        let counted = false;
+        const statObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && !counted) {
+              counted = true;
+              animateCount(el, 0, target, 1800);
+            }
+          });
+        }, { threshold: 0.5 });
+        statObserver.observe(el);
+      });
+    }
+
+    function animateCount(el, from, to, duration) {
+      const start = performance.now();
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.floor(from + (to - from) * eased);
+        if (progress < 1) requestAnimationFrame(update);
+        else el.textContent = to;
+      }
+      requestAnimationFrame(update);
+    }
+
+    // =====================================================
+    // SCROLL ANIMATIONS — IntersectionObserver
+    // =====================================================
+    function initScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            const delay = el.dataset.delay || 0;
+            setTimeout(() => {
+              el.classList.add('visible');
+            }, delay);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+      // Bento cells with staggered delay
+      document.querySelectorAll('.bento-cell').forEach((el, i) => {
+        el.dataset.delay = i * 80;
+        observer.observe(el);
+      });
+
+      // Service items
+      document.querySelectorAll('.service-item').forEach((el, i) => {
+        el.dataset.delay = i * 100;
+        observer.observe(el);
+      });
+
+      // Process steps
+      document.querySelectorAll('.process-step').forEach((el, i) => {
+        el.dataset.delay = i * 120;
+        observer.observe(el);
+      });
+
+      // Generic reveal
+      document.querySelectorAll('.reveal').forEach(el => {
+        observer.observe(el);
+      });
+    }
+
+    // =====================================================
+    // MAGNETIC BUTTONS
+    // =====================================================
+    function initMagneticButtons() {
+      if (window.matchMedia('(pointer: coarse)').matches) return;
+
+      document.querySelectorAll('.magnetic').forEach(btn => {
+        const strength = parseFloat(btn.dataset.strength) || 30;
+
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const dx = (e.clientX - cx) / rect.width;
+          const dy = (e.clientY - cy) / rect.height;
+          btn.style.transform = `translate(${dx * strength}px, ${dy * strength}px)`;
+        });
+
+        btn.addEventListener('mouseleave', () => {
+          btn.style.transform = '';
+        });
+      });
+    }
+
+    // =====================================================
+    // ASCII ART ANIMATION — Background decoration
+    // =====================================================
+    function initASCII() {
+      const pre = document.getElementById('ascii-output');
+      if (!pre) return;
+
+      // ASCII density ramp
+      const chars = ' .:-=+*#%@';
+      
+      // Generate an animated pattern
+      let time = 0;
+      
+      function render() {
+        const cols = Math.floor(window.innerWidth * 0.28 / 6);
+        const rows = Math.floor(window.innerHeight / 9.6);
+        let out = '';
+
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < cols; x++) {
+            // Wave + noise function
+            const nx = x / cols;
+            const ny = y / rows;
+            const wave1 = Math.sin(nx * 6 + time * 0.8) * Math.cos(ny * 4 - time * 0.5);
+            const wave2 = Math.sin((nx + ny) * 5 - time * 0.6) * 0.5;
+            const val = (wave1 + wave2 + 1) / 2;
+            const idx = Math.floor(val * (chars.length - 1));
+            out += chars[Math.max(0, Math.min(chars.length - 1, idx))];
+          }
+          out += '\n';
+        }
+
+        pre.textContent = out;
+        time += 0.03;
+        requestAnimationFrame(render);
+      }
+
+      render();
+    }
+
+    // =====================================================
+    // WEBGL DITHERING POST-PROCESS
+    // =====================================================
+    function initWebGLDither() {
+      const canvas = document.getElementById('dither-canvas');
+      if (!canvas) return;
+
+      // Get WebGL context
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (!gl) {
+        console.warn('WebGL not available, skipping dither effect');
+        return;
+      }
+
+      // Vertex shader
+      const vsSource = `
+        attribute vec2 a_position;
+        attribute vec2 a_texCoord;
+        varying vec2 v_texCoord;
+        void main() {
+          gl_Position = vec4(a_position, 0.0, 1.0);
+          v_texCoord = a_texCoord;
+        }
+      `;
+
+      // Fragment shader — Bayer matrix ordered dithering
+      const fsSource = `
+        precision mediump float;
+        varying vec2 v_texCoord;
+        uniform float u_time;
+        uniform vec2 u_resolution;
+        uniform float u_theme; /* 0=dark, 1=light */
+
+        /* 4x4 Bayer dither matrix */
+        float bayer4x4(vec2 pos) {
+          int x = int(mod(pos.x, 4.0));
+          int y = int(mod(pos.y, 4.0));
+          /* Flattened 4x4 Bayer matrix / 16.0 */
+          float mat[16];
+          mat[0]  =  0.0/16.0; mat[1]  =  8.0/16.0; mat[2]  =  2.0/16.0; mat[3]  = 10.0/16.0;
+          mat[4]  = 12.0/16.0; mat[5]  =  4.0/16.0; mat[6]  = 14.0/16.0; mat[7]  =  6.0/16.0;
+          mat[8]  =  3.0/16.0; mat[9]  = 11.0/16.0; mat[10] =  1.0/16.0; mat[11] =  9.0/16.0;
+          mat[12] = 15.0/16.0; mat[13] =  7.0/16.0; mat[14] = 13.0/16.0; mat[15] =  5.0/16.0;
+          return mat[y * 4 + x];
+        }
+
+        /* Simple hash noise */
+        float hash(vec2 p) {
+          p = fract(p * vec2(234.34, 435.345));
+          p += dot(p, p + 34.23);
+          return fract(p.x * p.y);
+        }
+
+        void main() {
+          vec2 uv = v_texCoord;
+          vec2 pixel = uv * u_resolution;
+
+          /* Animated wave pattern */
+          float wave = sin(uv.x * 8.0 + u_time * 1.2) * 
+                       cos(uv.y * 6.0 - u_time * 0.8) * 0.5 + 0.5;
+          
+          float wave2 = sin((uv.x + uv.y) * 5.0 + u_time * 0.9) * 0.3 + 0.3;
+          
+          /* Combined luminance value */
+          float lum = wave * 0.6 + wave2 * 0.4;
+          
+          /* Add edge darkening vignette */
+          vec2 center = uv - 0.5;
+          float vignette = 1.0 - dot(center, center) * 1.5;
+          lum *= vignette;
+
+          /* Bayer ordered dithering */
+          float threshold = bayer4x4(pixel);
+          float dithered = step(threshold, lum);
+
+          /* In dark mode, draw bright dots. In light mode, draw dark dots */
+          vec4 dotColor;
+          if (u_theme < 0.5) {
+            /* dark mode */
+            dotColor = vec4(1.0, 0.898, 0.0, dithered * 0.6);
+          } else {
+            /* light mode */
+            dotColor = vec4(0.0, 0.0, 0.0, dithered * 0.4);
+          }
+
+          gl_FragColor = dotColor;
+        }
+      `;
+
+      function createShader(gl, type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+          gl.deleteShader(shader);
+          return null;
+        }
+        return shader;
+      }
+
+      function createProgram(gl, vs, fs) {
+        const program = gl.createProgram();
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          console.error('Program link error:', gl.getProgramInfoLog(program));
+          return null;
+        }
+        return program;
+      }
+
+      const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+      const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+      if (!vs || !fs) return;
+      const program = createProgram(gl, vs, fs);
+      if (!program) return;
+
+      // Fullscreen quad
+      const positions = new Float32Array([
+        -1, -1,  1, -1,  -1, 1,
+        -1,  1,  1, -1,   1, 1
+      ]);
+      const texCoords = new Float32Array([
+        0, 1,  1, 1,  0, 0,
+        0, 0,  1, 1,  1, 0
+      ]);
+
+      const posBuf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+      const texBuf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, texBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
+
+      const aPosLoc = gl.getAttribLocation(program, 'a_position');
+      const aTexLoc = gl.getAttribLocation(program, 'a_texCoord');
+      const uTimeLoc = gl.getUniformLocation(program, 'u_time');
+      const uResLoc = gl.getUniformLocation(program, 'u_resolution');
+      const uThemeLoc = gl.getUniformLocation(program, 'u_theme');
+
+      // Enable blending
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+      function resize() {
+        const parent = canvas.parentElement;
+        const w = parent.offsetWidth;
+        const h = parent.offsetHeight;
+        // Use reduced resolution for performance
+        const scale = Math.min(window.devicePixelRatio, 1.5);
+        canvas.width = Math.floor(w * 0.5);   // Half-res for perf
+        canvas.height = Math.floor(h * 0.5);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+
+      let startTime = performance.now();
+
+      function render(now) {
+        const t = (now - startTime) / 1000;
+
+        // Detect theme
+        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.useProgram(program);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+        gl.enableVertexAttribArray(aPosLoc);
+        gl.vertexAttribPointer(aPosLoc, 2, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, texBuf);
+        gl.enableVertexAttribArray(aTexLoc);
+        gl.vertexAttribPointer(aTexLoc, 2, gl.FLOAT, false, 0, 0);
+
+        gl.uniform1f(uTimeLoc, t);
+        gl.uniform2f(uResLoc, canvas.width, canvas.height);
+        gl.uniform1f(uThemeLoc, isDark ? 0.0 : 1.0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        requestAnimationFrame(render);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    // =====================================================
+    // BENTO CELL CANVAS — animated abstract art
+    // =====================================================
+    function initCellCanvas() {
+      const canvas = document.getElementById('cell-canvas-1');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      let time = 0;
+      let w, h;
+
+      function resize() {
+        w = canvas.offsetWidth;
+        h = canvas.offsetHeight;
+        canvas.width = w;
+        canvas.height = h;
+      }
+
+      resize();
+
+      function drawGrid() {
+        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+        const fg = isDark ? '#ffe500' : '#cc9900';
+        const bg = isDark ? '#111111' : '#ebe6dd';
+
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.strokeStyle = fg;
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.3;
+
+        // Animated grid
+        const gridSize = 20;
+        for (let x = 0; x <= w; x += gridSize) {
+          const offset = Math.sin(x * 0.02 + time) * 8;
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x + offset, h);
+          ctx.stroke();
+        }
+        for (let y = 0; y <= h; y += gridSize) {
+          const offset = Math.cos(y * 0.02 + time * 0.7) * 8;
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y + offset);
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1;
+
+        // Circle pulse
+        const cx = w / 2 + Math.sin(time * 0.5) * 30;
+        const cy = h / 2 + Math.cos(time * 0.3) * 20;
+        const r = 50 + Math.sin(time) * 15;
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = fg;
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = 0.8;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * 1.6, 0, Math.PI * 2);
+        ctx.globalAlpha = 0.2;
+        ctx.stroke();
+
+        ctx.globalAlpha = 1;
+
+        time += 0.02;
+        requestAnimationFrame(drawGrid);
+      }
+
+      drawGrid();
+
+      const ro = new ResizeObserver(resize);
+      ro.observe(canvas.parentElement);
+    }
+  </script>
+
+</body>
+</html>
