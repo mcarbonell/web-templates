@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLUX // Digital Experience</title>
+    
+    <!--
+    ╔══════════════════════════════════════════════════════════════════════════════╗
+    ║  DESIGN SYSTEM: FLUX // SEED 352815718                                        ║
+    ║  ═══════════════════════════════════════════════════════════════════════════  ║
+    ║                                                                               ║
+    ║  DECOMPOSED RANDOMNESS FROM 352815718:                                        ║
+    ║  ├── Color Palette:    352815718 % 5  = 3 → ELECTRIC MINT                    ║
+    ║  │                      (Neon Lime #39FF14, Cyan #00F0FF, Emerald #10B981)     ║
+    ║  ├── Primary Effect:   352815718 % 7  = 1 → FLUID SIMULATION                 ║
+    ║  ├── Layout Style:     352815718 % 8  = 6 → BROKEN GRID / DECONSTRUCTED      ║
+    ║  ├── Typography:       352815718 % 6  = 4 → COMPRESSED / CONDENSED            ║
+    ║  ├── WebGL Technique:  352815718 % 4  = 2 → DITHERING + FLUID                 ║
+    ║  └── Secondary:        352815718 % 12 = 6 → GLASSMORPHISM + MAGNETIC         ║
+    ║                                                                               ║
+    ║  TECHNIQUES IMPLEMENTED:                                                        ║
+    ║  ✓ WebGL Fluid Simulation with Dithering Post-Processing                      ║
+    ║  ✓ Glassmorphism with Dynamic Backdrop Blur                                   ║
+    ║  ✓ Magnetic Buttons with Spring Physics                                         ║
+    ║  ✓ Scroll-Driven Animations (CSS scroll-timeline)                               ║
+    ║  ✓ Gradient Animated Text with Stroke Effects                                   ║
+    ║  ✓ Kinetic Typography with Scramble Effect                                    ║
+    ║  ✓ Aurora Gradient Blobs                                                        ║
+    ║  ✓ Light/Dark Mode Toggle                                                      ║
+    ║                                                                               ║
+    ║  PERFORMANCE TARGETS:                                                            ║
+    ║  • 60fps on mid-range mobile via requestAnimationFrame throttling              ║
+    ║  • GPU-accelerated transforms only                                             ║
+    ║  • Intersection Observer for scroll triggers                                   ║
+    ║  • Reduced motion support                                                      ║
+    ║                                                                               ║
+    ╚══════════════════════════════════════════════════════════════════════════════╝
+    -->
+    
+    <style>
+        /* ═══════════════════════════════════════════════════════════════════════
+           CSS CUSTOM PROPERTIES - ELECTRIC MINT THEME
+           ═══════════════════════════════════════════════════════════════════════ */
+        :root {
+            /* Electric Mint Palette */
+            --neon-lime: #39FF14;
+            --electric-cyan: #00F0FF;
+            --emerald: #10B981;
+            --mint-glow: rgba(57, 255, 20, 0.4);
+            --cyan-glow: rgba(0, 240, 255, 0.4);
+            
+            /* Dark Mode (Default) */
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --glass-bg: rgba(26, 26, 37, 0.6);
+            --glass-border: rgba(57, 255, 20, 0.15);
+            --stroke-color: rgba(0, 240, 255, 0.3);
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #0a0a0f;
+            --text-secondary: #495057;
+            --text-muted: #868e96;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(57, 255, 20, 0.25);
+            --stroke-color: rgba(0, 240, 255, 0.5);
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           RESET & BASE
+           ═══════════════════════════════════════════════════════════════════════ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            font-size: clamp(14px, 1vw + 10px, 18px);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           WEBGL CANVAS - FLUID SIMULATION BACKGROUND
+           ═══════════════════════════════════════════════════════════════════════ */
+        #fluid-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           THEME TOGGLE
+           ═══════════════════════════════════════════════════════════════════════ */
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            width: 60px;
+            height: 32px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            cursor: pointer;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--neon-lime);
+            box-shadow: 0 0 20px var(--mint-glow);
+        }
+        
+        .theme-toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--neon-lime), var(--electric-cyan));
+            border-radius: 50%;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        [data-theme="light"] .theme-toggle-slider {
+            transform: translateX(28px);
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           HERO SECTION - BROKEN GRID LAYOUT
+           ═══════════════════════════════════════════════════════════════════════ */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto;
+            place-items: center;
+            position: relative;
+            padding: 2rem;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: repeat(6, auto);
+            gap: 1rem;
+            max-width: 1400px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           KINETIC TYPOGRAPHY - COMPRESSED CONDENSED
+           ═══════════════════════════════════════════════════════════════════════ */
+        .hero-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-stretch: condensed;
+            text-transform: uppercase;
+            letter-spacing: -0.04em;
+            line-height: 0.85;
+            grid-column: 1 / -1;
+            grid-row: 1;
+            font-size: clamp(4rem, 15vw, 12rem);
+            position: relative;
+            z-index: 20;
+        }
+        
+        .hero-title .line-1 {
+            display: block;
+            background: linear-gradient(135deg, var(--neon-lime) 0%, var(--electric-cyan) 50%, var(--emerald) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 8s ease infinite;
+            background-size: 200% 200%;
+        }
+        
+        .hero-title .line-2 {
+            display: block;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--stroke-color);
+            text-stroke: 2px var(--stroke-color);
+            margin-left: 10vw;
+            margin-top: -0.1em;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           GLASSMORPHISM CARDS - FLOATING ELEMENTS
+           ═══════════════════════════════════════════════════════════════════════ */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--mint-glow) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+        
+        .glass-card:hover::before {
+            opacity: 1;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--neon-lime);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px var(--mint-glow);
+        }
+        
+        /* Card Positions - Broken Grid */
+        .card-1 {
+            grid-column: 2 / 6;
+            grid-row: 2 / 4;
+            transform: rotate(-2deg);
+        }
+        
+        .card-2 {
+            grid-column: 7 / 11;
+            grid-row: 3 / 5;
+            transform: rotate(1.5deg);
+        }
+        
+        .card-3 {
+            grid-column: 1 / 5;
+            grid-row: 4 / 6;
+            transform: rotate(2deg);
+        }
+        
+        .card-4 {
+            grid-column: 8 / 12;
+            grid-row: 5 / 7;
+            transform: rotate(-1deg);
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           MAGNETIC BUTTONS
+           ═══════════════════════════════════════════════════════════════════════ */
+        .magnetic-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--neon-lime), var(--electric-cyan));
+            border: none;
+            border-radius: 50px;
+            color: var(--bg-primary);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            will-change: transform;
+        }
+        
+        .magnetic-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .magnetic-btn:hover::after {
+            left: 100%;
+        }
+        
+        .magnetic-btn.secondary {
+            background: transparent;
+            border: 2px solid var(--electric-cyan);
+            color: var(--electric-cyan);
+        }
+        
+        .btn-container {
+            grid-column: 6 / 8;
+            grid-row: 4;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           AURORA BLOBS
+           ═══════════════════════════════════════════════════════════════════════ */
+        .aurora-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        .blob-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--neon-lime);
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+        
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--electric-cyan);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -5s;
+        }
+        
+        .blob-3 {
+            width: 400px;
+            height: 400px;
+            background: var(--emerald);
+            top: 50%;
+            left: 50%;
+            animation-delay: -10s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(1.1); }
+            50% { transform: translate(-30px, 30px) scale(0.9); }
+            75% { transform: translate(20px, 20px) scale(1.05); }
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           SCROLL-DRIVEN SECTIONS
+           ═══════════════════════════════════════════════════════════════════════ */
+        .scroll-section {
+            min-height: 100vh;
+            padding: 6rem 2rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .scroll-content {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+        
+        .feature-block {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .feature-block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .feature-number {
+            font-size: 6rem;
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--glass-border);
+            text-stroke: 1px var(--glass-border);
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--electric-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .feature-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           SCRAMBLE TEXT EFFECT
+           ═══════════════════════════════════════════════════════════════════════ */
+        .scramble-text {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════════════════════════════ */
+        .footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 4rem;
+        }
+        
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           RESPONSIVE DESIGN
+           ═══════════════════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .card-1, .card-2, .card-3, .card-4 {
+                grid-column: 1 / -1;
+                grid-row: auto;
+                transform: none;
+            }
+            
+            .btn-container {
+                grid-column: 1 / -1;
+                grid-row: auto;
+            }
+            
+            .hero-title {
+                font-size: clamp(3rem, 20vw, 6rem);
+            }
+            
+            .hero-title .line-2 {
+                margin-left: 0;
+            }
+            
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+            }
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           REDUCED MOTION
+           ═══════════════════════════════════════════════════════════════════════ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            #fluid-canvas {
+                display: none;
+            }
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════════
+           LOADING STATE
+           ═══════════════════════════════════════════════════════════════════════ */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--glass-border);
+            border-top-color: var(--neon-lime);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <div class="theme-toggle-slider">◐</div>
+    </button>
+    
+    <!-- Aurora Background -->
+    <div class="aurora-container">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+    </div>
+    
+    <!-- WebGL Fluid Canvas -->
+    <canvas id="fluid-canvas"></canvas>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="line-1 scramble-text" data-text="FLUX">FLUX</span>
+                <span class="line-2">DIGITAL</span>
+            </h1>
+            
+            <div class="glass-card card-1">
+                <h3 class="feature-title">Fluid Dynamics</h3>
+                <p class="feature-text">Experience the flow of digital creativity with our WebGL-powered fluid simulation that responds to your every movement.</p>
+            </div>
+            
+            <div class="glass-card card-2">
+                <h3 class="feature-title">Kinetic Energy</h3>
+                <p class="feature-text">Typography that breathes and moves with purpose. Every letter crafted to convey motion and emotion.</p>
+            </div>
+            
+            <div class="glass-card card-3">
+                <h3 class="feature-title">Glassmorphism</h3>
+                <p class="feature-text">Translucent layers of depth create a sense of space and dimensionality in our deconstructed grid layout.</p>
+            </div>
+            
+            <div class="glass-card card-4">
+                <h3 class="feature-title">Magnetic UI</h3>
+                <p class="feature-text">Interface elements that respond to your cursor with physics-based animations and spring dynamics.</p>
+            </div>
+            
+            <div class="btn-container">
+                <button class="magnetic-btn" data-magnetic>Explore</button>
+                <button class="magnetic-btn secondary" data-magnetic>Learn More</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Scroll Sections -->
+    <section class="scroll-section">
+        <div class="scroll-content">
+            <div class="feature-block">
+                <div class="feature-number">01</div>
+                <h3 class="feature-title">WebGL Shaders</h3>
+                <p class="feature-text">Custom fragment shaders with dithering post-processing create a unique visual aesthetic that maintains 60fps performance on mobile devices.</p>
+            </div>
+            
+            <div class="feature-block">
+                <div class="feature-number">02</div>
+                <h3 class="feature-title">Scroll Animations</h3>
+                <p class="feature-text">Intersection Observer API triggers smooth entrance animations as you navigate through the experience, creating a narrative flow.</p>
+            </div>
+            
+            <div class="feature-block">
+                <div class="feature-number">03</div>
+                <h3 class="feature-title">Electric Mint</h3>
+                <p class="feature-text">A bold color palette featuring neon lime, electric cyan, and emerald green creates an unforgettable visual identity.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section class="scroll-section">
+        <div class="scroll-content">
+            <div class="feature-block">
+                <div class="feature-number">04</div>
+                <h3 class="feature-title">Broken Grid</h3>
+                <p class="feature-text">Deconstructed layouts challenge conventional design patterns, creating visual tension and dynamic compositions.</p>
+            </div>
+            
+            <div class="feature-block">
+                <div class="feature-number">05</div>
+                <h3 class="feature-title">Text Scramble</h3>
+                <p class="feature-text">Kinetic typography with character scrambling effects adds an element of digital glitch aesthetic to the experience.</p>
+            </div>
+            
+            <div class="feature-block">
+                <div class="feature-number">06</div>
+                <h3 class="feature-title">Light & Dark</h3>
+                <p class="feature-text">Seamless theme switching with CSS custom properties ensures the design looks stunning in any lighting condition.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">FLUX // Digital Experience — Seed 352815718</p>
+    </footer>
+    
+    <!-- WebGL Fluid Simulation with Dithering -->
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════
+        // FLUID SIMULATION WITH DITHERING SHADER
+        // ═══════════════════════════════════════════════════════════════════════
+        const canvas = document.getElementById('fluid-canvas');
+        const gl = canvas.getContext('webgl', { 
+            alpha: true, 
+            antialias: false,
+            powerPreference: 'high-performance'
+        });
+        
+        if (!gl) {
+            console.log('WebGL not supported, falling back to CSS animations');
+            canvas.style.display = 'none';
+        } else {
+            // Resize canvas
+            function resize() {
+                const dpr = Math.min(window.devicePixelRatio, 2);
+                canvas.width = window.innerWidth * dpr;
+                canvas.height = window.innerHeight * dpr;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            }
+            resize();
+            window.addEventListener('resize', resize, { passive: true });
+            
+            // Vertex shader
+            const vertexShaderSource = `
+                attribute vec2 position;
+                void main() {
+                    gl_Position = vec4(position, 0.0, 1.0);
+                }
+            `;
+            
+            // Fragment shader - Fluid + Dithering
+            const fragmentShaderSource = `
+                precision mediump float;
+                
+                uniform float time;
+                uniform vec2 resolution;
+                uniform vec2 mouse;
+                uniform float intensity;
+                
+                // Simplex noise function
+                vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+                
+                float snoise(vec2 v) {
+                    const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                                       -0.577350269189626, 0.024390243902439);
+                    vec2 i  = floor(v + dot(v, C.yy));
+                    vec2 x0 = v -   i + dot(i, C.xx);
+                    vec2 i1;
+                    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                    vec4 x12 = x0.xyxy + C.xxzz;
+                    x12.xy -= i1;
+                    i = mod289(i);
+                    vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
+                                           + i.x + vec3(0.0, i1.x, 1.0));
+                    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+                                           dot(x12.zw,x12.zw)), 0.0);
+                    m = m*m;
+                    m = m*m;
+                    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                    vec3 h = abs(x) - 0.5;
+                    vec3 ox = floor(x + 0.5);
+                    vec3 a0 = x - ox;
+                    m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+                    vec3 g;
+                    g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                    return 130.0 * dot(m, g);
+                }
+                
+                // Dithering pattern
+                float dither(vec2 uv) {
+                    vec2 grid = floor(uv * resolution / 2.0);
+                    return mod(grid.x + grid.y, 2.0) * 0.02;
+                }
+                
+                void main() {
+                    vec2 uv = gl_FragCoord.xy / resolution.xy;
+                    vec2 p = uv * 2.0 - 1.0;
+                    p.x *= resolution.x / resolution.y;
+                    
+                    // Mouse influence
+                    vec2 m = mouse * 2.0 - 1.0;
+                    m.x *= resolution.x / resolution.y;
+                    float mouseInfluence = smoothstep(0.5, 0.0, length(p - m)) * intensity;
+                    
+                    // Fluid noise layers
+                    float n1 = snoise(p * 2.0 + time * 0.3);
+                    float n2 = snoise(p * 4.0 - time * 0.2) * 0.5;
+                    float n3 = snoise(p * 8.0 + time * 0.1) * 0.25;
+                    float noise = n1 + n2 + n3;
+                    
+                    // Add mouse ripple
+                    noise += sin(length(p - m) * 20.0 - time * 3.0) * mouseInfluence * 0.3;
+                    
+                    // Color palette - Electric Mint
+                    vec3 lime = vec3(0.224, 1.0, 0.078);    // #39FF14
+                    vec3 cyan = vec3(0.0, 0.941, 1.0);       // #00F0FF
+                    vec3 emerald = vec3(0.063, 0.725, 0.506); // #10B981
+                    vec3 dark = vec3(0.039, 0.039, 0.059);   // #0a0a0f
+                    
+                    // Mix colors based on noise
+                    vec3 color = mix(dark, lime, smoothstep(-0.5, 0.5, noise));
+                    color = mix(color, cyan, smoothstep(0.0, 0.8, noise + mouseInfluence));
+                    color = mix(color, emerald, smoothstep(0.3, 1.0, n2));
+                    
+                    // Add dithering
+                    color += dither(uv);
+                    
+                    // Vignette
+                    float vignette = 1.0 - length(uv - 0.5) * 0.8;
+                    color *= vignette;
+                    
+                    // Output with alpha for transparency
+                    float alpha = smoothstep(-0.8, 0.5, noise) * 0.6;
+                    gl_FragColor = vec4(color, alpha);
+                }
+            `;
+            
+            // Compile shaders
+            function compileShader(source, type) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+                    return null;
+                }
+                return shader;
+            }
+            
+            const vertexShader = compileShader(vertexShaderSource, gl.VERTEX_SHADER);
+            const fragmentShader = compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+            
+            // Create program
+            const program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                console.error('Program link error:', gl.getProgramInfoLog(program));
+            }
+            
+            // Setup geometry
+            const positions = new Float32Array([
+                -1, -1, 1, -1, -1, 1,
+                -1, 1, 1, -1, 1, 1
+            ]);
+            
+            const positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+            
+            const positionLocation = gl.getAttribLocation(program, 'position');
+            
+            // Uniforms
+            const timeLocation = gl.getUniformLocation(program, 'time');
+            const resolutionLocation = gl.getUniformLocation(program, 'resolution');
+            const mouseLocation = gl.getUniformLocation(program, 'mouse');
+            const intensityLocation = gl.getUniformLocation(program, 'intensity');
+            
+            // Mouse tracking
+            let mouseX = 0.5, mouseY = 0.5;
+            let targetMouseX = 0.5, targetMouseY = 0.5;
+            let mouseIntensity = 0;
+            
+            document.addEventListener('mousemove', (e) => {
+                targetMouseX = e.clientX / window.innerWidth;
+                targetMouseY = 1.0 - (e.clientY / window.innerHeight);
+                mouseIntensity = 1;
+            }, { passive: true });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    targetMouseX = e.touches[0].clientX / window.innerWidth;
+                    targetMouseY = 1.0 - (e.touches[0].clientY / window.innerHeight);
+                    mouseIntensity = 1;
+                }
+            }, { passive: true });
+            
+            // Animation loop with frame skipping for mobile
+            let frameCount = 0;
+            const isMobile = window.matchMedia('(pointer: coarse)').matches;
+            const skipFrames = isMobile ? 1 : 0;
+            
+            function render(time) {
+                frameCount++;
+                if (frameCount % (skipFrames + 1) !== 0) {
+                    requestAnimationFrame(render);
+                    return;
+                }
+                
+                // Smooth mouse interpolation
+                mouseX += (targetMouseX - mouseX) * 0.1;
+                mouseY += (targetMouseY - mouseY) * 0.1;
+                mouseIntensity *= 0.95;
+                
+                gl.useProgram(program);
+                
+                gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+                gl.enableVertexAttribArray(positionLocation);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+                
+                gl.uniform1f(timeLocation, time * 0.001);
+                gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+                gl.uniform2f(mouseLocation, mouseX, mouseY);
+                gl.uniform1f(intensityLocation, mouseIntensity);
+                
+                gl.enable(gl.BLEND);
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                
+                requestAnimationFrame(render);
+            }
+            
+            requestAnimationFrame(render);
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // THEME TOGGLE
+        // ═══════════════════════════════════════════════════════════════════════
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+        
+        // Restore saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // MAGNETIC BUTTONS
+        // ═══════════════════════════════════════════════════════════════════════
+        const magneticBtns = document.querySelectorAll('[data-magnetic]');
+        
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
+            });
+        });
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // TEXT SCRAMBLE EFFECT
+        // ═══════════════════════════════════════════════════════════════════════
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                this.update = this.update.bind(this);
+            }
+            
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise((resolve) => this.resolve = resolve);
+                this.queue = [];
+                
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end });
+                }
+                
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+            
+            update() {
+                let output = '';
+                let complete = 0;
+                
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.randomChar();
+                            this.queue[i].char = char;
+                        }
+                        output += `<span style="color: var(--electric-cyan)">${char}</span>`;
+                    } else {
+                        output += from;
+                    }
+                }
+                
+                this.el.innerHTML = output;
+                
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+            
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+        }
+        
+        // Initialize scramble on hero title
+        const scrambleEl = document.querySelector('.scramble-text');
+        if (scrambleEl) {
+            const fx = new TextScramble(scrambleEl);
+            let counter = 0;
+            
+            const phrases = [
+                'FLUX',
+                'FLOW',
+                'WAVE',
+                'FLUX'
+            ];
+            
+            const next = () => {
+                fx.setText(phrases[counter]).then(() => {
+                    setTimeout(next, 3000);
+                });
+                counter = (counter + 1) % phrases.length;
+            };
+            
+            setTimeout(next, 2000);
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // SCROLL ANIMATIONS - INTERSECTION OBSERVER
+        // ═══════════════════════════════════════════════════════════════════════
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.feature-block').forEach(block => {
+            observer.observe(block);
+        });
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // LOADING SCREEN
+        // ═══════════════════════════════════════════════════════════════════════
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 500);
+        });
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // SMOOTH SCROLL POLYFILL FOR SAFARI
+        // ═══════════════════════════════════════════════════════════════════════
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

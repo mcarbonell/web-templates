@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURAL ARCHIVE | Creative Intelligence</title>
+    <!-- 
+    DESIGN SPECIFICATIONS (Seed: 466967951)
+    - Concept: "Neural Archive" - A data-driven creative studio.
+    - Mandatory: Custom WebGL Fragment Shader with Aurora/Liquid effect and a Dithering post-processing pass for a retro-future aesthetic.
+    - Techniques: Bento Grids (Services), Glassmorphism (Cards), Scramble Text (Interactions), Gradient Animated Text (Hero), Scroll-Driven Animations (Fade-in).
+    - Color Palette: 
+        Dark: Deep Charcoal (#0a0a0a) with Neon Cyan (#00f3ff) and Electric Violet (#bc00ff).
+        Light: Stark White (#f5f5f5) with Deep Navy (#1a1a1a) and Soft Rose (#ff0055).
+    - Typography: Syne (Bold/ExtraBold) for impact, Inter for readability.
+    - 60 FPS Optimization: Single plane shader, requestAnimationFrame loop, optimized event listeners.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --fg: #f5f5f5;
+            --accent: #00f3ff;
+            --accent-secondary: #bc00ff;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: 12px;
+            --transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        [data-theme="light"] {
+            --bg: #f5f5f5;
+            --fg: #0a0a0a;
+            --accent: #0077ff;
+            --accent-secondary: #ff0055;
+            --card-bg: rgba(0, 0, 0, 0.03);
+            --card-border: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color var(--transition), color var(--transition);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Syne', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* Custom Cursor */
+        #cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        /* WebGL Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* Header & Nav */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--fg);
+            color: var(--fg);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            transition: all var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        /* Hero Section */
+        section {
+            padding: 10rem 2rem 5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 15vw, 12rem);
+            line-height: 0.85;
+            margin-bottom: 2rem;
+            background: linear-gradient(90deg, var(--fg), var(--accent), var(--accent-secondary));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 5s linear infinite;
+        }
+
+        @keyframes gradientMove {
+            to { background-position: 200% center; }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            opacity: 0.8;
+            margin-bottom: 3rem;
+        }
+
+        /* Bento Grid */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: minmax(200px, auto);
+            gap: 1.5rem;
+            margin-top: 4rem;
+        }
+
+        .bento-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(var(--glass-blur));
+            padding: 2rem;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform var(--transition), border-color var(--transition);
+        }
+
+        .bento-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .bento-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-item.tall {
+            grid-row: span 2;
+        }
+
+        .bento-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .bento-item p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Magnetic Button */
+        .magnetic-btn {
+            display: inline-block;
+            padding: 1.5rem 3rem;
+            border: 1px solid var(--fg);
+            border-radius: 50px;
+            color: var(--fg);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+            transition: color var(--transition);
+            width: fit-content;
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--fg);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+            z-index: -1;
+        }
+
+        .magnetic-btn:hover {
+            color: var(--bg);
+        }
+
+        .magnetic-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 5rem 2rem;
+            border-top: 1px solid var(--card-border);
+            text-align: center;
+        }
+
+        .scramble {
+            font-family: monospace;
+            display: inline-block;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+            .bento-item.large, .bento-item.tall {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+            .hero h1 {
+                font-size: 4rem;
+            }
+            header {
+                padding: 1rem;
+            }
+        }
+
+        /* Scroll Driven Animations (where supported) */
+        @supports (animation-range: entry exit) {
+            .bento-item {
+                animation: reveal linear both;
+                animation-timeline: view();
+                animation-range: entry 10% cover 30%;
+            }
+
+            @keyframes reveal {
+                from { opacity: 0; transform: translateY(50px) scale(0.9); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div id="cursor"></div>
+    <div id="canvas-container"></div>
+
+    <header>
+        <div class="logo">NA.STUDIO</div>
+        <button class="theme-toggle" id="themeSwitcher">Light Mode</button>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 data-scramble="NEURAL ARCHIVE">NEURAL ARCHIVE</h1>
+            <p>Decoding the future of digital aesthetics through generative systems and mathematical precision. We build experiences that live between the grid and the ghost.</p>
+            <a href="#" class="magnetic-btn">Initiate Protocol</a>
+        </section>
+
+        <section id="services">
+            <h2 style="margin-bottom: 2rem;">Capabilities</h2>
+            <div class="bento-grid">
+                <div class="bento-item large">
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--accent);">01</span>
+                        <h3>Neural Branding</h3>
+                    </div>
+                    <p>AI-driven identity systems that evolve with your brand's digital presence.</p>
+                </div>
+                <div class="bento-item">
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--accent);">02</span>
+                        <h3>Shader Art</h3>
+                    </div>
+                    <p>Custom WebGL implementations for high-performance visual storytelling.</p>
+                </div>
+                <div class="bento-item tall">
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--accent);">03</span>
+                        <h3>Interface Theory</h3>
+                    </div>
+                    <p>Research-based UI design focused on the intersection of human psychology and spatial computing.</p>
+                </div>
+                <div class="bento-item">
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--accent);">04</span>
+                        <h3>Motion DNA</h3>
+                    </div>
+                    <p>Procedural animation systems that create organic, life-like movements.</p>
+                </div>
+                <div class="bento-item large">
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--accent);">05</span>
+                        <h3>Data Sculpture</h3>
+                    </div>
+                    <p>Transforming complex datasets into immersive 3D environments and interactive installations.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 NEURAL ARCHIVE. <span class="scramble" data-scramble="SYSTEM_ACTIVE">SYSTEM_ACTIVE</span></p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // --- WEBGL SHADER SYSTEM ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        const vertexShader = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 1.0);
+            }
+        `;
+
+        const fragmentShader = `
+            uniform float time;
+            uniform vec2 resolution;
+            uniform vec3 color1;
+            uniform vec3 color2;
+            uniform float theme;
+            varying vec2 vUv;
+
+            // Pseudo-random function
+            float random (vec2 st) {
+                return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+            }
+
+            // 2D Noise
+            float noise (vec2 st) {
+                vec2 i = floor(st);
+                vec2 f = fract(st);
+                float a = random(i);
+                float b = random(i + vec2(1.0, 0.0));
+                float c = random(i + vec2(0.0, 1.0));
+                float d = random(i + vec2(1.0, 1.0));
+                vec2 u = f*f*(3.0-2.0*f);
+                return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+            }
+
+            void main() {
+                vec2 uv = vUv;
+                float t = time * 0.15;
+                
+                // Animated aurora effect
+                float n = noise(uv * 3.0 + vec2(t, t * 0.5));
+                n += noise(uv * 5.0 - vec2(t * 0.7, t)) * 0.5;
+                
+                vec3 finalColor = mix(color1, color2, n);
+                
+                // Add Dithering
+                float grain = random(uv + time * 0.05) * 0.08;
+                finalColor += grain;
+
+                // Threshold for dithering effect
+                float bayer = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898,78.233))) * 43758.5453);
+                finalColor = floor(finalColor * 8.0 + bayer) / 8.0;
+
+                gl_FragColor = vec4(finalColor, 1.0);
+            }
+        `;
+
+        const uniforms = {
+            time: { value: 0 },
+            resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            color1: { value: new THREE.Color(0x0a0a0a) },
+            color2: { value: new THREE.Color(0x1a1a1a) },
+            theme: { value: 0 } // 0 for dark, 1 for light
+        };
+
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        function updateColors(isLight) {
+            if (isLight) {
+                uniforms.color1.value.set(0xffffff);
+                uniforms.color2.value.set(0xe0e0e0);
+                uniforms.theme.value = 1.0;
+            } else {
+                uniforms.color1.value.set(0x0a0a0a);
+                uniforms.color2.value.set(0x1a1a1a);
+                uniforms.theme.value = 0.0;
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            uniforms.time.value += 0.05;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+        });
+
+        // --- INTERACTION SYSTEM ---
+
+        // Custom Cursor
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Theme Toggle
+        const themeSwitcher = document.getElementById('themeSwitcher');
+        const body = document.body;
+        themeSwitcher.addEventListener('click', () => {
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            const nextTheme = isDark ? 'light' : 'dark';
+            body.setAttribute('data-theme', nextTheme);
+            themeSwitcher.innerText = isDark ? 'Dark Mode' : 'Light Mode';
+            updateColors(!isDark);
+        });
+
+        // Magnetic Buttons
+        const btns = document.querySelectorAll('.magnetic-btn');
+        btns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                cursor.style.transform = 'scale(4)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = `translate(0px, 0px)`;
+                cursor.style.transform = 'scale(1)';
+            });
+        });
+
+        // Scramble Text
+        const scrambleElements = document.querySelectorAll('[data-scramble]');
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+-=';
+        
+        scrambleElements.forEach(el => {
+            const originalText = el.innerText;
+            let interval = null;
+
+            el.addEventListener('mouseenter', () => {
+                let iteration = 0;
+                clearInterval(interval);
+                
+                interval = setInterval(() => {
+                    el.innerText = originalText.split('')
+                        .map((letter, index) => {
+                            if(index < iteration) return originalText[index];
+                            return chars[Math.floor(Math.random() * chars.length)];
+                        })
+                        .join('');
+                    
+                    if(iteration >= originalText.length) clearInterval(interval);
+                    iteration += 1 / 3;
+                }, 30);
+            });
+        });
+
+        // Initial color state
+        updateColors(false);
+
+    </script>
+</body>
+</html>
